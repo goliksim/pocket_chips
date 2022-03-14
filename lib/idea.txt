@@ -6,12 +6,23 @@ Flutter Widgets we need:
 5. BottomNavigationBar
 6. ShowModalBottomSheet (окошко снизу)
 7. Positioned
-8. AlertDialog
++ 8. AlertDialog
 9. Inkwell (зажим окружностью)
-
+10. ReoderableListView (менят местами игроков)
+11. Backdrop Filter (матовый эффект)
+12. Tooptip (текст с подсказкой)
++ 13. GestureDetector (детектор прикосновений)
 ------------
-GestureDetector
 
 https://appicon.co/ - сайт для иконок 
 
+команда для релиза:
 flutter build apk --release
+создаст разные версии:
+flutter build apk --split-per-abi
+
+
+
+
+
+

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../internal/application.dart';
 
+
 // Конфиг UI. Отступы, стандартные размеры и т.д.
 const double stdHeight = 50;
 const double stdHorizontalOffset = stdHeight/5;
@@ -294,6 +295,7 @@ class BankWindow extends StatelessWidget {
       : super(key: key);
   final int bank;
   final ValueChanged<int> update;
+  
   //int tmp_bank = 0 ;
 
   @override
@@ -443,6 +445,7 @@ class BankWindow extends StatelessWidget {
       ),
     );
   }
+  
 }
 
 // Кнопка добавления игрока
@@ -469,6 +472,7 @@ class _AddWindowState extends State<AddWindow> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Dialog(
       backgroundColor: thisTheme.bgrColor,
       insetPadding: EdgeInsets.symmetric(
@@ -495,6 +499,7 @@ class _AddWindowState extends State<AddWindow> {
           children: <Widget>[
             GestureDetector(
               onTap: () async {
+
                 await showDialog(
                     barrierColor: null,
                     context: context,
@@ -629,7 +634,9 @@ class PickIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: thisTheme.bgrColor,
-      insetPadding: const EdgeInsets.all(15),
+      insetPadding: EdgeInsets.symmetric(
+          vertical: stdEdgeOffset,
+          horizontal: (MediaQuery.of(context).size.width - 360) / 2),
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(20.0))),
       //contentPadding: EdgeInsets.zero,
@@ -804,8 +811,7 @@ class _PlayerListState extends State<PlayerList> {
 // Карточка игрока. Принимает индекс. Массив берет из родительского класса.
   Widget _playerCards(int index) => Dismissible(
       key: Key(widget.players[index].name),
-      child: Expanded(
-        child: Padding(
+      child: Padding(
           padding: const EdgeInsets.only(bottom: stdHorizontalOffset / 2),
           child: Container(
             padding: const EdgeInsets.only(right: stdEdgeOffset * 0.7),
@@ -887,7 +893,6 @@ class _PlayerListState extends State<PlayerList> {
             ),
           ),
         ),
-      ),
       direction: DismissDirection.horizontal,
       onDismissed: (direction) {
         /*if (direction == DismissDirection.endToStart) {
