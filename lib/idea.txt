@@ -1,0 +1,17 @@
+Flutter Widgets we need:
+1. Adaptive
+2. ChoiceChip
+3. ExpansionTile
+4. ShowTimePicker (выбор времени для хода, возможно не понадобится)5
+5. BottomNavigationBar
+6. ShowModalBottomSheet (окошко снизу)
+7. Positioned
+8. AlertDialog
+9. Inkwell (зажим окружностью)
+
+------------
+GestureDetector
+
+https://appicon.co/ - сайт для иконок 
+
+flutter build apk --release
