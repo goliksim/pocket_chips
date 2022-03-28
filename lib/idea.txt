@@ -5,6 +5,8 @@ Flutter Widgets we need:
 4. ShowTimePicker (выбор времени для хода, возможно не понадобится)5
 5. BottomNavigationBar
 6. ShowModalBottomSheet (окошко снизу)
+6.1. SneckBar (вплывающее окошко снизу)
+6.2. Fluttertoast.showToast (окошко снизу)
 7. Positioned
 + 8. AlertDialog
 9. Inkwell (зажим окружностью)
@@ -12,7 +14,15 @@ Flutter Widgets we need:
 11. Backdrop Filter (матовый эффект)
 12. Tooptip (текст с подсказкой)
 + 13. GestureDetector (детектор прикосновений)
+14.!!!!!!!!!! ListWhellScrollView
+15.!!!!!!!!!! Animated List
+16. CircleAvatar ( radius: backgroundColor:, child:)
+17.{statusbarcolor
+systemnavigationbar}
+18.!!!!!!!!!! Spacer and Divider in column
+19.!!!!!!!!!!ShaderMask (градиет)
 ------------
+
 
 https://appicon.co/ - сайт для иконок 
 
@@ -20,6 +30,26 @@ https://appicon.co/ - сайт для иконок
 flutter build apk --release
 создаст разные версии:
 flutter build apk --split-per-abi
+
+
+--------------------------------
+Структура класса игровой сессии
+--------------------------------
+списки: 
+списком игроков (thisPlayers)
+возможно список тех, кто зафолдил //мб можно загнать в класс игрока а не игры
+список с ставками челиксов 
+------
+текущий смол блайнд
+текущий биг блайнд (возможно не нужен)
+индекс текущего игрока (чей ход)
+----
+bool автоматика повышения
+шаг повышения 
+интервал повышения 
+
+
+
 
 
 

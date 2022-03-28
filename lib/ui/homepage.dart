@@ -1,7 +1,9 @@
 import 'package:firstapp/internal/application.dart'; //для доступа к теме
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:url_launcher/url_launcher.dart'; // библиотека для ссылок
 import 'package:firstapp/ui/playersv4.dart' as players;
+import 'transitions.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title, required this.changeTheme})
@@ -21,6 +23,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, //убрать стрелочку, так как это стартовая страница
         backgroundColor: thisTheme.mainColor,
         title: Text(
           widget.title,
@@ -37,7 +40,7 @@ class _HomePageState extends State<HomePage> {
             ),
             tooltip: 'Add From List',
             onPressed: () {
-              widget.changeTheme();                             // смена темы
+              widget.changeTheme(); // смена темы
               setState(() {});
             },
             //confirmPress:
@@ -46,25 +49,21 @@ class _HomePageState extends State<HomePage> {
       ),
       backgroundColor: thisTheme.bgrColor,
       body: Container(
-        
-          padding: EdgeInsets.symmetric(
-          vertical: 15,
-                      horizontal:
-                          (MediaQuery.of(context).size.width - 360) / 2),
+        padding: EdgeInsets.symmetric(
+            vertical: 15,
+            horizontal: (MediaQuery.of(context).size.width - 360) / 2),
         child: Center(
-            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              //кнопочки
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          //кнопочки
           Container(
             padding: const EdgeInsets.symmetric(vertical: 5),
             width: double.infinity,
             //width: MediaQuery.of(context).size.width * 0.6,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const players.PlayersPage()));
                 
+                Navigator.push(context, SlidePageRoute(direction: AxisDirection.left, child: const players.PlayersPage(), childCurrent: widget));
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(10.0),
