@@ -1,39 +1,34 @@
-import 'package:flutter/material.dart'; // подключаем библиотеку material
-import 'package:firstapp/ui/homepage.dart' as homepage;
-//import 'package:firstapp/ui/test.dart' as test; //файл для отработки виджетов (песочница)
-import '../data/themes.dart';
+import 'dart:ui';
 
-// Глобальные переменные темы. Доступны всем файлам приложухи вроде как.
-List themeList = [light, dark];
-Themes thisTheme = dark;
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart'; 
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../pages/initPage.dart' as initpage;
+import '../data/uiValues.dart';
 
-
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key); 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
 
-class _MyAppState extends State<MyApp> {
-
-// Функция смены темы
-void changeTheme() {
-  if (thisTheme == themeList[0]) {
-    thisTheme = themeList[1];
-  } else {
-    thisTheme = themeList[0];
-  }
-  setState(() {});
-}
+  
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Your Poker Kit',
-        theme: ThemeData(primarySwatch: thisTheme.mainColor),
-        debugShowCheckedModeBanner: false, // скрываем надпись debug
-        home: homepage.HomePage(
-            title: 'Your Poker Kit', changeTheme: changeTheme) // вызов стартовой страницы
-        );
+    
+    //Size physicalScreenSize = window.physicalSize;
+    //print('${physicalScreenSize.width},${physicalScreenSize.height}');
+    return ScreenUtilInit(
+      builder: (BuildContext context, Widget? child) => MaterialApp(
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            title: 'Pocket Chips',
+            theme: ThemeData(primarySwatch: thisTheme.primaryColor, fontFamily:  'Ubuntu'),
+            debugShowCheckedModeBanner: false, // скрываем надпись debug
+            home: const initpage.InitWindow() // вызов стартовой страницы
+            ),
+      designSize: const Size(320, 800),
+    );
   }
 }
+
+

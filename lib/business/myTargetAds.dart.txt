@@ -1,0 +1,56 @@
+
+import 'package:firstapp/ui/ui_widgets.dart';
+import 'package:flutter/services.dart';
+import 'package:my_target_flutter/my_target_flutter.dart';
+import '../data/storage.dart';
+
+//final _plugin = MyTargetFlutter(isDebug: true);
+
+
+//await _plugin.initialize();
+MyTargetFlutter plugin = MyTargetFlutter(isDebug: false);
+InterstitialAd? interstitialAd; 
+
+Future<void> mytargetInit(callback) async{
+      try {
+      await plugin.initialize().then((_) async {
+        logs.writeLog('myTarget: Initialization Complete');
+        interstitialAd?.clearListeners();
+        await createAd(MyTargetManager.slotId);
+        callback(true);
+      });
+    } on PlatformException {
+      logs.writeLog('myTarget: initialization failed');
+    }
+      
+      
+}
+
+Future<void> createAd(int slotId) async {
+  interstitialAd = await plugin.createInterstitialAd(slotId);
+  interstitialAd?.addListener(AdStatusListener(
+  onAdLoaded:  (){logs.writeLog('myTarget: Ads created');},
+  onDisplay:  (){},
+  onClickOnAD: (){},
+  onVideoCompleted: (){showToast('Thanks');},
+  onDismiss:  (){},
+  onNoAd: (message) {
+    logs.writeLog('myTarget: Ads created');
+    showToast('myTarget: No ads now');
+  } 
+  ));
+
+  if (interstitialAd == null) {
+      logs.writeLog('myTarget:Ad not created');
+    } else {
+      interstitialAd!.load();
+      logs.writeLog('myTarget: Ads loaded');
+    }
+
+}
+
+class MyTargetManager{
+
+  static int slotId = 6896;
+
+}

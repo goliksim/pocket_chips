@@ -1,0 +1,220 @@
+str,en_US,ru_RU,zh_TW
+tooltip.dealer,Dealer,Дилер,经销商
+tooltip.theme,Change Theme,Сменить тему,更改主题
+tooltip.edit,Edit,Изменить,编辑
+tooltip.stor,Saved players,Сохраненные игроки,被拯救的球员
+tooltip.rot,Rotate,Повернуть,旋转
+tooltip.add.new,New,Новый,新的
+tooltip.add.stor,From List,Из списка,从列表中
+tooltip.add.main,Add Player,Добавить игрока,添加播放器
+conf.canc,Cancel,Отменить,取消
+conf.new.tittle,New Game Confirmation,Подтверждение новой игры,新游戏确认
+conf.new.text1,Are you sure you want to start a new game?,"Вы уверены, что хотите начать новую игру?",你确定要开始一个新游戏吗？
+conf.new.text2,Your last lobby will be deleted!,Ваше последнее лобби будет удалено!,你的最后一个大厅将被删除！
+conf.new.butt,New Game,Новая игра,新游戏
+conf.del.tittle,Delete Confirmation,Подтверждение удаления,删除确认
+conf.del.text,Are you sure you want to delete this player?,"Вы уверены, что хотите удалить игрока?",你确定要删除这个播放器吗?
+conf.del.butt,Delete,Удалить,删除
+conf.rest.tittle,Restore Confirmation,Подтверждение сброса,恢复确认
+conf.rest.text,Are you sure you want to restore the game?,"Вы уверены, что хотите сбросить игру?",你确定要恢复游戏吗?
+conf.rest.butt,Restore,Сбросить,还原
+home.new,New Game,Новая игра,新游戏
+home.cont,Continue,Продолжить,继续
+home.abo,About,Справка,关于
+home.sup,Support me,Поддержать,支持我
+support.tittle,You can support me by:,Вы можете поддержать меня:,你可以支持我:
+support.video,Video ads,Посмотреть рекламу,视频广告
+support.modest,Modest donation,Скромное пожертвование,适度捐款
+support.nice,Nice donation,Разумное пожертвование,善款
+support.huge,Huge donation,Огромное пожертвование,巨额捐款
+support.close,Close,Закрыть,接近/接近
+support.free,Free,Бесплатно,免费
+about.skip,Skip,Пропустить,跳过
+about.end,End tutorial,Закрыть,结束教程
+about.welc,Welcome to,Добро пожаловать в,欢迎来到
+about.welc.1,This application is designed to replace the material chips.,Это приложение предназначено для замены материальных фишек.,此应用程序旨在取代材料芯片。
+about.welc.2,All you need to play: cards and phone!,"Все, что вам нужно для игры: карты и телефон!",所有你需要玩：卡和电话！
+about.welc.3,The app:,Приложение:,应用程序:
+about.welc.4,stores players' chips,хранит фишки игроков,存储玩家的筹码
+about.welc.5,allows you to place bets,позволяет вам делать ставки,允许您下注
+about.welc.6,divide the final pot between players,делить итоговый банк между игроками,在玩家之间划分最后的底池
+about.welc.7,This application based on the rules of unlimited Texas Hold'em.,Это приложение основано на правилах безлимитного Техасского холдема.,此应用程序基于无限德州扑克的规则。
+about.hom.1,Home screen,Начальный экран,主屏幕
+about.hom.2,"On the home screen, you can choose a light or dark interface theme.",На главном экране вы можете выбрать светлую или темную тему интерфейса.,在主屏幕上，您可以选择浅色或深色界面主题。
+about.hom.3,"The app stores information about your last game. You can exit at any time, most likely, everything will be saved.","Приложение хранит информацию о вашей последней игре. Вы можете выйти в любой момент, скорее всего, все будет сохранено.",该应用程序存储有关您的最后一场比赛的信息。 您可以随时退出，最有可能的是，一切都将被保存。
+about.hom.4,"The NEW GAME button deletes all information about the last game, so be careful and save the players to the storage just in case.","Кнопка ""НОВАЯ ИГРА"" удаляет всю информацию о последней игре, поэтому будьте осторожны и сохраните игроков в хранилище на всякий случай.",新游戏按钮会删除有关最后一场比赛的所有信息，所以要小心，并将玩家保存到存储中以防万一。
+about.plme.1,Player Menu,Меню игрока,播放器菜单
+about.plme.2,The INITIAL STACK button lets you change the initial stack for all players.,Кнопка НАЧАЛЬНОГО СТЕКА позволяет вам изменить начальный стек для всех игроков.,初始堆栈按钮允许您更改所有玩家的初始堆栈。
+about.plme.3,Swipe the player left to remove it.,"Проведите пальцем по игроку влево, чтобы удалить его.",向左滑动播放器以将其删除。
+about.plme.4,Swipe the player right to add players to the storage.,"Проведите пальцем по игроку вправо, чтобы добавить его в хранилище.",向右滑动播放器以将播放器添加到存储中。
+about.plme.5,They will be stored there forever.,Они будут храниться там вечно.,它们将永远储存在那里。
+about.plme.6,The management is the same in the players' storage.,Управление в хранилище игроков такое же.,管理在玩家的存储中是相同的。
+about.plme.7,Maximum number of players: 10,Максимальное количество игроков: 10,最大玩家人数:10
+about.set.1,Settings,Настройки,设置
+about.set.2,"In the settings tab, you can also configure the initial stack, as well as small blind.","Во вкладке настройки вы также можете настроить начальный стек, а также малый блайнд.",在设置选项卡中，您还可以配置初始堆栈，以及小盲。
+about.set.3,"Before the start of betting, you can make any changes:",Перед началом ставок вы можете внести любые изменения:,在开始投注之前，您可以进行任何更改:
+about.set.4,"add, remove players","добавлять, удалять игроков",添加，删除玩家
+about.set.5,change player stacks,менять стеки игроков,更改播放器堆栈
+about.set.6,"you can change the dealer, etc",вы можете сменить дилера и т.д,您可以更改经销商等
+about.set.7,During the betting:,Во время ставок:,投注期间:
+about.set.8,change the initial smallblind,изменить начальный малый блайнд,改变初始小盲
+about.set.9,change the description and player\'s avatar,изменить имя и аватар игрока,更改描述和玩家的头像
+about.tab.1,Game table,Игровой стол,游戏桌
+about.tab.2,"At the top of the screen, you can change the player's position at the game table.",В верхней части экрана вы можете изменить положение игрока за игровым столом.,在屏幕的顶部，您可以更改玩家在游戏桌上的位置。
+about.tab.3,The amount of your bet or raise can be selected using the slider or by clicking on chips.,Размер вашей ставки или рейза можно выбрать с помощью ползунка или нажав на фишки.,您的赌注或提高的金额可以选择使用滑块或点击芯片。
+about.tab.4,After showdown (end of betting) you need to choose a winner or winners.,После вскрытия (окончания ставок) вам необходимо выбрать победителя или победителей.,摊牌后（投注结束），你需要选择一个或多个赢家。
+about.tab.5,"If side pots were created in the game (someone went ALL-in), then first choose the winner of the main pot.","Если в игре были созданы побочные банки (кто-то пошел олл-ин), то сначала выберите победителя основного банка.",如果在游戏中创建了侧锅（有人全押），那么首先选择主锅的赢家。
+about.link.1,Links,Полезные ссылки,连结
+about.link.2,Like my app? Rate it and leave a comment! Don't forget share with friends!,Нравится мое приложение? Оцените его и оставьте комментарий! Не забудьте поделиться с друзьями!,喜欢我的应用程序？ 评价它并留下评论! 不要忘记与朋友分享！
+about.link.3,Rate app,Оценить,费率应用
+about.link.4,You can also support me if you want. See the methods on the home screen.,"Вы также можете поддержать меня, если хотите. Смотрите способы во вкладке на главном экране.",如果你愿意，你也可以支持我。 请参阅主屏幕上的方法。
+about.link.5,Have a problem with app or want to ask questions? Send feedback and features request:,"У вас проблемы с приложением, хотите задать вопрос? Отправить отзыв или совет:",有应用程序的问题或想问问题？ 发送反馈和功能请求:
+about.link.6,In attachments there is file with app's logs...,Во вложениях есть файл с логами приложения...,在附件中有一个包含应用程序日志的文件。..
+about.link.7,Privacy policy,Политика конфиденциальности,私隐政策
+playp.tittle,Lobby Menu,Меню игроков,大堂菜单
+playp.rest,Restore,Сбросить,还原
+playp.init,Starting Stack:,Начальный стек:,启动堆栈:
+playp.add,Add New Player,Добавить нового игрока,添加新播放器
+playp.bank.title,Enter new starting stacks:,Введите новые стеки:,输入新的起始堆栈:
+playp.sp.title1,Saved Players,Сохраненные игроки,被拯救的球员
+playp.sp.title2,Players list is empty,Список игроков пуст,玩家列表为空
+playp.playr.diss1,Add to lobby,Добавить в лобби,添加到大堂
+playp.playr.diss2,Save Player,Сохранить игрока,保存播放器
+playp.playr.diss3,Unsave Player,Удалить игрока,无保存播放器
+playp.playr.diss4,Delete Player,Удалить игрока,删除播放器
+playp.edit.title1,New player,Новый игрок,新玩家
+playp.edit.title2,Player menu,Меню игрока,播放器菜单
+playp.edit.win1,Name,Имя,姓名
+playp.edit.win2,Starting stack,Стартовый стек,启动堆栈
+playp.edit.win3,Make a dealer,Сделать дилером,做一个经销商
+playp.bank.conf,Enter,Подтвердить,进入
+playp.edit.conf,Save,Сохранить,储蓄
+playp.edit.add,Add,Добавить,添加
+playp.start,Start Game,Начать игру,开始游戏
+playp.set,Settings,Настройки,设置
+sett.title,Game Settings,Настройки игры,游戏设置
+sett.win1,Starting Stack,Начальный стек,启动堆栈
+sett.win2,Small Blind,Малый блайнд,小盲
+sett.win3,Big Blind,Большой блайнд,大瞎子
+sett.conf,Save Changes,Сохранить,保存更改
+game.welc,Welcome to New Game!,Добро пожаловать!,欢迎来到新游戏！
+game.turn1,Turn,Ход,转
+game.turn2,of,,的
+game.shdw,Showdown,Вскрытие,摊牌
+game.break,Breaktime,Перерыв,休息时间
+game.pflop,Pre-Flop,Префлоп,翻牌前
+game.flop,Flop,Флоп,"翻牌,翻牌"
+game.turn,Turn,Терн,转
+game.river,River,Ривер,河川
+game.fold,Fold,Фолд,折叠
+game.check,Check,Чек,支票
+game.call,Call,Колл,打电话
+game.all,All in,Ва-банк,全部在
+game.bet,Bet,Ставка,打赌
+game.raise,Raise,Повысить,加薪
+game.raise.canc,Cancel,Отмена,取消
+game.win1,winner,победитель,胜利者
+game.win2,is winner!,победитель!,是赢家！
+game.win3,Select the winners,Выберите победителей,选择优胜者
+game.win.conf,Enter,Подтвердить,进入
+game.win4,Select side-pot winner,Выберите победителя сайд-пота,选择边锅赢家
+game.start,Start Betting,Начать торги,开始投注
+toast.thanks,Thank you!,Спасибо!,谢谢！
+toast.moreplay,You need more active players to play,"Нужно больше активных игроков, чтобы играть",你需要更多活跃的玩家来玩
+toast.winn,Сhoose one or more winners,Выберите одного или нескольких победителей,选择一个或多个获奖者
+toast.saved,saved!,сохранен!,得救了！
+toast.maxpl,Max players count,Максимальное количество игроков,最大玩家数
+toast.alred,already in lobby!,уже в лобби!,已经在大厅了！
+toast.moreplay2,You cant play without players,Вы не можете начать игру без игроков,没有球员你就不能打球
+toast.bank1,We recommend a value for the stack at least big blind,Рекомендуем значение стека не менее большого блайнда,我们建议堆栈至少有一个大盲值
+toast.bank2,In your case,В вашем случае,在你的情况下
+toast.alred2,Player with same name and icon already exist,Игрок с таким же именем и аватаром уже существует,具有相同名称和图标的播放器已经存在
+toast.bank3,The stack cannot be zero,Стек не может быть равен нулю,堆栈不能为零
+toast.bank4,We recommend a Big Blind value less than Stack,Рекомендуем использовать значение большого блайнда меньше стека,我们建议使用小于Stack的大盲值
+toast.unav,Unavailible now,Недоступно,现在不可避免
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,

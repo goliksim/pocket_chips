@@ -1,5 +1,9 @@
-import 'package:firstapp/internal/application.dart';
+//ФАЙЛ С ПЕРЕХОДАМИ МЕЖДУ ВИДЖЕТАМИ
+
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../data/uiValues.dart';
 
 Future<Object?> transitionDialog({
   required context,
@@ -17,7 +21,7 @@ Future<Object?> transitionDialog({
         Animation<double> secondaryAnimation) {
       final Widget pageChild = child;
       Builder(builder: (BuildContext context) {
-        return theme != null ? Theme(data: theme, child: pageChild) : pageChild;
+        return Theme(data: theme, child: pageChild); //theme != null ? Theme(data: theme, child: pageChild) : pageChild;
       });
       return child;
     },
@@ -122,9 +126,9 @@ Widget dialogWave1(
                     reverseCurve: Curves.fastOutSlowIn,
                   ),
                 ),
-                colors: [Colors.white, Colors.transparent, Colors.transparent],
-                stops: [0.4, 0.7, 1],
-                center: FractionalOffset(0.13, 0.5))
+                colors: const [Colors.white, Colors.transparent, Colors.transparent],
+                stops: const [0.4, 0.7, 1],
+                center: FractionalOffset(0.5 - 0.35 *stdButtonWidth/MediaQuery.of(context).size.width, 0.5))
             .createShader(rect);
       },
       child: child);
@@ -180,4 +184,118 @@ class SlidePageRoute extends PageRouteBuilder {
         return const Offset(1, 0);
     }
   }
+}
+
+class RotateCardRoute extends PageRouteBuilder {
+  final Widget child;
+  final Widget childCurrent;
+  final AxisDirection direction;
+
+  RotateCardRoute({
+    required this.child,
+    required this.childCurrent,
+    this.direction = AxisDirection.left,
+  }) : super(
+          transitionDuration: const Duration(milliseconds: 850),
+          reverseTransitionDuration: const Duration(milliseconds: 850),
+          pageBuilder: (context, animation, secondaryAnimation) => child,
+        );
+
+  @override
+  Widget buildTransitions(BuildContext context, Animation<double> animation,
+          Animation<double> secondaryAnimation, Widget child) =>
+      Stack(
+        children: [
+          SlideTransition(
+              position: Tween<Offset>(
+                begin: Offset.zero,
+                end: getBeginOffset().scale(-1, -1),
+              ).animate(CurvedAnimation(
+                  parent: animation, curve: Curves.easeInOutQuart.flipped)),
+              child: childCurrent),
+          SlideTransition(
+              position: Tween<Offset>(
+                begin: getBeginOffset(),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                  parent: animation, curve: Curves.easeInOutQuart.flipped)),
+              child: child),
+        ],
+      );
+
+  Offset getBeginOffset() {
+    switch (direction) {
+      case AxisDirection.up:
+        return const Offset(0, 1);
+      case AxisDirection.down:
+        return const Offset(0, -1);
+      case AxisDirection.right:
+        return const Offset(-1, 0);
+      case AxisDirection.left:
+        return const Offset(1, 0);
+    }
+  }
+}
+
+Route simpleSlidePageRoute(Widget child) {
+  return PageRouteBuilder(
+    transitionDuration: const Duration(milliseconds: 650),
+    reverseTransitionDuration: const Duration(milliseconds: 900),
+    pageBuilder: (context, animation, secondaryAnimation) => child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+
+
+Route simpleFadePageRoute(Widget child) {
+  return PageRouteBuilder(
+    transitionDuration: const Duration(milliseconds: 500),
+    reverseTransitionDuration: const Duration(milliseconds: 600),
+    pageBuilder: (context, animation, secondaryAnimation) => child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+
+      return FadeTransition(
+        opacity: animation,
+        child: child,
+      );
+    },
+  );
+}
+
+
+Route simpleThemePageRoute(Widget child) {
+  return PageRouteBuilder(
+    transitionDuration: const Duration(milliseconds: 900),
+    reverseTransitionDuration: const Duration(milliseconds: 900),
+    pageBuilder: (context, animation, secondaryAnimation) => child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      
+      return ShaderMask(
+        shaderCallback: (rect) {
+          return RadialGradient(
+            radius: Tween<double>(begin: 0, end: 15.h).evaluate(//7*[1.0,1.w].min ).evaluate(
+              CurvedAnimation(
+                parent: animation,
+                curve: Curves.fastOutSlowIn.flipped,
+                reverseCurve: Curves.fastOutSlowIn,
+              ),
+            ),
+            colors: const [Colors.white, Colors.transparent, Colors.transparent],
+            stops: const [0.4, 0.45, 1],
+            center: const FractionalOffset(1, 0)).createShader(rect);
+        },
+      child: child);
+    },
+  );
 }
