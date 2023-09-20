@@ -1,6 +1,4 @@
-
-
-enum Stores{appleStore, googlePlay}
+enum Stores { appleStore, googlePlay }
 
 class StoreConfig {
   final Stores store;
@@ -21,7 +19,6 @@ class StoreConfig {
   static bool isForAppleStore() => _instance!.store == Stores.appleStore;
 
   static bool isForGooglePlay() => _instance!.store == Stores.googlePlay;
-
 }
 
 //TO DO: add the Apple API key for your app from the RevenueCat dashboard: https://app.revenuecat.com
@@ -29,6 +26,3 @@ const String appleApiKey = 'appl_api_key';
 
 //TO DO: add the Google API key for your app from the RevenueCat dashboard: https://app.revenuecat.com
 const String googleApiKey = 'google_api_key';
-
-
-

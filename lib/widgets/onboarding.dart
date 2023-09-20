@@ -18,8 +18,11 @@ import '../data/uiValues.dart';
 import '../ui/ui_widgets.dart';
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key, required this.callbackFunction, this.onWillPop = false})
-      : super(key: key);
+  const MyApp({
+    Key? key,
+    required this.callbackFunction,
+    this.onWillPop = false,
+  }) : super(key: key);
 
   final Function() callbackFunction;
   final bool onWillPop;
@@ -43,8 +46,7 @@ class _MyAppState extends State<MyApp> {
       buttonColor: thisTheme.bankColor,
       height: stdButtonHeight * 0.75,
       textString: 'about.skip'.tr(),
-      textStyle:
-          stdTextStyle.copyWith( fontSize: stdFontSize),
+      textStyle: stdTextStyle.copyWith(fontSize: stdFontSize),
       action: () {
         if (setIndex != null) {
           index = 5;
@@ -56,15 +58,16 @@ class _MyAppState extends State<MyApp> {
 
   Widget get _finishButton {
     return MyButton(
-        buttonColor: thisTheme.primaryColor,
-        height: stdButtonHeight * 0.75,
-        textString: 'about.end'.tr(),
-        action: () {
-          thisConfig.firstTime = false;
-          configStorage.writeConfig(thisConfig);
-          //print(thisConfig.firstTime);
-          Navigator.pop(context);
-        });
+      buttonColor: thisTheme.primaryColor,
+      height: stdButtonHeight * 0.75,
+      textString: 'about.end'.tr(),
+      action: () {
+        thisConfig.firstTime = false;
+        configStorage.writeConfig(thisConfig);
+        //print(thisConfig.firstTime);
+        Navigator.pop(context);
+      },
+    );
   }
 
   Player tutorPlayer =
@@ -82,11 +85,12 @@ class _MyAppState extends State<MyApp> {
       elevation: 0,
       backgroundColor: thisTheme.bgrColor, //Colors.transparent,
       insetPadding: EdgeInsets.symmetric(
-          vertical: stdHorizontalOffset,
-          horizontal:
-              adaptiveOffset), //windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width)),
+        vertical: stdHorizontalOffset,
+        horizontal: adaptiveOffset,
+      ), //windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width)),
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius))),
+        borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
+      ),
       child: SizedBox(
         width: stdButtonWidth,
         height: 485.h,
@@ -102,52 +106,60 @@ class _MyAppState extends State<MyApp> {
                   // first page
                   page(
                       widget.onWillPop
-                          ? 'about.welc'.tr()+'POCKET CHIPS'
+                          ? 'about.welc'.tr() + 'POCKET CHIPS'
                           : 'POCKET CHIPS',
                       [
-                        
                         SizedBox(
-                          width:  double.infinity,
+                          width: double.infinity,
                           child: Text(
-                            'about.welc.1'.tr()+'\n\n'+'about.welc.2'.tr(),
+                            'about.welc.1'.tr() + '\n\n' + 'about.welc.2'.tr(),
                             style: TextStyle(
-                                height: 1.5,
-                                color: thisTheme.onBackground,
-                                fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                              height: 1.5,
+                              color: thisTheme.onBackground,
+                              fontWeight: FontWeight.w500,
+                              fontSize: stdFontSize * 0.7,
+                            ),
                             textAlign: TextAlign.start,
                           ),
                         ),
                         SizedBox(height: stdHorizontalOffset / 2),
                         Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Icon(
-                                MdiIcons.accountGroup,
-                                color: thisTheme.onBackground.withOpacity(1),
-                                size: stdIconSize,
-                              ),
-                              Icon(
-                                MdiIcons.cards,
-                                color: thisTheme.onBackground.withOpacity(1),
-                                size: stdIconSize,
-                              ),
-                              Icon(
-                                MdiIcons.cellphone,
-                                color: thisTheme.onBackground.withOpacity(1),
-                                size: stdIconSize,
-                              ),
-                            ]),
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Icon(
+                              MdiIcons.accountGroup,
+                              color: thisTheme.onBackground.withOpacity(1),
+                              size: stdIconSize,
+                            ),
+                            Icon(
+                              MdiIcons.cards,
+                              color: thisTheme.onBackground.withOpacity(1),
+                              size: stdIconSize,
+                            ),
+                            Icon(
+                              MdiIcons.cellphone,
+                              color: thisTheme.onBackground.withOpacity(1),
+                              size: stdIconSize,
+                            ),
+                          ],
+                        ),
                         SizedBox(height: stdHorizontalOffset),
                         SizedBox(
                           width: double.infinity,
                           child: Text(
-                            'about.welc.3'.tr()+'\n- '+'about.welc.4'.tr()+'\n- '+'about.welc.5'.tr()+'\n- '+'about.welc.6'.tr(),
+                            'about.welc.3'.tr() +
+                                '\n- ' +
+                                'about.welc.4'.tr() +
+                                '\n- ' +
+                                'about.welc.5'.tr() +
+                                '\n- ' +
+                                'about.welc.6'.tr(),
                             style: TextStyle(
-                                height: 1.5,
-                                color: thisTheme.onBackground,
-                                fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                              height: 1.5,
+                              color: thisTheme.onBackground,
+                              fontWeight: FontWeight.w500,
+                              fontSize: stdFontSize * 0.7,
+                            ),
                             textAlign: TextAlign.start,
                           ),
                         ),
@@ -157,40 +169,54 @@ class _MyAppState extends State<MyApp> {
                           child: Text(
                             'about.welc.7'.tr(),
                             style: TextStyle(
-                                height: 1.5,
-                                color: thisTheme.onBackground,
-                                fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7,
-                                fontStyle: FontStyle.italic),
+                              height: 1.5,
+                              color: thisTheme.onBackground,
+                              fontWeight: FontWeight.w500,
+                              fontSize: stdFontSize * 0.7,
+                              fontStyle: FontStyle.italic,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        SizedBox(height: stdHorizontalOffset ),
-                        Row(children: [
-                          Text('Languages:',
-                          style: TextStyle(
+                        SizedBox(height: stdHorizontalOffset),
+                        Row(
+                          children: [
+                            Text(
+                              'Languages:',
+                              style: TextStyle(
                                 height: 1.5,
                                 color: thisTheme.onBackground,
                                 fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
-                            textAlign: TextAlign.start,
-                          ),
-                          Expanded(child: SizedBox(width: stdHorizontalOffset )),
-                           MyButton(height: stdButtonHeight*0.75, width: stdButtonHeight*0.75, buttonColor: thisTheme.bankColor,textString: '1',
-                           action: () {
-                            context.setLocale(const Locale('en', 'US'));
-
-                           }
-                           ),
-                           SizedBox(width: stdHorizontalOffset ),
-                           MyButton(height: stdButtonHeight*0.75, width: stdButtonHeight*0.75, buttonColor: thisTheme.bankColor,textString: '2',
-                           action: (){
-                            context.setLocale(const Locale('ru', 'RU'));
-                            callBack();
-                           }
-                           )
-                        ],),
-                        SizedBox(height: stdHorizontalOffset ),
+                                fontSize: stdFontSize * 0.7,
+                              ),
+                              textAlign: TextAlign.start,
+                            ),
+                            Expanded(
+                              child: SizedBox(width: stdHorizontalOffset),
+                            ),
+                            MyButton(
+                              height: stdButtonHeight * 0.75,
+                              width: stdButtonHeight * 0.75,
+                              buttonColor: thisTheme.bankColor,
+                              textString: '1',
+                              action: () {
+                                context.setLocale(const Locale('en', 'US'));
+                              },
+                            ),
+                            SizedBox(width: stdHorizontalOffset),
+                            MyButton(
+                              height: stdButtonHeight * 0.75,
+                              width: stdButtonHeight * 0.75,
+                              buttonColor: thisTheme.bankColor,
+                              textString: '2',
+                              action: () {
+                                context.setLocale(const Locale('ru', 'RU'));
+                                callBack();
+                              },
+                            )
+                          ],
+                        ),
+                        SizedBox(height: stdHorizontalOffset),
                       ]),
                   // homescreen
                   page('about.hom.1'.tr(), [
@@ -201,10 +227,11 @@ class _MyAppState extends State<MyApp> {
                           child: Text(
                             'about.hom.2'.tr(),
                             style: TextStyle(
-                                height: 1.5,
-                                color: thisTheme.onBackground,
-                                fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                              height: 1.5,
+                              color: thisTheme.onBackground,
+                              fontWeight: FontWeight.w500,
+                              fontSize: stdFontSize * 0.7,
+                            ),
                             textAlign: TextAlign.start,
                           ),
                         ),
@@ -233,12 +260,13 @@ class _MyAppState extends State<MyApp> {
                     ),
                     SizedBox(height: stdHorizontalOffset / 2),
                     Text(
-                      'about.hom.3'.tr()+'\n\n'+'about.hom.4'.tr(),
+                      'about.hom.3'.tr() + '\n\n' + 'about.hom.4'.tr(),
                       style: TextStyle(
-                          height: 1.5,
-                          color: thisTheme.onBackground,
-                          fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                        height: 1.5,
+                        color: thisTheme.onBackground,
+                        fontWeight: FontWeight.w500,
+                        fontSize: stdFontSize * 0.7,
+                      ),
                       textAlign: TextAlign.start,
                     ),
                   ]),
@@ -247,10 +275,11 @@ class _MyAppState extends State<MyApp> {
                     Text(
                       'about.plme.2'.tr(),
                       style: TextStyle(
-                          height: 1.5,
-                          color: thisTheme.onBackground,
-                          fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                        height: 1.5,
+                        color: thisTheme.onBackground,
+                        fontWeight: FontWeight.w500,
+                        fontSize: stdFontSize * 0.7,
+                      ),
                       textAlign: TextAlign.start,
                     ),
                     SizedBox(height: stdHorizontalOffset),
@@ -262,9 +291,15 @@ class _MyAppState extends State<MyApp> {
                           DoNothingAction();
                           return null;
                         },
-                        key: const Key("0"),
-                        child: playerCard(tutorPlayer, null,
-                            stdButtonHeight * 0.85, false, context, callBack),
+                        key: const Key('0'),
+                        child: playerCard(
+                          tutorPlayer,
+                          null,
+                          stdButtonHeight * 0.85,
+                          false,
+                          context,
+                          callBack,
+                        ),
                         direction: DismissDirection.horizontal,
                         onDismissed: (direction) {},
                         background: Container(
@@ -273,14 +308,19 @@ class _MyAppState extends State<MyApp> {
                             children: [
                               AspectRatio(
                                 aspectRatio: 1,
-                                child: Icon(Icons.add,
-                                    color: thisTheme.onBackground,
-                                    size: stdIconSize),
+                                child: Icon(
+                                  Icons.add,
+                                  color: thisTheme.onBackground,
+                                  size: stdIconSize,
+                                ),
                               ),
-                              Text(' ''Save Player',
-                                  style: TextStyle(
-                                      color: thisTheme.onBackground,
-                                      fontSize: stdFontSize * 0.75)),
+                              Text(
+                                ' ' 'Save Player',
+                                style: TextStyle(
+                                  color: thisTheme.onBackground,
+                                  fontSize: stdFontSize * 0.75,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -289,15 +329,21 @@ class _MyAppState extends State<MyApp> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Text('Delete Player',
-                                  style: TextStyle(
-                                      color: thisTheme.subsubmainColor,
-                                      fontSize: stdFontSize * 0.75)),
+                              Text(
+                                'Delete Player',
+                                style: TextStyle(
+                                  color: thisTheme.subsubmainColor,
+                                  fontSize: stdFontSize * 0.75,
+                                ),
+                              ),
                               AspectRatio(
-                                  aspectRatio: 1,
-                                  child: Icon(Icons.delete,
-                                      color: thisTheme.subsubmainColor,
-                                      size: stdIconSize)),
+                                aspectRatio: 1,
+                                child: Icon(
+                                  Icons.delete,
+                                  color: thisTheme.subsubmainColor,
+                                  size: stdIconSize,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -311,10 +357,11 @@ class _MyAppState extends State<MyApp> {
                       child: Text(
                         'about.plme.3'.tr(),
                         style: TextStyle(
-                            height: 1.5,
-                            color: thisTheme.onBackground,
-                            fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                          height: 1.5,
+                          color: thisTheme.onBackground,
+                          fontWeight: FontWeight.w500,
+                          fontSize: stdFontSize * 0.7,
+                        ),
                         textAlign: TextAlign.start,
                       ),
                     ),
@@ -322,32 +369,41 @@ class _MyAppState extends State<MyApp> {
                       children: [
                         Flexible(
                           child: Text(
-                            '\t\t'+'about.plme.4'.tr()+' \n'+'about.plme.5'.tr(),
+                            '\t\t' +
+                                'about.plme.4'.tr() +
+                                ' \n' +
+                                'about.plme.5'.tr(),
                             style: TextStyle(
-                                height: 1.5,
-                                color: thisTheme.onBackground,
-                                fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                              height: 1.5,
+                              color: thisTheme.onBackground,
+                              fontWeight: FontWeight.w500,
+                              fontSize: stdFontSize * 0.7,
+                            ),
                             textAlign: TextAlign.start,
                           ),
                         ),
                         SizedBox(
                           width: stdButtonHeight * 0.8,
                           height: stdButtonHeight * 0.6,
-                          child: Icon(Icons.folder_shared,
-                                size: stdIconSize,
-                                color: thisTheme.onBackground),
+                          child: Icon(
+                            Icons.folder_shared,
+                            size: stdIconSize,
+                            color: thisTheme.onBackground,
                           ),
-                        
+                        ),
                       ],
                     ),
                     Text(
-                      '\n'+'about.plme.6'.tr()+' \n\n'+'about.plme.7'.tr(),
+                      '\n' +
+                          'about.plme.6'.tr() +
+                          ' \n\n' +
+                          'about.plme.7'.tr(),
                       style: TextStyle(
-                          height: 1.5,
-                          color: thisTheme.onBackground,
-                          fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                        height: 1.5,
+                        color: thisTheme.onBackground,
+                        fontWeight: FontWeight.w500,
+                        fontSize: stdFontSize * 0.7,
+                      ),
                       textAlign: TextAlign.start,
                     ),
                   ]),
@@ -360,29 +416,45 @@ class _MyAppState extends State<MyApp> {
                           child: Text(
                             'about.set.2'.tr(),
                             style: TextStyle(
-                                height: 1.5,
-                                color: thisTheme.onBackground,
-                                fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                              height: 1.5,
+                              color: thisTheme.onBackground,
+                              fontWeight: FontWeight.w500,
+                              fontSize: stdFontSize * 0.7,
+                            ),
                             textAlign: TextAlign.start,
                           ),
                         ),
                         SizedBox(
                           width: stdButtonHeight,
                           height: stdButtonHeight,
-                          child: Icon(Icons.settings,
-                                size: stdIconSize,
-                                color: thisTheme.onBackground),
+                          child: Icon(
+                            Icons.settings,
+                            size: stdIconSize,
+                            color: thisTheme.onBackground,
+                          ),
                         )
                       ],
                     ),
                     Text(
-                      'about.set.3'.tr()+'\n- '+'about.set.4'.tr()+'\n- '+'about.set.5'.tr()+'\n- '+'about.set.6'.tr()+'\n\n'+'about.set.7'.tr()+'\n- '+'about.set.8'.tr()+'\n- '+'about.set.9'.tr(),
+                      'about.set.3'.tr() +
+                          '\n- ' +
+                          'about.set.4'.tr() +
+                          '\n- ' +
+                          'about.set.5'.tr() +
+                          '\n- ' +
+                          'about.set.6'.tr() +
+                          '\n\n' +
+                          'about.set.7'.tr() +
+                          '\n- ' +
+                          'about.set.8'.tr() +
+                          '\n- ' +
+                          'about.set.9'.tr(),
                       style: TextStyle(
-                          height: 1.5,
-                          color: thisTheme.onBackground,
-                          fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                        height: 1.5,
+                        color: thisTheme.onBackground,
+                        fontWeight: FontWeight.w500,
+                        fontSize: stdFontSize * 0.7,
+                      ),
                       textAlign: TextAlign.start,
                     ),
                   ]),
@@ -395,29 +467,33 @@ class _MyAppState extends State<MyApp> {
                           child: Text(
                             'about.tab.2'.tr(),
                             style: TextStyle(
-                                height: 1.5,
-                                color: thisTheme.onBackground,
-                                fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                              height: 1.5,
+                              color: thisTheme.onBackground,
+                              fontWeight: FontWeight.w500,
+                              fontSize: stdFontSize * 0.7,
+                            ),
                             textAlign: TextAlign.start,
                           ),
                         ),
                         SizedBox(
                           width: stdButtonHeight * 0.8,
                           height: stdButtonHeight * 0.8,
-                          child: Icon(Icons.sync_sharp,
-                                size: stdIconSize,
-                                color: thisTheme.onBackground),
+                          child: Icon(
+                            Icons.sync_sharp,
+                            size: stdIconSize,
+                            color: thisTheme.onBackground,
+                          ),
                         )
                       ],
                     ),
                     Text(
                       'about.tab.3'.tr(),
                       style: TextStyle(
-                          height: 1.5,
-                          color: thisTheme.onBackground,
-                          fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                        height: 1.5,
+                        color: thisTheme.onBackground,
+                        fontWeight: FontWeight.w500,
+                        fontSize: stdFontSize * 0.7,
+                      ),
                       textAlign: TextAlign.start,
                     ),
                     ClipRRect(
@@ -431,10 +507,12 @@ class _MyAppState extends State<MyApp> {
                             ),
                             Padding(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: stdHorizontalOffset / 2),
+                                horizontal: stdHorizontalOffset / 2,
+                              ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(
-                                    stdButtonHeight * 0.75),
+                                  stdButtonHeight * 0.75,
+                                ),
                                 child: SingleChildScrollView(
                                   physics: const BouncingScrollPhysics(),
                                   scrollDirection: Axis.horizontal,
@@ -457,28 +535,35 @@ class _MyAppState extends State<MyApp> {
                                           width: stdButtonHeight * 0.6,
                                           height: stdButtonHeight * 0.6,
                                           margin: const EdgeInsets.symmetric(
-                                              vertical: 0, horizontal: 2.5),
+                                            vertical: 0,
+                                            horizontal: 2.5,
+                                          ),
                                           decoration: BoxDecoration(
                                             color: thisTheme.playerColor,
                                             borderRadius: BorderRadius.circular(
-                                                stdBorderRadius),
+                                              stdBorderRadius,
+                                            ),
                                           ),
                                           child: TextButton(
-                                              style: TextButton.styleFrom(
-                                                  padding:
-                                                      const EdgeInsets.all(4),
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              stdBorderRadius))),
-                                              child: Image.asset(
-                                                  "assets/chips/chips_$a.png"),
-                                              onPressed: () {
-                                                if (tmpBid + a <= 5000) {
-                                                  tmpBid += a;
-                                                  setState(() {});
-                                                }
-                                              }),
+                                            style: TextButton.styleFrom(
+                                              padding: const EdgeInsets.all(4),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  stdBorderRadius,
+                                                ),
+                                              ),
+                                            ),
+                                            child: Image.asset(
+                                              'assets/chips/chips_$a.png',
+                                            ),
+                                            onPressed: () {
+                                              if (tmpBid + a <= 5000) {
+                                                tmpBid += a;
+                                                setState(() {});
+                                              }
+                                            },
+                                          ),
                                         ),
                                     ],
                                   ),
@@ -487,25 +572,27 @@ class _MyAppState extends State<MyApp> {
                             ),
                             Container(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: stdHorizontalOffset),
+                                horizontal: stdHorizontalOffset,
+                              ),
                               height: stdButtonHeight * 0.6,
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "0",
+                                    '0',
                                     textAlign: TextAlign.right,
                                     style: TextStyle(
-                                        fontSize: stdFontSize,
-                                        color: thisTheme.onBackground),
+                                      fontSize: stdFontSize,
+                                      color: thisTheme.onBackground,
+                                    ),
                                   ),
                                   SizedBox(width: stdHorizontalOffset / 2),
                                   Flexible(
                                     flex: 6,
                                     fit: FlexFit.tight,
                                     child: Slider(
-                                      label: "$tmpBid",
+                                      label: '$tmpBid',
                                       value: tmpBid.toDouble(),
                                       onChanged: (newValue) {
                                         //thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank+=thisLobby.bids[thisLobby.lobbyIndex];
@@ -519,15 +606,17 @@ class _MyAppState extends State<MyApp> {
                                   ),
                                   SizedBox(width: stdHorizontalOffset / 2),
                                   Container(
-                                      alignment: Alignment.center,
-                                      width: stdButtonHeight / 1.5,
-                                      child: Text(
-                                        "$tmpBid",
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            fontSize: stdFontSize,
-                                            color: thisTheme.onBackground),
-                                      )),
+                                    alignment: Alignment.center,
+                                    width: stdButtonHeight / 1.5,
+                                    child: Text(
+                                      '$tmpBid',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                        fontSize: stdFontSize,
+                                        color: thisTheme.onBackground,
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -536,132 +625,178 @@ class _MyAppState extends State<MyApp> {
                       ),
                     ),
                     Text(
-                      '\n'+'about.tab.4'.tr()+'\n\t\t'+'about.tab.5'.tr(),
+                      '\n' + 'about.tab.4'.tr() + '\n\t\t' + 'about.tab.5'.tr(),
                       style: TextStyle(
-                          height: 1.5,
-                          color: thisTheme.onBackground,
-                          fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                        height: 1.5,
+                        color: thisTheme.onBackground,
+                        fontWeight: FontWeight.w500,
+                        fontSize: stdFontSize * 0.7,
+                      ),
                       textAlign: TextAlign.start,
                     ),
                   ]),
                   // Helpful
                   page('about.link.1'.tr(), [
                     SizedBox(
-                      width:  double.infinity,
+                      width: double.infinity,
                       child: Text(
                         'about.link.2'.tr(),
                         style: TextStyle(
-                            height: 1.5,
-                            color: thisTheme.onBackground,
-                            fontWeight: FontWeight.w500,
-                            fontSize:  stdFontSize*0.7),
+                          height: 1.5,
+                          color: thisTheme.onBackground,
+                          fontWeight: FontWeight.w500,
+                          fontSize: stdFontSize * 0.7,
+                        ),
                         textAlign: TextAlign.start,
                       ),
                     ),
-                    SizedBox(height: stdHorizontalOffset/1.5),
-                    MyButton(height: stdButtonHeight*0.5,
-                    width:stdButtonHeight*2,
-                    side: BorderSide(width: 1, color: thisTheme.primaryColor),  
-                    buttonColor: thisTheme.playerColor,
-                    child: Row(mainAxisAlignment:MainAxisAlignment.spaceEvenly,
-                      children: [
-                      Flexible(child: FittedBox(child: Padding(padding: EdgeInsets.symmetric(horizontal: stdHorizontalOffset) ,child: Text('about.link.3'.tr(), textAlign: TextAlign.center, style: TextStyle(color: thisTheme.primaryColor,),)))), AspectRatio(aspectRatio: 1,child: Icon(MdiIcons.star,size: stdIconSize, color: thisTheme.primaryColor))
-                    ],),
-                    action:()async {
-                      if (Platform.isAndroid || Platform.isIOS) {
-                      final appId = Platform.isAndroid ? 'com.goliksim.pocketchips' : 'YOUR_IOS_APP_ID';
-                      final url = Uri.parse(
-                        Platform.isAndroid
-                            ? "market://details?id=$appId"
-                            : "https://apps.apple.com/app/id$appId",
-                      );
-                      launchUrl(
-                        url,
-                        mode: LaunchMode.externalApplication,
-                      );
-                    }
-                    }
+                    SizedBox(height: stdHorizontalOffset / 1.5),
+                    MyButton(
+                      height: stdButtonHeight * 0.5,
+                      width: stdButtonHeight * 2,
+                      side: BorderSide(width: 1, color: thisTheme.primaryColor),
+                      buttonColor: thisTheme.playerColor,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Flexible(
+                            child: FittedBox(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: stdHorizontalOffset,
+                                ),
+                                child: Text(
+                                  'about.link.3'.tr(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: thisTheme.primaryColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          AspectRatio(
+                            aspectRatio: 1,
+                            child: Icon(
+                              MdiIcons.star,
+                              size: stdIconSize,
+                              color: thisTheme.primaryColor,
+                            ),
+                          )
+                        ],
+                      ),
+                      action: () async {
+                        if (Platform.isAndroid || Platform.isIOS) {
+                          final appId = Platform.isAndroid
+                              ? 'com.goliksim.pocketchips'
+                              : 'YOUR_IOS_APP_ID';
+                          final url = Platform.isAndroid
+                              ? 'https://play.google.com/store/apps/details?id=$appId'
+                              : 'https://apps.apple.com/app/id$appId';
+                          launch(
+                            url,
+                          );
+                        }
+                      },
                     ),
-                    SizedBox(height: stdHorizontalOffset/2),   
-                     Text(
-                      'about.link.4'.tr()+'\n\n'+'about.link.5'.tr(),
+                    SizedBox(height: stdHorizontalOffset / 2),
+                    Text(
+                      'about.link.4'.tr() + '\n\n' + 'about.link.5'.tr(),
                       style: TextStyle(
-                          height: 1.5,
-                          color: thisTheme.onBackground,
-                          fontWeight: FontWeight.w500,  
-                          fontSize:  stdFontSize*0.7),
+                        height: 1.5,
+                        color: thisTheme.onBackground,
+                        fontWeight: FontWeight.w500,
+                        fontSize: stdFontSize * 0.7,
+                      ),
                       textAlign: TextAlign.start,
                     ),
-                    SizedBox(height: stdHorizontalOffset/2),
-                    Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    SizedBox(height: stdHorizontalOffset / 2),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                      MyButton(height: stdButtonHeight/2,
-                    width:stdButtonHeight/2,
-                    buttonColor: thisTheme.bgrColor,
-                    child: Image.asset('assets/social/tele.png'),
-                    action:()async {
-                      const url = 'https://t.me/huzhetebyx';
-                      if (!await launch(url)) throw 'Could not launch $url';
-                    }
+                        MyButton(
+                          height: stdButtonHeight / 2,
+                          width: stdButtonHeight / 2,
+                          buttonColor: thisTheme.bgrColor,
+                          child: Image.asset('assets/social/tele.png'),
+                          action: () async {
+                            const url = 'https://t.me/huzhetebyx';
+                            if (!await launch(url)) {
+                              throw 'Could not launch $url';
+                            }
+                          },
+                        ),
+                        MyButton(
+                          height: stdButtonHeight / 2,
+                          width: stdButtonHeight / 2,
+                          buttonColor: thisTheme.bgrColor,
+                          child: Image.asset('assets/social/git.png'),
+                          action: () async {
+                            const url = 'https://github.com/goliksim';
+                            if (!await launch(url)) {
+                              throw 'Could not launch $url';
+                            }
+                          },
+                        ),
+                        MyButton(
+                          height: stdButtonHeight / 2,
+                          width: stdButtonHeight / 2,
+                          buttonColor: thisTheme.bgrColor,
+                          child: Image.asset('assets/social/mail.png'),
+                          action: () async {
+                            final path = await localPath;
+                            final MailOptions mailOptions = MailOptions(
+                              body: 'about.link.6'.tr(),
+                              subject: 'PC: problem or advice ',
+                              recipients: ['goliksim@gmail.com'],
+                              isHTML: true,
+                              attachments: [
+                                '$path/pocketchips/poker_chips.log',
+                              ],
+                            );
+                            await FlutterMailer.send(mailOptions);
+                          },
+                        ),
+                      ],
                     ),
-                    MyButton(height: stdButtonHeight/2,
-                    width:stdButtonHeight/2,
-                    buttonColor: thisTheme.bgrColor,
-                    child: Image.asset('assets/social/git.png'),
-                    action:()async {
-                      const url = 'https://github.com/goliksim';
-                      if (!await launch(url)) throw 'Could not launch $url';
-                    }
-                    ),
-                    MyButton(height: stdButtonHeight/2,
-                    width:stdButtonHeight/2,
-                    buttonColor: thisTheme.bgrColor,
-                    child: Image.asset('assets/social/mail.png'),
-                    action:()async {
-                      //final path = await localPath;   
-                      final MailOptions mailOptions = MailOptions(
-                        body: 'about.link.6'.tr(),
-                        subject: 'PC: problem or advice ',
-                        recipients: ['goliksim@gmail.com'],
-                        isHTML: true,
-                        //attachments: [ '$path/pocketchips/poker_chips.log', ],
-                      );
-                      await FlutterMailer.send(mailOptions);
-                      
-                    }
-                    ),
-                    ]),
                     SizedBox(height: stdHorizontalOffset),
                     SizedBox(
-                      width:  double.infinity,
+                      width: double.infinity,
                       child: Text(
                         '© 2022 GOLIKSIM (Alexander Golev)\nVersion: 1.0.4',
                         style: TextStyle(
-                            height: 1.5,
-                            color: thisTheme.onBackground,
-                            fontWeight: FontWeight.w500,
-                          fontSize:  stdFontSize*0.7),
+                          height: 1.5,
+                          color: thisTheme.onBackground,
+                          fontWeight: FontWeight.w500,
+                          fontSize: stdFontSize * 0.7,
+                        ),
                         textAlign: TextAlign.start,
                       ),
                     ),
-                    SizedBox(height: stdHorizontalOffset/2),
-                    
-                    MyButton(height: stdButtonHeight*0.5,
-                    borderRadius: BorderRadius.circular(stdBorderRadius/3),
-                    alignment: Alignment.centerLeft,
-                    //side: BorderSide(width: 1, color: thisTheme.primaryColor),  
-                    buttonColor: thisTheme.playerColor,
-                    child: SizedBox(width:double.infinity,
-                      child: Text(' '+'about.link.7'.tr(), style: TextStyle(color: thisTheme.secondaryColor,
-                          fontSize:  stdFontSize*0.7),)),
-                    action:()async {
-                        const url = 'https://github.com/goliksim/pocket_chips/blob/main/privacy_policy.md';
+                    SizedBox(height: stdHorizontalOffset / 2),
+                    MyButton(
+                      height: stdButtonHeight * 0.5,
+                      borderRadius: BorderRadius.circular(stdBorderRadius / 3),
+                      alignment: Alignment.centerLeft,
+                      //side: BorderSide(width: 1, color: thisTheme.primaryColor),
+                      buttonColor: thisTheme.playerColor,
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          ' ' + 'about.link.7'.tr(),
+                          style: TextStyle(
+                            color: thisTheme.secondaryColor,
+                            fontSize: stdFontSize * 0.7,
+                          ),
+                        ),
+                      ),
+                      action: () async {
+                        const url =
+                            'https://github.com/goliksim/pocket_chips/blob/main/privacy_policy.md';
                         if (!await launch(url)) throw 'Could not launch $url';
-                    }
+                      },
                     ),
                   ]),
-                  
                 ],
                 onPageChange: (int pageIndex) {
                   index = pageIndex;
@@ -682,11 +817,14 @@ class _MyAppState extends State<MyApp> {
                               pagesLength: pagesLength,
                               indicator: Indicator(
                                 activeIndicator: const ActiveIndicator(
-                                    color: Colors.grey, borderWidth: 0.7),
+                                  color: Colors.grey,
+                                  borderWidth: 0.7,
+                                ),
                                 closedIndicator: ClosedIndicator(
-                                    color:
-                                        thisTheme.primaryColor.withOpacity(0.5),
-                                    borderWidth: 0.7),
+                                  color:
+                                      thisTheme.primaryColor.withOpacity(0.5),
+                                  borderWidth: 0.7,
+                                ),
                                 indicatorDesign: IndicatorDesign.polygon(
                                   polygonDesign: PolygonDesign(
                                     polygon: DesignType.polygon_diamond,
@@ -696,9 +834,10 @@ class _MyAppState extends State<MyApp> {
                             ),
                           ),
                           Flexible(
-                              child: index == pagesLength - 1
-                                  ? _finishButton
-                                  : _skipButton(setIndex: setIndex))
+                            child: index == pagesLength - 1
+                                ? _finishButton
+                                : _skipButton(setIndex: setIndex),
+                          )
                         ],
                       ),
                     ),
@@ -717,9 +856,10 @@ class _MyAppState extends State<MyApp> {
           height: double.infinity,
           child: Padding(
             padding: EdgeInsets.only(
-                top: stdHorizontalOffset,
-                left: stdHorizontalOffset / 2,
-                right: stdHorizontalOffset / 2),
+              top: stdHorizontalOffset,
+              left: stdHorizontalOffset / 2,
+              right: stdHorizontalOffset / 2,
+            ),
             child: ClipRRect(
               borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
               child: DecoratedBox(
@@ -734,29 +874,31 @@ class _MyAppState extends State<MyApp> {
                   physics: const BouncingScrollPhysics(),
                   controller: ScrollController(),
                   child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                     
-                      children: [
-                        SizedBox(height: stdHorizontalOffset * 2),
-                        Text(
-                          name,
-                          //style: pageTitleStyle,
-                          style: TextStyle(
-                              color: thisTheme.onBackground,
-                              fontWeight: FontWeight.w700,
-                              fontSize: stdFontSize / 20 * 23),
-                          textAlign: TextAlign.left,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(height: stdHorizontalOffset * 2),
+                      Text(
+                        name,
+                        //style: pageTitleStyle,
+                        style: TextStyle(
+                          color: thisTheme.onBackground,
+                          fontWeight: FontWeight.w700,
+                          fontSize: stdFontSize / 20 * 23,
                         ),
-                        SizedBox(height: stdHorizontalOffset),
-                        Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: stdHorizontalOffset * 2,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: children,
-                            ))
-                      ]),
+                        textAlign: TextAlign.left,
+                      ),
+                      SizedBox(height: stdHorizontalOffset),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: stdHorizontalOffset * 2,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: children,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),

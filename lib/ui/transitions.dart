@@ -10,19 +10,27 @@ Future<Object?> transitionDialog({
   bool barrierDismissible = true,
   required Widget child,
   required WidgetBuilder builder,
-  String type = "Scale",
+  String type = 'Scale',
   Duration duration = const Duration(milliseconds: 500),
   Color barrierColor = const Color(0x80000000),
 }) {
   final ThemeData theme = Theme.of(context);
   return showGeneralDialog(
     context: context,
-    pageBuilder: (BuildContext context, Animation<double> animation,
-        Animation<double> secondaryAnimation) {
+    pageBuilder: (
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+    ) {
       final Widget pageChild = child;
-      Builder(builder: (BuildContext context) {
-        return Theme(data: theme, child: pageChild); //theme != null ? Theme(data: theme, child: pageChild) : pageChild;
-      });
+      Builder(
+        builder: (BuildContext context) {
+          return Theme(
+            data: theme,
+            child: pageChild,
+          ); //theme != null ? Theme(data: theme, child: pageChild) : pageChild;
+        },
+      );
       return child;
     },
     barrierDismissible: barrierDismissible,
@@ -33,13 +41,14 @@ Future<Object?> transitionDialog({
   );
 }
 
-getTransition(String type) {
+Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+    getTransition(String type) {
   switch (type) {
-    case "Scale1":
+    case 'Scale1':
       return dialogScale1;
-    case "SlideUp":
+    case 'SlideUp':
       return _dialogSlideUp;
-    case "SlideDown":
+    case 'SlideDown':
       return _dialogSlideDown;
     default:
       return dialogScale1;
@@ -53,19 +62,20 @@ Widget dialogScale1(
   Widget child,
 ) {
   return ScaleTransition(
-      scale: CurvedAnimation(
+    scale: CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutBack,
+      reverseCurve: Curves.easeOutBack,
+    ),
+    child: FadeTransition(
+      opacity: CurvedAnimation(
         parent: animation,
-        curve: Curves.easeOutBack,
-        reverseCurve: Curves.easeOutBack,
+        curve: Curves.fastOutSlowIn,
+        reverseCurve: Curves.fastOutSlowIn,
       ),
-      child: FadeTransition(
-        opacity: CurvedAnimation(
-          parent: animation,
-          curve: Curves.fastOutSlowIn,
-          reverseCurve: Curves.fastOutSlowIn,
-        ),
-        child: child,
-      ));
+      child: child,
+    ),
+  );
 }
 
 Widget _dialogSlideUp(
@@ -80,12 +90,13 @@ Widget _dialogSlideUp(
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutBack)),
     child: FadeTransition(
-        opacity: CurvedAnimation(
-          parent: animation,
-          curve: Curves.fastOutSlowIn,
-          reverseCurve: Curves.fastOutSlowIn,
-        ),
-        child: child),
+      opacity: CurvedAnimation(
+        parent: animation,
+        curve: Curves.fastOutSlowIn,
+        reverseCurve: Curves.fastOutSlowIn,
+      ),
+      child: child,
+    ),
   );
 }
 
@@ -96,18 +107,19 @@ Widget _dialogSlideDown(
   Widget child,
 ) {
   return SlideTransition(
-      position: Tween<Offset>(
-        begin: const Offset(0, 0.3),
-        end: Offset.zero,
-      ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutBack)),
-      child: FadeTransition(
-        opacity: CurvedAnimation(
-          parent: animation,
-          curve: Curves.fastOutSlowIn,
-          reverseCurve: Curves.fastOutSlowIn,
-        ),
-        child: child,
-      ));
+    position: Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutBack)),
+    child: FadeTransition(
+      opacity: CurvedAnimation(
+        parent: animation,
+        curve: Curves.fastOutSlowIn,
+        reverseCurve: Curves.fastOutSlowIn,
+      ),
+      child: child,
+    ),
+  );
 }
 
 Widget dialogWave1(
@@ -117,21 +129,25 @@ Widget dialogWave1(
   Widget child,
 ) {
   return ShaderMask(
-      shaderCallback: (rect) {
-        return RadialGradient(
-                radius: Tween<double>(begin: 0, end: 2.5).evaluate(
-                  CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.fastOutSlowIn.flipped,
-                    reverseCurve: Curves.fastOutSlowIn,
-                  ),
-                ),
-                colors: const [Colors.white, Colors.transparent, Colors.transparent],
-                stops: const [0.4, 0.7, 1],
-                center: FractionalOffset(0.5 - 0.35 *stdButtonWidth/MediaQuery.of(context).size.width, 0.5))
-            .createShader(rect);
-      },
-      child: child);
+    shaderCallback: (rect) {
+      return RadialGradient(
+        radius: Tween<double>(begin: 0, end: 2.5).evaluate(
+          CurvedAnimation(
+            parent: animation,
+            curve: Curves.fastOutSlowIn.flipped,
+            reverseCurve: Curves.fastOutSlowIn,
+          ),
+        ),
+        colors: const [Colors.white, Colors.transparent, Colors.transparent],
+        stops: const [0.4, 0.7, 1],
+        center: FractionalOffset(
+          0.5 - 0.35 * stdButtonWidth / MediaQuery.of(context).size.width,
+          0.5,
+        ),
+      ).createShader(rect);
+    },
+    child: child,
+  );
 }
 
 //Слайд с главного экрана
@@ -151,24 +167,38 @@ class SlidePageRoute extends PageRouteBuilder {
         );
 
   @override
-  Widget buildTransitions(BuildContext context, Animation<double> animation,
-          Animation<double> secondaryAnimation, Widget child) =>
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) =>
       Stack(
         children: [
           SlideTransition(
-              position: Tween<Offset>(
-                begin: Offset.zero,
-                end: getBeginOffset().scale(-1, -1),
-              ).animate(CurvedAnimation(
-                  parent: animation, curve: Curves.easeInOutQuart.flipped)),
-              child: childCurrent),
+            position: Tween<Offset>(
+              begin: Offset.zero,
+              end: getBeginOffset().scale(-1, -1),
+            ).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeInOutQuart.flipped,
+              ),
+            ),
+            child: childCurrent,
+          ),
           SlideTransition(
-              position: Tween<Offset>(
-                begin: getBeginOffset(),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                  parent: animation, curve: Curves.easeInOutQuart.flipped)),
-              child: child),
+            position: Tween<Offset>(
+              begin: getBeginOffset(),
+              end: Offset.zero,
+            ).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeInOutQuart.flipped,
+              ),
+            ),
+            child: child,
+          ),
         ],
       );
 
@@ -202,24 +232,38 @@ class RotateCardRoute extends PageRouteBuilder {
         );
 
   @override
-  Widget buildTransitions(BuildContext context, Animation<double> animation,
-          Animation<double> secondaryAnimation, Widget child) =>
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) =>
       Stack(
         children: [
           SlideTransition(
-              position: Tween<Offset>(
-                begin: Offset.zero,
-                end: getBeginOffset().scale(-1, -1),
-              ).animate(CurvedAnimation(
-                  parent: animation, curve: Curves.easeInOutQuart.flipped)),
-              child: childCurrent),
+            position: Tween<Offset>(
+              begin: Offset.zero,
+              end: getBeginOffset().scale(-1, -1),
+            ).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeInOutQuart.flipped,
+              ),
+            ),
+            child: childCurrent,
+          ),
           SlideTransition(
-              position: Tween<Offset>(
-                begin: getBeginOffset(),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                  parent: animation, curve: Curves.easeInOutQuart.flipped)),
-              child: child),
+            position: Tween<Offset>(
+              begin: getBeginOffset(),
+              end: Offset.zero,
+            ).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeInOutQuart.flipped,
+              ),
+            ),
+            child: child,
+          ),
         ],
       );
 
@@ -247,7 +291,7 @@ Route simpleSlidePageRoute(Widget child) {
       const end = Offset.zero;
       const curve = Curves.ease;
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      
+
       return SlideTransition(
         position: animation.drive(tween),
         child: child,
@@ -256,15 +300,12 @@ Route simpleSlidePageRoute(Widget child) {
   );
 }
 
-
-
 Route simpleFadePageRoute(Widget child) {
   return PageRouteBuilder(
     transitionDuration: const Duration(milliseconds: 500),
     reverseTransitionDuration: const Duration(milliseconds: 600),
     pageBuilder: (context, animation, secondaryAnimation) => child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-
       return FadeTransition(
         opacity: animation,
         child: child,
@@ -273,29 +314,34 @@ Route simpleFadePageRoute(Widget child) {
   );
 }
 
-
 Route simpleThemePageRoute(Widget child) {
   return PageRouteBuilder(
     transitionDuration: const Duration(milliseconds: 900),
     reverseTransitionDuration: const Duration(milliseconds: 900),
     pageBuilder: (context, animation, secondaryAnimation) => child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      
       return ShaderMask(
         shaderCallback: (rect) {
           return RadialGradient(
-            radius: Tween<double>(begin: 0, end: 15.h).evaluate(//7*[1.0,1.w].min ).evaluate(
+            radius: Tween<double>(begin: 0, end: 15.h).evaluate(
+              //7*[1.0,1.w].min ).evaluate(
               CurvedAnimation(
                 parent: animation,
                 curve: Curves.fastOutSlowIn.flipped,
                 reverseCurve: Curves.fastOutSlowIn,
               ),
             ),
-            colors: const [Colors.white, Colors.transparent, Colors.transparent],
+            colors: const [
+              Colors.white,
+              Colors.transparent,
+              Colors.transparent
+            ],
             stops: const [0.4, 0.45, 1],
-            center: const FractionalOffset(1, 0)).createShader(rect);
+            center: const FractionalOffset(1, 0),
+          ).createShader(rect);
         },
-      child: child);
+        child: child,
+      );
     },
   );
 }

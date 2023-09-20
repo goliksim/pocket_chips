@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:unity_ads_plugin/unity_ads_plugin.dart';
+//import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 /*
 void main() {
@@ -38,18 +38,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  var physicalScreenSize = window.physicalSize;
-  
-
-  void _incrementCounter() {
-    setState(() {
-      physicalScreenSize = window.physicalSize;
-      _counter++;
-    });
-  }
-
-
+  var physicalScreenSize =
+      PlatformDispatcher.instance.implicitView!.physicalSize;
 
   @override
   Widget build(BuildContext context) {
@@ -57,35 +47,28 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
-          actions: [],
+          actions: const [],
         ),
-        
-        body: LayoutBuilder(builder: (context, constraints) {
-          return Padding(
-            padding: EdgeInsets.all(10.0.h),
-            child: (constraints.maxWidth > 620.h)
-                ? Center(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: widgets(context, physicalScreenSize),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return Padding(
+              padding: EdgeInsets.all(10.0.h),
+              child: (constraints.maxWidth > 620.h)
+                  ? Center(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: widgets(context, physicalScreenSize),
+                      ),
+                    )
+                  : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: widgets(context, physicalScreenSize),
+                      ),
                     ),
-                  )
-                : Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: widgets(context, physicalScreenSize),
-                    ),
-                  ),
-          );
-        }),
-        floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            _incrementCounter();
-            
+            );
           },
-          tooltip: 'Increment',
-          child: const Icon(Icons.add),
         ),
       ),
     );
@@ -130,7 +113,8 @@ List<Widget> widgets(BuildContext context, Size physicalScreenSize) => [
     ];
 
 class MyButton extends StatelessWidget {
-  MyButton({Key? key, this.child, this.color = Colors.red}) : super(key: key);
+  const MyButton({Key? key, this.child, this.color = Colors.red})
+      : super(key: key);
   final Color? color;
   final Widget? child;
 

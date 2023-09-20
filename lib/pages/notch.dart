@@ -1,11 +1,6 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-
-
-
-
+//import 'dart:ui';
+//import 'package:flutter/services.dart';
 
 class MyWidget extends StatefulWidget {
   const MyWidget({Key? key}) : super(key: key);
@@ -15,11 +10,12 @@ class MyWidget extends StatefulWidget {
 }
 
 class _MyWidgetState extends State<MyWidget> {
-void initState(){
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  //SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-}
+    //SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,15 +24,28 @@ void initState(){
       height: double.infinity,
       color: Colors.white,
       child: Padding(
-        padding: EdgeInsets.only(top: MediaQueryData.fromWindow(window).systemGestureInsets.top > 24? MediaQueryData.fromWindow(window).systemGestureInsets.top: 0 ),
+        padding: EdgeInsets.only(
+          top: MediaQueryData.fromView(View.of(context))
+                      .systemGestureInsets
+                      .top >
+                  24
+              ? MediaQueryData.fromView(View.of(context))
+                  .systemGestureInsets
+                  .top
+              : 0,
+        ),
         child: Scaffold(
           appBar: AppBar(
-            title: Text("${MediaQueryData.fromWindow(window).systemGestureInsets.top}"),
+            title: Text(
+              '${MediaQueryData.fromView(View.of(context)).systemGestureInsets.top}',
+            ),
           ),
-          body:Center(
-            child: Container(height: 50,
-            child: Text("${MediaQuery.of(context).padding.top}"),)
-          )
+          body: Center(
+            child: SizedBox(
+              height: 50,
+              child: Text('${MediaQuery.of(context).padding.top}'),
+            ),
+          ),
         ),
       ),
     );

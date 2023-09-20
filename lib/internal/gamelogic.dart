@@ -22,24 +22,23 @@ class Game {
 
   //переменная для кнопки +
   int addButton;
-  
+
   //список названий этапов игры
   List<String> gameStateNameList = [
-    "game.pflop".tr(),
-    "game.flop".tr(),
-    "game.turn".tr(),
-    "game.river".tr(),
-    "game.shdw".tr(),
-    "game.break".tr()
+    'game.pflop'.tr(),
+    'game.flop'.tr(),
+    'game.turn'.tr(),
+    'game.river'.tr(),
+    'game.shdw'.tr(),
+    'game.break'.tr()
   ];
   int raiseBank = 0;
   bool raiseButtonPressed = false;
   bool bidsEqual = false;
-  Text gameStateName = Text("game.welc".tr(),
-      style: TextStyle(color: thisTheme.primaryColor));
+  Text gameStateName =
+      Text('game.welc'.tr(), style: TextStyle(color: thisTheme.primaryColor));
   Function()? callback;
   BuildContext? context;
-  
 
   // меняем отступы у игроков
   void changeOffset() {
@@ -74,44 +73,44 @@ class Game {
 
   // переходы между игроками
   int newPlayer({int index = 100}) {
-    //print(bigBlindIndex); 
+    //print(bigBlindIndex);
     //
     if (index == 100) {
       thisLobby.lobbyIndex += 1;
       if (thisLobby.lobbyIndex == thisLobby.lobbyPlayers.length) {
-        logs.writeLog("End of circle. Move to first in list");
+        logs.writeLog('End of circle. Move to first in list');
         thisLobby.lobbyIndex = 0;
       }
     } else {
       thisLobby.lobbyIndex = index;
     }
 
-
     //print(thisLobby.lapCount);
     //print(thisGame.bidsEqual);
     //print(thisGame.waitForBidsEqual());
 
-    if ((thisLobby.lobbyPlayers.map((e) => e.bank).where((element) => element != 0).isEmpty)) {
-      logs.writeLog(
-          'No one player with money\n${thisLobby.lobbyPlayers.map((e) => [e.name, e.bank
-              ])}');
+    if ((thisLobby.lobbyPlayers
+        .map((e) => e.bank)
+        .where((element) => element != 0)
+        .isEmpty)) {
+      logs.writeLog('No one player with money\n${thisLobby.lobbyPlayers.map(
+        (e) => [e.name, e.bank],
+      )}');
       newLap();
       return 0;
     }
 
-
-    if(index==100){
-      if(!bidsEqual&&waitForBidsEqual()){
+    if (index == 100) {
+      if (!bidsEqual && waitForBidsEqual()) {
         //bidsEqual = waitForBidsEqual();
-        if(thisLobby.lapCount>0) newState();
-      }
-      else{
-        if(thisLobby.lobbyIndex==thisLobby.firstPlayerIndex && thisLobby.lapCount>0 && waitForBidsEqual()) newState();
+        if (thisLobby.lapCount > 0) newState();
+      } else {
+        if (thisLobby.lobbyIndex == thisLobby.firstPlayerIndex &&
+            thisLobby.lapCount > 0 &&
+            waitForBidsEqual()) newState();
       }
     }
 
-    
-    
     /*
     //проверка на выравнивание ставок
     if (waitForBidsEqual()) {
@@ -128,10 +127,9 @@ class Game {
     }*/
 
     //bidsEqual = waitForBidsEqual();
-    logs.writeLog('Bids: ${thisLobby.lobbyPlayers.map((e) => [
-          e.name,
-          e.bid
-        ].join(': ')).join('\t')}');
+    logs.writeLog('Bids: ${thisLobby.lobbyPlayers.map(
+          (e) => [e.name, e.bid].join(': '),
+        ).join('\t')}');
 
     //пропуск лоха без денег
     if ((thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank <= 0)) {
@@ -144,7 +142,6 @@ class Game {
       return 0;
     }
 
-    
     /*
     //если чел не может рейзить, скипаем его
     if (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank<=minTmpFunction()){
@@ -154,19 +151,24 @@ class Game {
     */
     raiseBank = minTmpFunction(bidsEqual);
     thisGame.bidsEqual = thisGame.waitForBidsEqual();
-    if (thisLobby.lobbyIndex == thisLobby.bigBlindIndex){
-      thisLobby.lapCount+=1;
+    if (thisLobby.lobbyIndex == thisLobby.bigBlindIndex) {
+      thisLobby.lapCount += 1;
     }
     // print('raisebank');
     //print(raiseBank);
     if (index == 100) {
       gameStateName = Text(
-          "game.turn1".tr()+"\u00A0"+"game.turn2".tr()+"\u00A0""${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}",
-          style: TextStyle(color: thisTheme.onBackground));
+        'game.turn1'.tr() +
+            '\u00A0' +
+            'game.turn2'.tr() +
+            '\u00A0' '${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
+        style: TextStyle(color: thisTheme.onBackground),
+      );
     }
     callback!();
     logs.writeLog(
-        "Turn of ${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}");
+      'Turn of ${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
+    );
     lobbyStorage.writeLobby(thisLobby);
     return 0;
   }
@@ -201,15 +203,21 @@ class Game {
 
   // временное изменение текста
   void changeText(String text) async {
-    gameStateName = Text(text,
-        style: TextStyle(
-            color: thisTheme
-                .primaryColor)); //если конец, то переходим в новый круг
+    gameStateName = Text(
+      text,
+      style: TextStyle(
+        color: thisTheme.primaryColor,
+      ),
+    ); //если конец, то переходим в новый круг
     callback!();
     await Future.delayed(const Duration(seconds: 4));
     gameStateName = Text(
-        "game.turn1".tr()+"\u00A0"+"game.turn2".tr()+"\u00A0""${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}",
-        style: TextStyle(color: thisTheme.onBackground));
+      'game.turn1'.tr() +
+          '\u00A0' +
+          'game.turn2'.tr() +
+          '\u00A0' '${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
+      style: TextStyle(color: thisTheme.onBackground),
+    );
 
     callback!();
   }
@@ -220,11 +228,9 @@ class Game {
     if (waitForBidsEqual()) {
       //переходим в новое состояние
       thisLobby.lobbyState += 1;
-      logs.writeLog("NewState with lobbyState = ${thisLobby.lobbyState}");
+      logs.writeLog('NewState with lobbyState = ${thisLobby.lobbyState}');
       lobbyStorage.writeLobby(thisLobby);
-    }
-    else{
-    }
+    } else {}
     //после префлопа первый игрок - смол блайнд
     if (thisLobby.lobbyState == 1) {
       for (int i = 1; i < thisLobby.lobbyPlayers.length; i++) {
@@ -262,7 +268,7 @@ class Game {
         return false;
       }
     }
-    if (thisLobby.lapCount==0) {
+    if (thisLobby.lapCount == 0) {
       return false;
     } else {
       return true;
@@ -274,25 +280,27 @@ class Game {
     thisLobby.lobbyState = 4;
 
     gameStateName =
-        Text("Showdown", style: TextStyle(color: thisTheme.primaryColor));
+        Text('Showdown', style: TextStyle(color: thisTheme.primaryColor));
     callback!();
     // ignore: await_only_futures
     if (!folded) {
-      logs.writeLog("Call WinnerChooseWindow");
+      logs.writeLog('Call WinnerChooseWindow');
       await transitionDialog(
-          barrierDismissible: false,
-          duration: const Duration(milliseconds: 400),
-          type: "Scale1",
-          //barrierColor: null,
-          context: context,
-          child: WillPopScope(
-              onWillPop: () async => false,
-              child: WinnerChooseWindow(thisLobby: thisLobby)),
-          builder: (BuildContext context) {
-            return WinnerChooseWindow(thisLobby: thisLobby);
-          });
+        barrierDismissible: false,
+        duration: const Duration(milliseconds: 400),
+        type: 'Scale1',
+        //barrierColor: null,
+        context: context,
+        child: WillPopScope(
+          onWillPop: () async => false,
+          child: WinnerChooseWindow(thisLobby: thisLobby),
+        ),
+        builder: (BuildContext context) {
+          return WinnerChooseWindow(thisLobby: thisLobby);
+        },
+      );
     }
-    logs.writeLog("NEW Lap\tlobby state = 5\t lobbyIndex=-1;");
+    logs.writeLog('NEW Lap\tlobby state = 5\t lobbyIndex=-1;');
 
     //стираем старые ставки и тех, кто фолданул
     for (Player player in thisLobby.lobbyPlayers) {
@@ -301,10 +309,9 @@ class Game {
       player.isActive = !(player.bank <= 0);
     }
     logs.writeLog(
-        "Still Active players: ${thisLobby.lobbyPlayers.where((e) => e.isActive == true).map((e) => [
-              e.name,
-              e.bid
-            ]).join(' / ')}");
+        "Still Active players: ${thisLobby.lobbyPlayers.where((e) => e.isActive == true).map(
+              (e) => [e.name, e.bid],
+            ).join(' / ')}");
 
     // finding dealer
     for (int i = 1; i < thisLobby.lobbyPlayers.length; i++) {
@@ -319,8 +326,10 @@ class Game {
     thisLobby.lobbyState = 5;
     //await Future.delayed(Duration(milliseconds: 1));
     //changeText(gameStateNameList[thisLobby.lobbyState]);
-    gameStateName =
-        Text("game.break".tr(), style: TextStyle(color: thisTheme.primaryColor));
+    gameStateName = Text(
+      'game.break'.tr(),
+      style: TextStyle(color: thisTheme.primaryColor),
+    );
     thisLobby.lobbyIndex = -1;
     callback!();
     /*
@@ -346,24 +355,25 @@ class Game {
 
   // первые ставки
   int firstBlind(int bigBlindIndex) {
-  logs.writeLog('First Blind');
+    logs.writeLog('First Blind');
 
-  for (int i = 1; i < thisLobby.lobbyPlayers.length; i++) {
-    int localIndex =
-        (i + thisLobby.dealerIndex) % thisLobby.lobbyPlayers.length;
-    if (thisLobby.lobbyPlayers[localIndex].isActive) {
-      if (thisLobby.lobbyPlayers[localIndex].bank < thisLobby.lobbySmallBlind) {
-        thisLobby.lobbyPlayers[localIndex].bid =
-            thisLobby.lobbyPlayers[localIndex].bank;
-        thisLobby.lobbyPlayers[localIndex].bank = 0;
-      } else {
-        thisLobby.lobbyPlayers[localIndex].bank -= thisLobby.lobbySmallBlind;
-        thisLobby.lobbyPlayers[localIndex].bid = thisLobby.lobbySmallBlind;
+    for (int i = 1; i < thisLobby.lobbyPlayers.length; i++) {
+      int localIndex =
+          (i + thisLobby.dealerIndex) % thisLobby.lobbyPlayers.length;
+      if (thisLobby.lobbyPlayers[localIndex].isActive) {
+        if (thisLobby.lobbyPlayers[localIndex].bank <
+            thisLobby.lobbySmallBlind) {
+          thisLobby.lobbyPlayers[localIndex].bid =
+              thisLobby.lobbyPlayers[localIndex].bank;
+          thisLobby.lobbyPlayers[localIndex].bank = 0;
+        } else {
+          thisLobby.lobbyPlayers[localIndex].bank -= thisLobby.lobbySmallBlind;
+          thisLobby.lobbyPlayers[localIndex].bid = thisLobby.lobbySmallBlind;
+        }
+        logs.writeLog('smallBlindIndex - $localIndex');
+        //thisLobby.dealerIndex = (i+thisLobby.dealerIndex)%maxPlayerCount;
+        break;
       }
-      logs.writeLog("smallBlindIndex - $localIndex");
-      //thisLobby.dealerIndex = (i+thisLobby.dealerIndex)%maxPlayerCount;
-      break;
-    }
     } // finding bigBlind
     for (int i = 1; i < thisLobby.lobbyPlayers.length + 1; i++) {
       int localIndex =
@@ -378,10 +388,11 @@ class Game {
         } else {
           thisLobby.lobbyPlayers[localIndex].bank -=
               thisLobby.lobbySmallBlind * 2;
-          thisLobby.lobbyPlayers[localIndex].bid = thisLobby.lobbySmallBlind * 2;
+          thisLobby.lobbyPlayers[localIndex].bid =
+              thisLobby.lobbySmallBlind * 2;
         }
         bigBlindIndex = localIndex;
-        logs.writeLog("bigBlindIndex - $localIndex");
+        logs.writeLog('bigBlindIndex - $localIndex');
         //thisLobby.dealerIndex = (i+thisLobby.dealerIndex)%maxPlayerCount;
         break;
       }
@@ -393,7 +404,7 @@ class Game {
       if (thisLobby.lobbyPlayers[localIndex].isActive) {
         thisLobby.lobbyIndex = localIndex;
         thisLobby.firstPlayerIndex = localIndex;
-        logs.writeLog("firstPlayerIndex - $localIndex");
+        logs.writeLog('firstPlayerIndex - $localIndex');
         break;
       }
     }
