@@ -78,6 +78,7 @@ class Game {
     if (index == 100) {
       thisLobby.lobbyIndex += 1;
       if (thisLobby.lobbyIndex == thisLobby.lobbyPlayers.length) {
+        //TODO
         logs.writeLog('End of circle. Move to first in list');
         thisLobby.lobbyIndex = 0;
       }
@@ -103,11 +104,17 @@ class Game {
     if (index == 100) {
       if (!bidsEqual && waitForBidsEqual()) {
         //bidsEqual = waitForBidsEqual();
-        if (thisLobby.lapCount > 0) newState();
+        if (thisLobby.lapCount > 0) {
+          newState();
+          return 0;
+        }
       } else {
         if (thisLobby.lobbyIndex == thisLobby.firstPlayerIndex &&
             thisLobby.lapCount > 0 &&
-            waitForBidsEqual()) newState();
+            waitForBidsEqual()) {
+          newState();
+          return 0;
+        }
       }
     }
 
@@ -125,7 +132,7 @@ class Game {
         }
       }
     }*/
-
+    //TODO
     //bidsEqual = waitForBidsEqual();
     logs.writeLog('Bids: ${thisLobby.lobbyPlayers.map(
           (e) => [e.name, e.bid].join(': '),
@@ -228,6 +235,7 @@ class Game {
     if (waitForBidsEqual()) {
       //переходим в новое состояние
       thisLobby.lobbyState += 1;
+      //TODO
       logs.writeLog('NewState with lobbyState = ${thisLobby.lobbyState}');
       lobbyStorage.writeLobby(thisLobby);
     } else {}
@@ -284,6 +292,7 @@ class Game {
     callback!();
     // ignore: await_only_futures
     if (!folded) {
+      //TODO
       logs.writeLog('Call WinnerChooseWindow');
       await transitionDialog(
         barrierDismissible: false,

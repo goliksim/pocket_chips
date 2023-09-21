@@ -49,8 +49,8 @@ Themes light = Themes(
 
 Themes dark = Themes(
   'dark',
-  const Color.fromARGB(255, 29, 29, 34), // bgrColor
-  const Color.fromARGB(255, 40, 40, 50), // bankColor
+  const Color.fromARGB(254, 29, 29, 34), // bgrColor
+  const Color.fromARGB(255, 70, 70, 80), // bankColor
   const Color.fromARGB(255, 36, 35, 45), // playerColor
   const Color.fromARGB(255, 70, 78, 109), //additionButtonColor
   MaterialColor(0xff8882e6, colorLight), // primaryColor
