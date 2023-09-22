@@ -182,7 +182,7 @@ class _AddSettingsState extends State<AddSettings> {
                             decoration: InputDecoration(
                               hintStyle: TextStyle(
                                 fontSize: stdFontSize,
-                                color: thisTheme.bankColor,
+                                color: thisTheme.hintColor,
                               ),
                               hintText: '${widget.thisLobby.lobbyBank}',
                               enabledBorder: InputBorder.none,
@@ -241,7 +241,7 @@ class _AddSettingsState extends State<AddSettings> {
                       decoration: InputDecoration(
                         hintStyle: TextStyle(
                           fontSize: stdFontSize,
-                          color: thisTheme.bankColor,
+                          color: thisTheme.hintColor,
                         ),
                         hintText: '$smallBlind',
                         enabledBorder: InputBorder.none,
@@ -316,7 +316,7 @@ class _AddSettingsState extends State<AddSettings> {
                       overflow: TextOverflow.fade,
                       softWrap: false,
                       style: TextStyle(
-                        color: thisTheme.bankColor,
+                        color: thisTheme.hintColor,
                         fontSize: stdFontSize,
                         fontWeight: FontWeight.normal,
                       ),
@@ -329,7 +329,7 @@ class _AddSettingsState extends State<AddSettings> {
                       '${smallBlind * 2}',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: thisTheme.bankColor,
+                        color: thisTheme.hintColor,
                         fontSize: stdFontSize,
                         fontWeight: FontWeight.normal,
                       ),

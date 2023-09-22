@@ -231,7 +231,7 @@ class _GamePageState extends State<GamePage> {
                                       '${thisLobby.lobbySmallBlind} / ${thisLobby.lobbySmallBlind * 2}',
                                       style: TextStyle(
                                         color: thisTheme.onBackground
-                                            .withOpacity(0.2),
+                                            .withOpacity(0.3),
                                         fontSize: stdFontSize * 0.6,
                                       ),
                                     ),
@@ -780,7 +780,7 @@ class _GamePageState extends State<GamePage> {
               ),
             ),
           ),
-          thisLobby.dealerIndex == index
+          thisLobby.lobbyPlayers[index].isDealer
               ? Container(
                   width: stdHeight,
                   height: stdHeight,

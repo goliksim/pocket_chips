@@ -31,10 +31,16 @@ void addNewPlayer(Player newPlayer)async{
       }
     }*/
 
-void addPlayer(Player newPlayer, bool saved, bool isNew) async {
+void addPlayer(
+  Player newPlayer,
+  bool saved,
+  bool isNew, [
+  bool dealerBool = false,
+]) async {
   newPlayer = newPlayer.copy();
   if (saved) {
     if (!savedPlayers.contains(newPlayer)) {
+      newPlayer.isDealer = false;
       savedPlayers.add(newPlayer);
       logs.writeLog('Saving:\t${newPlayer.show()}');
       showToast('${newPlayer.name} ' + 'toast.saved'.tr());
@@ -52,6 +58,7 @@ void addPlayer(Player newPlayer, bool saved, bool isNew) async {
       if (!isNew) {
         newPlayer.changeBank(thisLobby.lobbyBank);
       }
+      if (thisLobby.lobbyPlayers.isEmpty) newPlayer.isDealer = true;
       thisLobby.add(newPlayer);
       logs.writeLog(
         (isNew ? 'New player' : 'Added from saved') + '\t ${newPlayer.show()}',
@@ -65,6 +72,8 @@ void addPlayer(Player newPlayer, bool saved, bool isNew) async {
           curve: Curves.ease,
         );
       }
+
+      if (dealerBool) {}
     } else {
       logs.writeLog('${newPlayer.show()}\talready in Lobby or MAX PLAYERS');
       if (thisLobby.lobbyPlayers.length == maxPlayerCount) {
@@ -696,6 +705,7 @@ class PlayerList extends StatefulWidget {
 
 class _PlayerListState extends State<PlayerList> {
   final ScrollController _scrollController = ScrollController();
+  ValueNotifier<int> reorderableIndex = ValueNotifier(-1);
 
   @override
   Widget build(BuildContext context) {
@@ -788,33 +798,69 @@ class _PlayerListState extends State<PlayerList> {
           )
         : ClipRRect(
             borderRadius: BorderRadius.circular(stdBorderRadius),
-            child: SingleChildScrollView(
-              controller: scrollController,
+            child: ReorderableListView.builder(
+              proxyDecorator: proxyDecorator,
+              onReorderStart: (index) {
+                reorderableIndex.value = index;
+              },
+              onReorderEnd: (index) {
+                reorderableIndex.value = -1;
+              },
+              onReorder: (oldIndex, newIndex) {
+                if (oldIndex < newIndex) {
+                  newIndex -= 1;
+                }
+
+                if (oldIndex != newIndex) {
+                  logs.writeLog(
+                    'Reorder $oldIndex to $newIndex (${thisLobby.lobbyPlayers[oldIndex].name} ->  ${thisLobby.lobbyPlayers[newIndex].name})',
+                  );
+
+                  final item = thisLobby.lobbyPlayers.removeAt(oldIndex);
+                  thisLobby.lobbyPlayers.insert(newIndex, item);
+
+                  widget.callbackFunction();
+                }
+              },
               physics: const BouncingScrollPhysics(),
-              child: SizedBox(
-                height: (stdButtonHeight + stdHorizontalOffset) *
-                    thisLobby.lobbyPlayers.length,
-                child: Column(
-                  children: <Widget>[
-                    for (int index = 0;
-                        index < thisLobby.lobbyPlayers.length;
-                        index++)
-                      Column(
-                        children: [
-                          ClipRRect(
-                            borderRadius:
-                                BorderRadius.circular(stdBorderRadius),
-                            child: _playerDissmisible(
-                              thisLobby.lobbyPlayers,
-                              index,
-                            ),
-                          ),
-                          SizedBox(height: stdHorizontalOffset)
-                        ],
-                      )
-                  ],
-                ),
-              ),
+              itemCount: thisLobby.lobbyPlayers.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  key: ValueKey(thisLobby.lobbyPlayers[index]),
+                  padding:
+                      EdgeInsets.symmetric(vertical: stdHorizontalOffset / 2),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(stdBorderRadius),
+                    child: ValueListenableBuilder<int>(
+                      valueListenable: reorderableIndex,
+                      builder:
+                          (BuildContext context, int value, Widget? child) {
+                        // This builder will only get called when the _counter
+                        // is updated.
+                        return (index == value)
+                            ? Card(
+                                margin: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(stdBorderRadius),
+                                  side: BorderSide(
+                                    color: thisTheme.primaryColor,
+                                  ),
+                                ),
+                                child: _playerDissmisible(
+                                  thisLobby.lobbyPlayers,
+                                  index,
+                                ),
+                              )
+                            : _playerDissmisible(
+                                thisLobby.lobbyPlayers,
+                                index,
+                              );
+                      },
+                    ),
+                  ),
+                );
+              },
             ),
           );
   }
@@ -934,11 +980,14 @@ class _PlayerListState extends State<PlayerList> {
       logs.writeLog(
         '${thisLobby.lobbyPlayers[index].show()}\tdeleted from Lobby',
       );
+      var dealerIndex = thisLobby.dealerIndex;
+      if (thisLobby.lobbyPlayers[index].isDealer) {
+        dealerIndex = thisLobby.dealerIndex;
+      }
       thisLobby.lobbyPlayers.removeAt(index);
-      if (thisLobby.dealerIndex >= thisLobby.lobbyPlayers.length &&
-          thisLobby.lobbyPlayers.isNotEmpty) {
-        thisLobby.dealerIndex =
-            thisLobby.dealerIndex % thisLobby.lobbyPlayers.length;
+      if (dealerIndex >= 0 && thisLobby.lobbyPlayers.isNotEmpty) {
+        thisLobby.lobbyPlayers[dealerIndex % thisLobby.lobbyPlayers.length]
+            .isDealer = true;
         logs.writeLog('New dealerIndex\t ${thisLobby.dealerIndex}');
       }
     }
@@ -1121,7 +1170,7 @@ class _AddWindowState extends State<AddWindow> {
                           hintStyle: TextStyle(
                             fontStyle: FontStyle.italic,
                             fontSize: stdFontSize * 0.85,
-                            color: thisTheme.bankColor,
+                            color: thisTheme.hintColor,
                           ),
                           hintText: 'playp.edit.win1'.tr(),
                           enabledBorder: UnderlineInputBorder(
@@ -1130,14 +1179,14 @@ class _AddWindowState extends State<AddWindow> {
                                 BorderSide(
                               color: (newName != '')
                                   ? thisTheme.primaryColor
-                                  : thisTheme.bankColor,
+                                  : thisTheme.hintColor,
                             ),
                           ),
                           focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
                               color: (newName != '')
                                   ? thisTheme.primaryColor
-                                  : thisTheme.bankColor,
+                                  : thisTheme.hintColor,
                             ),
                           ),
                           counterText: '',
@@ -1169,7 +1218,7 @@ class _AddWindowState extends State<AddWindow> {
                             hintStyle: TextStyle(
                               fontStyle: FontStyle.italic,
                               fontSize: stdFontSize * 0.85,
-                              color: thisTheme.bankColor,
+                              color: thisTheme.hintColor,
                             ),
                             hintText: 'playp.edit.win2'.tr() + ' - $newBank',
                             enabledBorder: UnderlineInputBorder(
@@ -1178,14 +1227,14 @@ class _AddWindowState extends State<AddWindow> {
                                   BorderSide(
                                 color: (newBank != '' && newBank != '0')
                                     ? thisTheme.primaryColor
-                                    : thisTheme.bankColor,
+                                    : thisTheme.hintColor,
                               ),
                             ),
                             focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide(
                                 color: (newBank != '' && newBank != '0')
                                     ? thisTheme.primaryColor
-                                    : thisTheme.bankColor,
+                                    : thisTheme.hintColor,
                               ),
                             ),
                             counterText: '',
@@ -1231,7 +1280,7 @@ class _AddWindowState extends State<AddWindow> {
                                 fillColor: MaterialStateProperty.all<Color>(
                                   dealerBool
                                       ? thisTheme.primaryColor
-                                      : thisTheme.bankColor,
+                                      : thisTheme.hintColor,
                                 ),
                                 value: dealerBool,
                                 onChanged: (bool? value) {
@@ -1297,16 +1346,6 @@ class _AddWindowState extends State<AddWindow> {
                                 const Duration(milliseconds: 500),
                               );
                             }
-                            // изменяем диллера, если нужно
-                            if (dealerBool && widget.playerIndex != null) {
-                              var newDealer = (widget.isNew)
-                                  ? thisLobby.lobbyPlayers.length
-                                  : widget.playerIndex;
-                              thisLobby.dealerIndex = newDealer!;
-                              logs.writeLog(
-                                'New dealerIndex\t ${thisLobby.dealerIndex}',
-                              );
-                            }
                             //меняем стек, только если он адекватный
                             if (int.parse(newBank) <= 0 &&
                                 thisLobby.lobbyState == 5) {
@@ -1337,10 +1376,18 @@ class _AddWindowState extends State<AddWindow> {
                                   newName,
                                   standartLogo,
                                   int.parse(newBank),
+                                  dealerBool,
                                 ),
                                 false,
                                 true,
+                                dealerBool,
                               );
+                              if (dealerBool ||
+                                  thisLobby.lobbyPlayers.length == 1) {
+                                thisLobby.setDealer(
+                                  thisLobby.lobbyPlayers.length - 1,
+                                );
+                              }
                               //addNewPlayer(Player(newName, standartLogo,int. parse(newBank), !thisLobby.lobbyIsActive||thisLobby.lobbyState==5));
                             }
                             // иначе редачим
@@ -1352,6 +1399,9 @@ class _AddWindowState extends State<AddWindow> {
                                 //widget.player!.isActive = int. parse(newBank) >= thisLobby.lobbySmallBlind * 2;
                                 widget.player!.isActive =
                                     int.parse(newBank) > 0;
+                              }
+                              if (dealerBool) {
+                                thisLobby.setDealer(widget.playerIndex!);
                               }
                               logs.writeLog(
                                 '${widget.player!.show()} -> $newName: $newBank/${widget.player!.bid}/${widget.player!.isActive}',
@@ -1481,10 +1531,33 @@ Widget playerCard(
   BuildContext context,
   callBackFunction,
 ) =>
-    Container(
-      color: thisTheme.bgrColor,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(stdBorderRadius),
+    ClipRRect(
+      borderRadius: BorderRadius.circular(stdBorderRadius),
+      child: GestureDetector(
+        onTap: () async {
+          await transitionDialog(
+            duration: const Duration(milliseconds: 400),
+            type: 'Scale1',
+            //barrierColor: null,
+            context: context,
+            child: AddWindow(
+              player: player,
+              callBackFunction: callBackFunction,
+              playerIndex: index,
+              settingsBool: (thisLobby.lobbyState == 5),
+            ),
+            builder: (BuildContext context) {
+              return AddWindow(
+                player: player,
+                callBackFunction: callBackFunction,
+                playerIndex: index,
+                settingsBool: (thisLobby.lobbyState == 5),
+              );
+            },
+          );
+          SystemChrome.restoreSystemUIOverlays();
+          //_quickDelete(index);
+        },
         child: Container(
           height: height,
           color: thisTheme.playerColor,
@@ -1535,14 +1608,13 @@ Widget playerCard(
                                     fontSize: stdFontSize * 0.8,
                                   ),
                                 ),
-                                if (index == thisLobby.dealerIndex && !saved)
+                                if (player.isDealer && !saved)
                                   Tooltip(
                                     message: 'tooltip.dealer'.tr(),
                                     verticalOffset: stdButtonHeight / 6,
                                     child: Icon(
                                       MdiIcons.cardsPlaying,
-                                      color:
-                                          thisTheme.onBackground.withOpacity(1),
+                                      color: thisTheme.onBackground,
                                       size: stdIconSize / 1.5,
                                     ),
                                   ),
@@ -1569,39 +1641,10 @@ Widget playerCard(
                   alignment: Alignment.centerLeft,
                   child: AspectRatio(
                     aspectRatio: 1 / 1,
-                    child: IconButton(
-                      tooltip: 'tooltip.edit'.tr(),
-                      onPressed: () async {
-                        await transitionDialog(
-                          duration: const Duration(milliseconds: 400),
-                          type: 'Scale1',
-                          //barrierColor: null,
-                          context: context,
-                          child: AddWindow(
-                            player: player,
-                            callBackFunction: callBackFunction,
-                            playerIndex: index,
-                            settingsBool: (thisLobby.lobbyState == 5),
-                          ),
-                          builder: (BuildContext context) {
-                            return AddWindow(
-                              player: player,
-                              callBackFunction: callBackFunction,
-                              playerIndex: index,
-                              settingsBool: (thisLobby.lobbyState == 5),
-                            );
-                          },
-                        );
-                        SystemChrome.restoreSystemUIOverlays();
-                        //_quickDelete(index);
-                      },
-                      splashColor: thisTheme.bankColor,
-                      highlightColor: Colors.transparent,
-                      icon: Icon(
-                        Icons.create,
-                        color: thisTheme.onBackground,
-                        size: stdIconSize * 0.75,
-                      ),
+                    child: Icon(
+                      Icons.drag_handle,
+                      color: thisTheme.onBackground,
+                      size: stdIconSize * 0.75,
                     ),
                   ),
                 ),

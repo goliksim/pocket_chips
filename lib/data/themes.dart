@@ -5,6 +5,7 @@ class Themes {
   String name;
   Color bgrColor;
   Color bankColor;
+  Color hintColor;
   Color playerColor;
   Color additionButtonColor;
   MaterialColor primaryColor;
@@ -17,6 +18,7 @@ class Themes {
     this.name,
     this.bgrColor,
     this.bankColor,
+    this.hintColor,
     this.playerColor,
     this.additionButtonColor,
     this.primaryColor,
@@ -38,6 +40,7 @@ Themes light = Themes(
   'light',
   const Color.fromARGB(255, 248, 247, 250), // bgrColor
   const Color.fromARGB(255, 215, 213, 245), // bankColor
+  const Color.fromARGB(255, 215, 213, 245), // hintColor
   const Color.fromARGB(255, 255, 255, 255), // playerColor
   const Color.fromARGB(255, 54, 60, 87), //additionButtonColor
   MaterialColor(0xff7064df, colorLight), // primaryColor
@@ -50,7 +53,8 @@ Themes light = Themes(
 Themes dark = Themes(
   'dark',
   const Color.fromARGB(254, 29, 29, 34), // bgrColor
-  const Color.fromARGB(255, 70, 70, 80), // bankColor
+  const Color.fromARGB(255, 50, 50, 60), // bankColor
+  const Color.fromARGB(255, 80, 80, 90), // hintColor
   const Color.fromARGB(255, 36, 35, 45), // playerColor
   const Color.fromARGB(255, 70, 78, 109), //additionButtonColor
   MaterialColor(0xff8882e6, colorLight), // primaryColor

@@ -227,7 +227,7 @@ class PatternContainer extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         image: DecorationImage(
-          opacity: 0.4 * opacity,
+          opacity: 0.3 * opacity,
           //colorFilter: ColorFilter.mode(thisTheme.primaryColor, BlendMode.srcATop),
           image: const AssetImage('assets/pattern.png'),
           fit: BoxFit.cover,
@@ -235,4 +235,18 @@ class PatternContainer extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget proxyDecorator(Widget child, int index, Animation<double> animation) {
+  return AnimatedBuilder(
+    animation: animation,
+    builder: (BuildContext context, Widget? child) {
+      return Material(
+        elevation: 0,
+        color: Colors.transparent,
+        child: child,
+      );
+    },
+    child: child,
+  );
 }

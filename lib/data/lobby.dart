@@ -15,6 +15,7 @@ class Player {
   int bank = 0; // Банк
   bool isActive = false;
   int bid = 0;
+  bool isDealer = false;
   //Функция обновления денег
   void changeBank(int newbank) {
     bank = newbank;
@@ -34,7 +35,8 @@ class Player {
         'assetUrl': assetUrl,
         'bank': bank,
         'active': isActive,
-        'bid': bid
+        'bid': bid,
+        'isDealer': isDealer,
       };
   //читаем из json
   Player.fromJson(Map<String, dynamic> json)
@@ -42,7 +44,8 @@ class Player {
         assetUrl = json['assetUrl'],
         bank = json['bank'],
         isActive = json['active'],
-        bid = json['bid']; //bids = json['bids'];
+        bid = json['bid'], //bids = json['bids'];
+        isDealer = json['isDealer'];
 
   @override
   //перегруженный оператор == для недобавления существующих игроков
@@ -104,13 +107,17 @@ class Lobby {
     logs.writeLog('elementsOffset: $elementsOffset');
   }
 
+  int get dealerIndex {
+    return lobbyPlayers.indexWhere((e) => e.isDealer);
+  }
+
   void reset() {
     for (Player player in lobbyPlayers) {
       player.bank = lobbyBank;
     }
     lobbyIndex = -1;
     lobbyState = 5;
-    dealerIndex = 0;
+    //dealerIndex = 0;
     lobbyIsActive = false;
     firstPlayerIndex = -1;
     lapCount = 0;
@@ -133,7 +140,7 @@ class Lobby {
   // банк лобби
   int lobbyBank;
   // смолБлайн первый игрок
-  int dealerIndex = 0;
+  //int dealerIndex = 0;
   int firstPlayerIndex = -1;
   int bigBlindIndex = 0;
   int lapCount = 0;
@@ -165,6 +172,13 @@ class Lobby {
   int lobbyFirstAnte;
   */
 
+  void setDealer(int index) {
+    for (var player in lobbyPlayers) {
+      player.isDealer = false;
+    }
+    lobbyPlayers[index].isDealer = true;
+  }
+
   //пишем в json
   Map toJson() => {
         'lobbyIsActive': lobbyIsActive,
@@ -174,7 +188,6 @@ class Lobby {
         'lobbyState': lobbyState,
         'elementsOffset': elementsOffset,
         'lobbyBank': lobbyBank,
-        'dealerIndex': dealerIndex,
         'firstPlayerIndex': firstPlayerIndex,
         'lobbyAnteBool': lobbyAnteBool,
         'lobbyAnte': lobbyAnte,
@@ -196,7 +209,6 @@ class Lobby {
         lobbyState = json['lobbyState'],
         elementsOffset = json['elementsOffset'],
         lobbyBank = json['lobbyBank'],
-        dealerIndex = json['dealerIndex'],
         firstPlayerIndex = json['firstPlayerIndex'],
         lobbyAnteBool = json['lobbyAnteBool'],
         lobbyAnte = json['lobbyAnte'],
@@ -204,7 +216,7 @@ class Lobby {
         lapCount = json['lapCount'],
         lobbyRandomOffset = json['lobbyRandomOffset']
             .map<double>((e) => jsonToDouble(e))
-            .toList(); //bids = json['bids'];
+            .toList();
 }
 
 double jsonToDouble(dynamic value) {
