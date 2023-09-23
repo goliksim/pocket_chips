@@ -1,10 +1,9 @@
 // ignore_for_file: file_names
 import 'dart:math';
 import 'dart:async';
-import 'package:collection/collection.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pocket_chips/internal/localization.dart';
 
 import '../internal/gamelogic.dart';
 import '../widgets/lobbySettings.dart';
@@ -53,10 +52,7 @@ class _GamePageState extends State<GamePage> {
     else {
       if (thisLobby.lobbyIndex >= 0 && thisLobby.lobbyIndex < 4) {
         thisGame.gameStateName = Text(
-          'game.turn1'.tr() +
-              '\u00A0' +
-              'game.turn2'.tr() +
-              '\u00A0' '${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
+          '${context.locale.game_turn1}\u00A0${context.locale.game_turn2}\u00A0${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
           style: TextStyle(color: thisTheme.onBackground),
         );
       }
@@ -129,8 +125,8 @@ class _GamePageState extends State<GamePage> {
               duration: const Duration(milliseconds: 300),
               transitionBuilder: (Widget child, Animation<double> animation) {
                 return FadeTransition(
-                  child: child,
                   opacity: animation,
+                  child: child,
                 );
               },
               child: Text(
@@ -153,7 +149,7 @@ class _GamePageState extends State<GamePage> {
                             color: thisTheme.onBackground,
                             size: stdIconSize,
                           ),
-                          tooltip: 'tooltip.rot'.tr(),
+                          tooltip: context.locale.tooltip_rot,
                           onPressed: () {
                             thisLobby.mixPlayersPosition();
                             thisGame.changeOffset();
@@ -218,15 +214,16 @@ class _GamePageState extends State<GamePage> {
                                   ),
                                   // 3 карты по середине
                                   Positioned(
-                                    child: cards2(0),
                                     bottom: 3 * stdButtonHeight,
+                                    child: cards2(0),
                                   ),
                                   // 2 карты по середине
                                   Positioned(
-                                    child: cards2(1),
                                     bottom: 2.2 * stdButtonHeight,
+                                    child: cards2(1),
                                   ),
                                   Positioned(
+                                    bottom: 2.5 * stdButtonHeight,
                                     child: Text(
                                       '${thisLobby.lobbySmallBlind} / ${thisLobby.lobbySmallBlind * 2}',
                                       style: TextStyle(
@@ -235,10 +232,10 @@ class _GamePageState extends State<GamePage> {
                                         fontSize: stdFontSize * 0.6,
                                       ),
                                     ),
-                                    bottom: 2.5 * stdButtonHeight,
                                   ),
                                   // Общая ставка
                                   Positioned(
+                                    bottom: 2.175 * stdButtonHeight,
                                     child: FittedBox(
                                       child: Container(
                                         height: stdHeight / 2.5,
@@ -253,7 +250,7 @@ class _GamePageState extends State<GamePage> {
                                         ),
                                         child: Center(
                                           child: Text(
-                                            '\$ ${thisLobby.lobbyPlayers.map((e) => e.bid).sum}',
+                                            '\$ ${thisLobby.lobbyPlayers.map((e) => e.bid).reduce((a, b) => a + b)}',
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: stdFontSize * 0.75,
@@ -262,7 +259,6 @@ class _GamePageState extends State<GamePage> {
                                         ),
                                       ),
                                     ),
-                                    bottom: 2.175 * stdButtonHeight,
                                   ),
                                   // Карточки игроков
                                   for (int a = 0;
@@ -371,7 +367,7 @@ class _GamePageState extends State<GamePage> {
                                 stdButtonWidth,
                                 MediaQuery.of(context).size.width -
                                     stdHorizontalOffset * 2
-                              ].min,
+                              ].reduce(min),
                               height: stdButtonHeight * 1.6,
                               child: AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 500),
@@ -400,7 +396,7 @@ class _GamePageState extends State<GamePage> {
                       stdButtonWidth,
                       MediaQuery.of(context).size.width -
                           stdHorizontalOffset * 2
-                    ].min,
+                    ].reduce(min),
                     child: (thisLobby.lobbyState != 5)
                         ? Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -426,7 +422,7 @@ class _GamePageState extends State<GamePage> {
                                     ), // Кнопка Call/Check/Skip
                               // Кнопка Fold
                               controlButton(
-                                'game.fold'.tr(),
+                                context.locale.game_fold,
                                 thisTheme.additionButtonColor,
                                 foldAction,
                               ),
@@ -496,7 +492,7 @@ class _GamePageState extends State<GamePage> {
                                           : 0.3,
                                     ),
                                   ),
-                                  textString: 'game.start'.tr(),
+                                  textString: context.locale.game_start,
                                   action: () => thisGame.startBetting(),
                                 ),
                               ),
@@ -553,14 +549,13 @@ class _GamePageState extends State<GamePage> {
   String middleButtonString() {
     if (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid ==
         thisLobby.lobbyPlayers.map((e) => e.bid).reduce(max)) {
-      return 'game.check'.tr();
+      return context.locale.game_check;
     } else {
       return (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank +
                   thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid >
               thisLobby.lobbyPlayers.map((e) => e.bid).reduce(max))
-          ? 'game.call'.tr() +
-              ' \$${(thisLobby.lobbyPlayers.map((e) => e.bid).reduce(max) - thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid)}'
-          : 'game.all'.tr();
+          ? '${context.locale.game_call} \$${(thisLobby.lobbyPlayers.map((e) => e.bid).reduce(max) - thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid)}'
+          : context.locale.game_all;
     }
   }
 
@@ -568,14 +563,9 @@ class _GamePageState extends State<GamePage> {
   String raiseBetString() {
     if (thisGame.raiseBank ==
         thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank) {
-      return 'game.all'.tr();
+      return context.locale.game_all;
     } else {
-      return ((thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid ==
-                      thisLobby.lobbyPlayers.map((e) => e.bid).reduce(max) &&
-                  thisLobby.lobbyState != 0)
-              ? 'game.bet'.tr()
-              : 'game.raise'.tr()) +
-          ' \$${thisGame.raiseBank}';
+      return '${(thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid == thisLobby.lobbyPlayers.map((e) => e.bid).reduce(max) && thisLobby.lobbyState != 0) ? context.locale.game_bet : context.locale.game_raise} \$${thisGame.raiseBank}';
     }
   }
 
@@ -587,17 +577,17 @@ class _GamePageState extends State<GamePage> {
       if (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid ==
               thisLobby.lobbyPlayers.map((e) => e.bid).reduce(max) &&
           thisLobby.lobbyState != 0) {
-        return 'game.bet'.tr();
+        return context.locale.game_bet;
       } else {
         //print(raiseBank);
         return (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank <=
                     thisGame.raiseBank &&
                 allMoney > thisLobby.lobbyPlayers.map((e) => e.bid).reduce(max))
-            ? 'game.all'.tr()
-            : 'game.raise'.tr();
+            ? context.locale.game_all
+            : context.locale.game_raise;
       }
     } else {
-      return 'game.raise.canc'.tr();
+      return context.locale.game_raise_canc;
     }
   }
 
@@ -632,8 +622,8 @@ class _GamePageState extends State<GamePage> {
                     final value = min(rotateAnim.value, pi / 2);
                     return Transform(
                       transform: Matrix4.rotationY(value)..setEntry(3, 0, tilt),
-                      child: widget,
                       alignment: Alignment.center,
+                      child: widget,
                     );
                   },
                 );
@@ -730,16 +720,13 @@ class _GamePageState extends State<GamePage> {
                   settingsBool: (thisLobby.lobbyState == 5),
                 );
               },
-            );
+            ).then((value) {
+              thisGame.gameStateName = Text(
+                '${context.locale.game_turn1}\u00A0${context.locale.game_turn2}\u00A0${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
+                style: TextStyle(color: thisTheme.onBackground),
+              );
+            });
             SystemChrome.restoreSystemUIOverlays();
-            thisGame.gameStateName = Text(
-              'game.turn1'.tr() +
-                  '\u00A0' +
-                  'game.turn2'.tr() +
-                  '\u00A0'
-                      '${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
-              style: TextStyle(color: thisTheme.onBackground),
-            );
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -997,14 +984,16 @@ class _GamePageState extends State<GamePage> {
         },
         transitionBuilder: getTransition('Scale1'),
       );
-      await Future.delayed(const Duration(seconds: 3));
-      Navigator.pop(dialogContext);
-      thisLobby
-          .lobbyPlayers[
-              thisLobby.lobbyPlayers.indexWhere((e) => e.isActive == true)]
-          .bank += thisLobby.lobbyPlayers.map((e) => e.bid).sum;
-      thisGame.newLap(folded: true);
-      setState(() {});
+      await Future.delayed(const Duration(seconds: 3)).then((_) {
+        Navigator.pop(dialogContext);
+        thisLobby
+                .lobbyPlayers[thisLobby.lobbyPlayers
+                    .indexWhere((e) => e.isActive == true)]
+                .bank +=
+            thisLobby.lobbyPlayers.map((e) => e.bid).reduce((a, b) => a + b);
+        thisGame.newLap(folded: true);
+        setState(() {});
+      });
     }
   }
 
@@ -1031,7 +1020,7 @@ class _WinnerWindowState extends State<WinnerWindow> {
   void initState() {
     super.initState();
     for (int i = 0; i < 100; i++) {
-      bgrText += 'game.win1'.tr() + '\u00A0';
+      bgrText += '${context.locale.game_win1}\u00A0';
     }
   }
 
@@ -1044,7 +1033,7 @@ class _WinnerWindowState extends State<WinnerWindow> {
         horizontal: [
           (MediaQuery.of(context).size.width - stdButtonHeight * 4) / 2,
           adaptiveOffset
-        ].max,
+        ].reduce(max),
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
@@ -1098,8 +1087,7 @@ class _WinnerWindowState extends State<WinnerWindow> {
                   width: stdButtonHeight * 4,
                   alignment: Alignment.center,
                   child: Text(
-                    '${thisLobby.lobbyPlayers[thisLobby.lobbyPlayers.indexWhere((e) => e.isActive == true)].name} ' +
-                        'game.win2'.tr(),
+                    '${thisLobby.lobbyPlayers[thisLobby.lobbyPlayers.indexWhere((e) => e.isActive == true)].name} ${context.locale.game_win2}',
                     style: TextStyle(
                       color: thisTheme.primaryColor,
                       fontSize: stdFontSize,
@@ -1131,10 +1119,10 @@ class StaticRaiseButton extends StatefulWidget {
   final int raiseBank;
 
   @override
-  _StaticRaiseButtonState createState() => _StaticRaiseButtonState();
+  StaticRaiseButtonState createState() => StaticRaiseButtonState();
 }
 
-class _StaticRaiseButtonState extends State<StaticRaiseButton> {
+class StaticRaiseButtonState extends State<StaticRaiseButton> {
   late int tmpBid;
   late int mintmpBid;
 
@@ -1298,7 +1286,7 @@ class _WinnerChooseWindowState extends State<WinnerChooseWindow> {
   @override
   void initState() {
     super.initState();
-    title = widget.title ?? 'game.win3'.tr();
+    title = widget.title ?? LocaleManager.locale.game_win3;
     logs.writeLog('${widget.title} window');
     for (int i = 0; i < thisLobby.lobbyPlayers.length; i++) {
       if (thisLobby.lobbyPlayers[i].isActive) {
@@ -1410,8 +1398,7 @@ class _WinnerChooseWindowState extends State<WinnerChooseWindow> {
                                             ),
                                           ),
                                           Text(
-                                            'game.bet'.tr() +
-                                                ': ${thisLobby.lobbyPlayers[i].bid}',
+                                            '${context.locale.game_bet}: ${thisLobby.lobbyPlayers[i].bid}',
                                             style: TextStyle(
                                               color: thisTheme.onBackground,
                                               fontSize: stdFontSize * 0.75,
@@ -1448,12 +1435,12 @@ class _WinnerChooseWindowState extends State<WinnerChooseWindow> {
               height: stdButtonHeight * 0.75 * 0.75,
               width: double.infinity,
               buttonColor: thisTheme.primaryColor,
-              textString: 'game.win.conf'.tr(),
+              textString: context.locale.game_win_conf,
               action: () {
                 if (winners.where((e) => e == true).isNotEmpty) {
                   moneyDistribution(winners, context);
                 } else {
-                  showToast('toast.winn'.tr());
+                  showToast(context.locale.toast_winn);
                 }
               },
             )
@@ -1490,17 +1477,16 @@ class _WinnerChooseWindowState extends State<WinnerChooseWindow> {
           context: context,
           child: WinnerChooseWindow(
             thisLobby: thisLobby,
-            title: 'game.win4'.tr(),
+            title: context.locale.game_win4,
           ),
           builder: (BuildContext context) {
             return WinnerChooseWindow(
               thisLobby: thisLobby,
-              title: 'game.win4'.tr(),
+              title: context.locale.game_win4,
             );
           },
-        );
+        ).then((_) => Navigator.pop(context));
 
-        Navigator.pop(context);
         return 0;
       }
 
@@ -1559,6 +1545,7 @@ class _WinnerChooseWindowState extends State<WinnerChooseWindow> {
       }
     }
 
+    // ignore: use_build_context_synchronously
     Navigator.pop(context);
     return deletedWinners;
   }
@@ -1598,8 +1585,8 @@ class _AddBottomState extends State<AddBottom> {
                           1.0,
                           1.0,
                         ),
-                        child: widget,
                         alignment: Alignment.center,
+                        child: widget,
                       );
                     },
                   );
@@ -1616,7 +1603,7 @@ class _AddBottomState extends State<AddBottom> {
                         ),
                         child: FittedBox(
                           child: IconButton(
-                            tooltip: 'tooltip.add.main'.tr(),
+                            tooltip: context.locale.tooltip_add_main,
                             splashRadius: stdButtonHeight * 0.75 * 0.45,
                             icon: const Icon(
                               Icons.add,
@@ -1659,7 +1646,7 @@ class _AddBottomState extends State<AddBottom> {
                                   color: Colors.white,
                                   //size: stdIconSize,
                                 ),
-                                tooltip: 'tooltip.add.new'.tr(),
+                                tooltip: context.locale.tooltip_add_new,
                                 onPressed: () async {
                                   setState(() {
                                     addButtonPressed = false;
@@ -1703,7 +1690,7 @@ class _AddBottomState extends State<AddBottom> {
                                   color: Colors.white,
                                   //size: stdIconSize,
                                 ),
-                                tooltip: 'tooltip.add.stor'.tr(),
+                                tooltip: context.locale.tooltip_add_stor,
                                 onPressed: () async {
                                   setState(() {
                                     addButtonPressed = false;

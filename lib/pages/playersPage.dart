@@ -1,9 +1,9 @@
 // ignore_for_file: file_names
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:pocket_chips/internal/localization.dart';
 
 import '../ui/transitions.dart';
 import '../widgets/lobbySettings.dart';
@@ -43,7 +43,7 @@ void addPlayer(
       newPlayer.isDealer = false;
       savedPlayers.add(newPlayer);
       logs.writeLog('Saving:\t${newPlayer.show()}');
-      showToast('${newPlayer.name} ' + 'toast.saved'.tr());
+      showToast('${newPlayer.name} ${LocaleManager.locale.toast_saved}');
       // запись в json, чтобы все сохранилось
       savedStorage.writePlayers(savedPlayers);
     } else {
@@ -61,7 +61,7 @@ void addPlayer(
       if (thisLobby.lobbyPlayers.isEmpty) newPlayer.isDealer = true;
       thisLobby.add(newPlayer);
       logs.writeLog(
-        (isNew ? 'New player' : 'Added from saved') + '\t ${newPlayer.show()}',
+        '${isNew ? 'New player' : 'Added from saved'}\t ${newPlayer.show()}',
       );
       //if(!isNew) showToast('${newPlayer.name} added from storage');
       await Future.delayed(const Duration(milliseconds: 300));
@@ -77,9 +77,9 @@ void addPlayer(
     } else {
       logs.writeLog('${newPlayer.show()}\talready in Lobby or MAX PLAYERS');
       if (thisLobby.lobbyPlayers.length == maxPlayerCount) {
-        showToast('toast.maxpl'.tr());
+        showToast(LocaleManager.locale.toast_maxpl);
       } else {
-        showToast('${newPlayer.name} ' + 'toast.alred'.tr());
+        showToast('${newPlayer.name} ${LocaleManager.locale.toast_alred}');
       }
     }
   }
@@ -114,10 +114,10 @@ class PlayersPage extends StatefulWidget {
   const PlayersPage({Key? key}) : super(key: key);
 
   @override
-  _PlayersPageState createState() => _PlayersPageState();
+  PlayersPageState createState() => PlayersPageState();
 }
 
-class _PlayersPageState extends State<PlayersPage> {
+class PlayersPageState extends State<PlayersPage> {
   @override
   void initState() {
     // загрузка игроков с прошлого раза
@@ -165,7 +165,7 @@ class _PlayersPageState extends State<PlayersPage> {
             titleTextStyle:
                 appBarStyle().copyWith(fontSize: stdFontSize / 20 * 24),
             elevation: 0,
-            title: Text('playp.tittle'.tr()),
+            title: Text(LocaleManager.locale.playp_tittle),
             centerTitle: true,
             actions: <Widget>[
               AspectRatio(
@@ -177,7 +177,7 @@ class _PlayersPageState extends State<PlayersPage> {
                     Icons.folder_shared,
                     size: stdIconSize,
                   ),
-                  tooltip: 'tooltip.stor'.tr(),
+                  tooltip: LocaleManager.locale.tooltip_stor,
                   onPressed: () async {
                     await transitionDialog(
                       duration: const Duration(milliseconds: 400),
@@ -281,9 +281,9 @@ class _PlayersPageState extends State<PlayersPage> {
               context: context,
               duration: const Duration(milliseconds: 400),
               child: ConfirmationWindow(
-                type: 'conf.rest.tittle'.tr(),
-                button: 'conf.rest.butt'.tr(),
-                message: 'conf.rest.text'.tr(),
+                type: LocaleManager.locale.conf_rest_tittle,
+                button: LocaleManager.locale.conf_rest_butt,
+                message: LocaleManager.locale.conf_rest_text,
                 action: () async {
                   thisLobby.reset();
                   callback();
@@ -291,9 +291,9 @@ class _PlayersPageState extends State<PlayersPage> {
               ), //setState(() {});
               builder: (BuildContext thiscontext) {
                 return ConfirmationWindow(
-                  type: 'conf.rest.tittle'.tr(),
-                  button: 'conf.rest.butt'.tr(),
-                  message: 'conf.rest.text'.tr(),
+                  type: LocaleManager.locale.conf_rest_tittle,
+                  button: LocaleManager.locale.conf_rest_butt,
+                  message: LocaleManager.locale.conf_rest_text,
                   action: () async {
                     thisLobby.reset();
                     callback();
@@ -336,7 +336,7 @@ class _PlayersPageState extends State<PlayersPage> {
                     ),
                   ),
                   Text(
-                    'playp.rest'.tr(),
+                    LocaleManager.locale.playp_rest,
                     style: TextStyle(
                       fontSize: stdFontSize,
                       color: thisTheme.onBackground,
@@ -356,7 +356,7 @@ class _PlayersPageState extends State<PlayersPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'playp.init'.tr() + '  ',
+                    '${LocaleManager.locale.playp_init}  ',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: stdFontSize,
@@ -388,7 +388,7 @@ class _PlayersPageState extends State<PlayersPage> {
               buttonColor: thisTheme.primaryColor,
               action: () async {
                 if (thisLobby.lobbyPlayers.length < 2) {
-                  showToast('toast.moreplay2'.tr());
+                  showToast(LocaleManager.locale.toast_moreplay2);
                 } else {
                   logs.writeLog('Switch to PlayerPage');
                   Navigator.push(
@@ -401,8 +401,8 @@ class _PlayersPageState extends State<PlayersPage> {
                 }
               },
               textString: thisLobby.lobbyIsActive
-                  ? 'home.cont'.tr()
-                  : 'playp.start'.tr(),
+                  ? LocaleManager.locale.home_cont
+                  : LocaleManager.locale.playp_start,
             ),
             // Settings
             MyButton(
@@ -427,7 +427,7 @@ class _PlayersPageState extends State<PlayersPage> {
                 callback();
                 SystemChrome.restoreSystemUIOverlays();
               },
-              textString: 'playp.set'.tr(),
+              textString: LocaleManager.locale.playp_set,
             ),
           ],
         ),
@@ -451,10 +451,10 @@ class AttentionAdd extends StatefulWidget {
   final Function() callBackFunction;
 
   @override
-  _AttentionAddState createState() => _AttentionAddState();
+  AttentionAddState createState() => AttentionAddState();
 }
 
-class _AttentionAddState extends State<AttentionAdd>
+class AttentionAddState extends State<AttentionAdd>
     with SingleTickerProviderStateMixin {
   late AnimationController controller;
   late dynamic f;
@@ -517,7 +517,7 @@ class _AttentionAddState extends State<AttentionAdd>
         buttonColor: thisTheme.playerColor,
         child: thisLobby.lobbyPlayers.isEmpty
             ? Text(
-                'playp.add'.tr(),
+                LocaleManager.locale.playp_add,
                 style: TextStyle(
                   color: thisTheme.primaryColor,
                   fontSize: stdFontSize * 0.75,
@@ -604,7 +604,7 @@ class _BankWindowState extends State<BankWindow> {
                 child: FittedBox(
                   fit: BoxFit.fitWidth,
                   child: Text(
-                    'playp.bank.title'.tr(),
+                    LocaleManager.locale.playp_bank_title,
                     style: TextStyle(
                       color: thisTheme.onBackground,
                       fontSize: stdFontSize,
@@ -680,7 +680,7 @@ class _BankWindowState extends State<BankWindow> {
                   widget.update(tmpBank.abs());
                 }
               },
-              textString: 'playp.bank.conf'.tr(),
+              textString: LocaleManager.locale.playp_bank_conf,
             ),
           ],
         ),
@@ -700,10 +700,10 @@ class PlayerList extends StatefulWidget {
   final bool saved;
 
   @override
-  _PlayerListState createState() => _PlayerListState();
+  PlayerListState createState() => PlayerListState();
 }
 
-class _PlayerListState extends State<PlayerList> {
+class PlayerListState extends State<PlayerList> {
   final ScrollController _scrollController = ScrollController();
   ValueNotifier<int> reorderableIndex = ValueNotifier(-1);
 
@@ -736,7 +736,7 @@ class _PlayerListState extends State<PlayerList> {
                     child: Center(
                       child: savedPlayers.isNotEmpty
                           ? Text(
-                              'playp.sp.title1'.tr(),
+                              LocaleManager.locale.playp_sp_title1,
                               style: TextStyle(
                                 color: thisTheme.onBackground,
                                 fontWeight: FontWeight.bold,
@@ -744,7 +744,7 @@ class _PlayerListState extends State<PlayerList> {
                               ),
                             )
                           : Text(
-                              'playp.sp.title2'.tr(),
+                              LocaleManager.locale.playp_sp_title2,
                               style: TextStyle(
                                 color: thisTheme.onBackground,
                                 fontWeight: FontWeight.w500,
@@ -798,69 +798,73 @@ class _PlayerListState extends State<PlayerList> {
           )
         : ClipRRect(
             borderRadius: BorderRadius.circular(stdBorderRadius),
-            child: ReorderableListView.builder(
-              proxyDecorator: proxyDecorator,
-              onReorderStart: (index) {
-                reorderableIndex.value = index;
-              },
-              onReorderEnd: (index) {
-                reorderableIndex.value = -1;
-              },
-              onReorder: (oldIndex, newIndex) {
-                if (oldIndex < newIndex) {
-                  newIndex -= 1;
-                }
+            child: SizedBox(
+              height: thisLobby.lobbyPlayers.length *
+                  (stdButtonHeight + stdHorizontalOffset),
+              child: ReorderableListView.builder(
+                scrollController: scrollController,
+                proxyDecorator: proxyDecorator,
+                onReorderStart: (index) {
+                  reorderableIndex.value = index;
+                },
+                onReorderEnd: (index) {
+                  reorderableIndex.value = -1;
+                },
+                onReorder: (oldIndex, newIndex) {
+                  if (oldIndex < newIndex) {
+                    newIndex -= 1;
+                  }
 
-                if (oldIndex != newIndex) {
-                  logs.writeLog(
-                    'Reorder $oldIndex to $newIndex (${thisLobby.lobbyPlayers[oldIndex].name} ->  ${thisLobby.lobbyPlayers[newIndex].name})',
-                  );
+                  if (oldIndex != newIndex) {
+                    logs.writeLog(
+                      'Reorder $oldIndex to $newIndex (${thisLobby.lobbyPlayers[oldIndex].name} ->  ${thisLobby.lobbyPlayers[newIndex].name})',
+                    );
 
-                  final item = thisLobby.lobbyPlayers.removeAt(oldIndex);
-                  thisLobby.lobbyPlayers.insert(newIndex, item);
+                    final item = thisLobby.lobbyPlayers.removeAt(oldIndex);
+                    thisLobby.lobbyPlayers.insert(newIndex, item);
 
-                  widget.callbackFunction();
-                }
-              },
-              physics: const BouncingScrollPhysics(),
-              itemCount: thisLobby.lobbyPlayers.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  key: ValueKey(thisLobby.lobbyPlayers[index]),
-                  padding:
-                      EdgeInsets.symmetric(vertical: stdHorizontalOffset / 2),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(stdBorderRadius),
-                    child: ValueListenableBuilder<int>(
-                      valueListenable: reorderableIndex,
-                      builder:
-                          (BuildContext context, int value, Widget? child) {
-                        // This builder will only get called when the _counter
-                        // is updated.
-                        return (index == value)
-                            ? Card(
-                                margin: EdgeInsets.zero,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(stdBorderRadius),
-                                  side: BorderSide(
-                                    color: thisTheme.primaryColor,
+                    widget.callbackFunction();
+                  }
+                },
+                physics: const BouncingScrollPhysics(),
+                itemCount: thisLobby.lobbyPlayers.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    key: ValueKey(thisLobby.lobbyPlayers[index]),
+                    padding: EdgeInsets.only(bottom: stdHorizontalOffset),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(stdBorderRadius),
+                      child: ValueListenableBuilder<int>(
+                        valueListenable: reorderableIndex,
+                        builder:
+                            (BuildContext context, int value, Widget? child) {
+                          // This builder will only get called when the _counter
+                          // is updated.
+                          return (index == value)
+                              ? Card(
+                                  margin: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(stdBorderRadius),
+                                    side: BorderSide(
+                                      color: thisTheme.primaryColor,
+                                    ),
                                   ),
-                                ),
-                                child: _playerDissmisible(
+                                  child: _playerDissmisible(
+                                    thisLobby.lobbyPlayers,
+                                    index,
+                                  ),
+                                )
+                              : _playerDissmisible(
                                   thisLobby.lobbyPlayers,
                                   index,
-                                ),
-                              )
-                            : _playerDissmisible(
-                                thisLobby.lobbyPlayers,
-                                index,
-                              );
-                      },
+                                );
+                        },
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           );
   }
@@ -868,14 +872,6 @@ class _PlayerListState extends State<PlayerList> {
 // Карточка игрока. Принимает индекс. Массив берет из родительского класса.
   Widget _playerDissmisible(List<Player> players, int index) => Dismissible(
         key: Key(players[index].name),
-        child: playerCard(
-          players[index],
-          index,
-          widget.saved ? stdButtonHeight * 0.75 : stdButtonHeight,
-          widget.saved,
-          context,
-          widget.callbackFunction,
-        ),
         direction: (thisLobby.lobbyState == 5)
             ? DismissDirection.horizontal
             : DismissDirection.none,
@@ -899,8 +895,8 @@ class _PlayerListState extends State<PlayerList> {
               ),
               Text(
                 widget.saved
-                    ? ' ' + 'playp.playr.diss1'.tr()
-                    : ' ' + 'playp.playr.diss2'.tr(),
+                    ? ' ${LocaleManager.locale.playp_playr_diss1}'
+                    : ' ${LocaleManager.locale.playp_playr_diss2}',
                 style: TextStyle(
                   color: thisTheme.onBackground,
                   fontSize: stdFontSize * 0.75,
@@ -916,8 +912,8 @@ class _PlayerListState extends State<PlayerList> {
             children: [
               Text(
                 widget.saved
-                    ? ' ' + 'playp.playr.diss3'.tr()
-                    : ' ' + 'playp.playr.diss4'.tr(),
+                    ? ' ${LocaleManager.locale.playp_playr_diss3}'
+                    : ' ${LocaleManager.locale.playp_playr_diss4}',
                 style: TextStyle(
                   color: thisTheme.subsubmainColor,
                   fontSize: stdFontSize * 0.75,
@@ -946,9 +942,9 @@ class _PlayerListState extends State<PlayerList> {
               context: context,
               builder: (BuildContext context) {
                 return ConfirmationWindow(
-                  type: 'conf.del.tittle'.tr(),
-                  button: 'conf.del.butt'.tr(),
-                  message: 'conf.del.text'.tr(),
+                  type: LocaleManager.locale.conf_del_tittle,
+                  button: LocaleManager.locale.conf_del_butt,
+                  message: LocaleManager.locale.conf_del_text,
                   action: () => _quickDelete(index),
                 );
               },
@@ -964,6 +960,14 @@ class _PlayerListState extends State<PlayerList> {
           );
           */
         },
+        child: playerCard(
+          players[index],
+          index,
+          widget.saved ? stdButtonHeight * 0.75 : stdButtonHeight,
+          widget.saved,
+          context,
+          widget.callbackFunction,
+        ),
       );
 
 // Карточка подтверждения удаления. Принимает индекс...
@@ -982,10 +986,11 @@ class _PlayerListState extends State<PlayerList> {
       );
       var dealerIndex = thisLobby.dealerIndex;
       if (thisLobby.lobbyPlayers[index].isDealer) {
-        dealerIndex = thisLobby.dealerIndex;
+        dealerIndex = thisLobby.dealerIndex - 1;
       }
       thisLobby.lobbyPlayers.removeAt(index);
-      if (dealerIndex >= 0 && thisLobby.lobbyPlayers.isNotEmpty) {
+      if (thisLobby.lobbyPlayers.isNotEmpty) {
+        if (dealerIndex < 0) dealerIndex = 0;
         thisLobby.lobbyPlayers[dealerIndex % thisLobby.lobbyPlayers.length]
             .isDealer = true;
         logs.writeLog('New dealerIndex\t ${thisLobby.dealerIndex}');
@@ -1017,10 +1022,10 @@ class AddWindow extends StatefulWidget {
 
   //int tmpBank = 0 ;
   @override
-  _AddWindowState createState() => _AddWindowState();
+  AddWindowState createState() => AddWindowState();
 }
 
-class _AddWindowState extends State<AddWindow> {
+class AddWindowState extends State<AddWindow> {
   final TextEditingController _bankController = TextEditingController();
   String standartLogo = 'assets/faces/pokerfaces0.jpg';
   String newName = '';
@@ -1143,8 +1148,8 @@ class _AddWindowState extends State<AddWindow> {
                       child: Center(
                         child: Text(
                           widget.isNew
-                              ? 'playp.edit.title1'.tr()
-                              : 'playp.edit.title2'.tr(),
+                              ? LocaleManager.locale.playp_edit_title1
+                              : LocaleManager.locale.playp_edit_title2,
                           style: TextStyle(
                             color: thisTheme.onBackground,
                             fontWeight: FontWeight.bold,
@@ -1172,7 +1177,7 @@ class _AddWindowState extends State<AddWindow> {
                             fontSize: stdFontSize * 0.85,
                             color: thisTheme.hintColor,
                           ),
-                          hintText: 'playp.edit.win1'.tr(),
+                          hintText: LocaleManager.locale.playp_edit_win1,
                           enabledBorder: UnderlineInputBorder(
                             borderSide:
                                 // цвет линнии в окне
@@ -1220,7 +1225,8 @@ class _AddWindowState extends State<AddWindow> {
                               fontSize: stdFontSize * 0.85,
                               color: thisTheme.hintColor,
                             ),
-                            hintText: 'playp.edit.win2'.tr() + ' - $newBank',
+                            hintText:
+                                '${LocaleManager.locale.playp_edit_win2} - $newBank',
                             enabledBorder: UnderlineInputBorder(
                               borderSide:
                                   // цвет линнии в окне
@@ -1263,7 +1269,7 @@ class _AddWindowState extends State<AddWindow> {
                           Flexible(
                             flex: 7,
                             child: Text(
-                              'playp.edit.win3'.tr(),
+                              LocaleManager.locale.playp_edit_win3,
                               style: TextStyle(
                                 color: thisTheme.onBackground,
                                 fontSize: stdFontSize * 0.85,
@@ -1319,8 +1325,8 @@ class _AddWindowState extends State<AddWindow> {
                           ? thisTheme.primaryColor
                           : thisTheme.bankColor,
                       textString: !widget.isNew
-                          ? 'playp.edit.conf'.tr()
-                          : 'playp.edit.add'.tr(),
+                          ? LocaleManager.locale.playp_edit_conf
+                          : LocaleManager.locale.playp_edit_add,
                       action: () async {
                         // проверка чтобы челикс не ввел пустой символ
                         SystemChrome.restoreSystemUIOverlays();
@@ -1355,10 +1361,7 @@ class _AddWindowState extends State<AddWindow> {
                                 text: newBank,
                               );
                               showToast(
-                                'toast.bank1'.tr() +
-                                    '\n' +
-                                    'toast.bank2'.tr() +
-                                    ' - ${thisLobby.lobbySmallBlind * 2}',
+                                '${LocaleManager.locale.toast_bank1}\n${LocaleManager.locale.toast_bank2} - ${thisLobby.lobbySmallBlind * 2}',
                               );
                               setState(() {});
                               return null;
@@ -1412,7 +1415,7 @@ class _AddWindowState extends State<AddWindow> {
                             widget.callBackFunction();
                           }
                         } else {
-                          showToast('toast.alred2'.tr());
+                          showToast(LocaleManager.locale.toast_alred2);
                         }
                       },
                     )
@@ -1535,27 +1538,29 @@ Widget playerCard(
       borderRadius: BorderRadius.circular(stdBorderRadius),
       child: GestureDetector(
         onTap: () async {
-          await transitionDialog(
-            duration: const Duration(milliseconds: 400),
-            type: 'Scale1',
-            //barrierColor: null,
-            context: context,
-            child: AddWindow(
-              player: player,
-              callBackFunction: callBackFunction,
-              playerIndex: index,
-              settingsBool: (thisLobby.lobbyState == 5),
-            ),
-            builder: (BuildContext context) {
-              return AddWindow(
+          if (!saved) {
+            await transitionDialog(
+              duration: const Duration(milliseconds: 400),
+              type: 'Scale1',
+              //barrierColor: null,
+              context: context,
+              child: AddWindow(
                 player: player,
                 callBackFunction: callBackFunction,
                 playerIndex: index,
                 settingsBool: (thisLobby.lobbyState == 5),
-              );
-            },
-          );
-          SystemChrome.restoreSystemUIOverlays();
+              ),
+              builder: (BuildContext context) {
+                return AddWindow(
+                  player: player,
+                  callBackFunction: callBackFunction,
+                  playerIndex: index,
+                  settingsBool: (thisLobby.lobbyState == 5),
+                );
+              },
+            );
+            SystemChrome.restoreSystemUIOverlays();
+          }
           //_quickDelete(index);
         },
         child: Container(
@@ -1600,8 +1605,7 @@ Widget playerCard(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
-                                  player.name +
-                                      '  ', //+ ((index == thisLobby.dealerIndex && !widget.saved)?" - dealer":""),
+                                  '${player.name}  ', //+ ((index == thisLobby.dealerIndex && !widget.saved)?" - dealer":""),
                                   style: TextStyle(
                                     color: thisTheme.onBackground,
                                     fontWeight: FontWeight.w500,
@@ -1610,7 +1614,8 @@ Widget playerCard(
                                 ),
                                 if (player.isDealer && !saved)
                                   Tooltip(
-                                    message: 'tooltip.dealer'.tr(),
+                                    message:
+                                        LocaleManager.locale.tooltip_dealer,
                                     verticalOffset: stdButtonHeight / 6,
                                     child: Icon(
                                       MdiIcons.cardsPlaying,

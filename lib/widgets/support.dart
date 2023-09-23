@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:pocket_chips/internal/localization.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 //import '../business/myTargetAds.dart.txt';
@@ -173,7 +173,7 @@ class _DonateWindowState extends State<DonateWindow> {
                   Column(
                     children: [
                       Text(
-                        'support.tittle'.tr(),
+                        context.locale.support_tittle,
                         style: TextStyle(
                           color: thisTheme.onBackground,
                           fontWeight: FontWeight.w500,
@@ -200,7 +200,7 @@ class _DonateWindowState extends State<DonateWindow> {
                   ),
                   donateWidget(
                     //text
-                    'support.video'.tr(),
+                    context.locale.support_video,
                     //icon
                     Icon(
                       MdiIcons.cardsSpade,
@@ -223,7 +223,7 @@ class _DonateWindowState extends State<DonateWindow> {
                                     stdHorizontalOffset / 2,
                                   ),
                                   child: Text(
-                                    'support.free'.tr(),
+                                    context.locale.support_free,
                                     style: TextStyle(
                                       color: thisTheme.onBackground,
                                     ),
@@ -244,7 +244,7 @@ class _DonateWindowState extends State<DonateWindow> {
                   ),
                   donateWidget(
                       //text
-                      'support.modest'.tr(),
+                      context.locale.support_modest,
                       //icon
                       Image.asset('assets/chips/chips_50.png'),
 
@@ -277,13 +277,13 @@ class _DonateWindowState extends State<DonateWindow> {
                       await Purchases.purchaseProduct('modest_donat');
                     } catch (e) {
                       //String message = '$e';
-                      showToast('toast.unav'.tr());
+                      showToast(context.locale.toast_unav);
                       //showToast(message.substring(0,20));
                     }
                   }),
                   donateWidget(
                     //text
-                    'support.nice'.tr(),
+                    context.locale.support_nice,
                     //icon
                     Image.asset('assets/chips/chips_500.png'),
                     //button
@@ -314,14 +314,14 @@ class _DonateWindowState extends State<DonateWindow> {
                         await Purchases.purchaseProduct('nice_donat');
                       } catch (e) {
                         //String message = '$e';
-                        showToast('toast.unav'.tr());
+                        showToast(context.locale.toast_unav);
                         //showToast(message.substring(0,20));
                       }
                     },
                   ),
                   donateWidget(
                     //text
-                    'support.huge'.tr(),
+                    context.locale.support_huge,
                     //icon
                     Image.asset('assets/chips/chips_5000.png'),
                     //button
@@ -353,7 +353,7 @@ class _DonateWindowState extends State<DonateWindow> {
                         await Purchases.purchaseProduct('huge_donat');
                       } catch (e) {
                         //String message = '$e';
-                        showToast('toast.unav'.tr());
+                        showToast(context.locale.toast_unav);
                         //showToast(message.substring(0,20));
                       }
                     },
@@ -371,7 +371,7 @@ class _DonateWindowState extends State<DonateWindow> {
                       fontSize: stdFontSize * 0.8,
                     ),
                     buttonColor: thisTheme.bgrColor,
-                    textString: 'support.close'.tr(),
+                    textString: context.locale.support_close,
                     action: () async {
                       Navigator.pop(context);
                       //const url = 'https://github.com/goliksim';

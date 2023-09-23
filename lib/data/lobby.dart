@@ -3,7 +3,7 @@
 //глобальная переменная лобби
 import 'storage_notshared.dart';
 
-late Lobby thisLobby = Lobby();
+Lobby thisLobby = Lobby();
 List<Player> savedPlayers = [];
 
 // Класс игрока
@@ -45,7 +45,7 @@ class Player {
         bank = json['bank'],
         isActive = json['active'],
         bid = json['bid'], //bids = json['bids'];
-        isDealer = json['isDealer'];
+        isDealer = json['isDealer'] ?? false;
 
   @override
   //перегруженный оператор == для недобавления существующих игроков
@@ -85,7 +85,7 @@ class Lobby {
     String text = 'Players count: ${lobbyPlayers.length}\n';
     text += '[';
     for (Player a in lobbyPlayers) {
-      text += a.show() + '\t';
+      text += '${a.show()}\t';
     }
     text += ']\n';
     text +=
@@ -216,7 +216,11 @@ class Lobby {
         lapCount = json['lapCount'],
         lobbyRandomOffset = json['lobbyRandomOffset']
             .map<double>((e) => jsonToDouble(e))
-            .toList();
+            .toList() {
+    //Support older version
+    final tmp = json['dealerIndex'];
+    if (tmp != null) setDealer(tmp);
+  }
 }
 
 double jsonToDouble(dynamic value) {

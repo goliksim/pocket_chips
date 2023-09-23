@@ -1,6 +1,6 @@
 // ignore_for_file: file_names
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
+import 'package:pocket_chips/internal/localization.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 import 'package:flutter/material.dart';
 
@@ -76,7 +76,7 @@ void showAd(String placementId, callback) {
     placementId: placementId,
     onComplete: (placementId) {
       logs.writeLog('UnityAds: Video Ad $placementId completed');
-      showToast('toast.thanks'.tr());
+      showToast(LocaleManager.locale.toast_thanks);
       _loadAd(placementId, callback);
     },
     onFailed: (placementId, error, message) {

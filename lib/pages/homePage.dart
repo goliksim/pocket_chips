@@ -1,8 +1,9 @@
 // ignore_for_file: file_names
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:pocket_chips/internal/localization.dart';
 //import 'package:flutter/services.dart';
 
 import '../widgets/support.dart';
@@ -57,7 +58,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
-  Widget homePageButtons(context) => SizedBox(
+  Widget homePageButtons(BuildContext context) => SizedBox(
         height: stdButtonHeight * 2 +
             stdHorizontalOffset * 2 +
             ((thisLobby.lobbyPlayers.isNotEmpty) ? (stdButtonHeight) : 0),
@@ -70,7 +71,7 @@ class _HomePageState extends State<HomePage> {
                 width: double.infinity,
                 borderRadius: BorderRadius.circular(stdBorderRadius),
                 buttonColor: thisTheme.primaryColor,
-                textString: 'home.cont'.tr(),
+                textString: context.locale.home_cont,
                 action: () {
                   logs.writeLog('Switch to PlayerPage(Continue)');
                   Navigator.push(
@@ -91,18 +92,17 @@ class _HomePageState extends State<HomePage> {
               buttonColor: (thisLobby.lobbyPlayers.isNotEmpty)
                   ? thisTheme.secondaryColor
                   : thisTheme.primaryColor,
-              textString: 'home.new'.tr(),
+              textString: context.locale.home_new,
               action: () async {
                 if (thisLobby.lobbyPlayers.isNotEmpty) {
                   await showDialog(
                     context: context,
                     builder: (BuildContext thisContext) {
                       return ConfirmationWindow(
-                        type: 'home.new'.tr(),
-                        button: 'home.new'.tr(),
-                        message: 'conf.new.text1'.tr() +
-                            '\n' +
-                            'conf.new.text2'.tr(),
+                        type: context.locale.home_new,
+                        button: context.locale.home_new,
+                        message:
+                            '${context.locale.conf_new_text1}\n${context.locale.conf_new_text2}',
                         action: () => newGame(context),
                       );
                     },
@@ -122,7 +122,7 @@ class _HomePageState extends State<HomePage> {
                     height: stdButtonHeight,
                     borderRadius: BorderRadius.circular(stdBorderRadius),
                     buttonColor: thisTheme.additionButtonColor,
-                    textString: 'home.abo'.tr(),
+                    textString: context.locale.home_abo,
                     action: () async {
                       showHelp(
                         context,
@@ -142,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                       height: stdButtonHeight,
                       borderRadius: BorderRadius.circular(stdBorderRadius),
                       buttonColor: thisTheme.additionButtonColor,
-                      textString: 'home.sup'.tr(),
+                      textString: context.locale.home_sup,
                       action: () async {
                         showDonate(context, callBack);
                         //const url = 'https://github.com/goliksim';
@@ -209,7 +209,7 @@ class _HomePageState extends State<HomePage> {
                         : Icons.nightlight_round,
                     size: stdIconSize,
                   ),
-                  tooltip: 'tooltip.theme'.tr(),
+                  tooltip: context.locale.tooltip_theme,
                   onPressed: () async {
                     changeTheme();
                     Navigator.pushReplacement(
@@ -269,19 +269,30 @@ Widget chipImage(context) => Container(
       width: MediaQuery.of(context).size.width,
     );
 
-Future showHelp(BuildContext context, callBack, {onWillpop = false}) =>
-    transitionDialog(
-      duration: const Duration(milliseconds: 400),
-      type: 'Scale',
-      context: context,
-      child: WillPopScope(
-        onWillPop: () async => onWillpop,
-        child: MyApp(callbackFunction: callBack),
+Future showHelp(BuildContext context, callBack, {onWillpop = false}) async {
+  final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  // ignore: use_build_context_synchronously
+  transitionDialog(
+    duration: const Duration(milliseconds: 400),
+    type: 'Scale',
+    context: context,
+    child: WillPopScope(
+      onWillPop: () async => onWillpop,
+      child: AboutPage(
+        callbackFunction: callBack,
+        packageInfo: packageInfo,
+        isFirst: !onWillpop,
       ),
-      builder: (BuildContext context) {
-        return MyApp(callbackFunction: callBack);
-      },
-    );
+    ),
+    builder: (BuildContext context) {
+      return AboutPage(
+        callbackFunction: callBack,
+        packageInfo: packageInfo,
+        isFirst: !onWillpop,
+      );
+    },
+  );
+}
 
 Future showDonate(BuildContext context, callBack) => transitionDialog(
       duration: const Duration(milliseconds: 400),

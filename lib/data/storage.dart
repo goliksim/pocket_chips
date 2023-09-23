@@ -9,7 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'lobby.dart';
 
-Config thisConfig = Config(0, false);
+Config thisConfig = Config(0, false, '');
 
 final LobbyStorage lobbyStorage = LobbyStorage();
 final ConfigStorage configStorage = ConfigStorage();
@@ -92,15 +92,17 @@ class LobbyStorage {
 }
 
 class Config {
-  Config([this.themeIndex = 0, this.firstTime = true]);
+  Config([this.themeIndex = 0, this.firstTime = true, this.locale = '']);
   int themeIndex; // тема
   bool firstTime;
+  String locale;
   //пишем в json
-  Map toJson() => {'theme': themeIndex, 'first': firstTime};
+  Map toJson() => {'theme': themeIndex, 'first': firstTime, 'locale': locale};
   //читаем из json
   Config.fromJson(Map<String, dynamic> json)
       : themeIndex = json['theme'],
-        firstTime = json['first'];
+        firstTime = json['first'],
+        locale = json['locale'];
 }
 
 class ConfigStorage {
@@ -116,7 +118,7 @@ class ConfigStorage {
       return config;
     } catch (e) {
       // If encountering an error, return 0
-      writeConfig(Config(0, true));
+      writeConfig(Config(0, true, ''));
       logs.writeLog('Starting app...\n --- ERROR OF READING CONFIG ---');
       //showToast("Welcome for the first time");
       return Config(); //новое пустое лобби

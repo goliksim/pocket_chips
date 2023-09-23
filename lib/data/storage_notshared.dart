@@ -29,14 +29,13 @@ class Logs {
     final file = await _localFile;
 
     var date = DateTime.now();
-    String finalDateString = [date.year, date.month, date.day].join('/') +
-        ' ' +
-        [date.hour, date.minute, date.second].join(':') +
-        '.' +
-        date.millisecond.toString() +
-        '\t';
+    String finalDateString = '${[date.year, date.month, date.day].join('/')} ${[
+      date.hour,
+      date.minute,
+      date.second
+    ].join(':')}.${date.millisecond}\t';
     file.writeAsStringSync(
-      finalDateString + text + '\n',
+      '$finalDateString$text\n',
       mode: FileMode.append,
     );
     log(finalDateString + text);

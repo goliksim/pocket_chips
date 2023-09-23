@@ -1,8 +1,6 @@
 //ОСНОВНАЯ ИГРОВАЯ ЛОГИКА
 import 'dart:math';
 import 'dart:async';
-import 'package:collection/collection.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../pages/gamePage.dart';
@@ -11,8 +9,9 @@ import '../data/lobby.dart';
 import '../ui/transitions.dart';
 import '../data/uiValues.dart';
 import '../ui/ui_widgets.dart';
+import 'localization.dart';
 
-late Game thisGame = Game();
+Game thisGame = Game();
 
 class Game {
   Game({
@@ -25,18 +24,20 @@ class Game {
 
   //список названий этапов игры
   List<String> gameStateNameList = [
-    'game.pflop'.tr(),
-    'game.flop'.tr(),
-    'game.turn'.tr(),
-    'game.river'.tr(),
-    'game.shdw'.tr(),
-    'game.break'.tr()
+    LocaleManager.locale.game_pflop,
+    LocaleManager.locale.game_flop,
+    LocaleManager.locale.game_turn,
+    LocaleManager.locale.game_river,
+    LocaleManager.locale.game_shdw,
+    LocaleManager.locale.game_break
   ];
   int raiseBank = 0;
   bool raiseButtonPressed = false;
   bool bidsEqual = false;
-  Text gameStateName =
-      Text('game.welc'.tr(), style: TextStyle(color: thisTheme.primaryColor));
+  Text gameStateName = Text(
+    LocaleManager.locale.game_welc,
+    style: TextStyle(color: thisTheme.primaryColor),
+  );
   Function()? callback;
   BuildContext? context;
 
@@ -67,7 +68,7 @@ class Game {
       callback!();
       changeText(gameStateNameList[thisLobby.lobbyState]);
     } else {
-      showToast('toast.moreplay'.tr());
+      showToast(LocaleManager.locale.toast_moreplay);
     }
   }
 
@@ -163,10 +164,7 @@ class Game {
     //print(raiseBank);
     if (index == 100) {
       gameStateName = Text(
-        'game.turn1'.tr() +
-            '\u00A0' +
-            'game.turn2'.tr() +
-            '\u00A0' '${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
+        '${LocaleManager.locale.game_turn1}\u00A0${LocaleManager.locale.game_turn2}\u00A0${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
         style: TextStyle(color: thisTheme.onBackground),
       );
     }
@@ -199,7 +197,8 @@ class Game {
 
     //result = toEqual + [(lastRaise - thisLobby.lobbySmallBlind*2),thisLobby.lobbySmallBlind*2].max;
 
-    int result = toEqual + [lastRaise, thisLobby.lobbySmallBlind * 2].max;
+    int result =
+        toEqual + [lastRaise, thisLobby.lobbySmallBlind * 2].reduce(max);
     //var result = [(toEqual + lastRaise + ((lastRaise+toEqual==0)?thisLobby.lobbySmallBlind*2:0) + ((lastRaise+toEqual==0 && thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank<thisLobby.lobbySmallBlind*2)?thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank:0)),
     //((thisLobby.lobbyState==0)?4:2)*thisLobby.lobbySmallBlind - thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid].max;
     //print("minTmpFunction - $result");
@@ -217,10 +216,7 @@ class Game {
     callback!();
     await Future.delayed(const Duration(seconds: 4));
     gameStateName = Text(
-      'game.turn1'.tr() +
-          '\u00A0' +
-          'game.turn2'.tr() +
-          '\u00A0' '${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
+      '${LocaleManager.locale.game_turn1}\u00A0${LocaleManager.locale.game_turn2}\u00A0${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
       style: TextStyle(color: thisTheme.onBackground),
     );
 
@@ -336,7 +332,7 @@ class Game {
     //await Future.delayed(Duration(milliseconds: 1));
     //changeText(gameStateNameList[thisLobby.lobbyState]);
     gameStateName = Text(
-      'game.break'.tr(),
+      LocaleManager.locale.game_break,
       style: TextStyle(color: thisTheme.primaryColor),
     );
     thisLobby.lobbyIndex = -1;

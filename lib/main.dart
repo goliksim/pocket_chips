@@ -1,25 +1,35 @@
-import 'package:easy_localization_loader/easy_localization_loader.dart';
 import 'package:flutter/material.dart'; // подключаем библиотеку material
 import 'package:flutter/services.dart';
+import 'data/storage.dart';
+import 'data/uiValues.dart';
 import 'internal/application.dart' as app;
-import 'package:easy_localization/easy_localization.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
-void _runAp() => runApp(
-      EasyLocalization(
-        assetLoader: CsvAssetLoader(),
-        supportedLocales: const [Locale('en', 'US'), Locale('ru', 'RU')],
-        path: 'assets/translations/langs.csv',
-        fallbackLocale: const Locale('en', 'US'),
-        child: const app.MyApp(),
-      ),
-    );
+import 'internal/localization.dart';
+
+void _runAp() async {
+  await configStorage.readConfig().then((value) {
+    thisTheme = themeList[value.themeIndex];
+    if (thisTheme == themeList[0]) {
+      logs.writeLog('LIGHT mode loaded from config');
+    } else {
+      logs.writeLog('DARK mode loaded from config');
+    }
+    thisConfig = value;
+  });
+  final LocaleManager localeManager = LocaleManager();
+  await localeManager.initLocale();
+  runApp(
+    app.MyApp(
+      localeManager: localeManager,
+    ),
+  );
+}
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await EasyLocalization.ensureInitialized();
   if (kIsWeb) {
     _runAp();
   }

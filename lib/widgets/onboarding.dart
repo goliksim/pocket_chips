@@ -1,12 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:io';
-
-import 'package:easy_localization/easy_localization.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:onboarding/onboarding.dart';
+import 'package:pocket_chips/internal/application.dart';
+import 'package:pocket_chips/internal/localization.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_mailer/flutter_mailer.dart';
 //import 'package:in_app_review/in_app_review.dart';
@@ -17,26 +18,29 @@ import '../pages/playersPage.dart';
 import '../data/uiValues.dart';
 import '../ui/ui_widgets.dart';
 
-class MyApp extends StatefulWidget {
-  const MyApp({
+class AboutPage extends StatefulWidget {
+  const AboutPage({
     Key? key,
     required this.callbackFunction,
-    this.onWillPop = false,
+    this.isFirst = false,
+    required this.packageInfo,
   }) : super(key: key);
 
   final Function() callbackFunction;
-  final bool onWillPop;
+  final bool isFirst;
+  final PackageInfo packageInfo;
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<AboutPage> createState() => _AboutPageState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _AboutPageState extends State<AboutPage> {
   late Material materialButton;
   late int index;
 
   @override
   void initState() {
     super.initState();
+
     //materialButton = _skipButton();
     index = 0;
   }
@@ -45,7 +49,7 @@ class _MyAppState extends State<MyApp> {
     return MyButton(
       buttonColor: thisTheme.bankColor,
       height: stdButtonHeight * 0.75,
-      textString: 'about.skip'.tr(),
+      textString: context.locale.about_skip,
       textStyle: stdTextStyle.copyWith(fontSize: stdFontSize),
       action: () {
         if (setIndex != null) {
@@ -60,7 +64,7 @@ class _MyAppState extends State<MyApp> {
     return MyButton(
       buttonColor: thisTheme.primaryColor,
       height: stdButtonHeight * 0.75,
-      textString: 'about.end'.tr(),
+      textString: context.locale.about_end,
       action: () {
         thisConfig.firstTime = false;
         configStorage.writeConfig(thisConfig);
@@ -105,14 +109,14 @@ class _MyAppState extends State<MyApp> {
                 pages: [
                   // first page
                   page(
-                      widget.onWillPop
-                          ? 'about.welc'.tr() + 'POCKET CHIPS'
+                      widget.isFirst
+                          ? '${context.locale.about_welc}\nPOCKET CHIPS'
                           : 'POCKET CHIPS',
                       [
                         SizedBox(
                           width: double.infinity,
                           child: Text(
-                            'about.welc.1'.tr() + '\n\n' + 'about.welc.2'.tr(),
+                            '${context.locale.about_welc_1}\n\n${context.locale.about_welc_2}',
                             style: TextStyle(
                               height: 1.5,
                               color: thisTheme.onBackground,
@@ -147,13 +151,7 @@ class _MyAppState extends State<MyApp> {
                         SizedBox(
                           width: double.infinity,
                           child: Text(
-                            'about.welc.3'.tr() +
-                                '\n- ' +
-                                'about.welc.4'.tr() +
-                                '\n- ' +
-                                'about.welc.5'.tr() +
-                                '\n- ' +
-                                'about.welc.6'.tr(),
+                            '${context.locale.about_welc_3}\n- ${context.locale.about_welc_4}\n- ${context.locale.about_welc_5}\n- ${context.locale.about_welc_6}',
                             style: TextStyle(
                               height: 1.5,
                               color: thisTheme.onBackground,
@@ -167,7 +165,7 @@ class _MyAppState extends State<MyApp> {
                         SizedBox(
                           width: double.infinity,
                           child: Text(
-                            'about.welc.7'.tr(),
+                            context.locale.about_welc_7,
                             style: TextStyle(
                               height: 1.5,
                               color: thisTheme.onBackground,
@@ -200,7 +198,14 @@ class _MyAppState extends State<MyApp> {
                               buttonColor: thisTheme.bankColor,
                               textString: '1',
                               action: () {
-                                context.setLocale(const Locale('en', 'US'));
+                                MyApp.of(context).setLocale(
+                                  const Locale.fromSubtags(
+                                    languageCode: 'en',
+                                  ),
+                                );
+                                thisConfig.locale = 'en';
+                                configStorage.writeConfig(thisConfig);
+                                callBack();
                               },
                             ),
                             SizedBox(width: stdHorizontalOffset),
@@ -210,7 +215,13 @@ class _MyAppState extends State<MyApp> {
                               buttonColor: thisTheme.bankColor,
                               textString: '2',
                               action: () {
-                                context.setLocale(const Locale('ru', 'RU'));
+                                MyApp.of(context).setLocale(
+                                  const Locale.fromSubtags(
+                                    languageCode: 'ru',
+                                  ),
+                                );
+                                thisConfig.locale = 'ru';
+                                configStorage.writeConfig(thisConfig);
                                 callBack();
                               },
                             )
@@ -219,13 +230,13 @@ class _MyAppState extends State<MyApp> {
                         SizedBox(height: stdHorizontalOffset),
                       ]),
                   // homescreen
-                  page('about.hom.1'.tr(), [
+                  page(context.locale.about_hom_1, [
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Flexible(
                           child: Text(
-                            'about.hom.2'.tr(),
+                            context.locale.about_hom_2,
                             style: TextStyle(
                               height: 1.5,
                               color: thisTheme.onBackground,
@@ -246,7 +257,7 @@ class _MyAppState extends State<MyApp> {
                               size: stdIconSize,
                               color: thisTheme.onBackground,
                             ),
-                            tooltip: 'tooltip.theme'.tr(),
+                            tooltip: context.locale.tooltip_theme,
                             onPressed: () async {
                               changeTheme();
                               widget.callbackFunction();
@@ -260,7 +271,7 @@ class _MyAppState extends State<MyApp> {
                     ),
                     SizedBox(height: stdHorizontalOffset / 2),
                     Text(
-                      'about.hom.3'.tr() + '\n\n' + 'about.hom.4'.tr(),
+                      '${context.locale.about_hom_3}\n\n${context.locale.about_hom_4}',
                       style: TextStyle(
                         height: 1.5,
                         color: thisTheme.onBackground,
@@ -271,9 +282,9 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ]),
                   // Player Menu
-                  page('about.plme.1'.tr(), [
+                  page(context.locale.about_plme_1, [
                     Text(
-                      'about.plme.2'.tr(),
+                      context.locale.about_plme_2,
                       style: TextStyle(
                         height: 1.5,
                         color: thisTheme.onBackground,
@@ -292,14 +303,6 @@ class _MyAppState extends State<MyApp> {
                           return null;
                         },
                         key: const Key('0'),
-                        child: playerCard(
-                          tutorPlayer,
-                          null,
-                          stdButtonHeight * 0.85,
-                          false,
-                          context,
-                          callBack,
-                        ),
                         direction: DismissDirection.horizontal,
                         onDismissed: (direction) {},
                         background: Container(
@@ -347,6 +350,14 @@ class _MyAppState extends State<MyApp> {
                             ],
                           ),
                         ),
+                        child: playerCard(
+                          tutorPlayer,
+                          null,
+                          stdButtonHeight * 0.85,
+                          false,
+                          context,
+                          callBack,
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -355,7 +366,7 @@ class _MyAppState extends State<MyApp> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'about.plme.3'.tr(),
+                        '- ${context.locale.about_plme_3}',
                         style: TextStyle(
                           height: 1.5,
                           color: thisTheme.onBackground,
@@ -369,10 +380,7 @@ class _MyAppState extends State<MyApp> {
                       children: [
                         Flexible(
                           child: Text(
-                            '\t\t' +
-                                'about.plme.4'.tr() +
-                                ' \n' +
-                                'about.plme.5'.tr(),
+                            '- ${context.locale.about_plme_4}\n${context.locale.about_plme_5}',
                             style: TextStyle(
                               height: 1.5,
                               color: thisTheme.onBackground,
@@ -393,28 +401,28 @@ class _MyAppState extends State<MyApp> {
                         ),
                       ],
                     ),
-                    Text(
-                      '\n' +
-                          'about.plme.6'.tr() +
-                          ' \n\n' +
-                          'about.plme.7'.tr(),
-                      style: TextStyle(
-                        height: 1.5,
-                        color: thisTheme.onBackground,
-                        fontWeight: FontWeight.w500,
-                        fontSize: stdFontSize * 0.7,
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '\n- ${context.locale.about_plme_6}\n\n- ${context.locale.about_plme_7}\n',
+                        style: TextStyle(
+                          height: 1.5,
+                          color: thisTheme.onBackground,
+                          fontWeight: FontWeight.w500,
+                          fontSize: stdFontSize * 0.7,
+                        ),
+                        textAlign: TextAlign.start,
                       ),
-                      textAlign: TextAlign.start,
                     ),
                   ]),
                   // Settings
-                  page('about.set.1'.tr(), [
+                  page(context.locale.about_set_1, [
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Flexible(
                           child: Text(
-                            'about.set.2'.tr(),
+                            context.locale.about_set_2,
                             style: TextStyle(
                               height: 1.5,
                               color: thisTheme.onBackground,
@@ -436,19 +444,7 @@ class _MyAppState extends State<MyApp> {
                       ],
                     ),
                     Text(
-                      'about.set.3'.tr() +
-                          '\n- ' +
-                          'about.set.4'.tr() +
-                          '\n- ' +
-                          'about.set.5'.tr() +
-                          '\n- ' +
-                          'about.set.6'.tr() +
-                          '\n\n' +
-                          'about.set.7'.tr() +
-                          '\n- ' +
-                          'about.set.8'.tr() +
-                          '\n- ' +
-                          'about.set.9'.tr(),
+                      '${context.locale.about_set_3}\n- ${context.locale.about_set_4}\n- ${context.locale.about_set_5}\n- ${context.locale.about_set_6}\n\n${context.locale.about_set_7}\n- ${context.locale.about_set_8}\n- ${context.locale.about_set_9}',
                       style: TextStyle(
                         height: 1.5,
                         color: thisTheme.onBackground,
@@ -459,13 +455,13 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ]),
                   // Game table
-                  page('about.tab.1'.tr(), [
+                  page(context.locale.about_tab_1, [
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Flexible(
                           child: Text(
-                            'about.tab.2'.tr(),
+                            context.locale.about_tab_2,
                             style: TextStyle(
                               height: 1.5,
                               color: thisTheme.onBackground,
@@ -487,7 +483,7 @@ class _MyAppState extends State<MyApp> {
                       ],
                     ),
                     Text(
-                      'about.tab.3'.tr(),
+                      context.locale.about_tab_3,
                       style: TextStyle(
                         height: 1.5,
                         color: thisTheme.onBackground,
@@ -625,7 +621,7 @@ class _MyAppState extends State<MyApp> {
                       ),
                     ),
                     Text(
-                      '\n' + 'about.tab.4'.tr() + '\n\t\t' + 'about.tab.5'.tr(),
+                      '\n${context.locale.about_tab_4}\n\t\t${context.locale.about_tab_5}',
                       style: TextStyle(
                         height: 1.5,
                         color: thisTheme.onBackground,
@@ -636,11 +632,11 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ]),
                   // Helpful
-                  page('about.link.1'.tr(), [
+                  page(context.locale.about_link_1, [
                     SizedBox(
                       width: double.infinity,
                       child: Text(
-                        'about.link.2'.tr(),
+                        context.locale.about_link_2,
                         style: TextStyle(
                           height: 1.5,
                           color: thisTheme.onBackground,
@@ -666,7 +662,7 @@ class _MyAppState extends State<MyApp> {
                                   horizontal: stdHorizontalOffset,
                                 ),
                                 child: Text(
-                                  'about.link.3'.tr(),
+                                  context.locale.about_link_3,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: thisTheme.primaryColor,
@@ -701,7 +697,7 @@ class _MyAppState extends State<MyApp> {
                     ),
                     SizedBox(height: stdHorizontalOffset / 2),
                     Text(
-                      'about.link.4'.tr() + '\n\n' + 'about.link.5'.tr(),
+                      '${context.locale.about_link_4}\n\n${context.locale.about_link_5}',
                       style: TextStyle(
                         height: 1.5,
                         color: thisTheme.onBackground,
@@ -746,7 +742,7 @@ class _MyAppState extends State<MyApp> {
                           action: () async {
                             final path = await localPath;
                             final MailOptions mailOptions = MailOptions(
-                              body: 'about.link.6'.tr(),
+                              body: context.locale.about_link_6,
                               subject: 'PC: problem or advice ',
                               recipients: ['goliksim@gmail.com'],
                               isHTML: true,
@@ -763,7 +759,7 @@ class _MyAppState extends State<MyApp> {
                     SizedBox(
                       width: double.infinity,
                       child: Text(
-                        '© 2022 GOLIKSIM (Alexander Golev)\nVersion: 1.0.4',
+                        '© 2022 GOLIKSIM (Alexander Golev)\nVersion: ${widget.packageInfo.version}',
                         style: TextStyle(
                           height: 1.5,
                           color: thisTheme.onBackground,
@@ -783,7 +779,7 @@ class _MyAppState extends State<MyApp> {
                       child: SizedBox(
                         width: double.infinity,
                         child: Text(
-                          ' ' + 'about.link.7'.tr(),
+                          ' ${context.locale.about_link_7}',
                           style: TextStyle(
                             color: thisTheme.secondaryColor,
                             fontSize: stdFontSize * 0.7,
@@ -879,13 +875,14 @@ class _MyAppState extends State<MyApp> {
                       SizedBox(height: stdHorizontalOffset * 2),
                       Text(
                         name,
+                        textAlign: TextAlign.center,
                         //style: pageTitleStyle,
                         style: TextStyle(
                           color: thisTheme.onBackground,
                           fontWeight: FontWeight.w700,
                           fontSize: stdFontSize / 20 * 23,
                         ),
-                        textAlign: TextAlign.left,
+                        //textAlign: TextAlign.left,
                       ),
                       SizedBox(height: stdHorizontalOffset),
                       Padding(

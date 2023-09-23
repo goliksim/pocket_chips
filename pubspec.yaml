@@ -3,10 +3,10 @@ description: Pocket poker chips for your phone. Play poker with only cards.
 
 publish_to: 'none' 
 
-version: 1.0.5
+version: 1.0.5+1
 
 environment:
-  sdk: ">=2.16.1 <3.0.0"
+  sdk: '>=3.0.3 <4.0.0'
 
 dependencies:
   
@@ -20,27 +20,30 @@ dependencies:
   
   # Monitization
   unity_ads_plugin: ^0.3.7
-  purchases_flutter: ^4.4.3
+  purchases_flutter: ^5.7.0
   # my_target_flutter: ^0.1.0+3
   # in_app_purchase: ^3.0.8
-  intl: ^0.18.0
+  
 
   # UI
   page_transition: "^2.0.5"
-  material_design_icons_flutter: 5.0.6996
+  material_design_icons_flutter: any
   cupertino_icons: ^1.0.2
   numberpicker: ^2.1.1
   fluttertoast: ^8.0.9
-  google_fonts: ^3.0.1
+  google_fonts: ^6.1.0
   onboarding: ^3.1.0
   flutter_screenutil: ^5.8.3
   
   # Iternal
   path_provider: ^2.0.11
-  easy_localization: ^3.0.0
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.18.0
+  #easy_localization: ^3.0.0
   shared_preferences: ^2.0.0 
-  easy_localization_loader:
-    git: https://github.com/aissat/easy_localization_loader.git
+  #easy_localization_loader: ^1.0.1+1
+  package_info_plus: ^4.1.0     
   #flutter_yandex_games: ^0.0.6
 
   
@@ -58,12 +61,13 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  flutter_lints: ^1.0.0
+  build_runner: ^2.3.3
+  flutter_lints: ^2.0.3
   
 
 
 flutter:
+  generate: true
   uses-material-design: true
 
   assets:

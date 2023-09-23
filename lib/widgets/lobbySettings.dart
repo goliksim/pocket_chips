@@ -1,7 +1,7 @@
 // ignore_for_file: file_names
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:pocket_chips/internal/localization.dart';
 
 import '../data/lobby.dart';
 import '../data/storage.dart';
@@ -98,7 +98,7 @@ class _AddSettingsState extends State<AddSettings> {
               child: Center(
                 child: FittedBox(
                   child: Text(
-                    'sett.title'.tr(),
+                    context.locale.sett_title,
                     style: TextStyle(
                       color: thisTheme.onBackground,
                       fontSize: stdFontSize,
@@ -124,7 +124,7 @@ class _AddSettingsState extends State<AddSettings> {
                   children: [
                     Expanded(
                       child: Text(
-                        'sett.win1'.tr(),
+                        context.locale.sett_win1,
                         overflow: TextOverflow.fade,
                         softWrap: false,
                         style: TextStyle(
@@ -151,7 +151,7 @@ class _AddSettingsState extends State<AddSettings> {
                                 text: '1',
                               );
                               tmpBank = 1;
-                              showToast('toast.bank3'.tr());
+                              showToast(context.locale.toast_bank3);
                             }
                             tmpBank = int.parse(_bankController.text);
                             if (smallBlind > tmpBank ~/ 2) {
@@ -162,7 +162,7 @@ class _AddSettingsState extends State<AddSettings> {
                                 text: "$smallBlind",
                               );
                               */
-                              showToast('toast.bank4'.tr());
+                              showToast(context.locale.toast_bank4);
                             }
                             setState(() {});
                           }
@@ -214,7 +214,7 @@ class _AddSettingsState extends State<AddSettings> {
                 children: [
                   Expanded(
                     child: Text(
-                      'sett.win2'.tr(),
+                      context.locale.sett_win2,
                       overflow: TextOverflow.fade,
                       softWrap: false,
                       style: TextStyle(
@@ -312,7 +312,7 @@ class _AddSettingsState extends State<AddSettings> {
                   Flexible(
                     flex: 5,
                     child: Text(
-                      'sett.win3'.tr(),
+                      context.locale.sett_win3,
                       overflow: TextOverflow.fade,
                       softWrap: false,
                       style: TextStyle(
@@ -828,7 +828,7 @@ class _AddSettingsState extends State<AddSettings> {
               height: stdButtonHeight * 0.75,
               width: double.infinity,
               buttonColor: thisTheme.primaryColor,
-              textString: 'sett.conf'.tr(),
+              textString: context.locale.sett_conf,
               action: () async {
                 if ((focusNode1.hasFocus) || (focusNode2.hasFocus)) {
                   focusNode1.unfocus();
@@ -863,14 +863,14 @@ class _AddSettingsState extends State<AddSettings> {
         ),
       );
 
-  void _checkInt(TextEditingController _thisEditingController) {
-    for (int i = 0; i < _thisEditingController.text.length; i++) {
+  void _checkInt(TextEditingController thisEditingController) {
+    for (int i = 0; i < thisEditingController.text.length; i++) {
       try {
-        int.parse(_thisEditingController.text[i]);
+        int.parse(thisEditingController.text[i]);
       } catch (e) {
-        _thisEditingController.value = _thisEditingController.value.copyWith(
-          text: _thisEditingController.text.substring(0, i) +
-              _thisEditingController.text.substring(i + 1),
+        thisEditingController.value = thisEditingController.value.copyWith(
+          text: thisEditingController.text.substring(0, i) +
+              thisEditingController.text.substring(i + 1),
           selection: TextSelection.fromPosition(
             TextPosition(offset: i),
           ),

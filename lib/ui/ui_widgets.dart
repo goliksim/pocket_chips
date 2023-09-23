@@ -1,6 +1,6 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:pocket_chips/internal/localization.dart';
 
 import '../data/uiValues.dart';
 
@@ -110,7 +110,7 @@ class ConfirmationWindow extends StatelessWidget {
                     height: stdButtonHeight * 0.75,
                     width: double.infinity,
                     buttonColor: thisTheme.bgrColor,
-                    textString: 'conf.canc'.tr(),
+                    textString: context.locale.conf_canc,
                     textStyle: TextStyle(
                       fontWeight: FontWeight.normal,
                       color: thisTheme.primaryColor,
@@ -222,7 +222,6 @@ class PatternContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: child,
       padding: padding,
       alignment: Alignment.center,
       decoration: BoxDecoration(
@@ -233,6 +232,7 @@ class PatternContainer extends StatelessWidget {
           fit: BoxFit.cover,
         ),
       ),
+      child: child,
     );
   }
 }

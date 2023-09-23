@@ -2,7 +2,8 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-
+import 'package:pocket_chips/internal/localization.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../data/lobby.dart';
 import '../data/storage.dart';
 import '../ui/transitions.dart';
@@ -24,14 +25,15 @@ class _InitWindowState extends State<InitWindow> {
 
   void startTimer({bool end = false}) async {
     if (end) {
-      await Future.delayed(const Duration(milliseconds: 900));
-      logs.writeLog('Switch to HomePage');
-      Navigator.pushReplacement(
-        context,
-        simpleFadePageRoute(
-          HomePage(isDark: thisTheme.name == themeList[1]),
-        ),
-      );
+      await Future.delayed(const Duration(milliseconds: 900)).then((value) {
+        logs.writeLog('Switch to HomePage');
+        Navigator.pushReplacement(
+          context,
+          simpleFadePageRoute(
+            HomePage(isDark: thisTheme.name == themeList[1]),
+          ),
+        );
+      });
     } else {
       const oneSec = Duration(milliseconds: 20);
       _timer = Timer.periodic(
@@ -54,15 +56,6 @@ class _InitWindowState extends State<InitWindow> {
   }
 
   Future loading() async {
-    configStorage.readConfig().then((value) {
-      thisTheme = themeList[value.themeIndex];
-      if (thisTheme == themeList[0]) {
-        logs.writeLog('LIGHT mode loaded from config');
-      } else {
-        logs.writeLog('DARK mode loaded from config');
-      }
-      thisConfig = value;
-    });
     lobbyStorage.readLobby().then((value) {
       setState(() {
         thisLobby = value;
@@ -80,6 +73,8 @@ class _InitWindowState extends State<InitWindow> {
   void initState() {
     //Android fullscreen
     super.initState();
+    //load localization
+
     final data = MediaQueryData.fromView(
       WidgetsBinding.instance.platformDispatcher.views.single,
     ).systemGestureInsets;
@@ -102,6 +97,7 @@ class _InitWindowState extends State<InitWindow> {
 
   @override
   Widget build(BuildContext context) {
+    LocaleManager.initialize(AppLocalizations.of(context));
     return Container(
       width: double.infinity,
       height: double.infinity,
