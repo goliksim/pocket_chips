@@ -1,11 +1,15 @@
+import 'card_model.dart';
 part 'combination_gpt.dart';
-part 'card_model.dart';
 
 // Функция для определения комбинации карт на столе
 (PokerHand, int) detectCombination(List<Card> playerCards, List<Card> table) {
-  
-  List<Card> allCards = [...playerCards, ...table]; // Сначала объединяем карты игрока и карты на столе
-  allCards.sort((b, a) => a.key.compareTo(b.key));  // !!! Сортируйте карты по их значению по УБЫВАНИЮ
+  List<Card> allCards = [
+    ...playerCards,
+    ...table
+  ]; // Сначала объединяем карты игрока и карты на столе
+  allCards.sort(
+    (b, a) => a.key.compareTo(b.key),
+  ); // !!! Сортируйте карты по их значению по УБЫВАНИЮ
 
   // Подсчитываем количество карт каждого значения
   Map<int, int> valueCounts = {};

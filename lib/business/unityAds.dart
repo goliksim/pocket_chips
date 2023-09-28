@@ -1,4 +1,8 @@
 // ignore_for_file: file_names
+
+// TODO разобраться с рекламой и бабками
+
+/*
 import 'package:flutter/foundation.dart';
 import 'package:pocket_chips/internal/localization.dart';
 import 'package:unity_ads_plugin/unity_ads_plugin.dart';
@@ -103,3 +107,5 @@ Widget unityBanner() => UnityBannerAd(
       onFailed: (placementId, error, message) => logs
           .writeLog('UnityAds: Banner Ad $placementId failed: $error $message'),
     );
+    
+*/

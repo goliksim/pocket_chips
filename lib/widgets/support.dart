@@ -1,10 +1,12 @@
+/*
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:pocket_chips/internal/localization.dart';
+import 'package:pocket_chips/ui/dialog_widget.dart';
+import 'package:pocket_chips/ui/transitions.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 //import '../business/myTargetAds.dart.txt';
@@ -14,14 +16,22 @@ import '../data/storage.dart';
 import '../data/uiValues.dart';
 import '../ui/ui_widgets.dart';
 
+Future showDonate(BuildContext context) => transitionDialog(
+      duration: const Duration(milliseconds: 400),
+      type: 'Scale',
+      context: context,
+      child: const DonateWindow(),
+      builder: (BuildContext context) {
+        return const DonateWindow();
+      },
+    );
+
 class DonateWindow extends StatefulWidget {
   const DonateWindow({
     Key? key,
-    required this.callbackFunction,
     this.onWillPop = false,
   }) : super(key: key);
 
-  final Function() callbackFunction;
   final bool onWillPop;
   @override
   State<DonateWindow> createState() => _DonateWindowState();
@@ -148,39 +158,21 @@ class _DonateWindowState extends State<DonateWindow> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      elevation: 0,
-      backgroundColor: thisTheme.bgrColor, //Colors.transparent,
-      insetPadding: EdgeInsets.symmetric(
-        vertical: stdHorizontalOffset,
-        horizontal: adaptiveOffset,
-      ), //windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width)),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
-      ),
-      child: SizedBox(
-        width: stdButtonWidth,
-        height: 485.h,
-        child: PatternContainer(
-          opacity: 0.4,
-          child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
-            child: Padding(
-              padding: EdgeInsets.all(stdHorizontalOffset * 2),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        context.locale.support_tittle,
-                        style: TextStyle(
-                          color: thisTheme.onBackground,
-                          fontWeight: FontWeight.w500,
-                          fontSize: stdFontSize,
-                        ),
-                      ),
-                      /*
+    return DialogWidget(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            children: [
+              Text(
+                context.locale.support_tittle,
+                style: TextStyle(
+                  color: thisTheme.onBackground,
+                  fontWeight: FontWeight.w500,
+                  fontSize: stdFontSize,
+                ),
+              ),
+              /*
                   !loaded? 
                     Container(
                       height: stdButtonHeight,
@@ -196,193 +188,188 @@ class _DonateWindowState extends State<DonateWindow> {
                       ? () => showAd(AdManager.interstitialVideoAdPlacementId)
                       : null,
                     ),*/
+            ],
+          ),
+          donateWidget(
+            //text
+            context.locale.support_video,
+            //icon
+            Icon(
+              MdiIcons.cardsSpade,
+              color: thisTheme.onBackground,
+              size: stdIconSize * 1.15,
+            ),
+            //button
+            loaded
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.smart_display,
+                        color: Colors.deepPurpleAccent,
+                        size: stdIconSize * 1.25,
+                      ),
+                      FittedBox(
+                        child: Padding(
+                          padding: EdgeInsets.all(
+                            stdHorizontalOffset / 2,
+                          ),
+                          child: Text(
+                            context.locale.support_free,
+                            style: TextStyle(
+                              color: thisTheme.onBackground,
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                : Padding(
+                    padding: EdgeInsets.all(stdHorizontalOffset * 2.5),
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 3,
+                    ),
+                  ),
+            //action
+            //mytargetShow
+            unityAdsShow, //РИСОВАТЬ РЕКЛАМУ <------------------------
+          ),
+          donateWidget(
+              //text
+              context.locale.support_modest,
+              //icon
+              Image.asset('assets/chips/chips_50.png'),
+
+              //button
+              _storeProducts == null || _storeProducts!.isEmpty
+                  ? Padding(
+                      padding: EdgeInsets.all(stdHorizontalOffset * 2.5),
+                      child: const CircularProgressIndicator(
+                        strokeWidth: 3,
+                      ),
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${_storeProducts![0].price}\n${_storeProducts![0].currencyCode}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.deepPurpleAccent,
+                            fontSize: stdFontSize * 0.9,
+                          ),
+                        ),
+                        //Text('Buy',style: TextStyle(color: thisTheme.onBackground,fontSize: stdFontSize*0.7))
+                      ],
+                    ),
+              //action
+              () async {
+            try {
+              await Purchases.purchaseProduct('modest_donat');
+            } catch (e) {
+              //String message = '$e';
+              showToast(context.locale.toast_unav);
+              //showToast(message.substring(0,20));
+            }
+          }),
+          donateWidget(
+            //text
+            context.locale.support_nice,
+            //icon
+            Image.asset('assets/chips/chips_500.png'),
+            //button
+            _storeProducts == null || _storeProducts!.isEmpty
+                ? Padding(
+                    padding: EdgeInsets.all(stdHorizontalOffset * 2.5),
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 3,
+                    ),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${_storeProducts![1].price}\n${_storeProducts![0].currencyCode}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.deepPurpleAccent,
+                          fontSize: stdFontSize * 0.9,
+                        ),
+                      ),
+                      //Text('Buy',style: TextStyle(color: thisTheme.onBackground,fontSize: stdFontSize*0.7))
                     ],
                   ),
-                  donateWidget(
-                    //text
-                    context.locale.support_video,
-                    //icon
-                    Icon(
-                      MdiIcons.cardsSpade,
-                      color: thisTheme.onBackground,
-                      size: stdIconSize * 1.15,
-                    ),
-                    //button
-                    loaded
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.smart_display,
-                                color: Colors.deepPurpleAccent,
-                                size: stdIconSize * 1.25,
-                              ),
-                              FittedBox(
-                                child: Padding(
-                                  padding: EdgeInsets.all(
-                                    stdHorizontalOffset / 2,
-                                  ),
-                                  child: Text(
-                                    context.locale.support_free,
-                                    style: TextStyle(
-                                      color: thisTheme.onBackground,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          )
-                        : Padding(
-                            padding: EdgeInsets.all(stdHorizontalOffset * 2.5),
-                            child: const CircularProgressIndicator(
-                              strokeWidth: 3,
-                            ),
-                          ),
-                    //action
-                    //mytargetShow
-                    unityAdsShow, //РИСОВАТЬ РЕКЛАМУ <------------------------
-                  ),
-                  donateWidget(
-                      //text
-                      context.locale.support_modest,
-                      //icon
-                      Image.asset('assets/chips/chips_50.png'),
-
-                      //button
-                      _storeProducts == null || _storeProducts!.isEmpty
-                          ? Padding(
-                              padding:
-                                  EdgeInsets.all(stdHorizontalOffset * 2.5),
-                              child: const CircularProgressIndicator(
-                                strokeWidth: 3,
-                              ),
-                            )
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '${_storeProducts![0].price}\n${_storeProducts![0].currencyCode}',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.deepPurpleAccent,
-                                    fontSize: stdFontSize * 0.9,
-                                  ),
-                                ),
-                                //Text('Buy',style: TextStyle(color: thisTheme.onBackground,fontSize: stdFontSize*0.7))
-                              ],
-                            ),
-                      //action
-                      () async {
-                    try {
-                      await Purchases.purchaseProduct('modest_donat');
-                    } catch (e) {
-                      //String message = '$e';
-                      showToast(context.locale.toast_unav);
-                      //showToast(message.substring(0,20));
-                    }
-                  }),
-                  donateWidget(
-                    //text
-                    context.locale.support_nice,
-                    //icon
-                    Image.asset('assets/chips/chips_500.png'),
-                    //button
-                    _storeProducts == null || _storeProducts!.isEmpty
-                        ? Padding(
-                            padding: EdgeInsets.all(stdHorizontalOffset * 2.5),
-                            child: const CircularProgressIndicator(
-                              strokeWidth: 3,
-                            ),
-                          )
-                        : Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '${_storeProducts![1].price}\n${_storeProducts![0].currencyCode}',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.deepPurpleAccent,
-                                  fontSize: stdFontSize * 0.9,
-                                ),
-                              ),
-                              //Text('Buy',style: TextStyle(color: thisTheme.onBackground,fontSize: stdFontSize*0.7))
-                            ],
-                          ),
-                    //action
-                    () async {
-                      try {
-                        await Purchases.purchaseProduct('nice_donat');
-                      } catch (e) {
-                        //String message = '$e';
-                        showToast(context.locale.toast_unav);
-                        //showToast(message.substring(0,20));
-                      }
-                    },
-                  ),
-                  donateWidget(
-                    //text
-                    context.locale.support_huge,
-                    //icon
-                    Image.asset('assets/chips/chips_5000.png'),
-                    //button
-                    _storeProducts == null || _storeProducts!.isEmpty
-                        ? Padding(
-                            padding: EdgeInsets.all(stdHorizontalOffset * 2.5),
-                            child: const CircularProgressIndicator(
-                              strokeWidth: 3,
-                            ),
-                          )
-                        : Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '${_storeProducts![2].price}\n${_storeProducts![0].currencyCode}',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.deepPurpleAccent,
-                                  fontSize: stdFontSize * 0.9,
-                                ),
-                              ),
-                              //Text('Buy',style: TextStyle(color: thisTheme.onBackground,fontSize: stdFontSize*0.7))
-                            ],
-                          ),
-                    //action
-                    //(){showToast('Not availible now');},
-                    () async {
-                      try {
-                        await Purchases.purchaseProduct('huge_donat');
-                      } catch (e) {
-                        //String message = '$e';
-                        showToast(context.locale.toast_unav);
-                        //showToast(message.substring(0,20));
-                      }
-                    },
-                  ),
-                  MyButton(
-                    side: BorderSide(
-                      width: 1.5,
-                      color: thisTheme.secondaryColor.withOpacity(0.6),
-                    ),
-                    height: stdButtonHeight * 0.6,
-                    width: double.infinity,
-                    borderRadius: BorderRadius.circular(stdBorderRadius),
-                    textStyle: stdTextStyle.copyWith(
-                      color: thisTheme.secondaryColor.withOpacity(0.6),
-                      fontSize: stdFontSize * 0.8,
-                    ),
-                    buttonColor: thisTheme.bgrColor,
-                    textString: context.locale.support_close,
-                    action: () async {
-                      Navigator.pop(context);
-                      //const url = 'https://github.com/goliksim';
-                      //if (!await launch(url)) throw 'Could not launch $url';
-                    },
-                  ),
-                ],
-              ),
-            ),
+            //action
+            () async {
+              try {
+                await Purchases.purchaseProduct('nice_donat');
+              } catch (e) {
+                //String message = '$e';
+                showToast(context.locale.toast_unav);
+                //showToast(message.substring(0,20));
+              }
+            },
           ),
-        ),
+          donateWidget(
+            //text
+            context.locale.support_huge,
+            //icon
+            Image.asset('assets/chips/chips_5000.png'),
+            //button
+            _storeProducts == null || _storeProducts!.isEmpty
+                ? Padding(
+                    padding: EdgeInsets.all(stdHorizontalOffset * 2.5),
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 3,
+                    ),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${_storeProducts![2].price}\n${_storeProducts![0].currencyCode}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.deepPurpleAccent,
+                          fontSize: stdFontSize * 0.9,
+                        ),
+                      ),
+                      //Text('Buy',style: TextStyle(color: thisTheme.onBackground,fontSize: stdFontSize*0.7))
+                    ],
+                  ),
+            //action
+            //(){showToast('Not availible now');},
+            () async {
+              try {
+                await Purchases.purchaseProduct('huge_donat');
+              } catch (e) {
+                //String message = '$e';
+                showToast(context.locale.toast_unav);
+                //showToast(message.substring(0,20));
+              }
+            },
+          ),
+          MyButton(
+            side: BorderSide(
+              width: 1.5,
+              color: thisTheme.secondaryColor.withOpacity(0.6),
+            ),
+            height: stdButtonHeight * 0.6,
+            width: double.infinity,
+            borderRadius: BorderRadius.circular(stdBorderRadius),
+            textStyle: stdTextStyle.copyWith(
+              color: thisTheme.secondaryColor.withOpacity(0.6),
+              fontSize: stdFontSize * 0.8,
+            ),
+            buttonColor: thisTheme.bgrColor,
+            textString: context.locale.support_close,
+            action: () async {
+              Navigator.pop(context);
+              //const url = 'https://github.com/goliksim';
+              //if (!await launch(url)) throw 'Could not launch $url';
+            },
+          ),
+        ],
       ),
     );
   }
@@ -448,4 +435,4 @@ class _DonateWindowState extends State<DonateWindow> {
           ],
         ),
       );
-}
+}*/

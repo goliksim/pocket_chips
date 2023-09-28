@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:pocket_chips/internal/cards/card_model.dart';
 import 'package:pocket_chips/internal/cards/winner_gpt.dart';
 
 Future<Map<String, dynamic>?> readJsonFromFile(String filePath) async {
@@ -54,8 +55,12 @@ void main() async {
 
     int winner = determineWinner(pl1, pl2, table);
 
-    print('Player 1 Cards: ${pl1.map((card) => '$card').join(', ')}  Combination: $player1Combination');
-    print('Player 2 Cards: ${pl2.map((card) => '$card').join(', ')}  Combination: $player2Combination');
+    print(
+      'Player 1 Cards: ${pl1.map((card) => '$card').join(', ')}  Combination: $player1Combination',
+    );
+    print(
+      'Player 2 Cards: ${pl2.map((card) => '$card').join(', ')}  Combination: $player2Combination',
+    );
     print('Table Cards: ${table.map((card) => '$card').join(', ')}');
 
     if (winner == 0) {

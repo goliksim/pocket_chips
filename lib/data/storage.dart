@@ -75,11 +75,12 @@ class LobbyStorage {
     try {
       final text = prefs.getString('lobby');
       final content = Lobby.fromJson(jsonDecode(text!));
+      logs.writeLog('LOBBY LOADED');
       return content;
     } catch (e) {
       // If encountering an error, return 0
       writeLobby(Lobby());
-      logs.writeLog('Starting app...\n ERROR OF READING LOBBY');
+      logs.writeLog('ERROR OF READING LOBBY');
       return Lobby(); //новое пустое лобби
     }
   }

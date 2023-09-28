@@ -1,5 +1,3 @@
-part of 'winner_gpt.dart';
-
 enum CardSuit { c, s, h, d }
 
 Map<String, int> cardText = {

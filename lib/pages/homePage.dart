@@ -2,11 +2,10 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pocket_chips/internal/localization.dart';
+import 'package:pocket_chips/widgets/winner_check/winner_check.dart';
 //import 'package:flutter/services.dart';
 
-import '../widgets/support.dart';
 import '../pages/playersPage.dart' as players;
 import '../data/lobby.dart';
 import '../data/storage.dart';
@@ -132,22 +131,24 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                 ),
-                if (!kIsWeb)
-                  SizedBox(
-                    width: stdHorizontalOffset,
-                  ),
-                if (!kIsWeb)
+
+                //TODO удалить затычку
+                if (!kIsWeb && kDebugMode)
                   Expanded(
-                    child: MyButton(
-                      height: stdButtonHeight,
-                      borderRadius: BorderRadius.circular(stdBorderRadius),
-                      buttonColor: thisTheme.additionButtonColor,
-                      textString: context.locale.home_sup,
-                      action: () async {
-                        showDonate(context, callBack);
-                        //const url = 'https://github.com/goliksim';
-                        //if (!await launch(url)) throw 'Could not launch $url';
-                      },
+                    child: Padding(
+                      padding: EdgeInsets.only(left: stdHorizontalOffset),
+                      child: MyButton(
+                        height: stdButtonHeight,
+                        borderRadius: BorderRadius.circular(stdBorderRadius),
+                        buttonColor: thisTheme.additionButtonColor,
+                        textString: context.locale.home_win_check,
+                        action: () async {
+                          showWinChecker(context);
+
+                          //const url = 'https://github.com/goliksim';
+                          //if (!await launch(url)) throw 'Could not launch $url';
+                        },
+                      ),
                     ),
                   ),
               ],
@@ -267,39 +268,4 @@ Widget chipImage(context) => Container(
       ),
       height: MediaQuery.of(context).size.width,
       width: MediaQuery.of(context).size.width,
-    );
-
-Future showHelp(BuildContext context, callBack, {onWillpop = false}) async {
-  final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  // ignore: use_build_context_synchronously
-  transitionDialog(
-    duration: const Duration(milliseconds: 400),
-    type: 'Scale',
-    context: context,
-    child: WillPopScope(
-      onWillPop: () async => onWillpop,
-      child: AboutPage(
-        callbackFunction: callBack,
-        packageInfo: packageInfo,
-        isFirst: !onWillpop,
-      ),
-    ),
-    builder: (BuildContext context) {
-      return AboutPage(
-        callbackFunction: callBack,
-        packageInfo: packageInfo,
-        isFirst: !onWillpop,
-      );
-    },
-  );
-}
-
-Future showDonate(BuildContext context, callBack) => transitionDialog(
-      duration: const Duration(milliseconds: 400),
-      type: 'Scale',
-      context: context,
-      child: DonateWindow(callbackFunction: callBack),
-      builder: (BuildContext context) {
-        return DonateWindow(callbackFunction: callBack);
-      },
     );

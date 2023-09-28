@@ -1,4 +1,6 @@
+// ignore_for_file: file_names
 
+/*
 import 'package:firstapp/ui/ui_widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:my_target_flutter/my_target_flutter.dart';
@@ -54,3 +56,4 @@ class MyTargetManager{
   static int slotId = 6896;
 
 }
+*/
