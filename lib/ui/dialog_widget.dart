@@ -4,7 +4,8 @@ import 'package:pocket_chips/data/uiValues.dart';
 import 'package:pocket_chips/ui/ui_widgets.dart';
 
 class DialogWidget extends StatelessWidget {
-  const DialogWidget({super.key, required this.child});
+  const DialogWidget({super.key, required this.child, this.edgeOffset});
+  final double? edgeOffset;
   final Widget child;
 
   @override
@@ -27,7 +28,7 @@ class DialogWidget extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
             child: Padding(
-              padding: EdgeInsets.all(stdHorizontalOffset * 2),
+              padding: EdgeInsets.all(edgeOffset ?? stdHorizontalOffset * 2),
               child: child,
             ),
           ),

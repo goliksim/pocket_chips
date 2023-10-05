@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+
 enum CardSuit { c, s, h, d }
 
 Map<String, int> cardText = {
@@ -33,11 +36,18 @@ Map<int, String> cardTextReversed = {
   14: 'A'
 };
 
+Map<String, IconData> cardsIconMap = {
+  'c': MdiIcons.cardsClub,
+  's': MdiIcons.cardsSpade,
+  'h': MdiIcons.cardsHeart,
+  'd': MdiIcons.cardsDiamond
+};
+
 Map<String, CardSuit> mapSuit = {
-  '♠': CardSuit.s,
-  '♣': CardSuit.c,
-  '♦': CardSuit.d,
-  '♥': CardSuit.h
+  's': CardSuit.s,
+  'c': CardSuit.c,
+  'd': CardSuit.d,
+  'h': CardSuit.h
 };
 
 Map<CardSuit, String> mapSuitReversed = {
@@ -51,6 +61,14 @@ class Card {
   Card(this.suit, this.key);
   CardSuit suit;
   int key;
+
+  String get suitString {
+    return mapSuitReversed[suit]!;
+  }
+
+  String get keyString {
+    return cardTextReversed[key]!;
+  }
 
   @override
   String toString() {

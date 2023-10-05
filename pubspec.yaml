@@ -74,8 +74,8 @@ flutter:
       - assets/translations/
       - assets/сard_back.jpg
       - assets/сard_back_dark.jpg
-      - assets/card_front.jpg
-      - assets/card_front_dark.jpg
+      - assets/card_front.png
+      - assets/card_front_dark.png
       - assets/table_dark.png
       - assets/table_light.png
       - assets/init_logo.png

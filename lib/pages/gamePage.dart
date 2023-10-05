@@ -4,6 +4,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pocket_chips/internal/localization.dart';
+import 'package:pocket_chips/ui/cards/card_rotation.dart';
+import 'package:pocket_chips/ui/cards/cards_variants/card_back.dart';
+import 'package:pocket_chips/ui/cards/cards_variants/card_front_sample.dart';
 
 import '../internal/gamelogic.dart';
 import '../widgets/lobbySettings.dart';
@@ -52,7 +55,7 @@ class _GamePageState extends State<GamePage> {
     else {
       if (thisLobby.lobbyIndex >= 0 && thisLobby.lobbyIndex < 4) {
         thisGame.gameStateName = Text(
-          '${context.locale.game_turn1}\u00A0${context.locale.game_turn2}\u00A0${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
+          '${LocaleManager.locale.game_turn1}\u00A0${LocaleManager.locale.game_turn2}\u00A0${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
           style: TextStyle(color: thisTheme.onBackground),
         );
       }
@@ -214,12 +217,12 @@ class _GamePageState extends State<GamePage> {
                                   ),
                                   // 3 карты по середине
                                   Positioned(
-                                    bottom: 3 * stdButtonHeight,
+                                    bottom: 3.8 * stdButtonHeight,
                                     child: cards2(0),
                                   ),
                                   // 2 карты по середине
                                   Positioned(
-                                    bottom: 2.2 * stdButtonHeight,
+                                    bottom: 3 * stdButtonHeight,
                                     child: cards2(1),
                                   ),
                                   Positioned(
@@ -593,97 +596,19 @@ class _GamePageState extends State<GamePage> {
 
   // Карты в два ряда
   Widget cards2(int count) => SizedBox(
-        height: stdButtonHeight * 0.75 * 2 * 0.85,
+        height: stdButtonHeight * 0.75,
         width: stdButtonHeight * 0.75 * (3 - count) * 0.75,
-        child: GridView.builder(
-          scrollDirection: Axis.vertical,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisSpacing: 5,
-            childAspectRatio: 0.7,
-            crossAxisCount: 3 - count,
+        child: Center(
+          child: RotationCard(
+            count: count,
+            conditionByIndex: (int index) => (index + 3 * count >=
+                thisLobby.lobbyState % 5 +
+                    (thisLobby.lobbyState % 5 > 0 ? 2 : 0)),
+            durationByIndex: (int index) => 500 + (index + 3 * count) * 100,
+            firstSide: (int index) => cardBack,
+            secondSide: (int index) => cardSample,
+            padding: EdgeInsets.symmetric(horizontal: stdHorizontalOffset / 6),
           ),
-          itemCount: 3 - count,
-          itemBuilder: (context, index) {
-            return AnimatedSwitcher(
-              switchInCurve: Curves.easeIn,
-              switchOutCurve: Curves.easeOut,
-              duration: Duration(milliseconds: 500 + (index + 3 * count) * 100),
-              transitionBuilder: (Widget widget, Animation<double> animation) {
-                final rotateAnim =
-                    Tween(begin: pi, end: 0.0).animate(animation);
-                return AnimatedBuilder(
-                  animation: rotateAnim,
-                  child: widget,
-                  builder: (context, widget) {
-                    final isUnder = (const ValueKey('1') != widget?.key);
-                    var tilt = ((animation.value - 0.5).abs() - 0.5) * 0.003;
-                    tilt *= isUnder ? -1.0 : 1.0;
-                    final value = min(rotateAnim.value, pi / 2);
-                    return Transform(
-                      transform: Matrix4.rotationY(value)..setEntry(3, 0, tilt),
-                      alignment: Alignment.center,
-                      child: widget,
-                    );
-                  },
-                );
-              },
-              child: (index + 3 * count >=
-                      thisLobby.lobbyState % 5 +
-                          (thisLobby.lobbyState % 5 > 0 ? 2 : 0))
-                  ? Container(
-                      key: const Key('1'),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 1,
-                          color: thisTheme.bankColor.withOpacity(1),
-                        ),
-                        borderRadius:
-                            BorderRadius.circular(0.35 * stdBorderRadius),
-                        image: DecorationImage(
-                          colorFilter: (thisTheme.name == 'dark')
-                              ? ColorFilter.mode(
-                                  thisTheme.primaryColor.withOpacity(0.2),
-                                  BlendMode.srcATop,
-                                )
-                              : ColorFilter.mode(
-                                  thisTheme.primaryColor.withOpacity(0.8),
-                                  BlendMode.colorDodge,
-                                ),
-                          fit: BoxFit.cover,
-                          image: AssetImage(
-                            (thisTheme.name == 'dark')
-                                ? 'assets/сard_back_dark.jpg'
-                                : 'assets/сard_back.jpg',
-                          ),
-                        ),
-                      ),
-                    )
-                  : Container(
-                      key: const Key('2'),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 1,
-                          color: thisTheme.bankColor.withOpacity(1),
-                        ),
-                        borderRadius:
-                            BorderRadius.circular(0.35 * stdBorderRadius),
-                        image: DecorationImage(
-                          colorFilter: ColorFilter.mode(
-                            thisTheme.primaryColor.withOpacity(0.04),
-                            BlendMode.srcATop,
-                          ),
-                          fit: BoxFit.cover,
-                          image: AssetImage(
-                            (thisTheme.name == 'dark')
-                                ? 'assets/card_front_dark.jpg'
-                                : 'assets/card_front.jpg',
-                          ),
-                        ),
-                      ),
-                    ),
-            );
-          },
         ),
       );
   // Окно игрока

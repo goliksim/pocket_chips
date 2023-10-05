@@ -1,5 +1,47 @@
 part of 'winner_gpt.dart';
 
+class Combination implements Comparable<Combination> {
+  Combination(
+    this.hand,
+    this.strength,
+  );
+
+  final PokerHand hand;
+  final int strength;
+
+  @override
+  int compareTo(Combination other) {
+    // Сначала сравниваем по силе (strength)
+    int handComparison = hand.index.compareTo(other.hand.index);
+
+    if (handComparison != 0) {
+      return handComparison;
+    }
+
+    // Если сила одинакова, сравниваем по типу комбинации (hand)
+    return strength.compareTo(other.strength);
+  }
+
+  bool operator >(Combination other) {
+    return compareTo(other) > 0;
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is Combination &&
+      hand.index == other.hand.index &&
+      strength == other.strength;
+
+  @override
+  int get hashCode => hand.hashCode ^ strength.hashCode;
+
+  @override
+  String toString() {
+    final text = '$hand with power $strength';
+    return text;
+  }
+}
+
 //Возможные комбинации
 enum PokerHand {
   highCard,
@@ -25,7 +67,7 @@ List<Card> _uniqueKeyList(List<Card> list) {
 }
 
 //Флеш-Рояль
-(PokerHand, int) _isRoyalFlush(Map<CardSuit, List<Card>> cardsBySuit) {
+Combination _isRoyalFlush(Map<CardSuit, List<Card>> cardsBySuit) {
   // Проверяем каждую масть на наличие "Straight Flush"
   for (var suit in cardsBySuit.keys) {
     final cardsInSuit = cardsBySuit[suit]!;
@@ -37,16 +79,16 @@ List<Card> _uniqueKeyList(List<Card> list) {
             cardsInSuit[i + 2].key == 12 &&
             cardsInSuit[i + 3].key == 11 &&
             cardsInSuit[i + 4].key == 10) {
-          return (PokerHand.royalFlush, -1);
+          return Combination(PokerHand.royalFlush, -1);
         }
       }
     }
   }
-  return (PokerHand.none, -1);
+  return Combination(PokerHand.none, -1);
 }
 
 //Стрит-Флеш
-(PokerHand, int) _isStraightFlush(Map<CardSuit, List<Card>> cardsBySuit) {
+Combination _isStraightFlush(Map<CardSuit, List<Card>> cardsBySuit) {
   PokerHand result = PokerHand.none;
 
   // Проверяем каждую масть на наличие "Straight Flush"
@@ -66,32 +108,32 @@ List<Card> _uniqueKeyList(List<Card> list) {
     // Ищем последовательность пяти карт
     for (int i = 0; i <= cardsInSuit.length - 5; i++) {
       if (cardsInSuit[i + 4].key - cardsInSuit[i].key == -4) {
-        return (PokerHand.straightFlush, cardsInSuit[i].key);
+        return Combination(PokerHand.straightFlush, cardsInSuit[i].key);
       }
     }
   }
-  return (result, -1);
+  return Combination(result, -1);
 }
 
 //Карэ
-(PokerHand, int) _isFourOfAKind(Map<int, int> valueCounts) {
+Combination _isFourOfAKind(Map<int, int> valueCounts) {
   // Проверяем, есть ли четыре карты с одинаковым значением
   for (var key in valueCounts.keys) {
     if (valueCounts[key] == 4) {
       final kickers = valueCounts.keys.where((e) => e != key).toList();
       //kickers.sort((a, b) => b.compareTo(a));
       //kickers.add(0);
-      return (
+      return Combination(
         PokerHand.fourOfAKind,
-        key * 100 + kickers.first //один кикер, так как 4 карты уже на столе
+        key * 100 + kickers.first, //один кикер, так как 4 карты уже на столе
       );
     }
   }
-  return (PokerHand.none, -1);
+  return Combination(PokerHand.none, -1);
 }
 
 //ФулХаус
-(PokerHand, int) _isFullHouse(Map<int, int> valueCounts) {
+Combination _isFullHouse(Map<int, int> valueCounts) {
   bool hasThreeOfAKind = false;
   bool hasPair = false;
   // Проверяем наличие тройки и пары
@@ -107,11 +149,11 @@ List<Card> _uniqueKeyList(List<Card> list) {
   }
   PokerHand result =
       (hasThreeOfAKind && hasPair) ? PokerHand.fullHouse : PokerHand.none;
-  return (result, value[0]! + value[1]!);
+  return Combination(result, value[0]! + value[1]!);
 }
 
 //Флеш
-(PokerHand, int) _isFlush(Map<CardSuit, List<Card>> cardsBySuit) {
+Combination _isFlush(Map<CardSuit, List<Card>> cardsBySuit) {
   // Проверяем каждую масть на наличие "Straight Flush"
   for (var suit in cardsBySuit.keys) {
     var cardsInSuit = cardsBySuit[suit]!;
@@ -120,21 +162,21 @@ List<Card> _uniqueKeyList(List<Card> list) {
       continue;
     }
     //Если есть флеш
-    return (
+    return Combination(
       PokerHand.flush,
       cardsInSuit[0].key * 100000000 +
           cardsInSuit[1].key * 1000000 +
           cardsInSuit[2].key * 10000 +
           cardsInSuit[3].key * 100 +
-          cardsInSuit[4].key
+          cardsInSuit[4].key,
     );
   }
 
-  return (PokerHand.none, -1);
+  return Combination(PokerHand.none, -1);
 }
 
 //Стрит
-(PokerHand, int) _isStraight(List<Card> cards) {
+Combination _isStraight(List<Card> cards) {
   //удаляем повторения
   cards = _uniqueKeyList(cards);
 
@@ -152,30 +194,30 @@ List<Card> _uniqueKeyList(List<Card> list) {
         maxVal = cards[i + 4].key;
       }
     }
-    return (result, maxVal);
+    return Combination(result, maxVal);
   }
 
-  return (PokerHand.none, -1);
+  return Combination(PokerHand.none, -1);
 }
 
 //Тройка
-(PokerHand, int) _isThreeOfAKind(Map<int, int> valueCounts) {
+Combination _isThreeOfAKind(Map<int, int> valueCounts) {
   // Проверяем наличие тройки
   for (var key in valueCounts.keys) {
     if (valueCounts[key] == 3) {
       var kickers = valueCounts.keys.where((e) => e != key).toList();
 
-      return (
+      return Combination(
         PokerHand.threeOfAKind,
-        key * 10000 + kickers[0] * 100 + kickers[1]
+        key * 10000 + kickers[0] * 100 + kickers[1],
       ); //используем два кикера, так как 3 карты уже на столе
     }
   }
-  return (PokerHand.none, -1);
+  return Combination(PokerHand.none, -1);
 }
 
 //Две пары
-(PokerHand, int) _isTwoPair(Map<int, int> valueCounts) {
+Combination _isTwoPair(Map<int, int> valueCounts) {
   List<int> pairNumbers = [];
   // Проверяем наличие двух пар
   for (var key in valueCounts.keys) {
@@ -187,31 +229,34 @@ List<Card> _uniqueKeyList(List<Card> list) {
       valueCounts.keys.where((e) => !pairNumbers.contains(e)).toList();
 
   if (pairNumbers.length >= 2) {
-    return (
+    return Combination(
       PokerHand.twoPair,
-      pairNumbers.first * 10000 + pairNumbers[1] * 100 + kickers.first
+      pairNumbers.first * 10000 + pairNumbers[1] * 100 + kickers.first,
     ); //используем 1 кикер, так как 4 карты уже на столе
   }
-  return (PokerHand.none, -1);
+  return Combination(PokerHand.none, -1);
 }
 
 //Пара
-(PokerHand, int) _isPair(Map<int, int> valueCounts) {
+Combination _isPair(Map<int, int> valueCounts) {
   // Проверяем наличие пары
   for (var key in valueCounts.keys) {
     if (valueCounts[key] == 2) {
       final kickers = valueCounts.keys.where((e) => e != key).toList();
-      return (
+      return Combination(
         PokerHand.pair,
-        key * 1000000 + kickers.first * 10000 + kickers[1] * 100 + kickers[2]
+        key * 1000000 + kickers.first * 10000 + kickers[1] * 100 + kickers[2],
       ); //используем 3 кикер, так как на столе всего 2 карты
     }
   }
-  return (PokerHand.none, -1);
+  return Combination(PokerHand.none, -1);
 }
 
 // Дополнительные функции для сравнения старших карт
-(PokerHand, int) _highCard(List<Card> playerCards) {
+Combination _highCard(List<Card> playerCards) {
   playerCards.sort((b, a) => a.key.compareTo(b.key));
-  return (PokerHand.highCard, playerCards.first.key * 100 + playerCards[1].key);
+  return Combination(
+    PokerHand.highCard,
+    playerCards.first.key * 100 + playerCards[1].key,
+  );
 }

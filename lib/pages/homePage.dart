@@ -1,6 +1,5 @@
 // ignore_for_file: file_names
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pocket_chips/internal/localization.dart';
 import 'package:pocket_chips/widgets/winner_check/winner_check.dart';
@@ -131,26 +130,23 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                 ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: stdHorizontalOffset),
+                    child: MyButton(
+                      height: stdButtonHeight,
+                      borderRadius: BorderRadius.circular(stdBorderRadius),
+                      buttonColor: thisTheme.additionButtonColor,
+                      textString: context.locale.home_win_check,
+                      action: () async {
+                        showWinChecker(context);
 
-                //TODO удалить затычку
-                if (!kIsWeb && kDebugMode)
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(left: stdHorizontalOffset),
-                      child: MyButton(
-                        height: stdButtonHeight,
-                        borderRadius: BorderRadius.circular(stdBorderRadius),
-                        buttonColor: thisTheme.additionButtonColor,
-                        textString: context.locale.home_win_check,
-                        action: () async {
-                          showWinChecker(context);
-
-                          //const url = 'https://github.com/goliksim';
-                          //if (!await launch(url)) throw 'Could not launch $url';
-                        },
-                      ),
+                        //const url = 'https://github.com/goliksim';
+                        //if (!await launch(url)) throw 'Could not launch $url';
+                      },
                     ),
                   ),
+                ),
               ],
             )
           ],

@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:pocket_chips/internal/cards/card_model.dart' as c;
+import 'package:pocket_chips/data/uiValues.dart';
+import 'package:pocket_chips/internal/localization.dart';
 import 'package:pocket_chips/ui/dialog_widget.dart';
 import 'package:pocket_chips/ui/transitions.dart';
-import 'package:pocket_chips/widgets/winner_check/card_widget.dart';
+
+import 'check_inherited.dart';
+import 'check_player.dart';
+import 'check_table.dart';
 
 Future showWinChecker(BuildContext context) => transitionDialog(
       duration: const Duration(milliseconds: 400),
       type: 'Scale',
       context: context,
-      child: const WinnerChecker(),
+      child: CheckCardsInherited(
+        winner: -1,
+        playerCards: List.generate(2, (index) => [null, null]),
+        combinations: List.filled(2, null),
+        tableCards: List.filled(5, null),
+        child: const WinnerChecker(),
+      ),
       builder: (BuildContext context) {
-        return const WinnerChecker();
+        return CheckCardsInherited(
+          winner: -1,
+          playerCards: List.generate(2, (index) => [null, null]),
+          combinations: List.filled(2, null),
+          tableCards: List.filled(5, null),
+          child: const WinnerChecker(),
+        );
       },
     );
 
@@ -23,21 +38,56 @@ class WinnerChecker extends StatefulWidget {
 }
 
 class _WinnerCheckerState extends State<WinnerChecker> {
+  void callback() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return DialogWidget(
-      child: SizedBox(
-        height: 100.h,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(child: CardWidget(card: c.Card(c.CardSuit.c, 1))),
-            Expanded(child: CardWidget(card: c.Card(c.CardSuit.c, 1))),
-            Expanded(child: CardWidget(card: c.Card(c.CardSuit.c, 1))),
-            Expanded(child: CardWidget(card: c.Card(c.CardSuit.c, 1))),
-            Expanded(child: CardWidget(card: c.Card(c.CardSuit.c, 1))),
-          ],
-        ),
+      edgeOffset: stdHorizontalOffset,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            height: stdButtonHeight * 0.5,
+            child: Center(
+              child: FittedBox(
+                child: Text(
+                  context.locale.home_win_check,
+                  style: TextStyle(
+                    color: thisTheme.onBackground,
+                    fontSize: stdFontSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          CheckTable(
+            callback: callback,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              for (int playerIndex = 0;
+                  playerIndex < context.playerCards!.length;
+                  playerIndex++)
+                Flexible(
+                  child: CheckPlayer(
+                    callback: callback,
+                    cards: context.playerCards![playerIndex],
+                    number: playerIndex,
+                    winner: context.winner == playerIndex,
+                    combination: context.combinations[playerIndex]?.hand,
+                  ),
+                )
+            ],
+          ),
+          SizedBox(
+            height: stdHorizontalOffset / 2,
+          ),
+        ],
       ),
     );
   }

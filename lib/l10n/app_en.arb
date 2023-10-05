@@ -132,5 +132,19 @@
     "toast_alred2":"Player with same name and icon already exist",
     "toast_bank3":"The stack cannot be zero",
     "toast_bank4":"We recommend a Big Blind value less than Stack",
-    "toast_unav":"Unavailible now"
+    "toast_unav":"Unavailible now",
+    "check_table":"Table",
+    "check_player":"Player",
+    "check_rf":"Royal Flush",
+    "check_sf":"Straight Flush",
+    "check_fok":"Four Of A Kind",
+    "check_fh":"Full House",
+    "check_f":"Flush",
+    "check_s":"Straight",
+    "check_tok":"Three Of A Kind",
+    "check_2p":"Two Pair",
+    "check_p":"Pair",
+    "check_hc":"High Card",
+    "check_picker":"Pick card",
+    "check_toast":"Already exist"
 }

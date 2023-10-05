@@ -2,7 +2,7 @@ import 'card_model.dart';
 part 'combination_gpt.dart';
 
 // Функция для определения комбинации карт на столе
-(PokerHand, int) detectCombination(List<Card> playerCards, List<Card> table) {
+Combination detectCombination(List<Card> playerCards, List<Card> table) {
   List<Card> allCards = [
     ...playerCards,
     ...table
@@ -26,7 +26,7 @@ part 'combination_gpt.dart';
     cardsBySuit[card.suit]!.add(card);
   }
 
-  List<(PokerHand, int) Function()> checks = [
+  List<Combination Function()> checks = [
     () => _isRoyalFlush(cardsBySuit),
     () => _isStraightFlush(cardsBySuit),
     () => _isFourOfAKind(valueCounts),
@@ -42,35 +42,56 @@ part 'combination_gpt.dart';
   // Проверьте наличие комбинаций, начиная с наивысшей
   for (var check in checks) {
     var result = check();
-    if (result.$1 != PokerHand.none) {
-      return (result.$1, result.$2);
+    if (result.hand != PokerHand.none) {
+      return result;
     }
   }
 
   final end = _highCard(playerCards);
-  return (end.$1, end.$2);
+  return end;
 }
 
-int determineWinner(
-  List<Card> player1Cards,
-  List<Card> player2Cards,
-  List<Card> table,
+int findIndexOfMax(List<Combination> list) {
+  if (list.isEmpty) {
+    throw ArgumentError('The list is empty');
+  }
+
+  Combination max = list[0];
+  int maxIndex = 0;
+
+  for (int i = 1; i < list.length; i++) {
+    if (list[i] == max) return -1;
+    if (list[i] > max) {
+      max = list[i];
+      maxIndex = i;
+    }
+  }
+
+  return maxIndex;
+}
+
+(int, List<Combination?>) determineWinner(
+  List<List<Card?>> playerCards,
+  List<Card?> table,
 ) {
-  var (PokerHand player1Combination, int pl1Key) =
-      detectCombination(player1Cards, table);
-  var (PokerHand player2Combination, int pl2Key) =
-      detectCombination(player2Cards, table);
+  if (table.contains(null)) {
+    return (-1, List.filled(playerCards.length, null));
+  }
+  final List<Combination?> combinations = [];
+  for (var cards in playerCards) {
+    if (cards.contains(null)) {
+      combinations.add(null);
+      continue;
+    }
+    combinations.add(
+      detectCombination(
+        cards.map((e) => e!).toList(),
+        table.map((e) => e!).toList(),
+      ),
+    );
+  }
 
   // Сравните комбинации игроков
-  if (player1Combination.index > player2Combination.index) {
-    return 1; // Победил первый игрок
-  } else if (player1Combination.index < player2Combination.index) {
-    return 2; // Победил второй игрок
-  } else if (pl1Key > pl2Key) {
-    return 1;
-  } else if (pl1Key < pl2Key) {
-    return 2;
-  } else {
-    return 0;
-  }
+  if (combinations.contains(null)) return (-1, combinations);
+  return (findIndexOfMax(combinations.map((e) => e!).toList()), combinations);
 }

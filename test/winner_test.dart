@@ -53,7 +53,7 @@ void main() async {
     final player1Combination = detectCombination(pl1, table);
     final player2Combination = detectCombination(pl2, table);
 
-    int winner = determineWinner(pl1, pl2, table);
+    var (int winner, _) = determineWinner([pl1, pl2], table);
 
     print(
       'Player 1 Cards: ${pl1.map((card) => '$card').join(', ')}  Combination: $player1Combination',
