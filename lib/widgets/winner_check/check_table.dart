@@ -19,7 +19,6 @@ class CheckTable extends StatefulWidget {
 
 class _CheckTableState extends State<CheckTable> {
   void updateTable(index, card) {
-    print('updateTable');
     if (context.notInCards(card)) {
       context.tableCards![index] = card;
       context.updateCombinations();
@@ -31,12 +30,6 @@ class _CheckTableState extends State<CheckTable> {
 
   @override
   Widget build(BuildContext context) {
-    //TODO
-    /*context.tableCards!.sort((b, a) {
-      if (a == null) return -1;
-      if (b == null) return 1;
-      return a.key.compareTo(b.key);
-    });*/
     return Container(
       decoration: BoxDecoration(
         border: Border.all(width: 2.0, color: thisTheme.bankColor),

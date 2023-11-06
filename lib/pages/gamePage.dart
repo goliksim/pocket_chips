@@ -3,10 +3,12 @@ import 'dart:math';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pocket_chips/data/logs.dart';
 import 'package:pocket_chips/internal/localization.dart';
 import 'package:pocket_chips/ui/cards/card_rotation.dart';
 import 'package:pocket_chips/ui/cards/cards_variants/card_back.dart';
 import 'package:pocket_chips/ui/cards/cards_variants/card_front_sample.dart';
+import 'package:pocket_chips/widgets/winner_check/winner_check.dart';
 
 import '../internal/gamelogic.dart';
 import '../widgets/lobbySettings.dart';
@@ -88,7 +90,7 @@ class _GamePageState extends State<GamePage> {
     thisGame.addButton =
         (thisLobby.lobbyPlayers.length >= maxPlayerCount ? 0 : 1);
     setState(() {});
-    lobbyStorage.writeLobby(thisLobby);
+    lobbyStorage.write(thisLobby);
   }
 
   @override
@@ -870,7 +872,7 @@ class _GamePageState extends State<GamePage> {
       thisGame.raiseBank = thisGame.minTmpFunction(thisGame.bidsEqual);
     }
     //Если денег хватает на рейз -> выводим окошко
-    if (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank >=
+    if (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank >
         thisGame.raiseBank) {
       thisGame.raiseButtonPressed = !thisGame.raiseButtonPressed;
     } else {
@@ -879,7 +881,7 @@ class _GamePageState extends State<GamePage> {
           thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank;
       thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank = 0;
       thisGame.newPlayer();
-      thisGame.raiseButtonPressed = !thisGame.raiseButtonPressed;
+      //thisGame.raiseButtonPressed = !thisGame.raiseButtonPressed;
       //}
     }
     setState(() {});
@@ -1063,11 +1065,13 @@ class StaticRaiseButtonState extends State<StaticRaiseButton> {
 
   List<int> chips(int maxbank) {
     List<int> tmplist = [1, 5, 10, 25, 50, 100, 500, 1000, 5000, 10000];
+    print(maxbank);
     while (true) {
       if (tmplist.last > maxbank) {
         tmplist.removeLast();
         continue;
       }
+
       return tmplist;
     }
   }
@@ -1356,19 +1360,41 @@ class _WinnerChooseWindowState extends State<WinnerChooseWindow> {
               ),
             ),
             SizedBox(height: stdHorizontalOffset),
-            MyButton(
+            SizedBox(
               height: stdButtonHeight * 0.75 * 0.75,
-              width: double.infinity,
-              buttonColor: thisTheme.primaryColor,
-              textString: context.locale.game_win_conf,
-              action: () {
-                if (winners.where((e) => e == true).isNotEmpty) {
-                  moneyDistribution(winners, context);
-                } else {
-                  showToast(context.locale.toast_winn);
-                }
-              },
-            )
+              child: Row(
+                children: [
+                  MyButton(
+                    height: stdButtonHeight * 0.75 * 0.75,
+                    width: stdButtonHeight * 0.75 * 0.75,
+                    buttonColor: thisTheme.secondaryColor,
+                    child: Icon(
+                      Icons.help_outline,
+                      color: thisTheme.onPrimary,
+                    ),
+                    action: () async {
+                      showWinChecker(context);
+                    },
+                  ),
+                  SizedBox(width: stdHorizontalOffset),
+                  Expanded(
+                    child: MyButton(
+                      height: stdButtonHeight * 0.75 * 0.75,
+                      width: double.infinity,
+                      buttonColor: thisTheme.primaryColor,
+                      textString: context.locale.game_win_conf,
+                      action: () {
+                        if (winners.where((e) => e == true).isNotEmpty) {
+                          moneyDistribution(winners, context);
+                        } else {
+                          showToast(context.locale.toast_winn);
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

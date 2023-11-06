@@ -1,10 +1,10 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:pocket_chips/data/logs.dart';
 import 'package:pocket_chips/internal/localization.dart';
 
 import '../data/lobby.dart';
-import '../data/storage.dart';
 import '../data/uiValues.dart';
 import '../ui/ui_widgets.dart';
 

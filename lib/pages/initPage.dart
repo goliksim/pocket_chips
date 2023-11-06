@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:pocket_chips/data/logs.dart';
 import 'package:pocket_chips/internal/localization.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../data/lobby.dart';
@@ -56,12 +57,12 @@ class _InitWindowState extends State<InitWindow> {
   }
 
   Future loading() async {
-    lobbyStorage.readLobby().then((value) {
+    lobbyStorage.read().then((value) {
       setState(() {
         thisLobby = value;
       });
     });
-    savedStorage.readPlayers().then((value) {
+    savedStorage.read().then((value) {
       setState(() {
         savedPlayers = value;
       });

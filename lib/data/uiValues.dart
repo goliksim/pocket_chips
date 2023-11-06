@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'config_model.dart';
+import 'logs.dart';
 import 'storage.dart';
 import 'themes.dart';
 
@@ -30,11 +32,11 @@ void changeTheme() {
   if (thisTheme == themeList[0]) {
     thisTheme = themeList[1];
     thisConfig.themeIndex = 1;
-    configStorage.writeConfig(thisConfig);
+    configStorage.write(thisConfig);
   } else {
     thisTheme = themeList[0];
     thisConfig.themeIndex = 0;
-    configStorage.writeConfig(thisConfig);
+    configStorage.write(thisConfig);
   }
 
   logs.writeLog('Turn to ${thisTheme.name} mode');

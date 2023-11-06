@@ -1,15 +1,17 @@
 // ignore_for_file: file_names
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:pocket_chips/data/config_model.dart';
+import 'package:pocket_chips/data/logs.dart';
 import 'package:pocket_chips/internal/localization.dart';
+import 'package:pocket_chips/widgets/onboading/dialogs/about.dart';
+import 'package:pocket_chips/widgets/onboading/dialogs/update.dart';
 import 'package:pocket_chips/widgets/winner_check/winner_check.dart';
 //import 'package:flutter/services.dart';
 
 import '../pages/playersPage.dart' as players;
 import '../data/lobby.dart';
-import '../data/storage.dart';
 import '../ui/transitions.dart';
-import '../widgets/onboarding.dart';
 import '../data/uiValues.dart';
 import '../ui/ui_widgets.dart';
 
@@ -42,13 +44,24 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    Future.delayed(const Duration(milliseconds: 800), () {
-      if (thisConfig.firstTime) firstTime();
+    Future.delayed(const Duration(milliseconds: 800), () async {
+      final version = await thisConfig.getVersion();
+      if (thisConfig.firstTime) {
+        firstTime();
+        thisConfig.version = version;
+      } else if (thisConfig.version!.compareTo(version) < 0) {
+        updateInfo();
+      }
     });
   }
 
   void firstTime() async {
     showHelp(context, callBack, onWillpop: false);
+  }
+
+  void updateInfo() async {
+    showToast('updateInfo');
+    //showUpdate(context, callBack);
   }
 
   void callBack() {
@@ -112,7 +125,6 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(height: stdHorizontalOffset),
 
-            //Our Contacts
             Row(
               children: [
                 Expanded(
@@ -122,11 +134,14 @@ class _HomePageState extends State<HomePage> {
                     buttonColor: thisTheme.additionButtonColor,
                     textString: context.locale.home_abo,
                     action: () async {
-                      showHelp(
+                      //TODO ВЕРНУТЬ ХЕЛП
+                      showUpdate(context);
+                      /*showHelp(
                         context,
                         callBack,
                         onWillpop: true,
                       ); //Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => const MyApp()));
+                    */
                     },
                   ),
                 ),

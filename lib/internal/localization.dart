@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl_standalone.dart';
-
-import '../data/storage.dart';
+import 'package:pocket_chips/data/config_model.dart';
 
 extension LocalizationExs on BuildContext {
   AppLocalizations get locale => AppLocalizations.of(this);

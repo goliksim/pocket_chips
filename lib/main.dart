@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart'; // подключаем библиотеку material
 import 'package:flutter/services.dart';
+import 'package:pocket_chips/data/config_model.dart';
+import 'package:pocket_chips/data/logs.dart';
 import 'data/storage.dart';
 import 'data/uiValues.dart';
 import 'internal/application.dart' as app;
@@ -8,8 +10,10 @@ import 'package:flutter/foundation.dart';
 
 import 'internal/localization.dart';
 
+//TODO Work with ignore
+
 void _runAp() async {
-  await configStorage.readConfig().then((value) {
+  await configStorage.read().then((value) {
     thisTheme = themeList[value.themeIndex];
     if (thisTheme == themeList[0]) {
       logs.writeLog('LIGHT mode loaded from config');

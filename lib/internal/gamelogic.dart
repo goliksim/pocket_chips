@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:pocket_chips/data/logs.dart';
 
 import '../pages/gamePage.dart';
 import '../data/storage.dart';
@@ -31,13 +32,15 @@ class Game {
     LocaleManager.locale.game_shdw,
     LocaleManager.locale.game_break
   ];
-  int raiseBank = 0;
-  bool raiseButtonPressed = false;
-  bool bidsEqual = false;
   Text gameStateName = Text(
     LocaleManager.locale.game_welc,
     style: TextStyle(color: thisTheme.primaryColor),
   );
+
+  int raiseBank = 0;
+  bool raiseButtonPressed = false;
+  bool bidsEqual = false;
+
   Function()? callback;
   BuildContext? context;
 
@@ -51,7 +54,7 @@ class Game {
     }
     arr[0] = 0.0;
     thisLobby.lobbyRandomOffset = arr;
-    lobbyStorage.writeLobby(thisLobby);
+    lobbyStorage.write(thisLobby);
   }
 
   // начало ставок
@@ -63,7 +66,7 @@ class Game {
       thisLobby.lapCount = 0;
       thisLobby.lobbyState = 0;
       thisLobby.bigBlindIndex = firstBlind(thisLobby.bigBlindIndex);
-      lobbyStorage.writeLobby(thisLobby);
+      lobbyStorage.write(thisLobby);
       newPlayer(index: thisLobby.firstPlayerIndex);
       callback!();
       changeText(gameStateNameList[thisLobby.lobbyState]);
@@ -75,7 +78,12 @@ class Game {
   // переходы между игроками
   int newPlayer({int index = 100}) {
     //print(bigBlindIndex);
-    //
+    print(
+      index == 100
+          ? thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name
+          : thisLobby.lobbyPlayers[index].name,
+    );
+
     if (index == 100) {
       thisLobby.lobbyIndex += 1;
       if (thisLobby.lobbyIndex == thisLobby.lobbyPlayers.length) {
@@ -102,16 +110,19 @@ class Game {
     }
 
     if (index == 100) {
-      if (!bidsEqual && waitForBidsEqual()) {
+      var thisBidsEqual = waitForBidsEqual();
+      var firstLap = thisLobby.lapCount > 0;
+      if (!bidsEqual && thisBidsEqual && !firstLap) {
         //bidsEqual = waitForBidsEqual();
-        if (thisLobby.lapCount > 0) {
-          newState();
-          return 0;
-        }
+        print('Case of normal on first lap equal');
+        newState();
+        return 0;
       } else {
+        //TODO BUUUUUUUUUUUUUUUUUUUUUUUUUUUUUG
         if (thisLobby.lobbyIndex == thisLobby.firstPlayerIndex &&
-            thisLobby.lapCount > 0 &&
-            waitForBidsEqual()) {
+            firstLap &&
+            thisBidsEqual) {
+          print('Case of first lap equal');
           newState();
           return 0;
         }
@@ -156,7 +167,7 @@ class Game {
     }
     */
     raiseBank = minTmpFunction(bidsEqual);
-    thisGame.bidsEqual = thisGame.waitForBidsEqual();
+    bidsEqual = waitForBidsEqual();
     if (thisLobby.lobbyIndex == thisLobby.bigBlindIndex) {
       thisLobby.lapCount += 1;
     }
@@ -172,7 +183,7 @@ class Game {
     logs.writeLog(
       'Turn of ${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
     );
-    lobbyStorage.writeLobby(thisLobby);
+    lobbyStorage.write(thisLobby);
     return 0;
   }
 
@@ -226,11 +237,12 @@ class Game {
   // новая улица
   void newState() async {
     //проверяем, шобы ставки были одинаковы
+
     if (waitForBidsEqual()) {
       //переходим в новое состояние
       thisLobby.lobbyState += 1;
       logs.writeLog('NewState with lobbyState = ${thisLobby.lobbyState}');
-      lobbyStorage.writeLobby(thisLobby);
+      lobbyStorage.write(thisLobby);
     } else {}
     //после префлопа первый игрок - смол блайнд
     if (thisLobby.lobbyState == 1) {
@@ -255,20 +267,26 @@ class Game {
 
   // проверка на выравнивание ставок
   bool waitForBidsEqual() {
-    bool allInBool = false;
+    bool notAllInBool = false;
     bool equalBool = false;
+    int notZeroPlayers = 0;
+
     //bool preFlop = false;
+    var maxBid = thisLobby.lobbyPlayers.map((e) => e.bid).reduce(max);
     for (Player player in thisLobby.lobbyPlayers) {
-      equalBool = (player.isActive) &&
-          (player.bid != thisLobby.lobbyPlayers.map((e) => e.bid).reduce(max));
-      allInBool = !((player.bid > 0) && (player.bank == 0));
+      equalBool = (player.isActive) && (player.bid != maxBid);
+      notAllInBool = !((player.bid > 0) && (player.bank == 0));
+      if (player.bank > 0) notZeroPlayers += 1;
       //preFlop = (player.isActive) && (player.bid == thisLobby.lobbySmallBlind*2);
       //if(!preFlop) return true;
       //pr(equalBool);
-      if (equalBool && allInBool) {
+      if (equalBool && notAllInBool) {
         return false;
       }
     }
+    //проверка на 1 оставшегося чела
+    if (notZeroPlayers < 2) return true;
+
     if (thisLobby.lapCount == 0) {
       return false;
     } else {
@@ -355,7 +373,7 @@ class Game {
       player.bid = 0;
     }
     bidsEqual = false;
-    lobbyStorage.writeLobby(thisLobby);
+    lobbyStorage.write(thisLobby);
   }
 
   // первые ставки

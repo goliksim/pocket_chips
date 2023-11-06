@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:pocket_chips/data/logs.dart';
 import 'package:pocket_chips/internal/localization.dart';
 
 import '../ui/transitions.dart';
@@ -45,7 +46,7 @@ void addPlayer(
       logs.writeLog('Saving:\t${newPlayer.show()}');
       showToast('${newPlayer.name} ${LocaleManager.locale.toast_saved}');
       // запись в json, чтобы все сохранилось
-      savedStorage.writePlayers(savedPlayers);
+      savedStorage.write(savedPlayers);
     } else {
       logs.writeLog('${newPlayer.show()}\talready saved');
       //showToast('${newPlayer.name} already saved!');
@@ -128,7 +129,7 @@ class PlayersPageState extends State<PlayersPage> {
 
   void callback() {
     setState(() {
-      lobbyStorage.writeLobby(thisLobby);
+      lobbyStorage.write(thisLobby);
     });
     //print("callback is ended");
   }
@@ -318,7 +319,7 @@ class PlayersPageState extends State<PlayersPage> {
               },
             );
             setState(() {});
-            lobbyStorage.writeLobby(thisLobby);
+            lobbyStorage.write(thisLobby);
             SystemChrome.restoreSystemUIOverlays();
           }
         },
@@ -979,7 +980,7 @@ class PlayerListState extends State<PlayerList> {
     if (widget.saved) {
       logs.writeLog('${savedPlayers[index].show()}\tdeleted from saved');
       savedPlayers.removeAt(index);
-      savedStorage.writePlayers(savedPlayers);
+      savedStorage.write(savedPlayers);
     } else {
       logs.writeLog(
         '${thisLobby.lobbyPlayers[index].show()}\tdeleted from Lobby',
