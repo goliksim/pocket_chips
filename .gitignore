@@ -49,6 +49,7 @@ app.*.map.json
 # Android Studio will place build artifacts here
 .android/.gradle
 android/key.properties
+.gradle/
 
 /.idea
 /android/app/debug

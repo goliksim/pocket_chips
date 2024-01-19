@@ -59,8 +59,8 @@ class _UpdateDialogState extends State<UpdateDialog> {
         // first page
         PageModel(
           widget: OnboardingPage(
-            //TODO локазация
-            title: '${context.locale.update_title} ${widget.packageInfo.version}',
+            title:
+                '${context.locale.update_title} ${widget.packageInfo.version}',
             children: [
               SizedBox(height: stdHorizontalOffset),
               Text(
@@ -147,6 +147,19 @@ class _UpdateDialogState extends State<UpdateDialog> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   '\n- ${context.locale.update_6}',
+                  style: TextStyle(
+                    height: 1.5,
+                    color: thisTheme.onBackground,
+                    fontWeight: FontWeight.w500,
+                    fontSize: stdFontSize * 0.65,
+                  ),
+                  textAlign: TextAlign.start,
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '\n- ${context.locale.update_7}',
                   style: TextStyle(
                     height: 1.5,
                     color: thisTheme.onBackground,

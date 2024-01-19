@@ -3,12 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pocket_chips/data/config_model.dart';
 import 'package:pocket_chips/data/logs.dart';
+import 'package:pocket_chips/data/storage.dart';
 import 'package:pocket_chips/internal/localization.dart';
 import 'package:pocket_chips/widgets/onboading/dialogs/about.dart';
 import 'package:pocket_chips/widgets/onboading/dialogs/update.dart';
 import 'package:pocket_chips/widgets/winner_check/winner_check.dart';
-//import 'package:flutter/services.dart';
-
 import '../pages/playersPage.dart' as players;
 import '../data/lobby.dart';
 import '../ui/transitions.dart';
@@ -45,12 +44,16 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     Future.delayed(const Duration(milliseconds: 800), () async {
-      final version = await thisConfig.getVersion();
+      final currentVersion = await thisConfig.getVersion();
       if (thisConfig.firstTime) {
         firstTime();
-        thisConfig.version = version;
-      } else if (thisConfig.version!.compareTo(version) < 0) {
+        thisConfig.version = currentVersion;
+        configStorage.write(thisConfig);
+        //TODO NULL VARIABLE
+      } else if (thisConfig.version.compareTo(currentVersion) < 0) {
         updateInfo();
+        thisConfig.version = currentVersion;
+        configStorage.write(thisConfig);
       }
     });
   }
@@ -60,8 +63,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void updateInfo() async {
-    showToast('updateInfo');
-    //showUpdate(context, callBack);
+    //showToast('updateInfo');
+    showUpdate(context);
   }
 
   void callBack() {
@@ -134,14 +137,7 @@ class _HomePageState extends State<HomePage> {
                     buttonColor: thisTheme.additionButtonColor,
                     textString: context.locale.home_abo,
                     action: () async {
-                      //TODO ВЕРНУТЬ ХЕЛП
-                      showUpdate(context);
-                      /*showHelp(
-                        context,
-                        callBack,
-                        onWillpop: true,
-                      ); //Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => const MyApp()));
-                    */
+                      showHelp(context, callBack, onWillpop: true);
                     },
                   ),
                 ),
@@ -170,19 +166,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      color: thisTheme.bgrColor,
-      child: PatternContainer(
-        padding: EdgeInsets.only(
-          top: stdCutoutWidth * 0.75,
-          bottom: stdCutoutWidthDown * 0.75,
-        ),
-        child: Scaffold(
-          appBar: AppBar(
-            leading: null,
-            /*
+    return PatternContainer(
+      padding: EdgeInsets.only(
+        top: stdCutoutWidth * 0.75,
+        bottom: stdCutoutWidthDown * 0.75,
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          leading: null,
+          /*
             IconButton(
               onPressed: () =>  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => const MyApp())),
                 icon: Icon(
@@ -192,70 +184,69 @@ class _HomePageState extends State<HomePage> {
                 tooltip: 'Help',
               ),*/
 
-            toolbarHeight: stdButtonHeight * 0.75,
-            automaticallyImplyLeading:
-                false, //убрать стрелочку, так как это стартовая страница
-            backgroundColor: const Color(0x00000000),
-            iconTheme: IconThemeData(
-              color: thisTheme.onBackground, //change your color here
-            ),
-            elevation: 0,
-            centerTitle: true,
-            title: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: appBarStyle().copyWith(
-                fontWeight: FontWeight.w700,
-                fontSize: stdFontSize / 20 * 28,
-              ), // aGoogleFonts.josefinSans(color: thisTheme.onBackground, fontWeight: FontWeight.w700,fontSize: 1.2* windowTextFix(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width)),
-            ),
-
-            actions: <Widget>[
-              AspectRatio(
-                aspectRatio: 1,
-                child: IconButton(
-                  //padding: EdgeInsets.only(right: 25.w),
-                  icon: Icon(
-                    (thisTheme == themeList[0])
-                        ? Icons.mode_night_outlined
-                        : Icons.nightlight_round,
-                    size: stdIconSize,
-                  ),
-                  tooltip: context.locale.tooltip_theme,
-                  onPressed: () async {
-                    changeTheme();
-                    Navigator.pushReplacement(
-                      context,
-                      simpleThemePageRoute(
-                        HomePage(isDark: !widget.isDark),
-                      ),
-                    );
-                    //setState({});
-                  },
-                ),
-              ),
-            ],
+          toolbarHeight: stdButtonHeight * 0.75,
+          automaticallyImplyLeading:
+              false, //убрать стрелочку, так как это стартовая страница
+          backgroundColor: const Color(0x00000000),
+          iconTheme: IconThemeData(
+            color: thisTheme.onBackground, //change your color here
           ),
-          backgroundColor: Colors.transparent,
-          body: Center(
-            child: Container(
-              width: stdButtonWidth,
-              margin: EdgeInsets.only(
-                //vertical: stdEdgeOffset,
-                bottom: adaptiveOffset,
-                left:
-                    adaptiveOffset, //  windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width),
-                right: adaptiveOffset,
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(child: chipImage(context)),
-                    //кнопочки
-                    homePageButtons(context),
-                  ],
+          elevation: 0,
+          centerTitle: true,
+          title: Text(
+            title,
+            textAlign: TextAlign.center,
+            style: appBarStyle().copyWith(
+              fontWeight: FontWeight.w700,
+              fontSize: stdFontSize / 20 * 28,
+            ), // aGoogleFonts.josefinSans(color: thisTheme.onBackground, fontWeight: FontWeight.w700,fontSize: 1.2* windowTextFix(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width)),
+          ),
+
+          actions: <Widget>[
+            AspectRatio(
+              aspectRatio: 1,
+              child: IconButton(
+                //padding: EdgeInsets.only(right: 25.w),
+                icon: Icon(
+                  (thisTheme == themeList[0])
+                      ? Icons.mode_night_outlined
+                      : Icons.nightlight_round,
+                  size: stdIconSize,
                 ),
+                tooltip: context.locale.tooltip_theme,
+                onPressed: () async {
+                  changeTheme();
+                  Navigator.pushReplacement(
+                    context,
+                    simpleThemePageRoute(
+                      HomePage(isDark: !widget.isDark),
+                    ),
+                  );
+                  //setState({});
+                },
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: Container(
+            width: stdButtonWidth,
+            margin: EdgeInsets.only(
+              //vertical: stdEdgeOffset,
+              bottom: adaptiveOffset,
+              left:
+                  adaptiveOffset, //  windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width),
+              right: adaptiveOffset,
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: chipImage(context)),
+                  //кнопочки
+                  homePageButtons(context),
+                ],
               ),
             ),
           ),
@@ -274,7 +265,10 @@ Widget chipImage(context) => Container(
             BlendMode.dstIn,
           ),
           fit: BoxFit.contain,
-          image: const AssetImage('assets/init_logo.png'),
+          filterQuality: FilterQuality.high,
+          image: const AssetImage(
+            'assets/init_logo.png',
+          ),
         ),
       ),
       height: MediaQuery.of(context).size.width,

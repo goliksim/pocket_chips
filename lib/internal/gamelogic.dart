@@ -3,8 +3,8 @@ import 'dart:math';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pocket_chips/data/logs.dart';
+import 'package:pocket_chips/pages/gamepage/winner_page.dart';
 
-import '../pages/gamePage.dart';
 import '../data/storage.dart';
 import '../data/lobby.dart';
 import '../ui/transitions.dart';
@@ -15,14 +15,6 @@ import 'localization.dart';
 Game thisGame = Game();
 
 class Game {
-  Game({
-    //переменная для кнопки +
-    this.addButton = 0,
-  });
-
-  //переменная для кнопки +
-  int addButton;
-
   //список названий этапов игры
   List<String> gameStateNameList = [
     LocaleManager.locale.game_pflop,
@@ -37,12 +29,43 @@ class Game {
     style: TextStyle(color: thisTheme.primaryColor),
   );
 
+  //Минимальная сумма для ставки
   int raiseBank = 0;
-  bool raiseButtonPressed = false;
+
+  //Уравнены ли все ставки
   bool bidsEqual = false;
+
+  int notZeroPlayers = 0;
+  //bool raiseButtonPressed = false;
 
   Function()? callback;
   BuildContext? context;
+
+  bool get canPlay =>
+      thisLobby.lobbyPlayers.where((e) => e.isActive == true).length > 1;
+
+  void allIN() {
+    thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid +=
+        thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank;
+    thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank = 0;
+    newPlayer();
+  }
+
+  void bet(int bid) {
+    thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank -= bid;
+    thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid += bid;
+    thisGame.newPlayer();
+  }
+
+  bool fold() {
+    thisLobby.lobbyPlayers[thisLobby.lobbyIndex].isActive = false;
+    if (thisLobby.lobbyPlayers.where((e) => e.isActive == true).length > 1) {
+      newPlayer();
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   // меняем отступы у игроков
   void changeOffset() {
@@ -78,11 +101,6 @@ class Game {
   // переходы между игроками
   int newPlayer({int index = 100}) {
     //print(bigBlindIndex);
-    print(
-      index == 100
-          ? thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name
-          : thisLobby.lobbyPlayers[index].name,
-    );
 
     if (index == 100) {
       thisLobby.lobbyIndex += 1;
@@ -111,21 +129,29 @@ class Game {
 
     if (index == 100) {
       var thisBidsEqual = waitForBidsEqual();
-      var firstLap = thisLobby.lapCount > 0;
-      if (!bidsEqual && thisBidsEqual && !firstLap) {
+
+      var firstLap = thisLobby.lapCount <= 0;
+      //print('${!bidsEqual}$thisBidsEqual$firstLap${thisLobby.lapCount}');
+      if (!bidsEqual && thisBidsEqual && firstLap) {
         //bidsEqual = waitForBidsEqual();
-        print('Case of normal on first lap equal');
+        //print('Case of normal on first lap equal');
         newState();
         return 0;
       } else {
-        //TODO BUUUUUUUUUUUUUUUUUUUUUUUUUUUUUG
+        //print('case 2 ${thisLobby.lobbyIndex == thisLobby.firstPlayerIndex}${!firstLap}$thisBidsEqual');
         if (thisLobby.lobbyIndex == thisLobby.firstPlayerIndex &&
-            firstLap &&
+            !firstLap &&
             thisBidsEqual) {
-          print('Case of first lap equal');
+          //print('Case of first lap equal');
           newState();
           return 0;
         }
+      }
+    }
+    if (notZeroPlayers < 2) {
+      if (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid ==
+          thisLobby.maxBid) {
+        newLap();
       }
     }
 
@@ -240,6 +266,7 @@ class Game {
 
     if (waitForBidsEqual()) {
       //переходим в новое состояние
+      thisLobby.lapCount += 1;
       thisLobby.lobbyState += 1;
       logs.writeLog('NewState with lobbyState = ${thisLobby.lobbyState}');
       lobbyStorage.write(thisLobby);
@@ -269,7 +296,7 @@ class Game {
   bool waitForBidsEqual() {
     bool notAllInBool = false;
     bool equalBool = false;
-    int notZeroPlayers = 0;
+    notZeroPlayers = 0;
 
     //bool preFlop = false;
     var maxBid = thisLobby.lobbyPlayers.map((e) => e.bid).reduce(max);
@@ -285,6 +312,7 @@ class Game {
       }
     }
     //проверка на 1 оставшегося чела
+    //print('notzero = $notZeroPlayers');
     if (notZeroPlayers < 2) return true;
 
     if (thisLobby.lapCount == 0) {
@@ -367,6 +395,10 @@ class Game {
 
   // начало игры
   void startGame() {
+    thisGame.gameStateName = Text(
+      LocaleManager.locale.game_welc,
+      style: TextStyle(color: thisTheme.onBackground),
+    );
     for (Player player in thisLobby.lobbyPlayers) {
       player.isActive = !(player.bank <= 0);
       //player.isActive = !(player.bank < thisLobby.lobbySmallBlind * 2);

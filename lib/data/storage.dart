@@ -29,7 +29,7 @@ abstract class Storage<T> {
 class SavedPlayerStorage extends Storage<List<Player>> {
   @override
   Future<List<Player>> read() async {
-    
+    prefs = await SharedPreferences.getInstance();
     try {
       final text = prefs.getString('saved');
       final content =

@@ -1,6 +1,8 @@
 // КЛАСС ИГРОКА И ЛОББИ, ХРАНЯЩИЙ ОСНОВНУЮ ИНФОРМАЦИЮ О СОСТОЯНИИ ИГРЫ
 
 //глобальная переменная лобби
+import 'dart:math';
+
 import 'storage_notshared.dart';
 
 Lobby thisLobby = Lobby();
@@ -102,13 +104,31 @@ class Lobby {
     return text;
   }
 
+  void bankUpdate(int newBank) async {
+    // TODO Внимание на минимальный банк!
+    /*
+      if (newBank < thisLobby.lobbySmallBlind * 2 + thisLobby.lobbyAnte) {
+        if (thisLobby.lobbyAnteBool) {
+          logs.writeLog("Ante changed to:\t ${thisLobby.lobbyAnte}");
+          thisLobby.lobbyAnte = newBank ~/ 2;
+        }
+        thisLobby.lobbySmallBlind = (newBank - thisLobby.lobbyAnte) ~/ 2;
+        logs.writeLog("Small blind changed to:\t ${thisLobby.lobbySmallBlind}");
+        showToast("Small blind changed");
+      }*/
+
+    thisLobby.lobbyBank = newBank;
+
+    for (final player in thisLobby.lobbyPlayers) {
+      player.changeBank(thisLobby.lobbyBank);
+    }
+
+    logs.writeLog('Initial stack changed to:\t $newBank');
+  }
+
   void mixPlayersPosition() {
     elementsOffset = (elementsOffset.abs() + 1) % lobbyPlayers.length;
     logs.writeLog('elementsOffset: $elementsOffset');
-  }
-
-  int get dealerIndex {
-    return lobbyPlayers.indexWhere((e) => e.isDealer);
   }
 
   void reset() {
@@ -221,6 +241,18 @@ class Lobby {
     final tmp = json['dealerIndex'];
     if (tmp != null) setDealer(tmp);
   }
+
+  //Геттеры
+
+  int get dealerIndex => lobbyPlayers.indexWhere((e) => e.isDealer);
+
+  bool get betBool => (lobbyPlayers[lobbyIndex].bid ==
+      lobbyPlayers.map((e) => e.bid).reduce(max));
+
+  int get allMoney =>
+      lobbyPlayers[lobbyIndex].bank + lobbyPlayers[lobbyIndex].bid;
+
+  int get maxBid => lobbyPlayers.map((e) => e.bid).reduce(max);
 }
 
 double jsonToDouble(dynamic value) {

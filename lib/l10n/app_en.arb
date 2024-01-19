@@ -22,7 +22,7 @@
     "home_cont":"Continue",
     "home_abo":"About",
     "home_sup":"Support me",
-    "home_win_check":"Winner Solver",
+    "home_win_check":"Solver",
     "support_tittle":"You can support me by:",
     "support_video":"Video ads",
     "support_modest":"Modest donation",
@@ -153,5 +153,6 @@
     "update_3":"New service to help determine the winner at the showndown",
     "update_4":"If the game goes to a showdown but the players are in dispute, let the game determine the pot winner.",
     "update_5": "The service will correctly determine a win or a draw according to the rules of Texas Hold'em.",
-    "update_6": "Fixed some game logic errors."
+    "update_6": "Fixed some game logic errors.",
+    "update_7": "Controls and UI have been changed."
 }

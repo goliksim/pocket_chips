@@ -12,7 +12,7 @@ import '../ui/ui_widgets.dart';
 import '../data/storage.dart';
 import '../data/uiValues.dart';
 import '../data/lobby.dart';
-import 'gamePage.dart';
+import 'gamepage/gamePage.dart';
 
 /*
 void addNewPlayer(Player newPlayer)async{
@@ -86,28 +86,6 @@ void addPlayer(
   }
 }
 
-void bankUpdate(int newBank) async {
-  // TODO Внимание на минимальный банк!
-  /*
-      if (newBank < thisLobby.lobbySmallBlind * 2 + thisLobby.lobbyAnte) {
-        if (thisLobby.lobbyAnteBool) {
-          logs.writeLog("Ante changed to:\t ${thisLobby.lobbyAnte}");
-          thisLobby.lobbyAnte = newBank ~/ 2;
-        }
-        thisLobby.lobbySmallBlind = (newBank - thisLobby.lobbyAnte) ~/ 2;
-        logs.writeLog("Small blind changed to:\t ${thisLobby.lobbySmallBlind}");
-        showToast("Small blind changed");
-      }*/
-
-  thisLobby.lobbyBank = newBank;
-
-  for (final player in thisLobby.lobbyPlayers) {
-    player.changeBank(thisLobby.lobbyBank);
-  }
-
-  logs.writeLog('Initial stack changed to:\t $newBank');
-}
-
 ScrollController scrollController = ScrollController();
 
 // Основной класс окна с игроками
@@ -136,129 +114,124 @@ class PlayersPageState extends State<PlayersPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      color: thisTheme.bgrColor,
-      child: PatternContainer(
-        padding: EdgeInsets.only(
-          top: stdCutoutWidth * 0.75,
-          bottom: stdCutoutWidthDown * 0.75,
-        ),
-        child: Scaffold(
-          resizeToAvoidBottomInset: false,
-          //extendBodyBehindAppBar: true,
-          appBar: AppBar(
-            toolbarHeight: stdButtonHeight * 0.75,
-            leading: ModalRoute.of(context)?.canPop == true
-                ? IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(
-                      Icons.arrow_back,
-                      size: stdIconSize,
-                    ),
-                  )
-                : null,
-            iconTheme: IconThemeData(
-              color: thisTheme.onBackground, //change your color here
-            ),
-            backgroundColor: const Color(0x00000000),
-            titleTextStyle:
-                appBarStyle().copyWith(fontSize: stdFontSize / 20 * 24),
-            elevation: 0,
-            title: Text(LocaleManager.locale.playp_tittle),
-            centerTitle: true,
-            actions: <Widget>[
-              AspectRatio(
-                aspectRatio: 1,
-                child: IconButton(
-                  splashColor: thisTheme.bankColor,
-                  highlightColor: Colors.transparent,
+    return PatternContainer(
+      padding: EdgeInsets.only(
+        top: stdCutoutWidth * 0.75,
+        bottom: stdCutoutWidthDown * 0.75,
+      ),
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        //extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          toolbarHeight: stdButtonHeight * 0.75,
+          leading: ModalRoute.of(context)?.canPop == true
+              ? IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
                   icon: Icon(
-                    Icons.folder_shared,
+                    Icons.arrow_back,
                     size: stdIconSize,
                   ),
-                  tooltip: LocaleManager.locale.tooltip_stor,
-                  onPressed: () async {
-                    await transitionDialog(
-                      duration: const Duration(milliseconds: 400),
-                      type: 'SlideUp',
-                      context: context,
-                      child: PlayerList(
+                )
+              : null,
+          iconTheme: IconThemeData(
+            color: thisTheme.onBackground, //change your color here
+          ),
+          backgroundColor: const Color(0x00000000),
+          titleTextStyle:
+              appBarStyle().copyWith(fontSize: stdFontSize / 20 * 24),
+          elevation: 0,
+          title: Text(LocaleManager.locale.playp_tittle),
+          centerTitle: true,
+          actions: <Widget>[
+            AspectRatio(
+              aspectRatio: 1,
+              child: IconButton(
+                splashColor: thisTheme.bankColor,
+                highlightColor: Colors.transparent,
+                icon: Icon(
+                  Icons.folder_shared,
+                  size: stdIconSize,
+                ),
+                tooltip: LocaleManager.locale.tooltip_stor,
+                onPressed: () async {
+                  await transitionDialog(
+                    duration: const Duration(milliseconds: 400),
+                    type: 'SlideUp',
+                    context: context,
+                    child: PlayerList(
+                      saved: true,
+                      callbackFunction: callback,
+                    ),
+                    builder: (BuildContext context) {
+                      return PlayerList(
                         saved: true,
                         callbackFunction: callback,
-                      ),
-                      builder: (BuildContext context) {
-                        return PlayerList(
-                          saved: true,
-                          callbackFunction: callback,
-                        );
-                      },
-                    );
-                  },
-                ),
+                      );
+                    },
+                  );
+                },
               ),
-            ],
-          ),
-          backgroundColor: Colors.transparent,
-          body: Center(
-            child: Container(
-              width: stdButtonWidth,
-              // главный контейнер с отступом
+            ),
+          ],
+        ),
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: Container(
+            width: stdButtonWidth,
+            // главный контейнер с отступом
 
-              margin: EdgeInsets.only(
-                bottom: adaptiveOffset,
-                left:
-                    adaptiveOffset, //  windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width),
-                right: adaptiveOffset,
-              ),
-              child: Column(
-                // колонка чтобы можно было разделить экран на верхнюю часть и нижние статичные кнопки
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  _topBotton(),
-                  SizedBox(
-                    height: stdHorizontalOffset,
-                    width: double.infinity,
-                  ),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        //PlayerList
-                        Flexible(
-                          child: thisLobby.lobbyPlayers.isNotEmpty
-                              ? PlayerList(
-                                  saved: false,
-                                  callbackFunction: callback,
-                                )
-                              : const SizedBox(),
-                        ),
-                        //AddBottom
-                        if (thisLobby.lobbyPlayers.length > standartPlayerCount)
-                          SizedBox(
-                            height: stdHorizontalOffset / 2,
-                            width: double.infinity,
-                          ),
-                        ((thisLobby.lobbyPlayers.length != maxPlayerCount) &&
-                                thisLobby.lobbyState == 5)
-                            ? AttentionAdd(
-                                callBackFunction: callback,
+            margin: EdgeInsets.only(
+              bottom: adaptiveOffset,
+              left:
+                  adaptiveOffset, //  windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width),
+              right: adaptiveOffset,
+            ),
+            child: Column(
+              // колонка чтобы можно было разделить экран на верхнюю часть и нижние статичные кнопки
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                _topBotton(),
+                SizedBox(
+                  height: stdHorizontalOffset,
+                  width: double.infinity,
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      //PlayerList
+                      Flexible(
+                        child: thisLobby.lobbyPlayers.isNotEmpty
+                            ? PlayerList(
+                                saved: false,
+                                callbackFunction: callback,
                               )
                             : const SizedBox(),
-                        //FreeSpace
-                      ],
-                    ),
+                      ),
+                      //AddBottom
+                      if (thisLobby.lobbyPlayers.length > standartPlayerCount)
+                        SizedBox(
+                          height: stdHorizontalOffset / 2,
+                          width: double.infinity,
+                        ),
+                      ((thisLobby.lobbyPlayers.length != maxPlayerCount) &&
+                              thisLobby.lobbyState == 5)
+                          ? AttentionAdd(
+                              callBackFunction: callback,
+                            )
+                          : const SizedBox(),
+                      //FreeSpace
+                    ],
                   ),
-                  SizedBox(
-                    height: (thisLobby.lobbyPlayers.length != maxPlayerCount)
-                        ? stdHorizontalOffset
-                        : 0,
-                    width: double.infinity,
-                  ),
-                  _lowerButton(),
-                ],
-              ),
+                ),
+                SizedBox(
+                  height: (thisLobby.lobbyPlayers.length != maxPlayerCount)
+                      ? stdHorizontalOffset
+                      : 0,
+                  width: double.infinity,
+                ),
+                _lowerButton(),
+              ],
             ),
           ),
         ),
@@ -309,12 +282,12 @@ class PlayersPageState extends State<PlayersPage> {
               duration: const Duration(milliseconds: 400),
               child: BankWindow(
                 bank: thisLobby.lobbyBank,
-                update: bankUpdate,
+                update: thisLobby.bankUpdate,
               ),
               builder: (BuildContext context) {
                 return BankWindow(
                   bank: thisLobby.lobbyBank,
-                  update: bankUpdate,
+                  update: thisLobby.bankUpdate,
                 );
               },
             );
@@ -416,12 +389,12 @@ class PlayersPageState extends State<PlayersPage> {
                   context: context,
                   child: AddSettings(
                     thisLobby: thisLobby,
-                    bankUpdate: bankUpdate,
+                    bankUpdate: thisLobby.bankUpdate,
                   ),
                   builder: (BuildContext context) {
                     return AddSettings(
                       thisLobby: thisLobby,
-                      bankUpdate: bankUpdate,
+                      bankUpdate: thisLobby.bankUpdate,
                     );
                   },
                 );
@@ -803,13 +776,19 @@ class PlayerListState extends State<PlayerList> {
               height: thisLobby.lobbyPlayers.length *
                   (stdButtonHeight + stdHorizontalOffset),
               child: ReorderableListView.builder(
+                buildDefaultDragHandles:
+                    thisLobby.lobbyState == 5, //disable on game
                 scrollController: scrollController,
                 proxyDecorator: proxyDecorator,
                 onReorderStart: (index) {
-                  reorderableIndex.value = index;
+                  if (thisLobby.lobbyState == 5) {
+                    reorderableIndex.value = index;
+                  }
                 },
                 onReorderEnd: (index) {
-                  reorderableIndex.value = -1;
+                  if (thisLobby.lobbyState == 5) {
+                    reorderableIndex.value = -1;
+                  }
                 },
                 onReorder: (oldIndex, newIndex) {
                   if (oldIndex < newIndex) {
@@ -1107,6 +1086,7 @@ class AddWindowState extends State<AddWindow> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
+                        filterQuality: FilterQuality.medium,
                         image: AssetImage(
                           standartLogo,
                         ),
@@ -1126,6 +1106,7 @@ class AddWindowState extends State<AddWindow> {
                       ),
                       shape: BoxShape.circle,
                       image: const DecorationImage(
+                        filterQuality: FilterQuality.medium,
                         image: AssetImage(
                           'assets/faces/edit_frame.png',
                         ),
@@ -1512,6 +1493,7 @@ class _PickIconState extends State<PickIcon> {
                       ),
                       shape: BoxShape.circle,
                       image: DecorationImage(
+                        filterQuality: FilterQuality.medium,
                         fit: BoxFit.cover,
                         image: AssetImage(
                           'assets/faces/pokerfaces${index + 1}.jpg',
@@ -1560,8 +1542,10 @@ Widget playerCard(
                 );
               },
             );
+
             SystemChrome.restoreSystemUIOverlays();
           }
+
           //_quickDelete(index);
         },
         child: Container(
@@ -1583,6 +1567,7 @@ Widget playerCard(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
+                              filterQuality: FilterQuality.medium,
                               image: AssetImage(
                                 player.assetUrl,
                               ),

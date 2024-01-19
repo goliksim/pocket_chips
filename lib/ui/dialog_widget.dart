@@ -23,10 +23,14 @@ class DialogWidget extends StatelessWidget {
       child: SizedBox(
         width: stdButtonWidth,
         height: 560.h,
-        child: PatternContainer(
-          opacity: 0.4,
-          child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.all(
+            Radius.circular(
+              stdBorderRadius,
+            ),
+          ),
+          child: PatternContainer(
+            opacity: 0.4,
             child: Padding(
               padding: EdgeInsets.all(edgeOffset ?? stdHorizontalOffset * 2),
               child: child,

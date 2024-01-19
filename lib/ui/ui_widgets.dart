@@ -225,7 +225,9 @@ class PatternContainer extends StatelessWidget {
       padding: padding,
       alignment: Alignment.center,
       decoration: BoxDecoration(
+        color: thisTheme.bgrColor,
         image: DecorationImage(
+          filterQuality: FilterQuality.high,
           opacity: 0.3 * opacity,
           //colorFilter: ColorFilter.mode(thisTheme.primaryColor, BlendMode.srcATop),
           image: const AssetImage('assets/pattern.png'),

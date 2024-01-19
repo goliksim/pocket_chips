@@ -16,6 +16,7 @@ import 'package:pocket_chips/internal/localization.dart';
 import 'package:pocket_chips/pages/playersPage.dart';
 import 'package:pocket_chips/ui/transitions.dart';
 import 'package:pocket_chips/ui/ui_widgets.dart';
+import 'package:pocket_chips/widgets/onboading/dialogs/update.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../onboarding.dart';
@@ -331,7 +332,7 @@ class _AboutDialogState extends State<AboutDialog> {
                     stdButtonHeight * 0.85,
                     false,
                     context,
-                    widget.callbackFunction,
+                    () => setState(() {}),
                   ),
                 ),
               ),
@@ -748,7 +749,7 @@ class _AboutDialogState extends State<AboutDialog> {
               SizedBox(
                 width: double.infinity,
                 child: Text(
-                  '© 2022 GOLIKSIM (Alexander Golev)\nVersion: ${widget.packageInfo.version}',
+                  '© 2022 GOLIKSIM (Alexander Golev)',
                   style: TextStyle(
                     height: 1.5,
                     color: thisTheme.onBackground,
@@ -758,7 +759,29 @@ class _AboutDialogState extends State<AboutDialog> {
                   textAlign: TextAlign.start,
                 ),
               ),
-              SizedBox(height: stdHorizontalOffset / 2),
+              MyButton(
+                height: stdButtonHeight * 0.5,
+                borderRadius: BorderRadius.circular(stdBorderRadius / 3),
+                alignment: Alignment.centerLeft,
+                //side: BorderSide(width: 1, color: thisTheme.primaryColor),
+                buttonColor: thisTheme.playerColor,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    'Version: ${widget.packageInfo.version}',
+                    style: TextStyle(
+                      height: 1.5,
+                      color: thisTheme.secondaryColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: stdFontSize * 0.7,
+                    ),
+                    textAlign: TextAlign.start,
+                  ),
+                ),
+                action: () async {
+                  showUpdate(context);
+                },
+              ),
               MyButton(
                 height: stdButtonHeight * 0.5,
                 borderRadius: BorderRadius.circular(stdBorderRadius / 3),

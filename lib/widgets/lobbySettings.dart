@@ -275,7 +275,7 @@ class _AddSettingsState extends State<AddSettings> {
                               
                               */
                           showToast(
-                            'We recommend a Big Blind value less than Stack',
+                            context.locale.toast_bank4,
                           );
 
                           //"Ante + Big Blind <= Bank");

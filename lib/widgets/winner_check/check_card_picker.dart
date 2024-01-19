@@ -29,7 +29,7 @@ class _CardPickerState extends State<CardPicker> {
     setState(() {});
   }
 
-  void returnCard(BuildContext context) async{
+  void returnCard(BuildContext context) async {
     if (pickedKey != null && pickedSuit != null) {
       await Future.delayed(const Duration(milliseconds: 400));
       widget.action(c.Card(c.mapSuit[pickedSuit]!, pickedKey!));
