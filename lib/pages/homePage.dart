@@ -7,6 +7,7 @@ import 'package:pocket_chips/data/storage.dart';
 import 'package:pocket_chips/internal/localization.dart';
 import 'package:pocket_chips/widgets/onboading/dialogs/about.dart';
 import 'package:pocket_chips/widgets/onboading/dialogs/update.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:pocket_chips/widgets/winner_check/winner_check.dart';
 import '../pages/playersPage.dart' as players;
 import '../data/lobby.dart';
@@ -166,6 +167,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    LocaleManager.initialize(AppLocalizations.of(context));
     return PatternContainer(
       padding: EdgeInsets.only(
         top: stdCutoutWidth * 0.75,

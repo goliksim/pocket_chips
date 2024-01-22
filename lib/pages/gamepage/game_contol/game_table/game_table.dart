@@ -166,24 +166,26 @@ Widget chip(int a) => FittedBox(
     );
 
 double playerLeftOffset(tableButtonWidth, a, addButton) =>
+    adaptiveOffset +
     tableButtonWidth / 3 -
-    (stdButtonHeight * 1.6 * getSin(a, addButton, multiply: -0.5));
+    (stdButtonHeight * 1.75 * getSin(a, addButton, multiply: -0.5));
 
 double playerBottomOffset(a, addButton, tableHeight) =>
     tableHeight / 3.3 - 3.2 * stdButtonHeight * getCos(a, addButton);
 //3.4 * stdButtonHeight - 3.2 * stdButtonHeight * getCos(a, addButton);
 
 double chipBottomOffset(a, addButton) =>
-    -3.08 * stdButtonHeight * getCos(a, addButton) +
+    -3.18 * stdButtonHeight * getCos(a, addButton) +
     3.55 * stdButtonHeight -
     (getCos(a, addButton) > 0.01
         ? -stdButtonHeight * 0.5
         : stdButtonHeight * 0.5);
 
 double chipsLeftOffset(tableButtonWidth, a, addButton) =>
+    adaptiveOffset +
     (tableButtonWidth) / 2.9 -
     (stdButtonHeight *
-        1.25 *
+        1.3 *
         getSin(
           a,
           addButton,

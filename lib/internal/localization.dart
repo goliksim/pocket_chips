@@ -9,7 +9,7 @@ extension LocalizationExs on BuildContext {
 
 class LocaleManager with ChangeNotifier {
   static AppLocalizations? _appLocalizations;
-  late Locale _lang; // Set the default locale to English
+  static Locale? _lang; // Set the default locale to English
 
   static void initialize(AppLocalizations appLocalizations) {
     _appLocalizations = appLocalizations;
@@ -28,9 +28,14 @@ class LocaleManager with ChangeNotifier {
     return _appLocalizations!;
   }
 
-  Locale get lang => _lang;
+  static Locale get lang => _lang!;
   void changeLocale(Locale newLocale) {
     _lang = newLocale;
     notifyListeners();
+  }
+
+  static void staticChangeLocale(Locale newLocale) {
+    _lang = newLocale;
+    //notifyListeners();
   }
 }

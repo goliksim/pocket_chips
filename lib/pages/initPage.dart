@@ -3,8 +3,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pocket_chips/data/logs.dart';
-import 'package:pocket_chips/internal/localization.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../data/lobby.dart';
 import '../data/storage.dart';
 import '../ui/transitions.dart';
@@ -98,7 +97,6 @@ class _InitWindowState extends State<InitWindow> {
 
   @override
   Widget build(BuildContext context) {
-    LocaleManager.initialize(AppLocalizations.of(context));
     return Container(
       width: double.infinity,
       height: double.infinity,

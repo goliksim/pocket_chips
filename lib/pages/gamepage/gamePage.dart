@@ -54,13 +54,19 @@ class _GamePageState extends State<GamePage> {
         );
       }
       //а вдруг крашнулось на выборе, тогда снова выведем окно
-      Future.delayed(const Duration(milliseconds: 800), () {
-        if (thisLobby.lobbyState == 4) thisGame.newLap();
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (thisLobby.lobbyState == 4) {
+          thisGame.newLap();
+        }
       });
     }
     //восстановление после выхода или перезапуска
     thisGame.context = context;
-    thisGame.callback = () => setState(() {});
+    thisGame.callback = () {
+      if (mounted) {
+        setState(() {});
+      }
+    };
     //thisGame.raiseButtonPressed = false;
     thisGame.bidsEqual = thisGame.waitForBidsEqual();
     //повторная проверка, а вдруг сделали закуп
@@ -145,30 +151,30 @@ class _GamePageState extends State<GamePage> {
           ],
         ),
         backgroundColor: Colors.transparent,
-        body: Padding(
-          padding: EdgeInsets.fromLTRB(
-            adaptiveOffset,
-            0,
-            adaptiveOffset,
-            adaptiveOffset,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              //Buttons
-              Expanded(
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: GameTable(
-                    callBack: callback,
-                  ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            //Buttons
+            Expanded(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: GameTable(
+                  callBack: callback,
                 ),
               ),
-              GameControl(
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                adaptiveOffset,
+                0,
+                adaptiveOffset,
+                adaptiveOffset,
+              ),
+              child: GameControl(
                 key: UniqueKey(),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

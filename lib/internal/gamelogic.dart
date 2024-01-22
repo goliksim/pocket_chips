@@ -38,7 +38,7 @@ class Game {
   int notZeroPlayers = 0;
   //bool raiseButtonPressed = false;
 
-  Function()? callback;
+  Function() callback = () {};
   BuildContext? context;
 
   bool get canPlay =>
@@ -54,7 +54,12 @@ class Game {
   void bet(int bid) {
     thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank -= bid;
     thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid += bid;
-    thisGame.newPlayer();
+
+    if (thisLobby.lapCount > 0 && thisGame.waitForBidsEqual()) {
+      thisGame.newState();
+    } else {
+      thisGame.newPlayer();
+    }
   }
 
   bool fold() {
@@ -91,7 +96,7 @@ class Game {
       thisLobby.bigBlindIndex = firstBlind(thisLobby.bigBlindIndex);
       lobbyStorage.write(thisLobby);
       newPlayer(index: thisLobby.firstPlayerIndex);
-      callback!();
+      callback();
       changeText(gameStateNameList[thisLobby.lobbyState]);
     } else {
       showToast(LocaleManager.locale.toast_moreplay);
@@ -205,7 +210,7 @@ class Game {
         style: TextStyle(color: thisTheme.onBackground),
       );
     }
-    callback!();
+    callback();
     logs.writeLog(
       'Turn of ${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
     );
@@ -250,14 +255,14 @@ class Game {
         color: thisTheme.primaryColor,
       ),
     ); //если конец, то переходим в новый круг
-    callback!();
+    callback();
     await Future.delayed(const Duration(seconds: 4));
     gameStateName = Text(
       '${LocaleManager.locale.game_turn1}\u00A0${LocaleManager.locale.game_turn2}\u00A0${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
       style: TextStyle(color: thisTheme.onBackground),
     );
 
-    callback!();
+    callback();
   }
 
   // новая улица
@@ -289,7 +294,7 @@ class Game {
       changeText(gameStateNameList[thisLobby.lobbyState]);
     }
     newPlayer(index: thisLobby.firstPlayerIndex);
-    callback!();
+    callback();
   }
 
   // проверка на выравнивание ставок
@@ -328,7 +333,7 @@ class Game {
 
     gameStateName =
         Text('Showdown', style: TextStyle(color: thisTheme.primaryColor));
-    callback!();
+    callback();
     // ignore: await_only_futures
     if (!folded) {
       logs.writeLog('Call WinnerChooseWindow');
@@ -382,7 +387,7 @@ class Game {
       style: TextStyle(color: thisTheme.primaryColor),
     );
     thisLobby.lobbyIndex = -1;
-    callback!();
+    callback();
     /*
     firstBlind();
     

@@ -140,7 +140,7 @@ class PlayersPageState extends State<PlayersPage> {
           titleTextStyle:
               appBarStyle().copyWith(fontSize: stdFontSize / 20 * 24),
           elevation: 0,
-          title: Text(LocaleManager.locale.playp_tittle),
+          title: Text(context.locale.playp_tittle),
           centerTitle: true,
           actions: <Widget>[
             AspectRatio(
@@ -310,7 +310,7 @@ class PlayersPageState extends State<PlayersPage> {
                     ),
                   ),
                   Text(
-                    LocaleManager.locale.playp_rest,
+                    context.locale.playp_rest,
                     style: TextStyle(
                       fontSize: stdFontSize,
                       color: thisTheme.onBackground,
@@ -375,8 +375,8 @@ class PlayersPageState extends State<PlayersPage> {
                 }
               },
               textString: thisLobby.lobbyIsActive
-                  ? LocaleManager.locale.home_cont
-                  : LocaleManager.locale.playp_start,
+                  ? context.locale.home_cont
+                  : context.locale.playp_start,
             ),
             // Settings
             MyButton(
@@ -401,7 +401,7 @@ class PlayersPageState extends State<PlayersPage> {
                 callback();
                 SystemChrome.restoreSystemUIOverlays();
               },
-              textString: LocaleManager.locale.playp_set,
+              textString: context.locale.playp_set,
             ),
           ],
         ),
@@ -791,26 +791,29 @@ class PlayerListState extends State<PlayerList> {
                   }
                 },
                 onReorder: (oldIndex, newIndex) {
-                  if (oldIndex < newIndex) {
-                    newIndex -= 1;
-                  }
+                  if (thisLobby.lobbyState == 5) {
+                    if (oldIndex < newIndex) {
+                      newIndex -= 1;
+                    }
 
-                  if (oldIndex != newIndex) {
-                    logs.writeLog(
-                      'Reorder $oldIndex to $newIndex (${thisLobby.lobbyPlayers[oldIndex].name} ->  ${thisLobby.lobbyPlayers[newIndex].name})',
-                    );
+                    if (oldIndex != newIndex) {
+                      logs.writeLog(
+                        'Reorder $oldIndex to $newIndex (${thisLobby.lobbyPlayers[oldIndex].name} ->  ${thisLobby.lobbyPlayers[newIndex].name})',
+                      );
 
-                    final item = thisLobby.lobbyPlayers.removeAt(oldIndex);
-                    thisLobby.lobbyPlayers.insert(newIndex, item);
+                      final item = thisLobby.lobbyPlayers.removeAt(oldIndex);
+                      thisLobby.lobbyPlayers.insert(newIndex, item);
 
-                    widget.callbackFunction();
+                      widget.callbackFunction();
+                    }
                   }
                 },
                 physics: const BouncingScrollPhysics(),
                 itemCount: thisLobby.lobbyPlayers.length,
                 itemBuilder: (context, index) {
                   return Padding(
-                    key: ValueKey(thisLobby.lobbyPlayers[index]),
+                    key: ValueKey(thisLobby.lobbyPlayers[index].name +
+                        thisLobby.lobbyPlayers[index].assetUrl),
                     padding: EdgeInsets.only(bottom: stdHorizontalOffset),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(stdBorderRadius),

@@ -168,6 +168,7 @@ class _AboutDialogState extends State<AboutDialog> {
                         const Locale.fromSubtags(
                           languageCode: 'en',
                         ),
+                        context,
                       );
                       thisConfig.locale = 'en';
                       configStorage.write(thisConfig);
@@ -185,6 +186,7 @@ class _AboutDialogState extends State<AboutDialog> {
                         const Locale.fromSubtags(
                           languageCode: 'ru',
                         ),
+                        context,
                       );
                       thisConfig.locale = 'ru';
                       configStorage.write(thisConfig);

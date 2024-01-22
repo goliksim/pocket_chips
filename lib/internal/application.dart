@@ -17,8 +17,10 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  void setLocale(Locale value) {
+  void setLocale(Locale value, BuildContext context) {
+    //LocaleManager.initialize(AppLocalizations.of(context));
     widget.localeManager.changeLocale(value);
+    LocaleManager.staticChangeLocale(value);
     setState(() {});
   }
 
@@ -30,7 +32,7 @@ class MyAppState extends State<MyApp> {
       builder: (BuildContext context, Widget? child) => MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        locale: widget.localeManager.lang,
+        locale: LocaleManager.lang,
         //locale: context.locale,
         title: 'Pocket Chips',
         theme: ThemeData(
