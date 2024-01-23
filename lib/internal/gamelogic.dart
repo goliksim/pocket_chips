@@ -45,9 +45,10 @@ class Game {
       thisLobby.lobbyPlayers.where((e) => e.isActive == true).length > 1;
 
   void allIN() {
-    thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid +=
-        thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank;
-    thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank = 0;
+    int bid = thisGame.maxbid();
+
+    thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid += bid;
+    thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank -= bid;
     newPlayer();
   }
 
@@ -56,6 +57,7 @@ class Game {
     thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid += bid;
 
     if (thisLobby.lapCount > 0 && thisGame.waitForBidsEqual()) {
+      print('betstate');
       thisGame.newState();
     } else {
       thisGame.newPlayer();
@@ -135,19 +137,18 @@ class Game {
     if (index == 100) {
       var thisBidsEqual = waitForBidsEqual();
 
-      var firstLap = thisLobby.lapCount <= 0;
+      var firstLap = thisLobby.lapCount <= 0; //первый круг
       //print('${!bidsEqual}$thisBidsEqual$firstLap${thisLobby.lapCount}');
-      if (!bidsEqual && thisBidsEqual && firstLap) {
+      if (firstLap && !bidsEqual && thisBidsEqual) {
         //bidsEqual = waitForBidsEqual();
-        //print('Case of normal on first lap equal');
+        print('Case of normal on first lap');
         newState();
         return 0;
       } else {
-        //print('case 2 ${thisLobby.lobbyIndex == thisLobby.firstPlayerIndex}${!firstLap}$thisBidsEqual');
-        if (thisLobby.lobbyIndex == thisLobby.firstPlayerIndex &&
-            !firstLap &&
-            thisBidsEqual) {
-          //print('Case of first lap equal');
+        //print(    'case 2 ${thisLobby.lobbyIndex == thisLobby.firstPlayerIndex}${!firstLap}$thisBidsEqual');
+        if ((thisLobby.lobbyIndex == thisLobby.firstPlayerIndex && bidsEqual) ||
+            (thisBidsEqual && !bidsEqual)) {
+          print('Case of normal equal');
           newState();
           return 0;
         }
@@ -179,6 +180,16 @@ class Game {
           (e) => [e.name, e.bid].join(': '),
         ).join('\t')}');
 
+    /*
+    //если чел не может рейзить, скипаем его
+    if (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank<=minTmpFunction()){
+      newPlayer();
+      return 0;
+    }
+    */
+
+    bidsEqual = waitForBidsEqual();
+
     //пропуск лоха без денег
     if ((thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank <= 0)) {
       newPlayer();
@@ -189,16 +200,8 @@ class Game {
       newPlayer();
       return 0;
     }
-
-    /*
-    //если чел не может рейзить, скипаем его
-    if (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank<=minTmpFunction()){
-      newPlayer();
-      return 0;
-    }
-    */
     raiseBank = minTmpFunction(bidsEqual);
-    bidsEqual = waitForBidsEqual();
+
     if (thisLobby.lobbyIndex == thisLobby.bigBlindIndex) {
       thisLobby.lapCount += 1;
     }
@@ -226,7 +229,11 @@ class Game {
     //print('toEqual');
     //print(toEqual);
     //подходит под ставку или ход в олл ин, если остался условно 1 бакс (бет)
-    List<int> bids = thisLobby.lobbyPlayers.map((e) => e.bid).toSet().toList();
+    List<int> bids = thisLobby.lobbyPlayers
+        .where((p) => p.isActive == true)
+        .map((e) => e.bid)
+        .toSet()
+        .toList();
     bids.sort();
     //последнее повышение
     int lastRaise = 0;
@@ -245,6 +252,34 @@ class Game {
     //((thisLobby.lobbyState==0)?4:2)*thisLobby.lobbySmallBlind - thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid].max;
     //print("minTmpFunction - $result");
     return result;
+  }
+
+  int maxbid() {
+    //Сколько нужно добавить для выравнивания
+    int thisBid = thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank;
+    int thisMax = thisBid + thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid;
+
+    int maxBid = thisMax;
+    for (Player player in thisLobby.lobbyPlayers) {
+      if (player.isActive) {
+        var playerMoney = player.bank + player.bid;
+        print(player.name);
+        print(playerMoney);
+        if (thisMax > playerMoney) {
+          var toEqual = thisMax - playerMoney;
+          print(toEqual);
+          if (toEqual < maxBid) {
+            maxBid = toEqual;
+            print(maxBid);
+          }
+        }
+      }
+    }
+    print(maxBid);
+    if (maxBid == thisMax) maxBid = 0;
+    print('итог');
+
+    return thisBid - maxBid;
   }
 
   // временное изменение текста
@@ -275,7 +310,7 @@ class Game {
       thisLobby.lobbyState += 1;
       logs.writeLog('NewState with lobbyState = ${thisLobby.lobbyState}');
       lobbyStorage.write(thisLobby);
-    } else {}
+    }
     //после префлопа первый игрок - смол блайнд
     if (thisLobby.lobbyState == 1) {
       for (int i = 1; i < thisLobby.lobbyPlayers.length; i++) {
@@ -305,7 +340,7 @@ class Game {
 
     //bool preFlop = false;
     var maxBid = thisLobby.lobbyPlayers.map((e) => e.bid).reduce(max);
-    for (Player player in thisLobby.lobbyPlayers) {
+    for (Player player in thisLobby.lobbyPlayers.where((e) => e.isActive)) {
       equalBool = (player.isActive) && (player.bid != maxBid);
       notAllInBool = !((player.bid > 0) && (player.bank == 0));
       if (player.bank > 0) notZeroPlayers += 1;
@@ -317,7 +352,7 @@ class Game {
       }
     }
     //проверка на 1 оставшегося чела
-    //print('notzero = $notZeroPlayers');
+    print('notzero = $notZeroPlayers');
     if (notZeroPlayers < 2) return true;
 
     if (thisLobby.lapCount == 0) {

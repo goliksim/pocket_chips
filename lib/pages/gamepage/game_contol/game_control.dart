@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:pocket_chips/data/lobby.dart';
 import 'package:pocket_chips/data/uiValues.dart';
 import 'package:pocket_chips/internal/gamelogic.dart';
 import 'control_widgets/control_buttons/control_buttons.dart';
 import 'control_widgets/control_buttons/raise_buttons.dart';
+import 'control_widgets/control_buttons/start_field.dart';
 import 'control_widgets/raise_field.dart';
 
 class GameControl extends StatefulWidget {
-  const GameControl({super.key});
-
+  const GameControl({super.key, required this.callback});
+  final Function() callback;
   @override
   State<GameControl> createState() => _GameControlState();
 }
@@ -19,6 +21,7 @@ class _GameControlState extends State<GameControl> {
 
   @override
   void initState() {
+    print('raiseButtonPressed = false');
     raiseButtonPressed = false;
     tmpBid = thisGame.raiseBank;
     minBid = tmpBid;
@@ -85,16 +88,20 @@ class _GameControlState extends State<GameControl> {
         ),
         SizedBox(height: stdHorizontalOffset),
         // Панелька нижних кнопок
-        !raiseButtonPressed
-            ? ControlButtons(
-                key: const ValueKey(1),
-                changeRaiseButton: changeRaiseBool,
-                raiseButtonPressed: raiseButtonPressed,
-              )
-            : RaiseButtons(
-                key: const ValueKey(2),
-                changeRaiseButton: changeRaiseBool,
-                tmpBid: tmpBid,
+        (thisLobby.lobbyState != 5)
+            ? (!raiseButtonPressed
+                ? ControlButtons(
+                    key: const ValueKey(1),
+                    changeRaiseButton: changeRaiseBool,
+                    raiseButtonPressed: raiseButtonPressed,
+                  )
+                : RaiseButtons(
+                    key: const ValueKey(2),
+                    changeRaiseButton: changeRaiseBool,
+                    tmpBid: tmpBid,
+                  ))
+            : StartGameField(
+                callback: widget.callback,
               )
       ],
     );

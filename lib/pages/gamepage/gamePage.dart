@@ -171,7 +171,8 @@ class _GamePageState extends State<GamePage> {
                 adaptiveOffset,
               ),
               child: GameControl(
-                key: UniqueKey(),
+                callback: callback,
+                //key: UniqueKey(),
               ),
             ),
           ],

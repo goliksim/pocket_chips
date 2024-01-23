@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_chips/data/lobby.dart';
 import 'package:pocket_chips/data/uiValues.dart';
+import 'package:pocket_chips/internal/gamelogic.dart';
 
 class StaticRaiseButton extends StatefulWidget {
   const StaticRaiseButton({
@@ -83,7 +84,7 @@ class StaticRaiseButtonState extends State<StaticRaiseButton> {
             RaiseSlider(
               minBid: widget.minBid,
               value: tmpBid,
-              maxBid: thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank,
+              maxBid: thisGame.maxbid(),
               onChanged: (newValue) {
                 tmpBid = newValue;
                 widget.changeBid(tmpBid);
@@ -222,7 +223,7 @@ class _RaiseSliderState extends State<RaiseSlider> {
             ),
             SizedBox(width: stdHorizontalOffset / 2),
             Text(
-              '${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank}',
+              '${widget.maxBid}',
               textAlign: TextAlign.left,
               style: TextStyle(
                 fontSize: stdFontSize,

@@ -28,16 +28,16 @@ class _ControlButtonsState extends State<ControlButtons> {
 
   //Текст первой кнопки
   String firstButtonString() {
-    //Ставка
-    if (thisLobby.betBool && thisLobby.lobbyState != 0) {
-      return context.locale.game_bet;
+    if (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank <=
+            thisGame.raiseBank &&
+        thisLobby.allMoney > thisLobby.maxBid) {
+      return context.locale.game_all;
     } else {
-      //All IN или Рейз
-      return (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank <=
-                  thisGame.raiseBank &&
-              thisLobby.allMoney > thisLobby.maxBid)
-          ? context.locale.game_all
-          : context.locale.game_raise;
+      if (thisLobby.betBool && thisLobby.lobbyState != 0) {
+        return context.locale.game_bet;
+      } else {
+        return context.locale.game_raise;
+      }
     }
   }
 
@@ -106,48 +106,44 @@ class _ControlButtonsState extends State<ControlButtons> {
 
   @override
   Widget build(BuildContext context) {
-    return (thisLobby.lobbyState != 5)
-        ? Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Кнопка Raise
-              Flexible(
-                flex: 1,
-                fit: FlexFit.tight,
-                child: controlButton(
-                  firstButtonString(),
-                  thisTheme.primaryColor,
-                  raiseAction,
-                  condition: raiseButtonActiveBool(),
-                ),
-              ),
-              SizedBox(width: stdHorizontalOffset),
-              // Кнопка подтверждения Raise/Bet
-              Flexible(
-                flex: 1,
-                fit: FlexFit.tight,
-                child: controlButton(
-                  middleButtonString(),
-                  thisTheme.secondaryColor,
-                  universalAction,
-                ),
-              ), // Кнопка Call/Check/Skip
-              // Кнопка Fold
-              SizedBox(width: stdHorizontalOffset),
-              Flexible(
-                flex: 1,
-                fit: FlexFit.tight,
-                child: controlButton(
-                  context.locale.game_fold,
-                  thisTheme.additionButtonColor,
-                  foldAction,
-                ),
-              ),
-            ],
-          )
-        : StartGameField(
-            callback: callback,
-          );
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Кнопка Raise
+        Flexible(
+          flex: 1,
+          fit: FlexFit.tight,
+          child: controlButton(
+            firstButtonString(),
+            thisTheme.primaryColor,
+            raiseAction,
+            condition: raiseButtonActiveBool(),
+          ),
+        ),
+        SizedBox(width: stdHorizontalOffset),
+        // Кнопка подтверждения Raise/Bet
+        Flexible(
+          flex: 1,
+          fit: FlexFit.tight,
+          child: controlButton(
+            middleButtonString(),
+            thisTheme.secondaryColor,
+            universalAction,
+          ),
+        ), // Кнопка Call/Check/Skip
+        // Кнопка Fold
+        SizedBox(width: stdHorizontalOffset),
+        Flexible(
+          flex: 1,
+          fit: FlexFit.tight,
+          child: controlButton(
+            context.locale.game_fold,
+            thisTheme.additionButtonColor,
+            foldAction,
+          ),
+        ),
+      ],
+    );
   }
 }
 
