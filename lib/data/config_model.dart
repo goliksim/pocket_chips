@@ -38,5 +38,5 @@ class Config {
       : themeIndex = json['theme'],
         firstTime = json['first'],
         version = json['ver'] ?? '0',
-        locale = json['locale'];
+        locale = json['locale'] ?? '';
 }

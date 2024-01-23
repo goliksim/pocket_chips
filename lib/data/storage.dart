@@ -3,6 +3,7 @@
 // ignore_for_file: avoid_renaming_method_parameters
 
 import 'dart:convert';
+import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'config_model.dart';
@@ -16,6 +17,11 @@ final SavedPlayerStorage savedStorage = SavedPlayerStorage();
 Future<String> get localPath async {
   final directory = await getApplicationDocumentsDirectory();
   return directory.path;
+}
+
+Future<File> localFile(String name) async {
+  final path = await localPath;
+  return File('$path/pocketchips/$name.json').create(recursive: true);
 }
 
 abstract class Storage<T> {
@@ -40,8 +46,8 @@ class SavedPlayerStorage extends Storage<List<Player>> {
 
       return content;
     } catch (e) {
-      logs.writeLog('EMPTY SAVED PLAYERS');
-      return [];
+      logs.writeLog('EMPTY SHARED SAVED PLAYERS');
+      return _oldRead();
     }
   }
 
@@ -50,6 +56,22 @@ class SavedPlayerStorage extends Storage<List<Player>> {
     String text = jsonEncode(savedPlayers.map((e) => e.toJson()).toList());
     logs.writeLog('Saved players info saved');
     prefs.setString('saved', text);
+  }
+
+  Future<List<Player>> _oldRead() async {
+    try {
+      final file = await localFile('savedplayers');
+      final content = (jsonDecode(await file.readAsString()) as List)
+          .map((i) => Player.fromJson(i))
+          .toList();
+      logs.writeLog('\n\tSAVED PLAYERS LOADED:\n [${[
+        for (var x in content) x.show()
+      ].join('\t')}]');
+      return content;
+    } catch (e) {
+      logs.writeLog('EMPTY SAVED PLAYERS');
+      return [];
+    }
   }
 }
 
@@ -65,8 +87,8 @@ class LobbyStorage extends Storage<Lobby> {
     } catch (e) {
       // If encountering an error, return 0
       write(Lobby());
-      logs.writeLog('ERROR OF READING LOBBY');
-      return Lobby(); //новое пустое лобби
+      logs.writeLog('ERROR OF READING SHARED LOBBY');
+      return _oldRead(); //новое пустое лобби
     }
   }
 
@@ -75,6 +97,19 @@ class LobbyStorage extends Storage<Lobby> {
     final text = jsonEncode(lobby);
     logs.writeLog('Lobby info saved');
     prefs.setString('lobby', text);
+  }
+
+  Future<Lobby> _oldRead() async {
+    try {
+      final file = await localFile('activelobby');
+      final content = Lobby.fromJson(jsonDecode(await file.readAsString()));
+      return content;
+    } catch (e) {
+      // If encountering an error, return 0
+      write(Lobby());
+      logs.writeLog('Starting app...\n ERROR OF READING LOBBY');
+      return Lobby(); //новое пустое лобби
+    }
   }
 }
 
@@ -92,9 +127,9 @@ class ConfigStorage extends Storage<Config> {
     } catch (e) {
       // If encountering an error, return 0
       write(Config(0, true, ''));
-      logs.writeLog('Starting app...\n --- ERROR OF READING CONFIG ---');
+      logs.writeLog('Starting app...\n --- ERROR OF READING SHARED CONFIG ---');
       //showToast("Welcome for the first time");
-      return Config(); //новое пустое лобби
+      return _oldRead(); //новое пустое лобби
     }
   }
 
@@ -103,5 +138,22 @@ class ConfigStorage extends Storage<Config> {
     final text = jsonEncode(config);
     logs.writeLog('Config info saved');
     prefs.setString('config', text);
+  }
+
+  Future<Config> _oldRead() async {
+    try {
+      final file = await localFile('config');
+      final config = Config.fromJson(jsonDecode(await file.readAsString()));
+      logs.writeLog(
+        'Starting app...\n --- CONFIG LOADED ---\nfirstTime: ${config.firstTime}',
+      );
+      return config;
+    } catch (e) {
+      // If encountering an error, return 0
+      write(Config(0, true, ''));
+      logs.writeLog('Starting app...\n --- ERROR OF READING CONFIG ---');
+      //showToast("Welcome for the first time");
+      return Config(); //новое пустое лобби
+    }
   }
 }

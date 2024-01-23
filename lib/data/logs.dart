@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:developer';
 import 'package:intl/intl.dart';
-import 'package:flutter/foundation.dart';
+//import 'package:flutter/foundation.dart';
 import 'package:pocket_chips/data/storage.dart';
 
 final Logs logs = Logs();
@@ -14,8 +14,8 @@ class Logs {
 
   Future<void> writeLog(String text) async {
     log(text);
-
-    if (kDebugMode && (Platform.isAndroid || Platform.isIOS)) {
+    //!kDebugMode &&
+    if ((Platform.isAndroid || Platform.isIOS)) {
       DateTime date = DateTime.now();
       String finalDateString =
           '${DateFormat.yMd().format(date)} ${DateFormat.jms().format(date)}\t';
