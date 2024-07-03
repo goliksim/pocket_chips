@@ -214,12 +214,11 @@ class PlayersPageState extends State<PlayersPage> {
                           height: stdHorizontalOffset / 2,
                           width: double.infinity,
                         ),
-                      ((thisLobby.lobbyPlayers.length != maxPlayerCount) &&
-                              thisLobby.lobbyState == 5)
-                          ? AttentionAdd(
-                              callBackFunction: callback,
-                            )
-                          : const SizedBox(),
+                      if ((thisLobby.lobbyPlayers.length != maxPlayerCount) &&
+                          thisLobby.lobbyState == 5)
+                        AttentionAdd(
+                          callBackFunction: callback,
+                        ),
                       //FreeSpace
                     ],
                   ),
@@ -812,8 +811,10 @@ class PlayerListState extends State<PlayerList> {
                 itemCount: thisLobby.lobbyPlayers.length,
                 itemBuilder: (context, index) {
                   return Padding(
-                    key: ValueKey(thisLobby.lobbyPlayers[index].name +
-                        thisLobby.lobbyPlayers[index].assetUrl),
+                    key: ValueKey(
+                      thisLobby.lobbyPlayers[index].name +
+                          thisLobby.lobbyPlayers[index].assetUrl,
+                    ),
                     padding: EdgeInsets.only(bottom: stdHorizontalOffset),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(stdBorderRadius),
@@ -1398,6 +1399,9 @@ class AddWindowState extends State<AddWindow> {
                             }
                             Navigator.of(context).pop();
                             widget.callBackFunction();
+                          } else {
+                            showToast(
+                                LocaleManager.locale.toast_incorrect_player);
                           }
                         } else {
                           showToast(LocaleManager.locale.toast_alred2);
@@ -1478,9 +1482,12 @@ class _PickIconState extends State<PickIcon> {
                     choosenIcon = index;
                   });
 
-                  await Future.delayed(const Duration(milliseconds: 500));
-                  widget.changeLogo('assets/faces/pokerfaces${index + 1}.jpg');
-                  Navigator.of(context).pop();
+                  await Future.delayed(const Duration(milliseconds: 500))
+                      .then((_) {
+                    widget
+                        .changeLogo('assets/faces/pokerfaces${index + 1}.jpg');
+                    Navigator.of(context).pop();
+                  });
                 },
                 child: Padding(
                   padding: EdgeInsets.all(stdHorizontalOffset / 2),
@@ -1630,7 +1637,7 @@ Widget playerCard(
                   ],
                 ),
               ),
-              if (!saved)
+              if (!saved && (thisLobby.lobbyState == 5))
                 Align(
                   alignment: Alignment.centerLeft,
                   child: AspectRatio(

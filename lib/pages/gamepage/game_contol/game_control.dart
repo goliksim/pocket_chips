@@ -21,7 +21,6 @@ class _GameControlState extends State<GameControl> {
 
   @override
   void initState() {
-    print('raiseButtonPressed = false');
     raiseButtonPressed = false;
     tmpBid = thisGame.raiseBank;
     minBid = tmpBid;

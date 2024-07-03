@@ -708,7 +708,7 @@ class _AboutDialogState extends State<AboutDialog> {
                     buttonColor: thisTheme.bgrColor,
                     child: Image.asset('assets/social/tele.png'),
                     action: () async {
-                      const url = 'https://t.me/huzhetebyx';
+                      const url = 'https://t.me/goliksim';
                       if (!await launch(url)) {
                         throw 'Could not launch $url';
                       }
@@ -751,7 +751,7 @@ class _AboutDialogState extends State<AboutDialog> {
               SizedBox(
                 width: double.infinity,
                 child: Text(
-                  '© 2022 GOLIKSIM (Alexander Golev)',
+                  '© 2024 GOLIKSIM (Alexander Golev)',
                   style: TextStyle(
                     height: 1.5,
                     color: thisTheme.onBackground,
@@ -783,6 +783,9 @@ class _AboutDialogState extends State<AboutDialog> {
                 action: () async {
                   showUpdate(context);
                 },
+              ),
+              SizedBox(
+                height: stdHorizontalOffset / 2,
               ),
               MyButton(
                 height: stdButtonHeight * 0.5,

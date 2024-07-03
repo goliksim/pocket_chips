@@ -133,6 +133,7 @@
     "toast_bank3":"The stack cannot be zero",
     "toast_bank4":"We recommend a Big Blind value less than Stack",
     "toast_unav":"Unavailible now",
+    "toast_incorrect_player":"Enter name and choose icon",
     "check_table":"Table",
     "check_player":"Player",
     "check_rf":"Royal Flush",

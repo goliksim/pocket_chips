@@ -57,7 +57,6 @@ class Game {
     thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid += bid;
 
     if (thisLobby.lapCount > 0 && thisGame.waitForBidsEqual()) {
-      print('betstate');
       thisGame.newState();
     } else {
       thisGame.newPlayer();
@@ -141,14 +140,12 @@ class Game {
       //print('${!bidsEqual}$thisBidsEqual$firstLap${thisLobby.lapCount}');
       if (firstLap && !bidsEqual && thisBidsEqual) {
         //bidsEqual = waitForBidsEqual();
-        print('Case of normal on first lap');
         newState();
         return 0;
       } else {
         //print(    'case 2 ${thisLobby.lobbyIndex == thisLobby.firstPlayerIndex}${!firstLap}$thisBidsEqual');
         if ((thisLobby.lobbyIndex == thisLobby.firstPlayerIndex && bidsEqual) ||
             (thisBidsEqual && !bidsEqual)) {
-          print('Case of normal equal');
           newState();
           return 0;
         }
@@ -263,21 +260,15 @@ class Game {
     for (Player player in thisLobby.lobbyPlayers) {
       if (player.isActive) {
         var playerMoney = player.bank + player.bid;
-        print(player.name);
-        print(playerMoney);
         if (thisMax > playerMoney) {
           var toEqual = thisMax - playerMoney;
-          print(toEqual);
           if (toEqual < maxBid) {
             maxBid = toEqual;
-            print(maxBid);
           }
         }
       }
     }
-    print(maxBid);
     if (maxBid == thisMax) maxBid = 0;
-    print('итог');
 
     return thisBid - maxBid;
   }
@@ -352,7 +343,6 @@ class Game {
       }
     }
     //проверка на 1 оставшегося чела
-    print('notzero = $notZeroPlayers');
     if (notZeroPlayers < 2) return true;
 
     if (thisLobby.lapCount == 0) {

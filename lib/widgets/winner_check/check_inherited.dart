@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:pocket_chips/internal/cards/card_model.dart' as c;
+import 'package:flutter/material.dart' hide Card;
+import 'package:pocket_chips/internal/cards/card_model.dart';
 import 'package:pocket_chips/internal/cards/winner_gpt.dart';
 
 extension CheckCardsBuilder on BuildContext {
   int get winner => CheckCardsInherited.of(this).winner;
   List<Combination?> get combinations =>
       CheckCardsInherited.of(this).combinations;
-  List<c.Card?>? get tableCards => CheckCardsInherited.of(this).tableCards;
-  List<List<c.Card?>>? get playerCards =>
+  List<Card?>? get tableCards => CheckCardsInherited.of(this).tableCards;
+  List<List<Card?>>? get playerCards =>
       CheckCardsInherited.of(this).playerCards;
-  Function(c.Card?) get notInCards => CheckCardsInherited.of(this).notInCards;
+  Function(Card?) get notInCards => CheckCardsInherited.of(this).notInCards;
   Function get updateCombinations =>
       CheckCardsInherited.of(this).updateCombinations;
 }
@@ -24,12 +24,12 @@ class CheckCardsInherited extends InheritedWidget {
     required this.playerCards,
   }) : super(key: key, child: child);
 
-  final List<c.Card?> tableCards;
-  final List<List<c.Card?>> playerCards;
+  final List<Card?> tableCards;
+  final List<List<Card?>> playerCards;
   int winner;
   List<Combination?> combinations;
 
-  bool notInCards(c.Card? card) {
+  bool notInCards(Card? card) {
     if (card == null) return true;
     var allCards = tableCards;
     for (var cards in playerCards) {

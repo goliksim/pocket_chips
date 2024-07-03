@@ -7,8 +7,6 @@ import 'package:pocket_chips/internal/localization.dart';
 import 'package:pocket_chips/pages/gamepage/winner_page.dart';
 import 'package:pocket_chips/ui/ui_widgets.dart';
 
-import 'start_field.dart';
-
 class ControlButtons extends StatefulWidget {
   const ControlButtons({
     super.key,
