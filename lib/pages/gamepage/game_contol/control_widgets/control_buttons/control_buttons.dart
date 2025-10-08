@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/lobby.dart';
-import 'package:pocket_chips/data/logs.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/gamelogic.dart';
-import 'package:pocket_chips/internal/localization.dart';
-import 'package:pocket_chips/pages/gamepage/winner_page.dart';
-import 'package:pocket_chips/ui/ui_widgets.dart';
+
+import '../../../../../data/lobby.dart';
+import '../../../../../data/logs.dart';
+import '../../../../../data/uiValues.dart';
+import '../../../../../internal/gamelogic.dart';
+import '../../../../../internal/localization.dart';
+import '../../../../../pages/gamepage/winner_page.dart';
+import '../../../../../ui/ui_widgets.dart';
 
 class ControlButtons extends StatefulWidget {
   const ControlButtons({
@@ -154,7 +155,7 @@ Widget controlButton(
     MyButton(
       height: stdButtonHeight,
       width: double.infinity,
-      buttonColor: color.withOpacity((condition) ? 1 : 0.3),
+      buttonColor: color.withAlpha((condition) ? 255 : 80),
       textString: name,
       action: (condition) ? action : () => DoNothingAction,
     );

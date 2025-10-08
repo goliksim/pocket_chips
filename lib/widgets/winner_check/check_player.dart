@@ -1,15 +1,16 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/cards/winner_gpt.dart';
-import 'package:pocket_chips/internal/localization.dart';
-import 'package:pocket_chips/ui/cards/card_rotation.dart';
-import 'package:pocket_chips/ui/cards/cards_variants/card_back.dart';
-import 'package:pocket_chips/ui/cards/cards_variants/card_front.dart';
-import 'package:pocket_chips/internal/cards/card_model.dart' as c;
-import 'package:pocket_chips/ui/ui_widgets.dart';
-import 'package:pocket_chips/widgets/winner_check/check_inherited.dart';
 
+import '../../../../../data/uiValues.dart';
+import '../../../../../internal/cards/card_model.dart' as c;
+import '../../../../../internal/cards/winner_gpt.dart';
+import '../../../../../internal/localization.dart';
+import '../../../../../ui/cards/card_rotation.dart';
+import '../../../../../ui/cards/cards_variants/card_back.dart';
+import '../../../../../ui/cards/cards_variants/card_front.dart';
+import '../../../../../ui/ui_widgets.dart';
+import '../../../../../widgets/winner_check/check_inherited.dart';
+import '../../internal/cards/card_model.dart';
 import 'check_card_button.dart';
 
 class CheckPlayer extends StatefulWidget {
@@ -32,7 +33,7 @@ class CheckPlayer extends StatefulWidget {
 }
 
 class _CheckPlayerState extends State<CheckPlayer> {
-  void updateHand(index, card) {
+  void updateHand(int index, Card? card) {
     if (context.notInCards(card)) {
       context.playerCards![widget.number][index] = card;
       context.updateCombinations();
@@ -73,8 +74,10 @@ class _CheckPlayerState extends State<CheckPlayer> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border:
-            Border.all(width: 2.0, color: thisTheme.bankColor.withOpacity(0)),
+        border: Border.all(
+          width: 2.0,
+          color: thisTheme.bankColor.withAlpha(0),
+        ),
         borderRadius: BorderRadius.all(
           Radius.circular(
             stdBorderRadius,

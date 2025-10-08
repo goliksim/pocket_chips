@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/uiValues.dart';
+
+import '../../../../../data/uiValues.dart';
 
 class CardWidget extends StatelessWidget {
   const CardWidget({super.key, required this.child});
@@ -14,7 +15,7 @@ class CardWidget extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(
             width: 2,
-            color: thisTheme.bankColor.withOpacity(1),
+            color: thisTheme.bankColor.withAlpha(255),
           ),
           borderRadius: BorderRadius.circular(0.5 * stdBorderRadius),
         ),

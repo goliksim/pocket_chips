@@ -1,14 +1,15 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/lobby.dart';
-import 'package:pocket_chips/data/logs.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/gamelogic.dart';
-import 'package:pocket_chips/internal/localization.dart';
-import 'package:pocket_chips/ui/transitions.dart';
-import 'package:pocket_chips/ui/ui_widgets.dart';
-import 'package:pocket_chips/widgets/winner_check/winner_check.dart';
+
+import '../../data/lobby.dart';
+import '../../data/logs.dart';
+import '../../data/uiValues.dart';
+import '../../internal/gamelogic.dart';
+import '../../internal/localization.dart';
+import '../../ui/transitions.dart';
+import '../../ui/ui_widgets.dart';
+import '../../widgets/winner_check/winner_check.dart';
 
 Future<void> showWinner(BuildContext context) async {
   late BuildContext dialogContext;
@@ -36,7 +37,7 @@ Future<void> showWinner(BuildContext context) async {
 }
 
 class WinnerWindow extends StatefulWidget {
-  const WinnerWindow({Key? key, required this.winner}) : super(key: key);
+  const WinnerWindow({super.key, required this.winner});
 
   final Player winner;
   @override
@@ -62,7 +63,7 @@ class _WinnerWindowState extends State<WinnerWindow> {
       insetPadding: EdgeInsets.symmetric(
         horizontal: [
           (MediaQuery.of(context).size.width - stdButtonHeight * 4) / 2,
-          adaptiveOffset
+          adaptiveOffset,
         ].reduce(max),
       ),
       shape: RoundedRectangleBorder(
@@ -88,7 +89,7 @@ class _WinnerWindowState extends State<WinnerWindow> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Ubuntu',
-                    color: thisTheme.bankColor.withOpacity(0.5),
+                    color: thisTheme.bankColor.withAlpha(128),
                     fontWeight: FontWeight.w700,
                     fontSize: stdFontSize * 2,
                   ),
@@ -136,8 +137,11 @@ class _WinnerWindowState extends State<WinnerWindow> {
 }
 
 class WinnerChooseWindow extends StatefulWidget {
-  const WinnerChooseWindow({Key? key, required this.thisLobby, this.title})
-      : super(key: key); // принимает значение title при обращении
+  const WinnerChooseWindow({
+    required this.thisLobby,
+    this.title,
+    super.key,
+  }); // принимает значение title при обращении
   final Lobby thisLobby;
   final String? title;
   @override
@@ -286,7 +290,7 @@ class _WinnerChooseWindowState extends State<WinnerChooseWindow> {
                                         });
                                       },
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
                             ),

@@ -1,17 +1,18 @@
 // ignore_for_file: file_names
 
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/logs.dart';
 
 import '../data/lobby.dart';
+import '../data/logs.dart';
 import '../data/storage.dart';
-import '../ui/transitions.dart';
 import '../data/uiValues.dart';
+import '../ui/transitions.dart';
 import 'homePage.dart';
 
 class InitWindow extends StatefulWidget {
-  const InitWindow({Key? key}) : super(key: key);
+  const InitWindow({super.key});
 
   @override
   State<InitWindow> createState() => _InitWindowState();
@@ -173,7 +174,7 @@ class _InitWindowState extends State<InitWindow> {
                           SizedBox(height: stdButtonHeight * 1),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

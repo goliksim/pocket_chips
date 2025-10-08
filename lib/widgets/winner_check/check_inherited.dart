@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Card;
-import 'package:pocket_chips/internal/cards/card_model.dart';
-import 'package:pocket_chips/internal/cards/winner_gpt.dart';
+
+import '../../../../../internal/cards/card_model.dart';
+import '../../../../../internal/cards/winner_gpt.dart';
 
 extension CheckCardsBuilder on BuildContext {
   int get winner => CheckCardsInherited.of(this).winner;
@@ -16,13 +17,13 @@ extension CheckCardsBuilder on BuildContext {
 
 class CheckCardsInherited extends InheritedWidget {
   CheckCardsInherited({
-    Key? key,
     required this.winner,
     required this.combinations,
-    required Widget child,
+    required super.child,
     required this.tableCards,
     required this.playerCards,
-  }) : super(key: key, child: child);
+    super.key,
+  });
 
   final List<Card?> tableCards;
   final List<List<Card?>> playerCards;

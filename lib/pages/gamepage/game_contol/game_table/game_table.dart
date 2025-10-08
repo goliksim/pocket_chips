@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/lobby.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/pages/gamepage/gamePage.dart';
-import 'package:pocket_chips/pages/gamepage/game_contol/game_table/player_window.dart';
 
+import '../../../../../data/lobby.dart';
+import '../../../../../data/uiValues.dart';
+import '../../../../../pages/gamepage/gamePage.dart';
+import '../../../../../pages/gamepage/game_contol/game_table/player_window.dart';
 import 'table_cards.dart';
 import 'table_service.dart';
 
@@ -33,8 +33,8 @@ class GameTable extends StatelessWidget {
             image: DecorationImage(
               filterQuality: FilterQuality.high,
               colorFilter: ColorFilter.mode(
-                thisTheme.primaryColor.withOpacity(
-                  thisTheme.name == 'light' ? 0.075 : 0,
+                thisTheme.primaryColor.withAlpha(
+                  thisTheme.name == 'light' ? 20 : 0,
                 ),
                 BlendMode.srcATop,
               ),
@@ -66,7 +66,7 @@ class GameTable extends StatelessWidget {
           child: Text(
             '${thisLobby.lobbySmallBlind} / ${thisLobby.lobbySmallBlind * 2}',
             style: TextStyle(
-              color: thisTheme.onBackground.withOpacity(0.3),
+              color: thisTheme.onBackground.withAlpha(75),
               fontSize: stdFontSize * 0.6,
             ),
           ),
@@ -157,7 +157,7 @@ Widget chip(int a) => FittedBox(
           child: Text(
             '\$ ${thisLobby.lobbyPlayers[a].bid}',
             style: TextStyle(
-              color: thisTheme.onBackground.withOpacity(0.6),
+              color: thisTheme.onBackground.withAlpha(150),
               fontSize: stdFontSize * 0.75,
             ),
           ),
@@ -165,23 +165,23 @@ Widget chip(int a) => FittedBox(
       ),
     );
 
-double playerLeftOffset(tableButtonWidth, a, addButton) =>
+double playerLeftOffset(double tableButtonWidth, int a, int addButton) =>
     adaptiveOffset +
     tableButtonWidth / 3 -
     (stdButtonHeight * 1.75 * getSin(a, addButton, multiply: -0.5));
 
-double playerBottomOffset(a, addButton, tableHeight) =>
+double playerBottomOffset(int a, int addButton, double tableHeight) =>
     tableHeight / 3.3 - 3.2 * stdButtonHeight * getCos(a, addButton);
 //3.4 * stdButtonHeight - 3.2 * stdButtonHeight * getCos(a, addButton);
 
-double chipBottomOffset(a, addButton) =>
+double chipBottomOffset(int a, int addButton) =>
     -3.18 * stdButtonHeight * getCos(a, addButton) +
     3.55 * stdButtonHeight -
     (getCos(a, addButton) > 0.01
         ? -stdButtonHeight * 0.5
         : stdButtonHeight * 0.5);
 
-double chipsLeftOffset(tableButtonWidth, a, addButton) =>
+double chipsLeftOffset(double tableButtonWidth, int a, int addButton) =>
     adaptiveOffset +
     (tableButtonWidth) / 2.9 -
     (stdButtonHeight *

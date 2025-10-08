@@ -178,7 +178,7 @@ class Lobby {
     0.0,
     0.0,
     0.0,
-    0.0
+    0.0,
   ];
   /*
   //автоматическое повышение?
@@ -213,7 +213,7 @@ class Lobby {
         'lobbyAnte': lobbyAnte,
         'lobbyRandomOffset': lobbyRandomOffset,
         'bigBlindIndex': bigBlindIndex,
-        'lapCount': lapCount
+        'lapCount': lapCount,
       };
 
   //читаем из json

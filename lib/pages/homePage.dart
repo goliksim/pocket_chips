@@ -1,23 +1,25 @@
 // ignore_for_file: file_names
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/config_model.dart';
-import 'package:pocket_chips/data/logs.dart';
-import 'package:pocket_chips/data/storage.dart';
-import 'package:pocket_chips/internal/localization.dart';
-import 'package:pocket_chips/widgets/onboading/dialogs/about.dart';
-import 'package:pocket_chips/widgets/onboading/dialogs/update.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:pocket_chips/widgets/winner_check/winner_check.dart';
-import '../pages/playersPage.dart' as players;
+
+import '../data/config_model.dart';
 import '../data/lobby.dart';
-import '../ui/transitions.dart';
+import '../data/logs.dart';
+import '../data/storage.dart';
 import '../data/uiValues.dart';
+import '../internal/localization.dart';
+import '../pages/playersPage.dart' as players;
+import '../ui/transitions.dart';
 import '../ui/ui_widgets.dart';
+import '../widgets/onboading/dialogs/about.dart';
+import '../widgets/onboading/dialogs/update.dart';
+import '../widgets/winner_check/winner_check.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key, required this.isDark}) //
-      : super(key: key); // принимает значение title при обращении
+  const HomePage(
+      {super.key,
+      required this.isDark}); // принимает значение title при обращении
 
   final bool isDark;
 
@@ -160,14 +162,14 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       );
 
   @override
   Widget build(BuildContext context) {
-    LocaleManager.initialize(AppLocalizations.of(context));
+    LocaleManager.initialize(context.locale);
     return PatternContainer(
       padding: EdgeInsets.only(
         top: stdCutoutWidth * 0.75,
@@ -258,12 +260,12 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-Widget chipImage(context) => Container(
+Widget chipImage(BuildContext context) => Container(
       margin: EdgeInsets.all(stdHorizontalOffset),
       decoration: BoxDecoration(
         image: DecorationImage(
           colorFilter: ColorFilter.mode(
-            thisTheme.bgrColor.withOpacity(0.95),
+            thisTheme.bgrColor.withAlpha(250),
             BlendMode.dstIn,
           ),
           fit: BoxFit.contain,

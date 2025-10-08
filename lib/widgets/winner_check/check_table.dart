@@ -1,13 +1,14 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/localization.dart';
-import 'package:pocket_chips/ui/cards/card_rotation.dart';
-import 'package:pocket_chips/ui/cards/cards_variants/card_back.dart';
-import 'package:pocket_chips/ui/cards/cards_variants/card_front.dart';
-import 'package:pocket_chips/ui/ui_widgets.dart';
-import 'package:pocket_chips/widgets/winner_check/check_inherited.dart';
 
+import '../../../../../data/uiValues.dart';
+import '../../../../../internal/localization.dart';
+import '../../../../../ui/cards/card_rotation.dart';
+import '../../../../../ui/cards/cards_variants/card_back.dart';
+import '../../../../../ui/cards/cards_variants/card_front.dart';
+import '../../../../../ui/ui_widgets.dart';
+import '../../../../../widgets/winner_check/check_inherited.dart';
+import '../../internal/cards/card_model.dart';
 import 'check_card_button.dart';
 
 class CheckTable extends StatefulWidget {
@@ -18,7 +19,7 @@ class CheckTable extends StatefulWidget {
 }
 
 class _CheckTableState extends State<CheckTable> {
-  void updateTable(index, card) {
+  void updateTable(int index, Card? card) {
     if (context.notInCards(card)) {
       context.tableCards![index] = card;
       context.updateCombinations();
@@ -100,7 +101,7 @@ class _CheckTableState extends State<CheckTable> {
           ),
           SizedBox(
             height: stdButtonHeight * 0.25,
-          )
+          ),
         ],
       ),
     );

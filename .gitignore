@@ -22,7 +22,6 @@ migrate_working_dir/
 *.exe
 *.zip
 
-
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
@@ -43,6 +42,9 @@ migrate_working_dir/
 # Symbolication related
 app.*.symbols
 
+# Firebase
+/android/app/google-services.json
+
 # Obfuscation related
 app.*.map.json
 
@@ -60,3 +62,6 @@ android/key.properties
 /macos
 /build
 /old_versions
+
+# FVM Version Cache
+.fvm/

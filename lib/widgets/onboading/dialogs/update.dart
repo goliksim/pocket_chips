@@ -1,17 +1,14 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/material.dart';
-
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:onboarding/onboarding.dart';
-import 'package:pocket_chips/data/lobby.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/localization.dart';
-
-import 'package:pocket_chips/ui/transitions.dart';
-
+import '../../../../../data/lobby.dart';
+import '../../../../../data/uiValues.dart';
+import '../../../../../internal/localization.dart';
+import '../../../../../ui/transitions.dart';
 //import 'package:in_app_review/in_app_review.dart';
 
 import '../onboarding.dart';
@@ -36,9 +33,9 @@ Future showUpdate(BuildContext context) async {
 
 class UpdateDialog extends StatefulWidget {
   const UpdateDialog({
-    Key? key,
+    super.key,
     required this.packageInfo,
-  }) : super(key: key);
+  });
 
   final PackageInfo packageInfo;
 

@@ -41,7 +41,8 @@ Instructions on how to install your application. This may include cloning the re
 ```bash
 git clone https://github.com/your-project-on-github.git
 cd your-project
-flutter pub get
+fvm flutter pub get
+fvm flutter gen-l10n
 ```
 
 ## Usage

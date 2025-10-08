@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/ui/cards/card_rotation.dart';
-import 'package:pocket_chips/ui/cards/cards_variants/card_back.dart';
-import 'package:pocket_chips/ui/cards/cards_variants/card_front_sample.dart';
+
+import '../../../../../data/uiValues.dart';
+import '../../../../../ui/cards/card_rotation.dart';
+import '../../../../../ui/cards/cards_variants/card_back.dart';
+import '../../../../../ui/cards/cards_variants/card_front_sample.dart';
 
 class TableCards extends StatelessWidget {
   const TableCards({super.key, required this.count, required this.state});

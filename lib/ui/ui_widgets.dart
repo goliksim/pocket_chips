@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:pocket_chips/internal/localization.dart';
 
+import '../../../../../internal/localization.dart';
 import '../data/uiValues.dart';
 
 //Всплывающие уведомления
@@ -27,12 +27,12 @@ void showToast(String text) async {
 //Подтверждение действия
 class ConfirmationWindow extends StatelessWidget {
   const ConfirmationWindow({
-    Key? key,
+    super.key,
     required this.type,
     required this.message,
     required this.action,
     required this.button,
-  }) : super(key: key);
+  });
 
   final String type;
   final String message;
@@ -131,7 +131,7 @@ class ConfirmationWindow extends StatelessWidget {
 //Класс Большинства кнопочек
 class MyButton extends StatelessWidget {
   const MyButton({
-    Key? key,
+    super.key,
     this.height,
     required this.buttonColor,
     this.action,
@@ -151,8 +151,7 @@ class MyButton extends StatelessWidget {
         assert(
           textString != null || child != null,
           'textString or child should be set\n',
-        ),
-        super(key: key);
+        );
 
   final double? height;
   final double? width;
@@ -213,11 +212,11 @@ class PatternContainer extends StatelessWidget {
   final double opacity;
   final EdgeInsets? padding;
   const PatternContainer({
-    Key? key,
     required this.child,
     this.opacity = 1.0,
     this.padding,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

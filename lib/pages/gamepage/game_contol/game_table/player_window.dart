@@ -2,13 +2,14 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pocket_chips/data/lobby.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/gamelogic.dart';
-import 'package:pocket_chips/internal/localization.dart';
-import 'package:pocket_chips/pages/playersPage.dart';
-import 'package:pocket_chips/ui/transitions.dart';
-import 'package:pocket_chips/ui/ui_widgets.dart';
+
+import '../../../../../data/lobby.dart';
+import '../../../../../data/uiValues.dart';
+import '../../../../../internal/gamelogic.dart';
+import '../../../../../internal/localization.dart';
+import '../../../../../pages/playersPage.dart';
+import '../../../../../ui/transitions.dart';
+import '../../../../../ui/ui_widgets.dart';
 
 class PlayerField extends StatelessWidget {
   const PlayerField({
@@ -37,7 +38,7 @@ class PlayerField extends StatelessWidget {
         buttonColor: (a == thisLobby.lobbyIndex)
             ? thisTheme.primaryColor
             : thisTheme.bankColor
-                .withOpacity(thisLobby.lobbyPlayers[a].isActive ? 1 : 0.5),
+                .withAlpha(thisLobby.lobbyPlayers[a].isActive ? 255 : 128),
         longAction: () async {
           await transitionDialog(
             duration: const Duration(milliseconds: 400),
@@ -98,8 +99,8 @@ List<Widget> reversablePlayerWidgetList(int index) {
                 thisLobby.lobbyPlayers[index].assetUrl,
               ),
               colorFilter: ColorFilter.mode(
-                Colors.white.withOpacity(
-                  thisLobby.lobbyPlayers[index].isActive ? 1 : 0.2,
+                Colors.white.withAlpha(
+                  thisLobby.lobbyPlayers[index].isActive ? 255 : 50,
                 ),
                 BlendMode.modulate,
               ),
@@ -119,8 +120,8 @@ List<Widget> reversablePlayerWidgetList(int index) {
                       'assets/chips/dealer.png',
                     ),
                     colorFilter: ColorFilter.mode(
-                      Colors.white.withOpacity(
-                        thisLobby.lobbyPlayers[index].isActive ? 1 : 0.2,
+                      Colors.white.withAlpha(
+                        thisLobby.lobbyPlayers[index].isActive ? 255 : 50,
                       ),
                       BlendMode.modulate,
                     ),
@@ -144,8 +145,8 @@ List<Widget> reversablePlayerWidgetList(int index) {
                 style: TextStyle(
                   color: (index == thisLobby.lobbyIndex)
                       ? thisTheme.onPrimary
-                      : thisTheme.onBackground.withOpacity(
-                          thisLobby.lobbyPlayers[index].isActive ? 1 : 0.2,
+                      : thisTheme.onBackground.withAlpha(
+                          thisLobby.lobbyPlayers[index].isActive ? 255 : 50,
                         ),
                   fontWeight: FontWeight.bold,
                   fontSize: stdFontSize,
@@ -161,8 +162,8 @@ List<Widget> reversablePlayerWidgetList(int index) {
                     fontSize: stdFontSize * 0.75,
                     color: (index == thisLobby.lobbyIndex)
                         ? thisTheme.onPrimary
-                        : thisTheme.onBackground.withOpacity(
-                            thisLobby.lobbyPlayers[index].isActive ? 1 : 0.2,
+                        : thisTheme.onBackground.withAlpha(
+                            thisLobby.lobbyPlayers[index].isActive ? 255 : 50,
                           ),
                   ),
                 ),
@@ -172,6 +173,6 @@ List<Widget> reversablePlayerWidgetList(int index) {
         ),
       ),
     ),
-    SizedBox(width: stdHorizontalOffset / 2)
+    SizedBox(width: stdHorizontalOffset / 2),
   ];
 }

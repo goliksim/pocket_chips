@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl_standalone.dart';
-import 'package:pocket_chips/data/config_model.dart';
+
+import '../data/config_model.dart';
+import '../l10n/app_localizations.dart';
 
 extension LocalizationExs on BuildContext {
-  AppLocalizations get locale => AppLocalizations.of(this);
+  AppLocalizations get locale => AppLocalizations.of(this)!;
 }
 
 class LocaleManager with ChangeNotifier {

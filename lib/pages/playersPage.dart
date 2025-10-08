@@ -3,15 +3,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:pocket_chips/data/logs.dart';
-import 'package:pocket_chips/internal/localization.dart';
 
-import '../ui/transitions.dart';
-import '../widgets/lobbySettings.dart';
-import '../ui/ui_widgets.dart';
+import '../data/lobby.dart';
+import '../data/logs.dart';
 import '../data/storage.dart';
 import '../data/uiValues.dart';
-import '../data/lobby.dart';
+import '../internal/localization.dart';
+import '../ui/transitions.dart';
+import '../ui/ui_widgets.dart';
+import '../widgets/lobbySettings.dart';
 import 'gamepage/gamePage.dart';
 
 /*
@@ -90,7 +90,7 @@ ScrollController scrollController = ScrollController();
 
 // Основной класс окна с игроками
 class PlayersPage extends StatefulWidget {
-  const PlayersPage({Key? key}) : super(key: key);
+  const PlayersPage({super.key});
 
   @override
   PlayersPageState createState() => PlayersPageState();
@@ -304,7 +304,7 @@ class PlayersPageState extends State<PlayersPage> {
                     aspectRatio: 1,
                     child: Icon(
                       MdiIcons.pokerChip,
-                      color: thisTheme.onPrimary.withOpacity(0),
+                      color: thisTheme.onPrimary.withAlpha(0),
                       size: stdIconSize,
                     ),
                   ),
@@ -322,7 +322,7 @@ class PlayersPageState extends State<PlayersPage> {
                       color: thisTheme.subsubmainColor,
                       size: stdIconSize,
                     ),
-                  )
+                  ),
                 ],
               )
             : Row(
@@ -411,12 +411,12 @@ class PlayersPageState extends State<PlayersPage> {
 
 class AttentionAdd extends StatefulWidget {
   const AttentionAdd({
-    Key? key,
+    super.key,
     this.duration = const Duration(seconds: 1),
     this.maxSize = 0.05,
     this.curve = Curves.easeInOut,
     required this.callBackFunction,
-  }) : super(key: key);
+  });
 
   final Duration duration;
   final double maxSize;
@@ -535,8 +535,7 @@ class AttentionAddState extends State<AttentionAdd>
 
 // Ячейка банка
 class BankWindow extends StatefulWidget {
-  const BankWindow({Key? key, required this.bank, required this.update})
-      : super(key: key);
+  const BankWindow({super.key, required this.bank, required this.update});
   final int bank;
   final void Function(int) update;
 
@@ -664,10 +663,10 @@ class _BankWindowState extends State<BankWindow> {
 // В дальнейшем думал сделать перемещение игроков местами но пока не получилось.
 class PlayerList extends StatefulWidget {
   const PlayerList({
-    Key? key,
+    super.key,
     required this.saved,
     required this.callbackFunction,
-  }) : super(key: key);
+  });
 
   final Function() callbackFunction;
   final bool saved;
@@ -756,7 +755,7 @@ class PlayerListState extends State<PlayerList> {
                                     ),
                                     SizedBox(
                                       height: stdHorizontalOffset / 2,
-                                    )
+                                    ),
                                   ],
                                 ),
                             ],
@@ -922,7 +921,7 @@ class PlayerListState extends State<PlayerList> {
             return false;
           } else {
             //_quickDelete(index);
-            return await showDialog(
+            return showDialog(
               context: context,
               builder: (BuildContext context) {
                 return ConfirmationWindow(
@@ -995,14 +994,13 @@ class AddWindow extends StatefulWidget {
   final bool settingsBool;
 
   const AddWindow({
-    Key? key,
+    super.key,
     this.player,
     required this.callBackFunction,
     this.settingsBool = false,
     this.isNew = false,
     this.playerIndex = 0,
-  }) //this.playerIndex = 0})
-  : super(key: key);
+  });
 
   //int tmpBank = 0 ;
   @override
@@ -1269,7 +1267,7 @@ class AddWindowState extends State<AddWindow> {
                               height: stdButtonHeight * 0.6,
                               child: Checkbox(
                                 checkColor: Colors.white,
-                                fillColor: MaterialStateProperty.all<Color>(
+                                fillColor: WidgetStateProperty.all<Color>(
                                   dealerBool
                                       ? thisTheme.primaryColor
                                       : thisTheme.hintColor,
@@ -1282,7 +1280,7 @@ class AddWindowState extends State<AddWindow> {
                                 },
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     MyButton(
@@ -1401,13 +1399,14 @@ class AddWindowState extends State<AddWindow> {
                             widget.callBackFunction();
                           } else {
                             showToast(
-                                LocaleManager.locale.toast_incorrect_player);
+                              LocaleManager.locale.toast_incorrect_player,
+                            );
                           }
                         } else {
                           showToast(LocaleManager.locale.toast_alred2);
                         }
                       },
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -1420,11 +1419,11 @@ class AddWindowState extends State<AddWindow> {
 // Окно с выбором аватарки. Принимает функцию смены аватарки в окне добавления.
 class PickIcon extends StatefulWidget {
   const PickIcon({
-    Key? key,
     required this.changeLogo,
     required this.settingsBool,
     required this.isNew,
-  }) : super(key: key);
+    super.key,
+  });
   final void Function(String) changeLogo;
 
   final bool settingsBool;
@@ -1633,7 +1632,7 @@ Widget playerCard(
                           ],
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

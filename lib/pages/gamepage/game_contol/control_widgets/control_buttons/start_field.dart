@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pocket_chips/data/lobby.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/gamelogic.dart';
-import 'package:pocket_chips/internal/localization.dart';
-import 'package:pocket_chips/ui/transitions.dart';
-import 'package:pocket_chips/ui/ui_widgets.dart';
-import 'package:pocket_chips/widgets/lobbySettings.dart';
+
+import '../../../../../data/lobby.dart';
+import '../../../../../data/uiValues.dart';
+import '../../../../../internal/gamelogic.dart';
+import '../../../../../internal/localization.dart';
+import '../../../../../ui/transitions.dart';
+import '../../../../../ui/ui_widgets.dart';
+import '../../../../../widgets/lobbySettings.dart';
 
 class StartGameField extends StatelessWidget {
   const StartGameField({super.key, required this.callback});
@@ -55,11 +56,10 @@ class StartGameField extends StatelessWidget {
             height: stdButtonHeight,
             width: double.infinity,
             buttonColor:
-                thisTheme.primaryColor.withOpacity(thisGame.canPlay ? 1 : 0.3),
+                thisTheme.primaryColor.withAlpha(thisGame.canPlay ? 255 : 75),
             textStyle: stdTextStyle.copyWith(
               fontSize: stdFontSize,
-              color:
-                  thisTheme.onPrimary.withOpacity(thisGame.canPlay ? 1 : 0.3),
+              color: thisTheme.onPrimary.withAlpha(thisGame.canPlay ? 255 : 75),
             ),
             textString: context.locale.game_start,
             action: () {

@@ -1,14 +1,15 @@
 //ОСНОВНАЯ ИГРОВАЯ ЛОГИКА
-import 'dart:math';
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/logs.dart';
-import 'package:pocket_chips/pages/gamepage/winner_page.dart';
+import 'dart:math';
 
-import '../data/storage.dart';
+import 'package:flutter/material.dart';
+
 import '../data/lobby.dart';
-import '../ui/transitions.dart';
+import '../data/logs.dart';
+import '../data/storage.dart';
 import '../data/uiValues.dart';
+import '../pages/gamepage/winner_page.dart';
+import '../ui/transitions.dart';
 import '../ui/ui_widgets.dart';
 import 'localization.dart';
 
@@ -22,7 +23,7 @@ class Game {
     LocaleManager.locale.game_turn,
     LocaleManager.locale.game_river,
     LocaleManager.locale.game_shdw,
-    LocaleManager.locale.game_break
+    LocaleManager.locale.game_break,
   ];
   Text gameStateName = Text(
     LocaleManager.locale.game_welc,
@@ -39,7 +40,7 @@ class Game {
   //bool raiseButtonPressed = false;
 
   Function() callback = () {};
-  BuildContext? context;
+  late BuildContext context;
 
   bool get canPlay =>
       thisLobby.lobbyPlayers.where((e) => e.isActive == true).length > 1;
@@ -368,8 +369,8 @@ class Game {
         type: 'Scale1',
         //barrierColor: null,
         context: context,
-        child: WillPopScope(
-          onWillPop: () async => false,
+        child: PopScope(
+          canPop: false,
           child: WinnerChooseWindow(thisLobby: thisLobby),
         ),
         builder: (BuildContext context) {

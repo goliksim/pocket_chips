@@ -1,11 +1,12 @@
 import 'card_model.dart';
+
 part 'combination_gpt.dart';
 
 // Функция для определения комбинации карт на столе
 Combination detectCombination(List<Card> playerCards, List<Card> table) {
   List<Card> allCards = [
     ...playerCards,
-    ...table
+    ...table,
   ]; // Сначала объединяем карты игрока и карты на столе
   allCards.sort(
     (b, a) => a.key.compareTo(b.key),

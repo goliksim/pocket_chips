@@ -1,9 +1,10 @@
 // Тут храняться классы для записи-чтения данных из/в системные данные
 
-import 'dart:developer';
-import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
 
 import 'lobby.dart';
 
@@ -32,7 +33,7 @@ class Logs {
     String finalDateString = '${[date.year, date.month, date.day].join('/')} ${[
       date.hour,
       date.minute,
-      date.second
+      date.second,
     ].join(':')}.${date.millisecond}\t';
     file.writeAsStringSync(
       '$finalDateString$text\n',
@@ -56,7 +57,7 @@ class SavedPlayerStorage {
           .map((i) => Player.fromJson(i))
           .toList();
       logs.writeLog('\n\tSAVED PLAYERS LOADED:\n [${[
-        for (var x in content) x.show()
+        for (var x in content) x.show(),
       ].join('\t')}]');
       return content;
     } catch (e) {

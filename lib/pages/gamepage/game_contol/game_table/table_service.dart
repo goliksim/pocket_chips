@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:pocket_chips/data/lobby.dart';
+import '../../../../../data/lobby.dart';
 
-double getCos(a, addButton) {
+double getCos(int a, int addButton) {
   double offset =
       thisLobby.lobbyRandomOffset[a] / thisLobby.lobbyPlayers.length;
   return cos(2 * pi * (a / (thisLobby.lobbyPlayers.length + addButton))) *
@@ -14,7 +14,7 @@ double getCos(a, addButton) {
       );
 }
 
-double getSin(a, addButton, {multiply = 0}) {
+double getSin(int a, int addButton, {double multiply = 0}) {
   double offset =
       0; // thisLobby.lobbyRandomOffset[a]/thisLobby.lobbyPlayers.length*2;
   return sin(

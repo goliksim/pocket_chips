@@ -1,24 +1,24 @@
 // ignore_for_file: file_names
-import 'dart:math';
 import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pocket_chips/data/logs.dart';
-import 'package:pocket_chips/internal/localization.dart';
-import 'package:pocket_chips/pages/gamepage/game_contol/game_table/game_table.dart';
 
-import '../../internal/gamelogic.dart';
-import '../../ui/ui_widgets.dart';
-import '../../data/storage.dart';
 import '../../data/lobby.dart';
-import '../../ui/transitions.dart';
-import '../playersPage.dart';
+import '../../data/logs.dart';
+import '../../data/storage.dart';
 import '../../data/uiValues.dart';
+import '../../internal/gamelogic.dart';
+import '../../internal/localization.dart';
+import '../../pages/gamepage/game_contol/game_table/game_table.dart';
+import '../../ui/transitions.dart';
+import '../../ui/ui_widgets.dart';
+import '../playersPage.dart';
 import 'game_contol/game_control.dart';
 
 class GamePage extends StatefulWidget {
-  const GamePage({Key? key})
-      : super(key: key); // принимает значение title при обращении
+  const GamePage({super.key}); // принимает значение title при обращении
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -184,7 +184,10 @@ class _GamePageState extends State<GamePage> {
 
 // Кпопка добавления игрока
 class AddBottom extends StatefulWidget {
-  const AddBottom({Key? key, required this.callBackFunction}) : super(key: key);
+  const AddBottom({
+    required this.callBackFunction,
+    super.key,
+  });
 
   final Function() callBackFunction;
   @override

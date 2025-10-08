@@ -1,24 +1,25 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mailer/flutter_mailer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:onboarding/onboarding.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:pocket_chips/data/config_model.dart';
-import 'package:pocket_chips/data/lobby.dart';
-import 'package:pocket_chips/data/storage.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/application.dart';
-import 'package:pocket_chips/internal/localization.dart';
-import 'package:pocket_chips/pages/playersPage.dart';
-import 'package:pocket_chips/ui/transitions.dart';
-import 'package:pocket_chips/ui/ui_widgets.dart';
-import 'package:pocket_chips/widgets/onboading/dialogs/update.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../../data/config_model.dart';
+import '../../../../../data/lobby.dart';
+import '../../../../../data/storage.dart';
+import '../../../../../data/uiValues.dart';
+import '../../../../../internal/application.dart';
+import '../../../../../internal/localization.dart';
+import '../../../../../pages/playersPage.dart';
+import '../../../../../ui/transitions.dart';
+import '../../../../../ui/ui_widgets.dart';
+import '../../../../../widgets/onboading/dialogs/update.dart';
 import '../onboarding.dart';
 
 Future showHelp(BuildContext context, callBack, {onWillpop = false}) async {
@@ -48,11 +49,11 @@ Future showHelp(BuildContext context, callBack, {onWillpop = false}) async {
 
 class AboutDialog extends StatefulWidget {
   const AboutDialog({
-    Key? key,
+    super.key,
     required this.callbackFunction,
     required this.packageInfo,
     required this.isFirst,
-  }) : super(key: key);
+  });
 
   final Function() callbackFunction;
   final PackageInfo packageInfo;
@@ -192,7 +193,7 @@ class _AboutDialogState extends State<AboutDialog> {
                       configStorage.write(thisConfig);
                       widget.callbackFunction();
                     },
-                  )
+                  ),
                 ],
               ),
               SizedBox(height: stdHorizontalOffset),
@@ -239,7 +240,7 @@ class _AboutDialogState extends State<AboutDialog> {
                         //setState({});
                       },
                     ),
-                  )
+                  ),
                 ],
               ),
               SizedBox(height: stdHorizontalOffset / 2),
@@ -423,7 +424,7 @@ class _AboutDialogState extends State<AboutDialog> {
                       size: stdIconSize,
                       color: thisTheme.onBackground,
                     ),
-                  )
+                  ),
                 ],
               ),
               Text(
@@ -467,7 +468,7 @@ class _AboutDialogState extends State<AboutDialog> {
                       size: stdIconSize,
                       color: thisTheme.onBackground,
                     ),
-                  )
+                  ),
                 ],
               ),
               Text(
@@ -512,7 +513,7 @@ class _AboutDialogState extends State<AboutDialog> {
                                   50,
                                   100,
                                   500,
-                                  1000
+                                  1000,
                                 ])
                                   Container(
                                     width: stdButtonHeight * 0.6,
@@ -668,7 +669,7 @@ class _AboutDialogState extends State<AboutDialog> {
                         size: stdIconSize,
                         color: thisTheme.primaryColor,
                       ),
-                    )
+                    ),
                   ],
                 ),
                 action: () async {
@@ -751,7 +752,7 @@ class _AboutDialogState extends State<AboutDialog> {
               SizedBox(
                 width: double.infinity,
                 child: Text(
-                  '© 2024 GOLIKSIM (Alexander Golev)',
+                  '© 2025 GOLIKSIM (Alexander Golev)',
                   style: TextStyle(
                     height: 1.5,
                     color: thisTheme.onBackground,

@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../data/uiValues.dart';
 
 Future<Object?> transitionDialog({
-  required context,
+  required BuildContext context,
   bool barrierDismissible = true,
   required Widget child,
   required WidgetBuilder builder,
@@ -334,7 +334,7 @@ Route simpleThemePageRoute(Widget child) {
             colors: const [
               Colors.white,
               Colors.transparent,
-              Colors.transparent
+              Colors.transparent,
             ],
             stops: const [0.4, 0.45, 1],
             center: const FractionalOffset(1, 0),

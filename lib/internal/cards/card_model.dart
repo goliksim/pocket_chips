@@ -33,28 +33,28 @@ Map<int, String> cardTextReversed = {
   11: 'J',
   12: 'Q',
   13: 'K',
-  14: 'A'
+  14: 'A',
 };
 
 Map<String, IconData> cardsIconMap = {
   'c': MdiIcons.cardsClub,
   's': MdiIcons.cardsSpade,
   'h': MdiIcons.cardsHeart,
-  'd': MdiIcons.cardsDiamond
+  'd': MdiIcons.cardsDiamond,
 };
 
 Map<String, CardSuit> mapSuit = {
   's': CardSuit.s,
   'c': CardSuit.c,
   'd': CardSuit.d,
-  'h': CardSuit.h
+  'h': CardSuit.h,
 };
 
 Map<CardSuit, String> mapSuitReversed = {
   CardSuit.s: '♠',
   CardSuit.c: '♣',
   CardSuit.d: '♦',
-  CardSuit.h: '♥'
+  CardSuit.h: '♥',
 };
 
 class Card {

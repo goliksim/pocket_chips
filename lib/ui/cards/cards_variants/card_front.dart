@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/cards/card_model.dart' as c;
+
+import '../../../../../data/uiValues.dart';
+import '../../../../../internal/cards/card_model.dart' as c;
 import '../card_widget.dart';
 
 class CardFront extends StatelessWidget {

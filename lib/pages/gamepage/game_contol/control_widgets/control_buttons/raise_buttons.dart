@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/lobby.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/gamelogic.dart';
-import 'package:pocket_chips/internal/localization.dart';
 
+import '../../../../../data/lobby.dart';
+import '../../../../../data/uiValues.dart';
+import '../../../../../internal/gamelogic.dart';
+import '../../../../../internal/localization.dart';
 import 'control_buttons.dart';
 
 class RaiseButtons extends StatefulWidget {

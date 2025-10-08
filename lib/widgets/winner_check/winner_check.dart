@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/localization.dart';
-import 'package:pocket_chips/ui/dialog_widget.dart';
-import 'package:pocket_chips/ui/transitions.dart';
 
+import '../../../../../data/uiValues.dart';
+import '../../../../../internal/localization.dart';
+import '../../../../../ui/dialog_widget.dart';
+import '../../../../../ui/transitions.dart';
 import 'check_inherited.dart';
 import 'check_player.dart';
 import 'check_table.dart';
@@ -81,7 +81,7 @@ class _WinnerCheckerState extends State<WinnerChecker> {
                     winner: context.winner == playerIndex,
                     combination: context.combinations[playerIndex]?.hand,
                   ),
-                )
+                ),
             ],
           ),
           SizedBox(

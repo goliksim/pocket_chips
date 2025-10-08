@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/lobby.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/gamelogic.dart';
+
+import '../../../data/lobby.dart';
+import '../../../data/uiValues.dart';
+import '../../../internal/gamelogic.dart';
 import 'control_widgets/control_buttons/control_buttons.dart';
 import 'control_widgets/control_buttons/raise_buttons.dart';
 import 'control_widgets/control_buttons/start_field.dart';
@@ -33,7 +34,7 @@ class _GameControlState extends State<GameControl> {
     });
   }
 
-  void changeRaiseBool(value) {
+  void changeRaiseBool(bool value) {
     setState(() {
       raiseButtonPressed = value;
       if (!value) reset();
@@ -101,7 +102,7 @@ class _GameControlState extends State<GameControl> {
                   ))
             : StartGameField(
                 callback: widget.callback,
-              )
+              ),
       ],
     );
   }

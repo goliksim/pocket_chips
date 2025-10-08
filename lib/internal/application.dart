@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../pages/initPage.dart' as initpage;
 import '../data/uiValues.dart';
-import 'localization.dart';
+import '../internal/localization.dart';
+import '../l10n/app_localizations.dart';
+import '../pages/initPage.dart' as initpage;
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key, required this.localeManager}) : super(key: key);
+  const MyApp({
+    required this.localeManager,
+    super.key,
+  });
   final LocaleManager localeManager;
 
   @override

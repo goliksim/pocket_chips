@@ -1,17 +1,18 @@
 // Static Raise Window
 import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/lobby.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/gamelogic.dart';
+
+import '../../../../data/lobby.dart';
+import '../../../../data/uiValues.dart';
+import '../../../../internal/gamelogic.dart';
 
 class StaticRaiseButton extends StatefulWidget {
   const StaticRaiseButton({
-    Key? key,
     required this.newPlayer,
     required this.changeBid,
     required this.tmpBid,
     required this.minBid,
-  }) : super(key: key);
+    super.key,
+  });
   final Function newPlayer;
   final Function changeBid;
   final int tmpBid;

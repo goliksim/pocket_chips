@@ -4,8 +4,10 @@
 
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'config_model.dart';
 import 'lobby.dart';
 import 'logs.dart';
@@ -41,7 +43,7 @@ class SavedPlayerStorage extends Storage<List<Player>> {
       final content =
           (jsonDecode(text!) as List).map((i) => Player.fromJson(i)).toList();
       logs.writeLog('\n\tSAVED PLAYERS LOADED:\n [${[
-        for (var x in content) x.show()
+        for (var x in content) x.show(),
       ].join('\t')}]');
 
       return content;
@@ -65,7 +67,7 @@ class SavedPlayerStorage extends Storage<List<Player>> {
           .map((i) => Player.fromJson(i))
           .toList();
       logs.writeLog('\n\tSAVED PLAYERS LOADED:\n [${[
-        for (var x in content) x.show()
+        for (var x in content) x.show(),
       ].join('\t')}]');
       return content;
     } catch (e) {

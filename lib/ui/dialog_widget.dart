@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/ui/ui_widgets.dart';
+
+import '../../../../../data/uiValues.dart';
+import '../../../../../ui/ui_widgets.dart';
 
 class DialogWidget extends StatelessWidget {
   const DialogWidget({super.key, required this.child, this.edgeOffset});

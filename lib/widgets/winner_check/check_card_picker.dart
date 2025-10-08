@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:pocket_chips/data/uiValues.dart';
-import 'package:pocket_chips/internal/cards/card_model.dart' as c;
 
-import 'package:pocket_chips/internal/localization.dart';
+import '../../../../../data/uiValues.dart';
+import '../../../../../internal/cards/card_model.dart' as c;
+import '../../../../../internal/localization.dart';
 
 class CardPicker extends StatefulWidget {
   const CardPicker({
-    Key? key,
     required this.action,
-  }) : super(key: key);
+    super.key,
+  });
   final Function(c.Card?) action;
 
   @override

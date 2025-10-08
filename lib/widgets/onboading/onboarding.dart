@@ -1,12 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:onboarding/onboarding.dart';
-import 'package:pocket_chips/data/config_model.dart';
-import 'package:pocket_chips/internal/localization.dart';
-import 'package:pocket_chips/ui/dialog_widget.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
+import '../../../../../data/config_model.dart';
+import '../../../../../internal/localization.dart';
+import '../../../../../ui/dialog_widget.dart';
 //import 'package:in_app_review/in_app_review.dart';
 
 import '../../data/storage.dart';
@@ -15,11 +16,11 @@ import '../../ui/ui_widgets.dart';
 
 class OnboardingDialog extends StatefulWidget {
   const OnboardingDialog({
-    Key? key,
+    super.key,
     this.callbackFunction,
     required this.packageInfo,
     required this.pages,
-  }) : super(key: key);
+  });
 
   final List<PageModel> pages;
   final Function()? callbackFunction;
@@ -125,7 +126,7 @@ class _OnboardingDialogState extends State<OnboardingDialog> {
                             setIndex: setIndex,
                             finalIndex: pagesLength - 1,
                           ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -192,7 +193,7 @@ class OnboardingPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: children,
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

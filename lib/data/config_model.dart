@@ -31,7 +31,7 @@ class Config {
         'theme': themeIndex,
         'first': firstTime,
         'locale': locale,
-        'ver': version
+        'ver': version,
       };
   //читаем из json
   Config.fromJson(Map<String, dynamic> json)
