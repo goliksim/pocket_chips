@@ -3,8 +3,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:pocket_chips/internal/cards/card_model.dart';
-import 'package:pocket_chips/internal/cards/winner_gpt.dart';
+import 'package:pocket_chips/domain/models/cards/card_model.dart';
+import 'package:pocket_chips/domain/winner_solver.dart';
 
 Future<Map<String, dynamic>?> readJsonFromFile(String filePath) async {
   try {

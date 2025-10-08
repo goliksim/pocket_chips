@@ -4,12 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'; // подключаем библиотеку material
 import 'package:flutter/services.dart';
 
-import 'data/config_model.dart';
-import 'data/logs.dart';
-import 'data/storage.dart';
-import 'data/uiValues.dart';
-import 'internal/application.dart' as app;
-import 'internal/localization.dart';
+import 'app/application.dart' as app;
+import 'data/storage/storage.dart';
+import 'domain/models/config_model.dart';
+import 'l10n/localization.dart';
+import 'utils/logs.dart';
+import 'utils/theme/uiValues.dart';
 
 //TODO Work with ignore
 
