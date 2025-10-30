@@ -1,34 +1,101 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
-import '../../../../domain/models/lobby.dart';
-import '../../../../utils/theme/uiValues.dart';
-import '../../game_page.dart';
+import '../../../../domain/models/lobby/lobby_state_model.dart';
+import '../../../../utils/theme/ui_values.dart';
+import '../../view_model/game_page_view_model.dart';
+import '../add_player_button.dart';
+import 'cards/table_cards.dart';
 import 'player_field.dart';
-import 'table_cards.dart';
-import 'table_service.dart';
 
 class GameTable extends StatelessWidget {
-  const GameTable({super.key, required this.callBack});
-  final Function() callBack;
+  final GamePageViewModel viewModel;
+
+  const GameTable({
+    required this.viewModel,
+    super.key,
+  });
+
+  double _playerLeftOffset(
+    double tableButtonWidth,
+    int index,
+    int totalAmount,
+  ) =>
+      adaptiveOffset +
+      tableButtonWidth / 3 -
+      (stdButtonHeight * 1.75 * _getSin(index, totalAmount, multiply: -0.5));
+
+  double _playerBottomOffset(
+    int index,
+    int totalAmount,
+    double tableHeight,
+  ) =>
+      tableHeight / 3.3 - 3.2 * stdButtonHeight * _getCos(index, totalAmount);
+
+  double _chipBottomOffset(
+    int index,
+    int totalAmount,
+  ) =>
+      -3.18 * stdButtonHeight * _getCos(index, totalAmount) +
+      3.55 * stdButtonHeight -
+      (_getCos(index, totalAmount) > 0.01
+          ? -stdButtonHeight * 0.5
+          : stdButtonHeight * 0.5);
+
+  double _chipsLeftOffset(
+    double tableButtonWidth,
+    int a,
+    int addButton,
+  ) =>
+      adaptiveOffset +
+      (tableButtonWidth) / 2.9 -
+      (stdButtonHeight * 1.3 * _getSin(a, addButton, multiply: -1));
+
+  double _getCos(int index, int totalAmount) {
+    double randomOffset =
+        0; //thisLobby.lobbyRandomOffset[index] / thisLobby.lobbyPlayers.length;
+    return cos(2 * pi * (index / totalAmount)) *
+        pow((cos(2 * pi * (index / totalAmount) + randomOffset)).abs(), 0.3);
+  }
+
+  double _getSin(int index, int totalAmount, {double multiply = 0}) {
+    double randomOffset =
+        0; // thisLobby.lobbyRandomOffset[a]/thisLobby.lobbyPlayers.length*2;
+    return sin(2 * pi * (index / totalAmount) + randomOffset) *
+        pow(
+          sin(2 * pi * (index / totalAmount) + 0.01 + randomOffset).abs(),
+          multiply,
+        );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final viewState = viewModel.viewState;
+    final tableState = viewState.tableState;
+    final players = tableState.players;
+
+    bool showAddButton = (players.length >= maxPlayerCount ? false : true);
+    final playersOffset = showAddButton ? 1 : 0;
+    final totalElementCount = players.length + playersOffset;
+
+    final totalBets =
+        players.map((e) => e.bet).whereType<int>().reduce((a, b) => a + b);
+
     double tableButtonWidth =
         MediaQuery.of(context).size.width - adaptiveOffset;
     double tableHeight = MediaQuery.of(context).size.height;
-    int addButton = (thisLobby.lobbyPlayers.length >= maxPlayerCount ? 0 : 1);
+
     return Stack(
       fit: StackFit.expand,
       alignment: Alignment.center,
       children: [
         //Table
         Container(
-          //duration: Duration(milliseconds: 500),
           margin: EdgeInsets.only(
             top: stdButtonHeight / 3,
             bottom: stdButtonHeight / 3,
           ),
-          //height: 550,
           decoration: BoxDecoration(
             image: DecorationImage(
               filterQuality: FilterQuality.high,
@@ -48,23 +115,21 @@ class GameTable extends StatelessWidget {
         // 3 карты по середине
         Positioned(
           bottom: 3.8 * stdButtonHeight,
-          child: TableCards(
-            state: thisLobby.lobbyState,
-            count: 0,
+          child: TableCards.firstRow(
+            stateEnum: viewState.gameStatus,
           ),
         ),
         // 2 карты по середине
         Positioned(
           bottom: 3 * stdButtonHeight,
-          child: TableCards(
-            state: thisLobby.lobbyState,
-            count: 1,
+          child: TableCards.secondRow(
+            stateEnum: viewState.gameStatus,
           ),
         ),
         Positioned(
           bottom: 2.5 * stdButtonHeight,
           child: Text(
-            '${thisLobby.lobbySmallBlind} / ${thisLobby.lobbySmallBlind * 2}',
+            '${tableState.smallBlindValue} / ${tableState.smallBlindValue * 2}',
             style: TextStyle(
               color: thisTheme.onBackground.withAlpha(75),
               fontSize: stdFontSize * 0.6,
@@ -88,7 +153,7 @@ class GameTable extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  '\$ ${thisLobby.lobbyPlayers.map((e) => e.bid).reduce((a, b) => a + b)}',
+                  '\$ $totalBets',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: stdFontSize * 0.75,
@@ -99,51 +164,72 @@ class GameTable extends StatelessWidget {
           ),
         ),
         // Карточки игроков
+        for (int index = 0; index < totalElementCount; index++)
 
-        for (int player = 0;
-            player < thisLobby.lobbyPlayers.length + addButton;
-            player++)
-          Positioned(
-            bottom: playerBottomOffset(player, addButton, tableHeight),
-            left: playerLeftOffset(tableButtonWidth, player, addButton),
-            child: ((player == 0) && (addButton > 0))
-                ? AddBottom(
-                    callBackFunction: callBack,
-                  )
-                : PlayerField(
-                    a: (player - addButton - thisLobby.elementsOffset) %
-                        thisLobby.lobbyPlayers.length,
-                    index: player - addButton,
-                    addButton: addButton,
-                    callBack: callBack,
-                  ), // playerCard(a - addButton) - без крутежки игроков
-          ),
-        // Ставки игроков
-        for (int a = addButton;
-            a < thisLobby.lobbyPlayers.length + addButton;
-            a++)
-          Positioned(
-            bottom: chipBottomOffset(a, addButton),
-            left: chipsLeftOffset(tableButtonWidth, a, addButton),
-            child: (thisLobby
-                        .lobbyPlayers[
-                            (a - addButton - thisLobby.elementsOffset) %
-                                thisLobby.lobbyPlayers.length]
-                        .bid !=
-                    0)
-                ? chip(
-                    (a - addButton - thisLobby.elementsOffset) %
-                        thisLobby.lobbyPlayers.length,
-                  ) //chip((a - addButton) - без крутежки игроков
-                : const SizedBox(),
-          ),
+          // Ставки игроков
+          ...List.generate(totalElementCount, (index) => index)
+              .expand((int playerIndex) {
+            final player = players[
+                (index - playersOffset - tableState.tableRotationOffset) %
+                    players.length];
+
+            return [
+              Positioned(
+                bottom: _playerBottomOffset(
+                  index,
+                  totalElementCount,
+                  tableHeight,
+                ),
+                left: _playerLeftOffset(
+                  tableButtonWidth,
+                  index,
+                  totalElementCount,
+                ),
+                child: ((index == 0) && showAddButton)
+                    ? AddPlayerButton(
+                        canEditPlayers: viewModel.viewState.canEditPlayer,
+                        addPlayerCallback: () =>
+                            viewModel.openPlayerEditor(null),
+                        openPlayersListCallback: () =>
+                            viewModel.showSavedPlayers(),
+                      )
+                    : PlayerField(
+                        player: player,
+                        shouldReverse: sin(
+                              2 *
+                                  pi *
+                                  (index / (players.length - playersOffset)),
+                            ) <
+                            0,
+                      ),
+              ),
+              if ((player.bet != null && player.bet != 0) &&
+                  (!showAddButton || index != 0))
+                Positioned(
+                  bottom: _chipBottomOffset(index, totalElementCount),
+                  left: _chipsLeftOffset(
+                      tableButtonWidth, index, totalElementCount),
+                  child: _BetWidget(
+                    bet: player.bet!,
+                  ),
+                ),
+            ];
+          })
       ],
     );
   }
 }
 
-// Ставочки игроков
-Widget chip(int a) => FittedBox(
+class _BetWidget extends StatelessWidget {
+  final int bet;
+
+  const _BetWidget({
+    required this.bet,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FittedBox(
       child: Container(
         width: stdHeight * 2,
         alignment: Alignment.center,
@@ -155,7 +241,7 @@ Widget chip(int a) => FittedBox(
             borderRadius: BorderRadius.circular(stdBorderRadius),
           ),
           child: Text(
-            '\$ ${thisLobby.lobbyPlayers[a].bid}',
+            '\$ $bet',
             style: TextStyle(
               color: thisTheme.onBackground.withAlpha(150),
               fontSize: stdFontSize * 0.75,
@@ -164,30 +250,5 @@ Widget chip(int a) => FittedBox(
         ),
       ),
     );
-
-double playerLeftOffset(double tableButtonWidth, int a, int addButton) =>
-    adaptiveOffset +
-    tableButtonWidth / 3 -
-    (stdButtonHeight * 1.75 * getSin(a, addButton, multiply: -0.5));
-
-double playerBottomOffset(int a, int addButton, double tableHeight) =>
-    tableHeight / 3.3 - 3.2 * stdButtonHeight * getCos(a, addButton);
-//3.4 * stdButtonHeight - 3.2 * stdButtonHeight * getCos(a, addButton);
-
-double chipBottomOffset(int a, int addButton) =>
-    -3.18 * stdButtonHeight * getCos(a, addButton) +
-    3.55 * stdButtonHeight -
-    (getCos(a, addButton) > 0.01
-        ? -stdButtonHeight * 0.5
-        : stdButtonHeight * 0.5);
-
-double chipsLeftOffset(double tableButtonWidth, int a, int addButton) =>
-    adaptiveOffset +
-    (tableButtonWidth) / 2.9 -
-    (stdButtonHeight *
-        1.3 *
-        getSin(
-          a,
-          addButton,
-          multiply: -1,
-        ));
+  }
+}

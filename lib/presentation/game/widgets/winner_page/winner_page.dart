@@ -1,0 +1,111 @@
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+
+import '../../../../domain/models/player/player_model.dart';
+import '../../../../utils/extensions.dart';
+import '../../../../utils/theme/ui_values.dart';
+
+class WinnerWindow extends StatefulWidget {
+  final PlayerModel winner;
+
+  const WinnerWindow({
+    required this.winner,
+    super.key,
+  });
+
+  @override
+  State<WinnerWindow> createState() => _WinnerWindowState();
+}
+
+class _WinnerWindowState extends State<WinnerWindow> {
+  String bgrText = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    for (int i = 0; i < 100; i++) {
+      bgrText += '${context.strings.game_win1}\u00A0';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      elevation: 0,
+      backgroundColor: thisTheme.bgrColor,
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: [
+          (MediaQuery.of(context).size.width - stdButtonHeight * 4) / 2,
+          adaptiveOffset,
+        ].reduce(max),
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
+      ),
+      child: SizedBox(
+        height: stdButtonHeight * 4,
+        width: 0,
+        child: ClipRRect(
+          borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
+          child: Stack(
+            alignment: Alignment.topCenter,
+            children: [
+              Container(
+                padding: EdgeInsets.only(left: stdHorizontalOffset / 4),
+                height: stdButtonHeight * 3,
+                width: stdButtonHeight * 4,
+                child: Text(
+                  bgrText,
+                  overflow: TextOverflow.fade,
+                  maxLines: 20,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Ubuntu',
+                    color: thisTheme.bankColor.withAlpha(128),
+                    fontWeight: FontWeight.w700,
+                    fontSize: stdFontSize * 2,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: stdButtonHeight / 8,
+                child: Container(
+                  height: stdButtonHeight * 3,
+                  width: stdButtonHeight * 3,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      filterQuality: FilterQuality.high,
+                      image: AssetImage(
+                        widget.winner.assetUrl,
+                      ),
+                      fit: BoxFit.fitHeight,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                child: Container(
+                  height: stdButtonHeight,
+                  width: stdButtonHeight * 4,
+                  alignment: Alignment.center,
+                  child: Text(
+                    '${widget.winner.name} ${context.strings.game_win2}',
+                    style: TextStyle(
+                      color: thisTheme.primaryColor,
+                      fontSize: stdFontSize,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

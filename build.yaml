@@ -1,0 +1,27 @@
+targets:
+  $default:
+    builders:
+      freezed|freezed:
+        generate_for:
+          - lib/**/model/**
+          - lib/**/models/**
+          - lib/**/model_holder/**
+          - lib/**/entities/**
+          - lib/features/**/models/**
+          - lib/**/view_state/**
+        options:
+          make_collections_unmodifiable: false
+      json_serializable|json_serializable:
+        options:
+          explicit_to_json: true
+          any_map: true  
+        generate_for:
+          include:
+            - lib/**/dtos/**
+            - lib/**/models/**
+            - lib/**/entities/**
+            - lib/**/view_state/**
+      source_gen:combining_builder:
+        generate_for:
+          include:
+            - lib/**

@@ -1,280 +1,167 @@
 // ignore_for_file: file_names
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
-import '../../data/storage/storage.dart';
-import '../../domain/models/config_model.dart';
-import '../../domain/models/lobby.dart';
-import '../../l10n/localization.dart';
-import '../../utils/logs.dart';
-import '../../utils/theme/uiValues.dart';
-import '../common/transitions.dart';
+import '../../utils/extensions.dart';
+import '../../utils/theme/ui_values.dart';
+import '../common/widgets/chips_image.dart';
 import '../common/widgets/ui_widgets.dart';
-import '../lobby/lobby_page.dart' as players;
-import '../onboading/dialogs/about.dart';
-import '../onboading/dialogs/update.dart';
-import '../winner_check/winner_check.dart';
+import 'home_page_view_model.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage(
-      {super.key,
-      required this.isDark}); // принимает значение title при обращении
+class HomePage extends StatelessWidget {
+  final HomePageViewModel viewModel;
 
-  final bool isDark;
+  const HomePage({
+    required this.viewModel,
+    super.key,
+  });
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  String title = 'POCKET CHIPS';
-
-  Future<void> newGame(BuildContext context) async {
-    thisLobby = Lobby(
-      lobbyPlayers: [],
-    );
-    logs.writeLog('Switch to PlayerPage(NewGame)');
-    Navigator.push(context, simpleSlidePageRoute(const players.LobbyPage()))
-        .then((_) {
-      logs.writeLog('Returned to HomePage');
-      setState(() {});
-    });
-  }
+  final String title = 'POCKET CHIPS';
 
   @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: viewModel,
+        builder: (_, __) {
+          final shouldDrawContinure =
+              viewModel.hasActiveLobby || viewModel.isLoading;
 
-    Future.delayed(const Duration(milliseconds: 800), () async {
-      final currentVersion = await thisConfig.getVersion();
-      if (thisConfig.firstTime) {
-        firstTime();
-        thisConfig.version = currentVersion;
-        configStorage.write(thisConfig);
-        //TODO NULL VARIABLE
-      } else if (thisConfig.version.compareTo(currentVersion) < 0) {
-        updateInfo();
-        thisConfig.version = currentVersion;
-        configStorage.write(thisConfig);
-      }
-    });
-  }
-
-  void firstTime() async {
-    showHelp(context, callBack, onWillpop: false);
-  }
-
-  void updateInfo() async {
-    //showToast('updateInfo');
-    showUpdate(context);
-  }
-
-  void callBack() {
-    // print('homepage callback');
-    setState(() {});
-  }
-
-  Widget homePageButtons(BuildContext context) => SizedBox(
-        height: stdButtonHeight * 2 +
-            stdHorizontalOffset * 2 +
-            ((thisLobby.lobbyPlayers.isNotEmpty) ? (stdButtonHeight) : 0),
-        child: Column(
-          children: [
-            if ((thisLobby.lobbyPlayers.isNotEmpty))
-              //Continue
-              MyButton(
-                height: stdButtonHeight,
-                width: double.infinity,
-                borderRadius: BorderRadius.circular(stdBorderRadius),
-                buttonColor: thisTheme.primaryColor,
-                textString: context.locale.home_cont,
-                action: () {
-                  logs.writeLog('Switch to PlayerPage(Continue)');
-                  Navigator.push(
-                    context,
-                    simpleSlidePageRoute(const players.LobbyPage()),
-                  ).then((_) {
-                    logs.writeLog('Returned to HomePage');
-                    setState(() {});
-                  }); //SlidePageRoute(direction: AxisDirection.left, child:  players.PlayersPage(), childCurrent: widget));
-                },
-              ),
-            SizedBox(height: stdHorizontalOffset),
-            //New Game
-            MyButton(
-              height: stdButtonHeight,
-              width: double.infinity,
-              borderRadius: BorderRadius.circular(stdBorderRadius),
-              buttonColor: (thisLobby.lobbyPlayers.isNotEmpty)
-                  ? thisTheme.secondaryColor
-                  : thisTheme.primaryColor,
-              textString: context.locale.home_new,
-              action: () async {
-                if (thisLobby.lobbyPlayers.isNotEmpty) {
-                  await showDialog(
-                    context: context,
-                    builder: (BuildContext thisContext) {
-                      return ConfirmationWindow(
-                        type: context.locale.home_new,
-                        button: context.locale.home_new,
-                        message:
-                            '${context.locale.conf_new_text1}\n${context.locale.conf_new_text2}',
-                        action: () => newGame(context),
-                      );
-                    },
-                  );
-                } else {
-                  newGame(context);
-                }
-              },
+          return PatternContainer(
+            padding: EdgeInsets.only(
+              top: stdCutoutWidth * 0.75,
+              bottom: stdCutoutWidthDown * 0.75,
             ),
-            SizedBox(height: stdHorizontalOffset),
-
-            Row(
-              children: [
-                Expanded(
-                  child: MyButton(
-                    height: stdButtonHeight,
-                    borderRadius: BorderRadius.circular(stdBorderRadius),
-                    buttonColor: thisTheme.additionButtonColor,
-                    textString: context.locale.home_abo,
-                    action: () async {
-                      showHelp(context, callBack, onWillpop: true);
-                    },
+            child: Scaffold(
+              appBar: AppBar(
+                leading: null,
+                toolbarHeight: stdButtonHeight * 0.75,
+                automaticallyImplyLeading: false,
+                backgroundColor: const Color(0x00000000),
+                iconTheme: IconThemeData(
+                  color: thisTheme.onBackground,
+                ),
+                elevation: 0,
+                centerTitle: true,
+                title: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: appBarStyle().copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: stdFontSize / 20 * 28,
                   ),
                 ),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(left: stdHorizontalOffset),
-                    child: MyButton(
-                      height: stdButtonHeight,
-                      borderRadius: BorderRadius.circular(stdBorderRadius),
-                      buttonColor: thisTheme.additionButtonColor,
-                      textString: context.locale.home_win_check,
-                      action: () async {
-                        showWinChecker(context);
-
-                        //const url = 'https://github.com/goliksim';
-                        //if (!await launch(url)) throw 'Could not launch $url';
-                      },
+                actions: <Widget>[
+                  AspectRatio(
+                    aspectRatio: 1,
+                    child: IconButton(
+                      icon: Icon(
+                        (thisTheme == themeList[0])
+                            ? Icons.mode_night_outlined
+                            : Icons.nightlight_round,
+                        size: stdIconSize,
+                      ),
+                      tooltip: context.strings.tooltip_theme,
+                      onPressed: () => viewModel.changeTheme(),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-
-  @override
-  Widget build(BuildContext context) {
-    LocaleManager.initialize(context.locale);
-    return PatternContainer(
-      padding: EdgeInsets.only(
-        top: stdCutoutWidth * 0.75,
-        bottom: stdCutoutWidthDown * 0.75,
-      ),
-      child: Scaffold(
-        appBar: AppBar(
-          leading: null,
-          /*
-            IconButton(
-              onPressed: () =>  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => const MyApp())),
-                icon: Icon(
-                  Icons.info_outline,
-                  size: stdIconSize,
-                ),
-                tooltip: 'Help',
-              ),*/
-
-          toolbarHeight: stdButtonHeight * 0.75,
-          automaticallyImplyLeading:
-              false, //убрать стрелочку, так как это стартовая страница
-          backgroundColor: const Color(0x00000000),
-          iconTheme: IconThemeData(
-            color: thisTheme.onBackground, //change your color here
-          ),
-          elevation: 0,
-          centerTitle: true,
-          title: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: appBarStyle().copyWith(
-              fontWeight: FontWeight.w700,
-              fontSize: stdFontSize / 20 * 28,
-            ), // aGoogleFonts.josefinSans(color: thisTheme.onBackground, fontWeight: FontWeight.w700,fontSize: 1.2* windowTextFix(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width)),
-          ),
-
-          actions: <Widget>[
-            AspectRatio(
-              aspectRatio: 1,
-              child: IconButton(
-                //padding: EdgeInsets.only(right: 25.w),
-                icon: Icon(
-                  (thisTheme == themeList[0])
-                      ? Icons.mode_night_outlined
-                      : Icons.nightlight_round,
-                  size: stdIconSize,
-                ),
-                tooltip: context.locale.tooltip_theme,
-                onPressed: () async {
-                  changeTheme();
-                  Navigator.pushReplacement(
-                    context,
-                    simpleThemePageRoute(
-                      HomePage(isDark: !widget.isDark),
-                    ),
-                  );
-                  //setState({});
-                },
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.transparent,
-        body: Center(
-          child: Container(
-            width: stdButtonWidth,
-            margin: EdgeInsets.only(
-              //vertical: stdEdgeOffset,
-              bottom: adaptiveOffset,
-              left:
-                  adaptiveOffset, //  windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width),
-              right: adaptiveOffset,
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(child: chipImage(context)),
-                  //кнопочки
-                  homePageButtons(context),
                 ],
               ),
+              backgroundColor: Colors.transparent,
+              body: Center(
+                child: Container(
+                  width: stdButtonWidth,
+                  margin: EdgeInsets.only(
+                    bottom: adaptiveOffset,
+                    left: adaptiveOffset,
+                    right: adaptiveOffset,
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: ChipsImage(),
+                        ),
+                        SizedBox(
+                          height: stdButtonHeight * 2 +
+                              stdHorizontalOffset * 2 +
+                              (shouldDrawContinure ? stdButtonHeight : 0),
+                          child: Column(
+                            children: [
+                              if (shouldDrawContinure)
+                                // Continue Button
+                                viewModel.isLoading
+                                    ? SizedBox(
+                                        height: stdButtonHeight,
+                                        width: double.infinity,
+                                        child: CircularProgressIndicator(),
+                                      )
+                                    : MyButton(
+                                        height: stdButtonHeight,
+                                        width: double.infinity,
+                                        borderRadius: BorderRadius.circular(
+                                            stdBorderRadius),
+                                        buttonColor: thisTheme.primaryColor,
+                                        textString: context.strings.home_cont,
+                                        action: () => viewModel.continueGame(),
+                                      ),
+                              SizedBox(height: stdHorizontalOffset),
+                              //New Game
+                              MyButton(
+                                height: stdButtonHeight,
+                                width: double.infinity,
+                                borderRadius:
+                                    BorderRadius.circular(stdBorderRadius),
+                                buttonColor: shouldDrawContinure
+                                    ? thisTheme.secondaryColor
+                                    : thisTheme.primaryColor,
+                                textString: context.strings.home_new,
+                                action: () => viewModel.createNewGame(),
+                              ),
+                              SizedBox(
+                                height: stdHorizontalOffset,
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: MyButton(
+                                      height: stdButtonHeight,
+                                      borderRadius: BorderRadius.circular(
+                                          stdBorderRadius),
+                                      buttonColor:
+                                          thisTheme.additionButtonColor,
+                                      textString: context.strings.home_abo,
+                                      action: () => viewModel.showAboutInfo(),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        left: stdHorizontalOffset,
+                                      ),
+                                      child: MyButton(
+                                        height: stdButtonHeight,
+                                        borderRadius: BorderRadius.circular(
+                                            stdBorderRadius),
+                                        buttonColor:
+                                            thisTheme.additionButtonColor,
+                                        textString:
+                                            context.strings.home_win_check,
+                                        action: () =>
+                                            viewModel.showWinnerSolver(),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
+          );
+        },
+      );
 }
-
-Widget chipImage(BuildContext context) => Container(
-      margin: EdgeInsets.all(stdHorizontalOffset),
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          colorFilter: ColorFilter.mode(
-            thisTheme.bgrColor.withAlpha(250),
-            BlendMode.dstIn,
-          ),
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.high,
-          image: const AssetImage(
-            'assets/init_logo.png',
-          ),
-        ),
-      ),
-      height: MediaQuery.of(context).size.width,
-      width: MediaQuery.of(context).size.width,
-    );

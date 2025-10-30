@@ -1,81 +1,37 @@
 // ignore_for_file: file_names
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
-import '../../data/storage/storage.dart';
-import '../../domain/models/lobby.dart';
 import '../../utils/logs.dart';
-import '../../utils/theme/uiValues.dart';
-import '../common/transitions.dart';
-import '../home/home_page.dart';
+import '../../utils/theme/ui_values.dart';
+import '../common/widgets/chips_image.dart';
+import 'init_page_view_model.dart';
 
-class InitWindow extends StatefulWidget {
-  const InitWindow({super.key});
+class InitPage extends StatefulWidget {
+  final InitPageViewModel viewModel;
+  const InitPage({
+    required this.viewModel,
+    super.key,
+  });
 
   @override
-  State<InitWindow> createState() => _InitWindowState();
+  State<InitPage> createState() => _InitPageState();
 }
 
-class _InitWindowState extends State<InitWindow> {
-  late Timer _timer;
-  int _start = -150;
-  bool loadingBool = false;
-  //late AdvancedIconState _state;// = AdvancedIconState.primary ;
+class _InitPageState extends State<InitPage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _opacity;
 
-  void startTimer({bool end = false}) async {
-    if (end) {
-      await Future.delayed(const Duration(milliseconds: 900)).then((value) {
-        logs.writeLog('Switch to HomePage');
-        Navigator.pushReplacement(
-          context,
-          simpleFadePageRoute(
-            HomePage(isDark: thisTheme.name == themeList[1]),
-          ),
-        );
-      });
-    } else {
-      const oneSec = Duration(milliseconds: 20);
-      _timer = Timer.periodic(
-        oneSec,
-        (Timer timer) {
-          if (_start == 1000) {
-            setState(() {
-              timer.cancel();
-              //print('timer ended');
-              startTimer(end: loadingBool);
-            });
-          } else {
-            setState(() {
-              _start += 10;
-            });
-          }
-        },
-      );
-    }
-  }
-
-  Future loading() async {
-    lobbyStorage.read().then((value) {
-      setState(() {
-        thisLobby = value;
-      });
-    });
-    savedStorage.read().then((value) {
-      setState(() {
-        savedPlayers = value;
-      });
-    });
-    loadingBool = true;
-  }
+  bool _animationDone = false;
+  bool _initDone = false;
+  bool _navigated = false;
 
   @override
   void initState() {
-    //Android fullscreen
     super.initState();
-    //load localization
 
+    //TODO: Выпилить это говно
     final data = MediaQueryData.fromView(
       WidgetsBinding.instance.platformDispatcher.views.single,
     ).systemGestureInsets;
@@ -85,15 +41,47 @@ class _InitWindowState extends State<InitWindow> {
     stdCutoutWidth = stdCutoutWidth >= 48 ? stdCutoutWidth : 0;
     stdCutoutWidthDown = stdCutoutWidthDown > 48 ? stdCutoutWidthDown / 2 : 0;
 
-    startTimer();
-    loading();
-    // загрузка лобби из памяти !!!!!!!!!!
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+    _opacity = Tween<double>(begin: 0, end: 1).animate(_controller);
+
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _animationDone = true;
+        _tryNavigate();
+      }
+    });
+
+    widget.viewModel.addListener(_onInitChanged);
+
+    _controller.forward();
+  }
+
+  void _onInitChanged() {
+    if (widget.viewModel.value) {
+      _initDone = true;
+      _tryNavigate();
+    }
+  }
+
+  void _tryNavigate() {
+    if (_navigated) return;
+    if (_animationDone && _initDone) {
+      _navigated = true;
+
+      logs.writeLog('Switch to HomePage');
+
+      widget.viewModel.pushHomePage();
+    }
   }
 
   @override
   void dispose() {
+    _controller.dispose();
+    widget.viewModel.removeListener(_onInitChanged);
     super.dispose();
-    _timer.cancel();
   }
 
   @override
@@ -110,29 +98,26 @@ class _InitWindowState extends State<InitWindow> {
         appBar: AppBar(
           leading: null,
           toolbarHeight: stdButtonHeight * 0.75,
-          automaticallyImplyLeading:
-              false, //убрать стрелочку, так как это стартовая страница
+          automaticallyImplyLeading: false,
           backgroundColor: const Color(0x00000000),
           iconTheme: IconThemeData(
-            color: thisTheme.onBackground, //change your color here
+            color: thisTheme.onBackground,
           ),
           elevation: 0,
         ),
         backgroundColor: thisTheme.bgrColor,
         body: Center(
-          child: Opacity(
-            // If the widget is visible, animate to 0.0 (invisible).
-            // If the widget is hidden, animate to 1.0 (fully visible).
-            opacity: _start > 0 ? (_start / 1000) : 0.0,
-
-            // The green box must be a child of the AnimatedOpacity widget.
+          child: AnimatedBuilder(
+            animation: _opacity,
+            builder: (context, child) => Opacity(
+              opacity: _opacity.value,
+              child: child,
+            ),
             child: Container(
               width: stdButtonWidth,
               margin: EdgeInsets.only(
-                //vertical: stdEdgeOffset,
                 bottom: adaptiveOffset,
-                left:
-                    adaptiveOffset, //  windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width),
+                left: adaptiveOffset,
                 right: adaptiveOffset,
               ),
               child: Center(
@@ -140,16 +125,10 @@ class _InitWindowState extends State<InitWindow> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: chipImage(context),
+                      child: ChipsImage(),
                     ),
-                    //кнопочки
-                    // Continue
                     SizedBox(
-                      height: stdButtonHeight * 2 +
-                          stdHorizontalOffset * 2 +
-                          ((thisLobby.lobbyPlayers.isNotEmpty)
-                              ? (stdButtonHeight)
-                              : 0),
+                      height: stdButtonHeight * 2 + stdHorizontalOffset * 2,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

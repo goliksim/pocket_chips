@@ -1,33 +1,18 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart'; // подключаем библиотеку material
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'app/application.dart' as app;
-import 'data/storage/storage.dart';
-import 'domain/models/config_model.dart';
-import 'l10n/localization.dart';
-import 'utils/logs.dart';
-import 'utils/theme/uiValues.dart';
+import 'app/application.dart';
+import 'di/domain_managers.dart';
 
-//TODO Work with ignore
-
-void _runApp() async {
-  await configStorage.read().then((value) {
-    thisTheme = themeList[value.themeIndex];
-    if (thisTheme == themeList[0]) {
-      logs.writeLog('LIGHT mode loaded from config');
-    } else {
-      logs.writeLog('DARK mode loaded from config');
-    }
-    thisConfig = value;
-  });
-  final LocaleManager localeManager = LocaleManager();
-  await localeManager.initLocale();
+void _runApp(ProviderContainer container) async {
   runApp(
-    app.MyApp(
-      localeManager: localeManager,
+    UncontrolledProviderScope(
+      container: container,
+      child: MyApp(),
     ),
   );
 }
@@ -35,16 +20,14 @@ void _runApp() async {
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (kIsWeb) {
-    _runApp();
-  }
-  /*if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    setWindowTitle('My App');
-    setWindowMaxSize(const Size(3840,2160));
-    setWindowMinSize(const Size(360, 640));
-  }*/
+  final container = ProviderContainer();
+  await container.read(localeManagerProvider).initLocale();
 
-  else if (Platform.isAndroid || Platform.isIOS) {
+  if (kIsWeb) {
+    // Для веб-приложений может потребоваться своя логика инициализации.
+    // Пока оставим как есть, но с возможностью расширения.
+    _runApp(container);
+  } else if (Platform.isAndroid || Platform.isIOS) {
     //await Purchases.configure(PurchasesConfiguration('goog_oLBnINIENkDvkGoquoIjyBHPcoy'));
     if (Platform.isAndroid) {
       SystemChrome.setEnabledSystemUIMode(
@@ -59,7 +42,7 @@ Future main() async {
       await Future.delayed(const Duration(milliseconds: 100));
       //print('Orientation set to portrait');
 
-      _runApp();
+      _runApp(container);
     });
   }
 }

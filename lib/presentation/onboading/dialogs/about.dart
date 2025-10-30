@@ -4,86 +4,57 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mailer/flutter_mailer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:onboarding/onboarding.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:uuid/uuid.dart';
 
-import '../../../app/application.dart';
-import '../../../data/storage/storage.dart';
-import '../../../domain/models/config_model.dart';
-import '../../../domain/models/lobby.dart';
-import '../../../l10n/localization.dart';
-import '../../../utils/theme/uiValues.dart';
-import '../../common/transitions.dart';
+import '../../../utils/extensions.dart';
+import '../../../utils/theme/ui_values.dart';
 import '../../common/widgets/ui_widgets.dart';
-import '../../lobby/lobby_page.dart';
-import '../onboarding.dart';
-import 'update.dart';
-
-Future showHelp(BuildContext context, callBack, {onWillpop = false}) async {
-  final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  // ignore: use_build_context_synchronously
-  transitionDialog(
-    duration: const Duration(milliseconds: 400),
-    type: 'Scale',
-    context: context,
-    child: WillPopScope(
-      onWillPop: () async => onWillpop,
-      child: AboutDialog(
-        callbackFunction: callBack,
-        packageInfo: packageInfo,
-        isFirst: !onWillpop,
-      ),
-    ),
-    builder: (BuildContext context) {
-      return AboutDialog(
-        callbackFunction: callBack,
-        packageInfo: packageInfo,
-        isFirst: !onWillpop,
-      );
-    },
-  );
-}
+import '../../lobby/player_list/view_state/lobby_player_item.dart';
+import '../../lobby/player_list/widgets/player_card.dart';
+import '../onboarding_dialog.dart';
+import '../onboarding_view_model.dart';
 
 class AboutDialog extends StatefulWidget {
+  //TODO: разделить на два класса
+  final OnboardingViewModel viewModel;
+
   const AboutDialog({
+    required this.viewModel,
     super.key,
-    required this.callbackFunction,
-    required this.packageInfo,
-    required this.isFirst,
   });
 
-  final Function() callbackFunction;
-  final PackageInfo packageInfo;
-  final bool isFirst;
   @override
   State<AboutDialog> createState() => _AboutDialogState();
 }
 
 class _AboutDialogState extends State<AboutDialog> {
-  Player tutorPlayer =
-      Player('TestPlayer', 'assets/faces/pokerfaces0.jpg', 500);
+  LobbyPlayerItem tutorPlayer = LobbyPlayerItem(
+    name: 'TestPlayer',
+    assetUrl: 'assets/faces/pokerfaces0.jpg',
+    bank: 500,
+    uid: Uuid().v4(),
+  );
   int tmpBid = 0;
 
   @override
   Widget build(BuildContext context) {
     return OnboardingDialog(
-      callbackFunction: widget.callbackFunction,
-      packageInfo: widget.packageInfo,
+      onComplete: () => widget.viewModel.onComplete(),
       pages: [
         // first page
         PageModel(
           widget: OnboardingPage(
-            title: widget.isFirst
-                ? '${context.locale.about_welc}\nPOCKET CHIPS'
+            title: widget.viewModel.isFirstLaunch
+                ? '${context.strings.about_welc}\nPOCKET CHIPS'
                 : 'POCKET CHIPS',
             children: [
               SizedBox(
                 width: double.infinity,
                 child: Text(
-                  '${context.locale.about_welc_1}\n\n${context.locale.about_welc_2}',
+                  '${context.strings.about_welc_1}\n\n${context.strings.about_welc_2}',
                   style: TextStyle(
                     height: 1.5,
                     color: thisTheme.onBackground,
@@ -118,7 +89,7 @@ class _AboutDialogState extends State<AboutDialog> {
               SizedBox(
                 width: double.infinity,
                 child: Text(
-                  '${context.locale.about_welc_3}\n- ${context.locale.about_welc_4}\n- ${context.locale.about_welc_5}\n- ${context.locale.about_welc_6}',
+                  '${context.strings.about_welc_3}\n- ${context.strings.about_welc_4}\n- ${context.strings.about_welc_5}\n- ${context.strings.about_welc_6}',
                   style: TextStyle(
                     height: 1.5,
                     color: thisTheme.onBackground,
@@ -132,7 +103,7 @@ class _AboutDialogState extends State<AboutDialog> {
               SizedBox(
                 width: double.infinity,
                 child: Text(
-                  context.locale.about_welc_7,
+                  context.strings.about_welc_7,
                   style: TextStyle(
                     height: 1.5,
                     color: thisTheme.onBackground,
@@ -164,17 +135,11 @@ class _AboutDialogState extends State<AboutDialog> {
                     width: stdButtonHeight * 0.75,
                     buttonColor: thisTheme.bankColor,
                     textString: '1',
-                    action: () {
-                      MyApp.of(context).setLocale(
-                        const Locale.fromSubtags(
-                          languageCode: 'en',
-                        ),
-                        context,
-                      );
-                      thisConfig.locale = 'en';
-                      configStorage.write(thisConfig);
-                      widget.callbackFunction();
-                    },
+                    action: () => widget.viewModel.setLocale(
+                      Locale.fromSubtags(
+                        languageCode: 'en',
+                      ),
+                    ),
                   ),
                   SizedBox(width: stdHorizontalOffset),
                   MyButton(
@@ -182,17 +147,11 @@ class _AboutDialogState extends State<AboutDialog> {
                     width: stdButtonHeight * 0.75,
                     buttonColor: thisTheme.bankColor,
                     textString: '2',
-                    action: () {
-                      MyApp.of(context).setLocale(
-                        const Locale.fromSubtags(
-                          languageCode: 'ru',
-                        ),
-                        context,
-                      );
-                      thisConfig.locale = 'ru';
-                      configStorage.write(thisConfig);
-                      widget.callbackFunction();
-                    },
+                    action: () => widget.viewModel.setLocale(
+                      Locale.fromSubtags(
+                        languageCode: 'ru',
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -203,14 +162,14 @@ class _AboutDialogState extends State<AboutDialog> {
         // homescreen
         PageModel(
           widget: OnboardingPage(
-            title: context.locale.about_hom_1,
+            title: context.strings.about_hom_1,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Flexible(
                     child: Text(
-                      context.locale.about_hom_2,
+                      context.strings.about_hom_2,
                       style: TextStyle(
                         height: 1.5,
                         color: thisTheme.onBackground,
@@ -231,21 +190,15 @@ class _AboutDialogState extends State<AboutDialog> {
                         size: stdIconSize,
                         color: thisTheme.onBackground,
                       ),
-                      tooltip: context.locale.tooltip_theme,
-                      onPressed: () async {
-                        changeTheme();
-                        widget.callbackFunction();
-                        setState(() {});
-
-                        //setState({});
-                      },
+                      tooltip: context.strings.tooltip_theme,
+                      onPressed: () async => widget.viewModel.changeTheme(),
                     ),
                   ),
                 ],
               ),
               SizedBox(height: stdHorizontalOffset / 2),
               Text(
-                '${context.locale.about_hom_3}\n\n${context.locale.about_hom_4}',
+                '${context.strings.about_hom_3}\n\n${context.strings.about_hom_4}',
                 style: TextStyle(
                   height: 1.5,
                   color: thisTheme.onBackground,
@@ -260,10 +213,10 @@ class _AboutDialogState extends State<AboutDialog> {
         // Player Menu
         PageModel(
           widget: OnboardingPage(
-            title: context.locale.about_plme_1,
+            title: context.strings.about_plme_1,
             children: [
               Text(
-                context.locale.about_plme_2,
+                context.strings.about_plme_2,
                 style: TextStyle(
                   height: 1.5,
                   color: thisTheme.onBackground,
@@ -329,13 +282,9 @@ class _AboutDialogState extends State<AboutDialog> {
                       ],
                     ),
                   ),
-                  child: playerCard(
-                    tutorPlayer,
-                    null,
-                    stdButtonHeight * 0.85,
-                    false,
-                    context,
-                    () => setState(() {}),
+                  child: PlayerCard(
+                    player: tutorPlayer,
+                    canReorderOrDismiss: false,
                   ),
                 ),
               ),
@@ -345,7 +294,7 @@ class _AboutDialogState extends State<AboutDialog> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '- ${context.locale.about_plme_3}',
+                  '- ${context.strings.about_plme_3}',
                   style: TextStyle(
                     height: 1.5,
                     color: thisTheme.onBackground,
@@ -359,7 +308,7 @@ class _AboutDialogState extends State<AboutDialog> {
                 children: [
                   Flexible(
                     child: Text(
-                      '- ${context.locale.about_plme_4}\n${context.locale.about_plme_5}',
+                      '- ${context.strings.about_plme_4}\n${context.strings.about_plme_5}',
                       style: TextStyle(
                         height: 1.5,
                         color: thisTheme.onBackground,
@@ -383,7 +332,7 @@ class _AboutDialogState extends State<AboutDialog> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '\n- ${context.locale.about_plme_6}\n\n- ${context.locale.about_plme_7}\n',
+                  '\n- ${context.strings.about_plme_6}\n\n- ${context.strings.about_plme_7}\n',
                   style: TextStyle(
                     height: 1.5,
                     color: thisTheme.onBackground,
@@ -399,14 +348,14 @@ class _AboutDialogState extends State<AboutDialog> {
         // Settings
         PageModel(
           widget: OnboardingPage(
-            title: context.locale.about_set_1,
+            title: context.strings.about_set_1,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Flexible(
                     child: Text(
-                      context.locale.about_set_2,
+                      context.strings.about_set_2,
                       style: TextStyle(
                         height: 1.5,
                         color: thisTheme.onBackground,
@@ -428,7 +377,7 @@ class _AboutDialogState extends State<AboutDialog> {
                 ],
               ),
               Text(
-                '${context.locale.about_set_3}\n- ${context.locale.about_set_4}\n- ${context.locale.about_set_5}\n- ${context.locale.about_set_6}\n\n${context.locale.about_set_7}\n- ${context.locale.about_set_8}\n- ${context.locale.about_set_9}',
+                '${context.strings.about_set_3}\n- ${context.strings.about_set_4}\n- ${context.strings.about_set_5}\n- ${context.strings.about_set_6}\n\n${context.strings.about_set_7}\n- ${context.strings.about_set_8}\n- ${context.strings.about_set_9}',
                 style: TextStyle(
                   height: 1.5,
                   color: thisTheme.onBackground,
@@ -443,14 +392,14 @@ class _AboutDialogState extends State<AboutDialog> {
         // Game table
         PageModel(
           widget: OnboardingPage(
-            title: context.locale.about_tab_1,
+            title: context.strings.about_tab_1,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Flexible(
                     child: Text(
-                      context.locale.about_tab_2,
+                      context.strings.about_tab_2,
                       style: TextStyle(
                         height: 1.5,
                         color: thisTheme.onBackground,
@@ -472,7 +421,7 @@ class _AboutDialogState extends State<AboutDialog> {
                 ],
               ),
               Text(
-                context.locale.about_tab_3,
+                context.strings.about_tab_3,
                 style: TextStyle(
                   height: 1.5,
                   color: thisTheme.onBackground,
@@ -607,7 +556,7 @@ class _AboutDialogState extends State<AboutDialog> {
                 ),
               ),
               Text(
-                '\n${context.locale.about_tab_4}\n\t\t${context.locale.about_tab_5}',
+                '\n${context.strings.about_tab_4}\n\t\t${context.strings.about_tab_5}',
                 style: TextStyle(
                   height: 1.5,
                   color: thisTheme.onBackground,
@@ -622,12 +571,12 @@ class _AboutDialogState extends State<AboutDialog> {
         // Helpful
         PageModel(
           widget: OnboardingPage(
-            title: context.locale.about_link_1,
+            title: context.strings.about_link_1,
             children: [
               SizedBox(
                 width: double.infinity,
                 child: Text(
-                  context.locale.about_link_2,
+                  context.strings.about_link_2,
                   style: TextStyle(
                     height: 1.5,
                     color: thisTheme.onBackground,
@@ -653,7 +602,7 @@ class _AboutDialogState extends State<AboutDialog> {
                             horizontal: stdHorizontalOffset,
                           ),
                           child: Text(
-                            context.locale.about_link_3,
+                            context.strings.about_link_3,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: thisTheme.primaryColor,
@@ -690,7 +639,7 @@ class _AboutDialogState extends State<AboutDialog> {
               ),
               SizedBox(height: stdHorizontalOffset / 2),
               Text(
-                '${context.locale.about_link_4}\n\n${context.locale.about_link_5}',
+                '${context.strings.about_link_4}\n\n${context.strings.about_link_5}',
                 style: TextStyle(
                   height: 1.5,
                   color: thisTheme.onBackground,
@@ -732,19 +681,7 @@ class _AboutDialogState extends State<AboutDialog> {
                     width: stdButtonHeight / 2,
                     buttonColor: thisTheme.bgrColor,
                     child: Image.asset('assets/social/mail.png'),
-                    action: () async {
-                      final path = await localPath;
-                      final MailOptions mailOptions = MailOptions(
-                        body: LocaleManager.locale.about_link_6,
-                        subject: 'PC: problem or advice ',
-                        recipients: ['goliksim@gmail.com'],
-                        isHTML: true,
-                        attachments: [
-                          '$path/pocketchips/poker_chips.log',
-                        ],
-                      );
-                      await FlutterMailer.send(mailOptions);
-                    },
+                    action: () async => widget.viewModel.sendMail(),
                   ),
                 ],
               ),
@@ -762,27 +699,35 @@ class _AboutDialogState extends State<AboutDialog> {
                   textAlign: TextAlign.start,
                 ),
               ),
-              MyButton(
-                height: stdButtonHeight * 0.5,
-                borderRadius: BorderRadius.circular(stdBorderRadius / 3),
-                alignment: Alignment.centerLeft,
-                //side: BorderSide(width: 1, color: thisTheme.primaryColor),
-                buttonColor: thisTheme.playerColor,
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Text(
-                    'Version: ${widget.packageInfo.version}',
-                    style: TextStyle(
-                      height: 1.5,
-                      color: thisTheme.secondaryColor,
-                      fontWeight: FontWeight.w500,
-                      fontSize: stdFontSize * 0.7,
-                    ),
-                    textAlign: TextAlign.start,
-                  ),
-                ),
-                action: () async {
-                  showUpdate(context);
+              ListenableBuilder(
+                listenable: widget.viewModel,
+                builder: (context, _) {
+                  if (widget.viewModel.currentVersion != null) {
+                    return MyButton(
+                      height: stdButtonHeight * 0.5,
+                      borderRadius: BorderRadius.circular(stdBorderRadius / 3),
+                      alignment: Alignment.centerLeft,
+                      //side: BorderSide(width: 1, color: thisTheme.primaryColor),
+                      buttonColor: thisTheme.playerColor,
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          'Version: ${widget.viewModel.currentVersion}',
+                          style: TextStyle(
+                            height: 1.5,
+                            color: thisTheme.secondaryColor,
+                            fontWeight: FontWeight.w500,
+                            fontSize: stdFontSize * 0.7,
+                          ),
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                      action: () async {
+                        widget.viewModel.showUpdateInfo();
+                      },
+                    );
+                  }
+                  return SizedBox();
                 },
               ),
               SizedBox(
@@ -797,7 +742,7 @@ class _AboutDialogState extends State<AboutDialog> {
                 child: SizedBox(
                   width: double.infinity,
                   child: Text(
-                    ' ${context.locale.about_link_7}',
+                    ' ${context.strings.about_link_7}',
                     style: TextStyle(
                       color: thisTheme.secondaryColor,
                       fontSize: stdFontSize * 0.7,

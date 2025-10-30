@@ -25,7 +25,7 @@ class RotationCard extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      itemCount: 3 - count,
+      itemCount: count,
       itemBuilder: (context, index) {
         return AnimatedSwitcher(
           switchInCurve: Curves.easeIn,

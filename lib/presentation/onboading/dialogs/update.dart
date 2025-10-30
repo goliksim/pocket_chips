@@ -3,65 +3,36 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:onboarding/onboarding.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
-import '../../../domain/models/lobby.dart';
-import '../../../l10n/localization.dart';
-import '../../../utils/theme/uiValues.dart';
-import '../../common/transitions.dart';
+import '../../../utils/extensions.dart';
+import '../../../utils/theme/ui_values.dart';
 //import 'package:in_app_review/in_app_review.dart';
 
-import '../onboarding.dart';
+import '../onboarding_dialog.dart';
+import '../onboarding_view_model.dart';
 
-Future showUpdate(BuildContext context) async {
-  final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  // ignore: use_build_context_synchronously
-  transitionDialog(
-    duration: const Duration(milliseconds: 400),
-    type: 'Scale',
-    context: context,
-    child: UpdateDialog(
-      packageInfo: packageInfo,
-    ),
-    builder: (BuildContext context) {
-      return UpdateDialog(
-        packageInfo: packageInfo,
-      );
-    },
-  );
-}
+class UpdateDialog extends StatelessWidget {
+  final OnboardingViewModel viewModel;
 
-class UpdateDialog extends StatefulWidget {
   const UpdateDialog({
+    required this.viewModel,
     super.key,
-    required this.packageInfo,
   });
-
-  final PackageInfo packageInfo;
-
-  @override
-  State<UpdateDialog> createState() => _UpdateDialogState();
-}
-
-class _UpdateDialogState extends State<UpdateDialog> {
-  Player tutorPlayer =
-      Player('TestPlayer', 'assets/faces/pokerfaces0.jpg', 500);
-  int tmpBid = 0;
 
   @override
   Widget build(BuildContext context) {
     return OnboardingDialog(
-      packageInfo: widget.packageInfo,
+      onComplete: () => viewModel.onComplete(),
       pages: [
         // first page
         PageModel(
           widget: OnboardingPage(
             title:
-                '${context.locale.update_title} ${widget.packageInfo.version}',
+                '${context.strings.update_title} ${viewModel.currentVersion}',
             children: [
               SizedBox(height: stdHorizontalOffset),
               Text(
-                '- ${context.locale.update_1}\n',
+                '- ${context.strings.update_1}\n',
                 style: TextStyle(
                   height: 1.5,
                   color: thisTheme.onBackground,
@@ -77,7 +48,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '- ${context.locale.update_2}',
+                      '- ${context.strings.update_2}',
                       style: TextStyle(
                         height: 1.5,
                         color: thisTheme.primaryColor,
@@ -118,7 +89,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
                 ),
               ),
               Text(
-                '${context.locale.update_3}:\n',
+                '${context.strings.update_3}:\n',
                 style: TextStyle(
                   height: 1.5,
                   color: thisTheme.onBackground,
@@ -130,7 +101,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
               Padding(
                 padding: EdgeInsets.only(left: stdHorizontalOffset),
                 child: Text(
-                  '${context.locale.update_4}\n${context.locale.update_5}',
+                  '${context.strings.update_4}\n${context.strings.update_5}',
                   style: TextStyle(
                     height: 1.5,
                     color: thisTheme.onBackground,
@@ -143,7 +114,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '\n- ${context.locale.update_6}',
+                  '\n- ${context.strings.update_6}',
                   style: TextStyle(
                     height: 1.5,
                     color: thisTheme.onBackground,
@@ -156,7 +127,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '\n- ${context.locale.update_7}',
+                  '\n- ${context.strings.update_7}',
                   style: TextStyle(
                     height: 1.5,
                     color: thisTheme.onBackground,

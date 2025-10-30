@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../utils/theme/uiValues.dart';
+import '../../../../../utils/theme/ui_values.dart';
 
 class CardWidget extends StatelessWidget {
   const CardWidget({super.key, required this.child});

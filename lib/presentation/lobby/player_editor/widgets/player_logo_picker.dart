@@ -1,0 +1,92 @@
+import 'package:flutter/material.dart';
+
+import '../../../../utils/theme/ui_values.dart';
+
+class PlayerLogoPicker extends StatefulWidget {
+  const PlayerLogoPicker({
+    super.key,
+  });
+
+  @override
+  State<PlayerLogoPicker> createState() => _PickIconState();
+}
+
+class _PickIconState extends State<PlayerLogoPicker> {
+  static const _totalLogosCount = 10;
+
+  int choosenIcon = -1;
+
+  Future<void> _selectLogo(int index) async {
+    setState(() {
+      choosenIcon = index;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 500)).then((_) {
+      _pop('assets/faces/pokerfaces${index + 1}.jpg');
+    });
+  }
+
+  void _pop(String newLogo) => Navigator.of(context).pop(newLogo);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      elevation: 0,
+      backgroundColor: thisTheme.bgrColor,
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: adaptiveOffset,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
+      ),
+      child: Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.all(stdHorizontalOffset),
+        height: stdDialogHeight * 1.2,
+        width: stdButtonWidth,
+        child: AspectRatio(
+          aspectRatio: 5 / 2,
+          child: GridView.builder(
+            reverse: true,
+            scrollDirection: Axis.vertical,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisSpacing: 0,
+              mainAxisSpacing: 0,
+              crossAxisCount: 5,
+            ),
+            itemCount: _totalLogosCount,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () => _selectLogo(index),
+                child: Padding(
+                  padding: EdgeInsets.all(stdHorizontalOffset / 2),
+                  child: AnimatedContainer(
+                    height: stdButtonHeight,
+                    duration: const Duration(milliseconds: 150),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: (index == choosenIcon) ? 1.5 : 0,
+                        color: (index == choosenIcon)
+                            ? thisTheme.primaryColor
+                            : thisTheme.bgrColor,
+                      ),
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        filterQuality: FilterQuality.medium,
+                        fit: BoxFit.cover,
+                        image: AssetImage(
+                          'assets/faces/pokerfaces${index + 1}.jpg',
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}

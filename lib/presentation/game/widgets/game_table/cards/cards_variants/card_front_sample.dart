@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../../utils/theme/uiValues.dart';
+import '../../../../../../utils/theme/ui_values.dart';
 import '../card_widget.dart';
 
 Widget get cardSample => CardWidget(

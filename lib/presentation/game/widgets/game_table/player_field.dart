@@ -1,90 +1,45 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-import '../../../../domain/game_logic.dart';
-import '../../../../domain/models/lobby.dart';
-import '../../../../l10n/localization.dart';
-import '../../../../utils/theme/uiValues.dart';
-import '../../../common/transitions.dart';
+import '../../../../utils/theme/ui_values.dart';
 import '../../../common/widgets/ui_widgets.dart';
-import '../../../lobby/lobby_page.dart';
+import '../../view_state/game_player_item.dart';
 
 class PlayerField extends StatelessWidget {
+  final GamePlayerItem player;
+
+  final bool shouldReverse;
+
   const PlayerField({
+    required this.player,
+    required this.shouldReverse,
     super.key,
-    required this.a,
-    required this.index,
-    required this.addButton,
-    required this.callBack,
   });
-  final int a;
-  final int index;
-  final int addButton;
-  final Function() callBack;
 
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      //padding: EdgeInsets.symmetric(horizontal: stdHeight*0.1),
       height: stdHeight,
       width: stdHeight * 2.2,
-
       child: MyButton(
         borderRadius: BorderRadius.circular(stdBorderRadius * 2),
         height: stdHeight,
-        buttonColor: (a == thisLobby.lobbyIndex)
+        buttonColor: player.isCurrent
             ? thisTheme.primaryColor
-            : thisTheme.bankColor
-                .withAlpha(thisLobby.lobbyPlayers[a].isActive ? 255 : 128),
-        longAction: () async {
-          await transitionDialog(
-            duration: const Duration(milliseconds: 400),
-            type: 'Scale1',
-            //barrierColor: null,
-            context: context,
-            child: AddWindow(
-              player: thisLobby.lobbyPlayers[a],
-              callBackFunction: callBack,
-              playerIndex: a,
-              settingsBool: (thisLobby.lobbyState == 5),
-            ),
-            builder: (BuildContext context) {
-              return AddWindow(
-                player: thisLobby.lobbyPlayers[a],
-                callBackFunction: callBack,
-                playerIndex: a,
-                settingsBool: (thisLobby.lobbyState == 5),
-              );
-            },
-          ).then((value) {
-            thisGame.gameStateName = Text(
-              '${context.locale.game_turn1}\u00A0${context.locale.game_turn2}\u00A0${thisLobby.lobbyPlayers[thisLobby.lobbyIndex].name}',
-              style: TextStyle(color: thisTheme.onBackground),
-            );
-          });
-          SystemChrome.restoreSystemUIOverlays();
-        },
+            : thisTheme.bankColor.withAlpha(player.isFolded ? 128 : 255),
+        //longAction: () async {},
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: sin(
-                    2 *
-                        pi *
-                        (index / (thisLobby.lobbyPlayers.length - addButton)),
-                  ) <
-                  0
-              ? reversablePlayerWidgetList(a)
-              : List.from(reversablePlayerWidgetList(a).reversed),
+          children: shouldReverse
+              ? List.from(reversablePlayerWidgetList(player).reversed)
+              : reversablePlayerWidgetList(player),
         ),
       ),
     );
   }
 }
 
-// В зависимости от значения, возвращает либо лого персонажа, либо имя с банком
-List<Widget> reversablePlayerWidgetList(int index) {
+List<Widget> reversablePlayerWidgetList(GamePlayerItem player) {
   return [
     Stack(
       children: [
@@ -96,11 +51,11 @@ List<Widget> reversablePlayerWidgetList(int index) {
             image: DecorationImage(
               filterQuality: FilterQuality.medium,
               image: AssetImage(
-                thisLobby.lobbyPlayers[index].assetUrl,
+                player.assetUrl,
               ),
               colorFilter: ColorFilter.mode(
                 Colors.white.withAlpha(
-                  thisLobby.lobbyPlayers[index].isActive ? 255 : 50,
+                  player.isFolded ? 50 : 255,
                 ),
                 BlendMode.modulate,
               ),
@@ -108,7 +63,7 @@ List<Widget> reversablePlayerWidgetList(int index) {
             ),
           ),
         ),
-        thisLobby.lobbyPlayers[index].isDealer
+        player.isDealer
             ? Container(
                 width: stdHeight,
                 height: stdHeight,
@@ -121,7 +76,7 @@ List<Widget> reversablePlayerWidgetList(int index) {
                     ),
                     colorFilter: ColorFilter.mode(
                       Colors.white.withAlpha(
-                        thisLobby.lobbyPlayers[index].isActive ? 255 : 50,
+                        player.isFolded ? 50 : 255,
                       ),
                       BlendMode.modulate,
                     ),
@@ -141,12 +96,12 @@ List<Widget> reversablePlayerWidgetList(int index) {
             FittedBox(
               fit: BoxFit.fitHeight,
               child: Text(
-                thisLobby.lobbyPlayers[index].name,
+                player.name,
                 style: TextStyle(
-                  color: (index == thisLobby.lobbyIndex)
+                  color: player.isCurrent
                       ? thisTheme.onPrimary
                       : thisTheme.onBackground.withAlpha(
-                          thisLobby.lobbyPlayers[index].isActive ? 255 : 50,
+                          player.isFolded ? 50 : 255,
                         ),
                   fontWeight: FontWeight.bold,
                   fontSize: stdFontSize,
@@ -157,13 +112,13 @@ List<Widget> reversablePlayerWidgetList(int index) {
               child: FittedBox(
                 fit: BoxFit.fitHeight,
                 child: Text(
-                  '${thisLobby.lobbyPlayers[index].bank}',
+                  '${player.bank}',
                   style: TextStyle(
                     fontSize: stdFontSize * 0.75,
-                    color: (index == thisLobby.lobbyIndex)
+                    color: player.isCurrent
                         ? thisTheme.onPrimary
                         : thisTheme.onBackground.withAlpha(
-                            thisLobby.lobbyPlayers[index].isActive ? 255 : 50,
+                            player.isFolded ? 50 : 255,
                           ),
                   ),
                 ),

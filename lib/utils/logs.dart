@@ -2,15 +2,18 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:intl/intl.dart';
-
-//import 'package:flutter/foundation.dart';
-import '../data/storage/storage.dart';
+import 'package:path_provider/path_provider.dart';
 
 final Logs logs = Logs();
 
 class Logs {
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
   Future<File> get _localFile async {
-    final path = await localPath;
+    final path = await _localPath;
     return File('$path/pocketchips/poker_chips.log').create(recursive: true);
   }
 

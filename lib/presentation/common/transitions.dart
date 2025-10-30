@@ -3,9 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../utils/theme/uiValues.dart';
+import '../../utils/theme/ui_values.dart';
 
-Future<Object?> transitionDialog({
+Future<T?> transitionDialog<T>({
   required BuildContext context,
   bool barrierDismissible = true,
   required Widget child,
@@ -15,7 +15,7 @@ Future<Object?> transitionDialog({
   Color barrierColor = const Color(0x80000000),
 }) {
   final ThemeData theme = Theme.of(context);
-  return showGeneralDialog(
+  return showGeneralDialog<T>(
     context: context,
     pageBuilder: (
       BuildContext context,

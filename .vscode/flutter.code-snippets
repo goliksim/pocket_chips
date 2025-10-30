@@ -1,0 +1,77 @@
+{
+  "Freezed model": {
+    "prefix": "json",
+    "body": [
+      "import 'package:freezed_annotation/freezed_annotation.dart';",
+      "",
+      "part '${1:filename}.freezed.dart';",
+      "part '${1:filename}.g.dart';",
+      "",
+      "@freezed",
+  "class ${2:ClassName} with _\\$${2:ClassName} {",
+      "  const factory ${2:ClassName}({",
+      "    ${3:Type}? ${4:field},",
+      "  }) = _${2:ClassName};",
+      "",
+  "  factory ${2:ClassName}.fromJson(Map<String, dynamic> json) => _\\$${2:ClassName}FromJson(json);",
+      "}"
+    ],
+    "description": "Freezed data class with JSON serialization"
+  },
+
+  "Freezed union / sealed class": {
+    "prefix": "freezed",
+    "body": [
+      "import 'package:freezed_annotation/freezed_annotation.dart';",
+      "",
+      "part '${1:filename}.freezed.dart';",
+      "",
+      "@freezed",
+  "abstract class ${2:Name} with _\\$${2:Name} {",
+      "  const factory ${2:Name}${3:}({}) = _${2:Name};",
+      
+      "}"
+    ],
+    "description": "Freezed union / sealed class (multiple factories)"
+  },
+
+  "Stateless Widget": {
+    "prefix": "stless",
+    "body": [
+      "import 'package:flutter/widgets.dart';",
+      "",
+      "class ${1:WidgetName} extends StatelessWidget {",
+      "  const ${1:WidgetName}({Key? key}) : super(key: key);",
+      "",
+      "  @override",
+      "  Widget build(BuildContext context) {",
+      "    return ${2:Container()};",
+      "  }",
+      "}"
+    ],
+    "description": "StatelessWidget skeleton"
+  },
+
+  "Stateful Widget": {
+    "prefix": "stful",
+    "body": [
+      "import 'package:flutter/widgets.dart';",
+      "",
+      "class ${1:WidgetName} extends StatefulWidget {",
+      "  const ${1:WidgetName}({Key? key}) : super(key: key);",
+      "",
+      "  @override",
+      "  State<${1:WidgetName}> createState() => _${1:WidgetName}State();",
+      "}",
+      "",
+      "class _${1:WidgetName}State extends State<${1:WidgetName}> {",
+      "  @override",
+      "  Widget build(BuildContext context) {",
+      "    return ${2:Container()};",
+      "  }",
+      "}"
+    ],
+    "description": "StatefulWidget skeleton"
+  },
+
+}

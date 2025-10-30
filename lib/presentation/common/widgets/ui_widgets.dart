@@ -1,42 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
-import '../../../l10n/localization.dart';
-import '../../../utils/theme/uiValues.dart';
-
-//Всплывающие уведомления
-Future<bool?> toastWarning(String text) => Fluttertoast.showToast(
-      msg: text, // message
-      fontSize: stdFontSize * 0.75,
-      toastLength: Toast.LENGTH_SHORT, // length
-      gravity: ToastGravity.BOTTOM, // location
-      timeInSecForIosWeb: 1,
-      backgroundColor: thisTheme.bgrColor,
-      textColor: thisTheme.onBackground, // duration
-    );
-
-void showToast(String text) async {
-  try {
-    await toastWarning(text);
-  } catch (e) {
-    // ignore: avoid_print
-    print('TOAST ERROR of: $text');
-  }
-}
+import '../../../utils/extensions.dart';
+import '../../../utils/theme/ui_values.dart';
 
 //Подтверждение действия
 class ConfirmationWindow extends StatelessWidget {
   const ConfirmationWindow({
     super.key,
-    required this.type,
+    required this.title,
     required this.message,
     required this.action,
-    required this.button,
+    required this.actionTitle,
   });
 
-  final String type;
+  final String title;
   final String message;
-  final String button;
+  final String actionTitle;
   final Function action;
 
   @override
@@ -63,7 +42,7 @@ class ConfirmationWindow extends StatelessWidget {
               alignment: Alignment.center,
               height: stdButtonHeight * 0.5,
               child: Text(
-                type,
+                title,
                 style: TextStyle(
                   color: thisTheme.onBackground,
                   fontSize: stdFontSize,
@@ -92,14 +71,13 @@ class ConfirmationWindow extends StatelessWidget {
                     height: stdButtonHeight * 0.75,
                     width: double.infinity,
                     buttonColor: thisTheme.bgrColor,
-                    textString: button,
+                    textString: actionTitle,
                     textStyle: TextStyle(
                       fontWeight: FontWeight.normal,
                       color: thisTheme.subsubmainColor,
                       fontSize: stdFontSize,
                     ),
                     action: () async {
-                      //_quickDelete(index)
                       Navigator.of(context).pop(true);
                       action();
                     },
@@ -110,7 +88,7 @@ class ConfirmationWindow extends StatelessWidget {
                     height: stdButtonHeight * 0.75,
                     width: double.infinity,
                     buttonColor: thisTheme.bgrColor,
-                    textString: context.locale.conf_canc,
+                    textString: context.strings.conf_canc,
                     textStyle: TextStyle(
                       fontWeight: FontWeight.normal,
                       color: thisTheme.primaryColor,

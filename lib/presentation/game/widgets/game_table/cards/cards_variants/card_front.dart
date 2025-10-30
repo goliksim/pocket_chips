@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../../domain/models/cards/card_model.dart' as c;
-import '../../../../../../utils/theme/uiValues.dart';
+import '../../../../../../utils/theme/ui_values.dart';
 import '../card_widget.dart';
 
 class CardFront extends StatelessWidget {

@@ -1,42 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl_standalone.dart';
 
-import '../domain/models/config_model.dart';
-import 'app_localizations.dart';
-
-extension LocalizationExs on BuildContext {
-  AppLocalizations get locale => AppLocalizations.of(this)!;
-}
+import '../domain/model_holders/config_model_holder.dart';
 
 class LocaleManager with ChangeNotifier {
-  static AppLocalizations? _appLocalizations;
-  static Locale? _lang; // Set the default locale to English
+  final ConfigModelHolder _configModelHolder;
 
-  static void initialize(AppLocalizations appLocalizations) {
-    _appLocalizations = appLocalizations;
+  static Locale? _lang;
+
+  LocaleManager({
+    required ConfigModelHolder configModelHolder,
+    required Function(VoidCallback) addListener,
+  }) : _configModelHolder = configModelHolder {
+    addListener(notifyListeners);
   }
 
   Future<void> initLocale() async {
-    if (thisConfig.locale != '') {
-      _lang = Locale(thisConfig.locale);
+    final appConfig = _configModelHolder.dataOrNull;
+
+    if (appConfig != null && appConfig.locale != '') {
+      _lang = Locale(appConfig.locale);
     } else {
       final locale = await findSystemLocale();
       _lang = Locale(locale.split('_')[0]);
     }
   }
 
-  static AppLocalizations get locale {
-    return _appLocalizations!;
-  }
+  Locale get lang => _lang!;
 
-  static Locale get lang => _lang!;
   void changeLocale(Locale newLocale) {
     _lang = newLocale;
     notifyListeners();
-  }
-
-  static void staticChangeLocale(Locale newLocale) {
-    _lang = newLocale;
-    //notifyListeners();
   }
 }

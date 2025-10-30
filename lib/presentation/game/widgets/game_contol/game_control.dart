@@ -1,109 +1,125 @@
 import 'package:flutter/material.dart';
 
-import '../../../../domain/game_logic.dart';
-import '../../../../domain/models/lobby.dart';
-import '../../../../utils/theme/uiValues.dart';
-import 'control_widgets/control_buttons/control_buttons.dart';
-import 'control_widgets/control_buttons/raise_buttons.dart';
-import 'control_widgets/control_buttons/start_field.dart';
-import 'control_widgets/raise_field.dart';
+import '../../../../utils/theme/ui_values.dart';
+import 'breakdown_buttons.dart';
+import 'control_buttons.dart';
+import 'raise/raise_buttons.dart';
+import 'raise/raise_field.dart';
+import 'raise/raise_provider.dart';
+import 'view_model/game_control_view_model.dart';
+import 'view_state/game_page_control_state.dart';
 
 class GameControl extends StatefulWidget {
-  const GameControl({super.key, required this.callback});
-  final Function() callback;
+  final GameControlViewModel viewModel;
+
+  const GameControl({
+    required this.viewModel,
+    super.key,
+  });
+
   @override
   State<GameControl> createState() => _GameControlState();
 }
 
 class _GameControlState extends State<GameControl> {
   late bool raiseButtonPressed;
-  late int tmpBid;
-  late int minBid;
 
   @override
   void initState() {
     raiseButtonPressed = false;
-    tmpBid = thisGame.raiseBank;
-    minBid = tmpBid;
     super.initState();
   }
 
-  void changeBid(int newBank) {
-    setState(() {
-      tmpBid = newBank;
-    });
-  }
+  GamePageControlState get state => widget.viewModel.controlsState;
 
   void changeRaiseBool(bool value) {
     setState(() {
       raiseButtonPressed = value;
-      if (!value) reset();
     });
   }
 
-  void reset() {
-    thisGame.raiseBank = thisGame.minTmpFunction(thisGame.bidsEqual);
-    tmpBid = thisGame.raiseBank;
-    minBid = tmpBid;
-  }
-
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: stdButtonHeight * 1.6,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 150),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return FadeTransition(
-                opacity: animation,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0.0, 0.1),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.ease,
-                    ),
+  Widget build(BuildContext context) => _InheritedWrapper(
+        state: state,
+        child: Builder(
+          builder: (context) => Column(
+            children: [
+              SizedBox(
+                height: stdButtonHeight * 1.6,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 150),
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0.0, 0.1),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.ease,
+                          ),
+                        ),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: SizedBox(
+                    height:
+                        2 * stdButtonHeight * 0.75 + stdHorizontalOffset / 2,
+                    key: ValueKey(raiseButtonPressed),
+                    child: raiseButtonPressed
+                        ? RaiseFieldWidget(
+                            state: (state as GamePageActiveControlState)
+                                .raiseState,
+                          )
+                        : null,
                   ),
-                  child: child,
                 ),
-              );
-            },
-            child: SizedBox(
-              height: 2 * stdButtonHeight * 0.75 + stdHorizontalOffset / 2,
-              key: ValueKey(raiseButtonPressed),
-              child: raiseButtonPressed
-                  ? StaticRaiseButton(
-                      newPlayer: thisGame.newPlayer,
-                      changeBid: changeBid,
-                      tmpBid: tmpBid,
-                      minBid: minBid,
-                    )
-                  : null,
-            ),
+              ),
+              SizedBox(height: stdHorizontalOffset),
+              // Панелька нижних кнопок
+              state.map(
+                active: (activeState) => raiseButtonPressed
+                    ? RaiseButtons(
+                        state: activeState.raiseState,
+                        onConfirm: widget.viewModel.onControlAction,
+                        onClose: () => changeRaiseBool(false),
+                      )
+                    : ControlButtons(
+                        controlAction: widget.viewModel.onControlAction,
+                        state: activeState,
+                        openRaiseField: () => changeRaiseBool(true),
+                      ),
+                breakdown: (breakdownState) => BreakdownButtons(
+                  canStartBetting: breakdownState.canStartBetting,
+                  openSettings: () => widget.viewModel.openSettings(),
+                  startBetting: () => widget.viewModel.startBetting(),
+                ),
+              ),
+            ],
           ),
         ),
-        SizedBox(height: stdHorizontalOffset),
-        // Панелька нижних кнопок
-        (thisLobby.lobbyState != 5)
-            ? (!raiseButtonPressed
-                ? ControlButtons(
-                    key: const ValueKey(1),
-                    changeRaiseButton: changeRaiseBool,
-                    raiseButtonPressed: raiseButtonPressed,
-                  )
-                : RaiseButtons(
-                    key: const ValueKey(2),
-                    changeRaiseButton: changeRaiseBool,
-                    tmpBid: tmpBid,
-                  ))
-            : StartGameField(
-                callback: widget.callback,
-              ),
-      ],
-    );
-  }
+      );
+}
+
+class _InheritedWrapper extends StatelessWidget {
+  final GamePageControlState state;
+  final Widget child;
+
+  const _InheritedWrapper({
+    required this.state,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) => state.map(
+        active: (activeState) => CurrentBetValueProvider(
+          currentBet: activeState.raiseState.minPossibleBet,
+          child: child,
+        ),
+        breakdown: (_) => child,
+      );
 }

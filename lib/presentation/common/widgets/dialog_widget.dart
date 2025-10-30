@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../utils/theme/uiValues.dart';
+import '../../../utils/theme/ui_values.dart';
 import 'ui_widgets.dart';
 
 class DialogWidget extends StatelessWidget {
