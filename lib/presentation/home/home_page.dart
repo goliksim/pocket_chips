@@ -1,120 +1,128 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../di/view_models.dart';
 import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
+import '../common/widgets/attention_button.dart';
 import '../common/widgets/chips_image.dart';
 import '../common/widgets/ui_widgets.dart';
-import 'home_page_view_model.dart';
 
-class HomePage extends StatelessWidget {
-  final HomePageViewModel viewModel;
-
-  const HomePage({
-    required this.viewModel,
-    super.key,
-  });
-
+class HomePage extends ConsumerWidget {
   final String title = 'POCKET CHIPS';
 
-  @override
-  Widget build(BuildContext context) => ListenableBuilder(
-        listenable: viewModel,
-        builder: (_, __) {
-          final shouldDrawContinure =
-              viewModel.hasActiveLobby || viewModel.isLoading;
+  const HomePage({super.key});
 
-          return PatternContainer(
-            padding: EdgeInsets.only(
-              top: stdCutoutWidth * 0.75,
-              bottom: stdCutoutWidthDown * 0.75,
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final viewModel = ref.watch(homePageViewModelProvider.notifier);
+    final asyncState = ref.watch(homePageViewModelProvider);
+
+    final isLoading = asyncState.isLoading;
+
+    final shouldDrawContinue = asyncState.maybeWhen(
+      data: (data) => data,
+      loading: () => false,
+      orElse: () => false,
+    );
+
+    return PatternContainer(
+      padding: EdgeInsets.only(
+        top: stdCutoutWidth * 0.75,
+        bottom: stdCutoutWidthDown * 0.75,
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          leading: null,
+          toolbarHeight: stdButtonHeight * 0.75,
+          automaticallyImplyLeading: false,
+          backgroundColor: const Color(0x00000000),
+          iconTheme: IconThemeData(
+            color: thisTheme.onBackground,
+          ),
+          elevation: 0,
+          centerTitle: true,
+          title: Text(
+            title,
+            textAlign: TextAlign.center,
+            style: appBarStyle().copyWith(
+              fontWeight: FontWeight.w700,
+              fontSize: stdFontSize / 20 * 28,
             ),
-            child: Scaffold(
-              appBar: AppBar(
-                leading: null,
-                toolbarHeight: stdButtonHeight * 0.75,
-                automaticallyImplyLeading: false,
-                backgroundColor: const Color(0x00000000),
-                iconTheme: IconThemeData(
-                  color: thisTheme.onBackground,
+          ),
+          actions: <Widget>[
+            AspectRatio(
+              aspectRatio: 1,
+              child: IconButton(
+                icon: Icon(
+                  (thisTheme == themeList[0])
+                      ? Icons.mode_night_outlined
+                      : Icons.nightlight_round,
+                  size: stdIconSize,
                 ),
-                elevation: 0,
-                centerTitle: true,
-                title: Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: appBarStyle().copyWith(
-                    fontWeight: FontWeight.w700,
-                    fontSize: stdFontSize / 20 * 28,
-                  ),
-                ),
-                actions: <Widget>[
-                  AspectRatio(
-                    aspectRatio: 1,
-                    child: IconButton(
-                      icon: Icon(
-                        (thisTheme == themeList[0])
-                            ? Icons.mode_night_outlined
-                            : Icons.nightlight_round,
-                        size: stdIconSize,
-                      ),
-                      tooltip: context.strings.tooltip_theme,
-                      onPressed: () => viewModel.changeTheme(),
-                    ),
-                  ),
-                ],
+                tooltip: context.strings.tooltip_theme,
+                onPressed: () => viewModel.changeTheme(),
               ),
-              backgroundColor: Colors.transparent,
-              body: Center(
-                child: Container(
-                  width: stdButtonWidth,
-                  margin: EdgeInsets.only(
-                    bottom: adaptiveOffset,
-                    left: adaptiveOffset,
-                    right: adaptiveOffset,
+            ),
+          ],
+        ),
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: Container(
+            width: stdButtonWidth,
+            margin: EdgeInsets.only(
+              bottom: adaptiveOffset,
+              left: adaptiveOffset,
+              right: adaptiveOffset,
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  AspectRatio(
+                    aspectRatio: 0.8,
+                    child: ChipsImage(),
                   ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: ChipsImage(),
-                        ),
-                        SizedBox(
-                          height: stdButtonHeight * 2 +
-                              stdHorizontalOffset * 2 +
-                              (shouldDrawContinure ? stdButtonHeight : 0),
-                          child: Column(
+                  Expanded(
+                    child: isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              if (shouldDrawContinure)
-                                // Continue Button
-                                viewModel.isLoading
-                                    ? SizedBox(
-                                        height: stdButtonHeight,
-                                        width: double.infinity,
-                                        child: CircularProgressIndicator(),
-                                      )
-                                    : MyButton(
-                                        height: stdButtonHeight,
-                                        width: double.infinity,
-                                        borderRadius: BorderRadius.circular(
-                                            stdBorderRadius),
-                                        buttonColor: thisTheme.primaryColor,
-                                        textString: context.strings.home_cont,
-                                        action: () => viewModel.continueGame(),
-                                      ),
+                              // Continue Button
+                              Opacity(
+                                opacity: shouldDrawContinue ? 1 : 0.25,
+                                child: MyButton(
+                                  height: stdButtonHeight,
+                                  width: double.infinity,
+                                  borderRadius:
+                                      BorderRadius.circular(stdBorderRadius),
+                                  buttonColor: thisTheme.primaryColor,
+                                  textString: context.strings.home_cont,
+                                  action: () {
+                                    if (shouldDrawContinue) {
+                                      viewModel.continueGame();
+                                    }
+                                  },
+                                ),
+                              ),
+
                               SizedBox(height: stdHorizontalOffset),
                               //New Game
-                              MyButton(
-                                height: stdButtonHeight,
-                                width: double.infinity,
-                                borderRadius:
-                                    BorderRadius.circular(stdBorderRadius),
-                                buttonColor: shouldDrawContinure
+                              AttentionButton(
+                                onTap: () => viewModel.createNewGame(),
+                                needToAnimate: () => !shouldDrawContinue,
+                                bgColor: shouldDrawContinue
                                     ? thisTheme.secondaryColor
                                     : thisTheme.primaryColor,
-                                textString: context.strings.home_new,
-                                action: () => viewModel.createNewGame(),
+                                textColor: thisTheme.onBackground,
+                                textWidget: Text(
+                                  context.strings.home_new,
+                                  style: stdTextStyle.copyWith(
+                                    fontSize: stdFontSize,
+                                  ),
+                                ),
                               ),
                               SizedBox(
                                 height: stdHorizontalOffset,
@@ -154,14 +162,13 @@ class HomePage extends StatelessWidget {
                               ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
                   ),
-                ),
+                ],
               ),
             ),
-          );
-        },
-      );
+          ),
+        ),
+      ),
+    );
+  }
 }

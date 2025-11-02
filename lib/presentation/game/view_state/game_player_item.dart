@@ -13,8 +13,8 @@ abstract class GamePlayerItem with _$GamePlayerItem {
     required bool isDealer,
     required bool isCurrent,
     required bool isFolded,
-    int? bank,
-    int? bet,
+    required int bank,
+    required int bet,
   }) = _GamePlayerItem;
 }
 

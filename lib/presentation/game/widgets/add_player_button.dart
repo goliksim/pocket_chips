@@ -74,6 +74,8 @@ class _AddPlayerButtonState extends State<AddPlayerButton> {
                               setState(() {
                                 addButtonPressed = true;
                               });
+                              //TODO: продлить, если нажали на внутренние кнопки
+                              //TODO: дублируется кнопочка
                               await Future.delayed(const Duration(seconds: 10));
                               setState(() {
                                 addButtonPressed = false;

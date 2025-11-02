@@ -39,6 +39,13 @@ class _GameControlState extends State<GameControl> {
   }
 
   @override
+  void didUpdateWidget(covariant GameControl oldWidget) {
+    raiseButtonPressed = false;
+
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) => _InheritedWrapper(
         state: state,
         child: Builder(
@@ -98,6 +105,9 @@ class _GameControlState extends State<GameControl> {
                   openSettings: () => widget.viewModel.openSettings(),
                   startBetting: () => widget.viewModel.startBetting(),
                 ),
+                showdown: (_) => SizedBox(
+                  height: stdButtonHeight,
+                ),
               ),
             ],
           ),
@@ -116,10 +126,11 @@ class _InheritedWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => state.map(
-        active: (activeState) => CurrentBetValueProvider(
+        active: (activeState) => RaiseProviderScope(
           currentBet: activeState.raiseState.minPossibleBet,
           child: child,
         ),
         breakdown: (_) => child,
+        showdown: (value) => child,
       );
 }

@@ -9,15 +9,11 @@ class ThemeManager {
       : _configModelHolder = configModelHolder;
 
   void changeTheme() {
-    final currentConfig = _configModelHolder.dataOrNull;
+    final currentConfig = _configModelHolder.state.requireValue;
 
     final isDark = thisTheme == themeList[1];
 
     thisTheme = themeList[isDark ? 0 : 1];
-
-    if (currentConfig == null) {
-      return;
-    }
 
     _configModelHolder.updateConfig(
       currentConfig.copyWith(isDark: isDark),

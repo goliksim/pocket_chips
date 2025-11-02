@@ -18,7 +18,7 @@ class InitPageViewModel extends ValueNotifier<bool> {
   }
 
   void _completeInitialization() {
-    if (_initializationManager.isInitialized) {}
+    value = _initializationManager.isInitialized;
   }
 
   @override

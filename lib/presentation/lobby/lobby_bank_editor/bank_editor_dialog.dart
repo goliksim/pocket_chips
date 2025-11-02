@@ -125,13 +125,7 @@ class _BankWindowState extends State<BankEditorDialog> {
               width: double.infinity,
               buttonColor:
                   (tmpBank >= 1) ? thisTheme.primaryColor : thisTheme.bankColor,
-              action: () {
-                // проверка чтобы челикс не ввел пустой символ
-                if (tmpBank >= 1) {
-                  // TODO Внимание на минимальный банк!
-                  widget.viewModel.changeBank(tmpBank);
-                }
-              },
+              action: () => widget.viewModel.changeBank(tmpBank),
               textString: context.strings.playp_bank_conf,
             ),
           ],

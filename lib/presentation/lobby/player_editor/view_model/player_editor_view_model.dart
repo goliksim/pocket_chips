@@ -44,7 +44,7 @@ class PlayerEditorViewModel with ChangeNotifier {
     final newPlayer = _playerUid == null;
     final lobby = _lobbyStateHolder.activeLobby;
 
-    final lobbyPlayer = lobby.players.findByUid(_playerUid!);
+    final lobbyPlayer = newPlayer ? null : lobby.players.findByUid(_playerUid!);
     final lobbyPlayerBank = lobby.banks[_playerUid];
 
     if (!newPlayer && (lobbyPlayer == null)) {
@@ -57,15 +57,22 @@ class PlayerEditorViewModel with ChangeNotifier {
       nameInput: playerForEditing?.name ?? standartName,
       assetUrl: playerForEditing?.assetUrl ?? standartLogo,
       bankInput: lobbyPlayerBank ?? lobby.defaultBank,
-      makeDealer: lobby.dealerId == _playerUid,
+      forceDeadler: lobby.dealerId == null,
+      makeDealer: lobby.dealerId == _playerUid && _playerUid != null,
     );
 
     canEdit = (newPlayer || lobby.gameState.canEditPlayers);
   }
 
-  void openLogoEditor() => _navigationManager.openPlayerLogoEditor();
+  Future<void> openLogoEditor() async {
+    final newLogo = await _navigationManager.openPlayerLogoEditor();
 
-  void changeLogo(String newLogo) {
+    if (newLogo != null) {
+      _changeLogo(newLogo);
+    }
+  }
+
+  void _changeLogo(String newLogo) {
     playerState = playerState.copyWith(assetUrl: newLogo);
 
     notifyListeners();
@@ -133,7 +140,7 @@ class PlayerEditorViewModel with ChangeNotifier {
     );
 
     // Проверяем, что не ввели данные существующего игрока
-    if (lobby.players.contains(playerModel)) {
+    if (newPlayerEditing && lobby.players.contains(playerModel)) {
       _toastManager.showToast(_strings.toast_alred2);
 
       return;
@@ -153,10 +160,10 @@ class PlayerEditorViewModel with ChangeNotifier {
         await _lobbyStateHolder.addPlayer(
           player: playerModel,
           bank: bank,
-          makeDealer: playerState.makeDealer,
+          makeDealer: playerState.forceDeadler || playerState.makeDealer,
         );
 
-        return;
+        return _pop();
       }
 
       await _lobbyStateHolder.updatePlayer(
@@ -165,11 +172,13 @@ class PlayerEditorViewModel with ChangeNotifier {
         makeDealer: playerState.makeDealer,
       );
 
-      return;
+      return _pop();
     } on Exception catch (e) {
       _toastManager.showToast(e.toString());
 
       return;
     }
   }
+
+  void _pop() => _navigationManager.pop();
 }

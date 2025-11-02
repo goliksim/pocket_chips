@@ -9,7 +9,7 @@ class ToastManager {
         fontSize: stdFontSize * 0.75,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
+        timeInSecForIosWeb: 3,
         backgroundColor: thisTheme.bgrColor,
         textColor: thisTheme.onBackground,
       );

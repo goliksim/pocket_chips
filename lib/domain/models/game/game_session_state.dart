@@ -9,7 +9,6 @@ abstract class GameSessionState with _$GameSessionState {
     required Set<String> foldedOrInactive,
     required int lapCounter,
     String? currentPlayerUid,
-    String? bigBlindPlayerUid,
     String? firstPlayerUid,
   }) = _GameSessionState;
 }

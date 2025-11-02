@@ -1,37 +1,29 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/model_holders/config_model_holder.dart';
+import '../domain/model_holders/game_state_machine.dart';
 import '../domain/model_holders/lobby_state_holder.dart';
 import '../domain/model_holders/saved_players_model_holder.dart';
-import 'domain_managers.dart';
-import 'repositories.dart';
+import '../domain/models/config_model.dart';
+import '../domain/models/game/game_state_model.dart';
+import '../domain/models/lobby/lobby_state_model.dart';
 
-final configModelHolderProvider = Provider.autoDispose(
-  (ref) => ConfigModelHolder(
-    repository: ref.watch(appRepositoryProvider),
-  ),
+final configModelHolderProvider =
+    AsyncNotifierProvider<ConfigModelHolder, ConfigModel>(
+  ConfigModelHolder.new,
 );
 
-final lobbyStateHolderProvider = Provider.autoDispose<LobbyStateHolder>(
-  (ref) => LobbyStateHolder(
-    repository: ref.watch(appRepositoryProvider),
-    strings: ref.watch(stringsProvider),
-  ),
+final lobbyStateHolderProvider =
+    AsyncNotifierProvider<LobbyStateHolder, LobbyStateModel>(
+  LobbyStateHolder.new,
 );
 
 final savedPlayersModelHolderProvider =
-    Provider.autoDispose<SavedPlayersModelHolder>(
-  (ref) => SavedPlayersModelHolder(
-    repository: ref.watch(appRepositoryProvider),
-  ),
+    AsyncNotifierProvider.autoDispose<SavedPlayersModelHolder, SavedPlayers>(
+  SavedPlayersModelHolder.new,
 );
 
-final gameStateMachineProvider = Provider(
-  (ref) => GameStateMachine(
-    navigationManager: ref.watch(navigationManagerProvider),
-    lobbyStateHolder: ref.watch(lobbyStateHolderProvider),
-    toastManager: ref.watch(toastManagerProvider),
-    appRepository: ref.watch(appRepositoryProvider),
-    strings: ref.watch(stringsProvider),
-  ),
+final gameStateMachineProvider =
+    AsyncNotifierProvider<GameStateMachine, GameStateModel>(
+  GameStateMachine.new,
 );

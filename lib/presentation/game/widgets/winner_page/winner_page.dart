@@ -8,9 +8,11 @@ import '../../../../utils/theme/ui_values.dart';
 
 class WinnerWindow extends StatefulWidget {
   final PlayerModel winner;
+  final VoidCallback pop;
 
   const WinnerWindow({
     required this.winner,
+    required this.pop,
     super.key,
   });
 
@@ -26,7 +28,7 @@ class _WinnerWindowState extends State<WinnerWindow> {
     super.initState();
 
     for (int i = 0; i < 100; i++) {
-      bgrText += '${context.strings.game_win1}\u00A0';
+      bgrText += 'winner';
     }
   }
 
@@ -44,65 +46,68 @@ class _WinnerWindowState extends State<WinnerWindow> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
       ),
-      child: SizedBox(
-        height: stdButtonHeight * 4,
-        width: 0,
-        child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
-          child: Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              Container(
-                padding: EdgeInsets.only(left: stdHorizontalOffset / 4),
-                height: stdButtonHeight * 3,
-                width: stdButtonHeight * 4,
-                child: Text(
-                  bgrText,
-                  overflow: TextOverflow.fade,
-                  maxLines: 20,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'Ubuntu',
-                    color: thisTheme.bankColor.withAlpha(128),
-                    fontWeight: FontWeight.w700,
-                    fontSize: stdFontSize * 2,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: stdButtonHeight / 8,
-                child: Container(
+      child: GestureDetector(
+        onTap: () => widget.pop(),
+        child: SizedBox(
+          height: stdButtonHeight * 4,
+          width: 0,
+          child: ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
+            child: Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(left: stdHorizontalOffset / 4),
                   height: stdButtonHeight * 3,
-                  width: stdButtonHeight * 3,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      filterQuality: FilterQuality.high,
-                      image: AssetImage(
-                        widget.winner.assetUrl,
-                      ),
-                      fit: BoxFit.fitHeight,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                child: Container(
-                  height: stdButtonHeight,
                   width: stdButtonHeight * 4,
-                  alignment: Alignment.center,
                   child: Text(
-                    '${widget.winner.name} ${context.strings.game_win2}',
+                    bgrText,
+                    overflow: TextOverflow.fade,
+                    maxLines: 20,
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: thisTheme.primaryColor,
-                      fontSize: stdFontSize,
-                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Ubuntu',
+                      color: thisTheme.bankColor.withAlpha(128),
+                      fontWeight: FontWeight.w700,
+                      fontSize: stdFontSize * 2,
                     ),
                   ),
                 ),
-              ),
-            ],
+                Positioned(
+                  top: stdButtonHeight / 8,
+                  child: Container(
+                    height: stdButtonHeight * 3,
+                    width: stdButtonHeight * 3,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        filterQuality: FilterQuality.high,
+                        image: AssetImage(
+                          widget.winner.assetUrl,
+                        ),
+                        fit: BoxFit.fitHeight,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  child: Container(
+                    height: stdButtonHeight,
+                    width: stdButtonHeight * 4,
+                    alignment: Alignment.center,
+                    child: Text(
+                      '${widget.winner.name} ${context.strings.game_win2}',
+                      style: TextStyle(
+                        color: thisTheme.primaryColor,
+                        fontSize: stdFontSize,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

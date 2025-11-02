@@ -45,17 +45,17 @@ Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
     getTransition(String type) {
   switch (type) {
     case 'Scale1':
-      return dialogScale1;
+      return _dialogScale1;
     case 'SlideUp':
       return _dialogSlideUp;
     case 'SlideDown':
       return _dialogSlideDown;
     default:
-      return dialogScale1;
+      return _dialogScale1;
   }
 }
 
-Widget dialogScale1(
+Widget _dialogScale1(
   BuildContext context,
   Animation<double> animation,
   Animation<double> secondaryAnimation,
@@ -141,7 +141,7 @@ Widget dialogWave1(
         colors: const [Colors.white, Colors.transparent, Colors.transparent],
         stops: const [0.4, 0.7, 1],
         center: FractionalOffset(
-          0.5 - 0.35 * stdButtonWidth / MediaQuery.of(context).size.width,
+          0.5 - 0.275 * stdButtonWidth / MediaQuery.of(context).size.width,
           0.5,
         ),
       ).createShader(rect);

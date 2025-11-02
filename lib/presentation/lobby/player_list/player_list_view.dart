@@ -7,7 +7,7 @@ import '../../common/widgets/ui_widgets.dart';
 import 'view_state/lobby_player_item.dart';
 import 'widgets/player_card.dart';
 
-class PlayerList extends StatefulWidget {
+class PlayerList extends StatelessWidget {
   final List<LobbyPlayerItem> players;
   final bool canReorder;
   final Function(int oldIndex, int newIndex) onReorder;
@@ -16,55 +16,49 @@ class PlayerList extends StatefulWidget {
   final Future<bool> Function(String playerUid)? leftItemCallback;
   final void Function(String playerUid)? onItemTap;
 
-  const PlayerList({
+  PlayerList({
     required this.players,
     required this.canReorder,
     required this.onReorder,
+    this.scrollController,
     this.rightItemCallback,
     this.leftItemCallback,
     this.onItemTap,
     super.key,
   });
 
-  @override
-  PlayerListState createState() => PlayerListState();
-}
-
-class PlayerListState extends State<PlayerList> {
-  final ScrollController _scrollController = ScrollController();
-  ValueNotifier<int> reorderableIndex = ValueNotifier(-1);
+  final ScrollController? scrollController;
+  final ValueNotifier<int> reorderableIndex = ValueNotifier(-1);
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(stdBorderRadius),
       child: SizedBox(
-        height: widget.players.length * (stdButtonHeight + stdHorizontalOffset),
+        height: players.length * (stdButtonHeight + stdHorizontalOffset),
         child: ReorderableListView.builder(
-          buildDefaultDragHandles: widget.canReorder,
-          scrollController: _scrollController,
+          buildDefaultDragHandles: canReorder,
+          scrollController: scrollController,
           proxyDecorator: proxyDecorator,
           onReorderStart: (index) {
-            if (widget.canReorder) {
+            if (canReorder) {
               reorderableIndex.value = index;
             }
           },
           onReorderEnd: (index) {
-            if (widget.canReorder) {
+            if (canReorder) {
               reorderableIndex.value = -1;
             }
           },
-          onReorder: widget.onReorder,
+          onReorder: onReorder,
           physics: const BouncingScrollPhysics(),
-          itemCount: widget.players.length,
+          itemCount: players.length,
           itemBuilder: (context, index) {
-            final player = widget.players[index];
+            final player = players[index];
 
             return Padding(
-              key: ValueKey(
-                player.name + player.assetUrl,
-              ),
-              padding: EdgeInsets.only(bottom: stdHorizontalOffset),
+              key: ValueKey(player.uid),
+              padding: EdgeInsets.symmetric(vertical: stdHorizontalOffset / 2),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(stdBorderRadius),
                 child: ValueListenableBuilder<int>(
@@ -75,15 +69,15 @@ class PlayerListState extends State<PlayerList> {
                     return _ReorderableWrapper(
                       isOrdering: index == value,
                       child: PlayerCard(
-                        canReorderOrDismiss: widget.canReorder,
+                        canReorderOrDismiss: canReorder,
                         player: player,
                         rightCallback: () =>
-                            widget.rightItemCallback?.call(player.uid) ??
+                            rightItemCallback?.call(player.uid) ??
                             Future.value(false),
                         leftCallback: () =>
-                            widget.leftItemCallback?.call(player.uid) ??
+                            leftItemCallback?.call(player.uid) ??
                             Future.value(false),
-                        onTap: () => widget.onItemTap?.call(player.uid),
+                        onTap: () => onItemTap?.call(player.uid),
                       ),
                     );
                   },

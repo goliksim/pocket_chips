@@ -14,9 +14,8 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$GameSettingsModel {
-  int get startingStack;
-  bool get canEditStack;
-  int get smallBlind;
+  int? get startingStack;
+  int? get smallBlind;
 
   /// Create a copy of GameSettingsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -33,19 +32,16 @@ mixin _$GameSettingsModel {
             other is GameSettingsModel &&
             (identical(other.startingStack, startingStack) ||
                 other.startingStack == startingStack) &&
-            (identical(other.canEditStack, canEditStack) ||
-                other.canEditStack == canEditStack) &&
             (identical(other.smallBlind, smallBlind) ||
                 other.smallBlind == smallBlind));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, startingStack, canEditStack, smallBlind);
+  int get hashCode => Object.hash(runtimeType, startingStack, smallBlind);
 
   @override
   String toString() {
-    return 'GameSettingsModel(startingStack: $startingStack, canEditStack: $canEditStack, smallBlind: $smallBlind)';
+    return 'GameSettingsModel(startingStack: $startingStack, smallBlind: $smallBlind)';
   }
 }
 
@@ -55,7 +51,7 @@ abstract mixin class $GameSettingsModelCopyWith<$Res> {
           GameSettingsModel value, $Res Function(GameSettingsModel) _then) =
       _$GameSettingsModelCopyWithImpl;
   @useResult
-  $Res call({int startingStack, bool canEditStack, int smallBlind});
+  $Res call({int startingStack, int smallBlind});
 }
 
 /// @nodoc
@@ -72,20 +68,15 @@ class _$GameSettingsModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? startingStack = null,
-    Object? canEditStack = null,
     Object? smallBlind = null,
   }) {
     return _then(_self.copyWith(
       startingStack: null == startingStack
-          ? _self.startingStack
+          ? _self.startingStack!
           : startingStack // ignore: cast_nullable_to_non_nullable
               as int,
-      canEditStack: null == canEditStack
-          ? _self.canEditStack
-          : canEditStack // ignore: cast_nullable_to_non_nullable
-              as bool,
       smallBlind: null == smallBlind
-          ? _self.smallBlind
+          ? _self.smallBlind!
           : smallBlind // ignore: cast_nullable_to_non_nullable
               as int,
     ));
@@ -108,13 +99,16 @@ extension GameSettingsModelPatterns on GameSettingsModel {
 
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>(
-    TResult Function(_GameSettingsModel value)? $default, {
+    TResult Function(GameSettingsModelArgs value)? $default, {
+    TResult Function(GameSettingsModelResult value)? result,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _GameSettingsModel() when $default != null:
+      case GameSettingsModelArgs() when $default != null:
         return $default(_that);
+      case GameSettingsModelResult() when result != null:
+        return result(_that);
       case _:
         return orElse();
     }
@@ -135,12 +129,15 @@ extension GameSettingsModelPatterns on GameSettingsModel {
 
   @optionalTypeArgs
   TResult map<TResult extends Object?>(
-    TResult Function(_GameSettingsModel value) $default,
-  ) {
+    TResult Function(GameSettingsModelArgs value) $default, {
+    required TResult Function(GameSettingsModelResult value) result,
+  }) {
     final _that = this;
     switch (_that) {
-      case _GameSettingsModel():
+      case GameSettingsModelArgs():
         return $default(_that);
+      case GameSettingsModelResult():
+        return result(_that);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -160,12 +157,15 @@ extension GameSettingsModelPatterns on GameSettingsModel {
 
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>(
-    TResult? Function(_GameSettingsModel value)? $default,
-  ) {
+    TResult? Function(GameSettingsModelArgs value)? $default, {
+    TResult? Function(GameSettingsModelResult value)? result,
+  }) {
     final _that = this;
     switch (_that) {
-      case _GameSettingsModel() when $default != null:
+      case GameSettingsModelArgs() when $default != null:
         return $default(_that);
+      case GameSettingsModelResult() when result != null:
+        return result(_that);
       case _:
         return null;
     }
@@ -187,13 +187,16 @@ extension GameSettingsModelPatterns on GameSettingsModel {
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(int startingStack, bool canEditStack, int smallBlind)?
         $default, {
+    TResult Function(int? startingStack, int? smallBlind)? result,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _GameSettingsModel() when $default != null:
+      case GameSettingsModelArgs() when $default != null:
         return $default(
             _that.startingStack, _that.canEditStack, _that.smallBlind);
+      case GameSettingsModelResult() when result != null:
+        return result(_that.startingStack, _that.smallBlind);
       case _:
         return orElse();
     }
@@ -215,13 +218,16 @@ extension GameSettingsModelPatterns on GameSettingsModel {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(int startingStack, bool canEditStack, int smallBlind)
-        $default,
-  ) {
+        $default, {
+    required TResult Function(int? startingStack, int? smallBlind) result,
+  }) {
     final _that = this;
     switch (_that) {
-      case _GameSettingsModel():
+      case GameSettingsModelArgs():
         return $default(
             _that.startingStack, _that.canEditStack, _that.smallBlind);
+      case GameSettingsModelResult():
+        return result(_that.startingStack, _that.smallBlind);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -242,13 +248,16 @@ extension GameSettingsModelPatterns on GameSettingsModel {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(int startingStack, bool canEditStack, int smallBlind)?
-        $default,
-  ) {
+        $default, {
+    TResult? Function(int? startingStack, int? smallBlind)? result,
+  }) {
     final _that = this;
     switch (_that) {
-      case _GameSettingsModel() when $default != null:
+      case GameSettingsModelArgs() when $default != null:
         return $default(
             _that.startingStack, _that.canEditStack, _that.smallBlind);
+      case GameSettingsModelResult() when result != null:
+        return result(_that.startingStack, _that.smallBlind);
       case _:
         return null;
     }
@@ -257,15 +266,14 @@ extension GameSettingsModelPatterns on GameSettingsModel {
 
 /// @nodoc
 
-class _GameSettingsModel implements GameSettingsModel {
-  const _GameSettingsModel(
+class GameSettingsModelArgs implements GameSettingsModel {
+  const GameSettingsModelArgs(
       {required this.startingStack,
       required this.canEditStack,
       required this.smallBlind});
 
   @override
   final int startingStack;
-  @override
   final bool canEditStack;
   @override
   final int smallBlind;
@@ -275,14 +283,15 @@ class _GameSettingsModel implements GameSettingsModel {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$GameSettingsModelCopyWith<_GameSettingsModel> get copyWith =>
-      __$GameSettingsModelCopyWithImpl<_GameSettingsModel>(this, _$identity);
+  $GameSettingsModelArgsCopyWith<GameSettingsModelArgs> get copyWith =>
+      _$GameSettingsModelArgsCopyWithImpl<GameSettingsModelArgs>(
+          this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _GameSettingsModel &&
+            other is GameSettingsModelArgs &&
             (identical(other.startingStack, startingStack) ||
                 other.startingStack == startingStack) &&
             (identical(other.canEditStack, canEditStack) ||
@@ -302,23 +311,23 @@ class _GameSettingsModel implements GameSettingsModel {
 }
 
 /// @nodoc
-abstract mixin class _$GameSettingsModelCopyWith<$Res>
+abstract mixin class $GameSettingsModelArgsCopyWith<$Res>
     implements $GameSettingsModelCopyWith<$Res> {
-  factory _$GameSettingsModelCopyWith(
-          _GameSettingsModel value, $Res Function(_GameSettingsModel) _then) =
-      __$GameSettingsModelCopyWithImpl;
+  factory $GameSettingsModelArgsCopyWith(GameSettingsModelArgs value,
+          $Res Function(GameSettingsModelArgs) _then) =
+      _$GameSettingsModelArgsCopyWithImpl;
   @override
   @useResult
   $Res call({int startingStack, bool canEditStack, int smallBlind});
 }
 
 /// @nodoc
-class __$GameSettingsModelCopyWithImpl<$Res>
-    implements _$GameSettingsModelCopyWith<$Res> {
-  __$GameSettingsModelCopyWithImpl(this._self, this._then);
+class _$GameSettingsModelArgsCopyWithImpl<$Res>
+    implements $GameSettingsModelArgsCopyWith<$Res> {
+  _$GameSettingsModelArgsCopyWithImpl(this._self, this._then);
 
-  final _GameSettingsModel _self;
-  final $Res Function(_GameSettingsModel) _then;
+  final GameSettingsModelArgs _self;
+  final $Res Function(GameSettingsModelArgs) _then;
 
   /// Create a copy of GameSettingsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -329,7 +338,7 @@ class __$GameSettingsModelCopyWithImpl<$Res>
     Object? canEditStack = null,
     Object? smallBlind = null,
   }) {
-    return _then(_GameSettingsModel(
+    return _then(GameSettingsModelArgs(
       startingStack: null == startingStack
           ? _self.startingStack
           : startingStack // ignore: cast_nullable_to_non_nullable
@@ -342,6 +351,86 @@ class __$GameSettingsModelCopyWithImpl<$Res>
           ? _self.smallBlind
           : smallBlind // ignore: cast_nullable_to_non_nullable
               as int,
+    ));
+  }
+}
+
+/// @nodoc
+
+class GameSettingsModelResult implements GameSettingsModel {
+  const GameSettingsModelResult(
+      {required this.startingStack, required this.smallBlind});
+
+  @override
+  final int? startingStack;
+  @override
+  final int? smallBlind;
+
+  /// Create a copy of GameSettingsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $GameSettingsModelResultCopyWith<GameSettingsModelResult> get copyWith =>
+      _$GameSettingsModelResultCopyWithImpl<GameSettingsModelResult>(
+          this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is GameSettingsModelResult &&
+            (identical(other.startingStack, startingStack) ||
+                other.startingStack == startingStack) &&
+            (identical(other.smallBlind, smallBlind) ||
+                other.smallBlind == smallBlind));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, startingStack, smallBlind);
+
+  @override
+  String toString() {
+    return 'GameSettingsModel.result(startingStack: $startingStack, smallBlind: $smallBlind)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $GameSettingsModelResultCopyWith<$Res>
+    implements $GameSettingsModelCopyWith<$Res> {
+  factory $GameSettingsModelResultCopyWith(GameSettingsModelResult value,
+          $Res Function(GameSettingsModelResult) _then) =
+      _$GameSettingsModelResultCopyWithImpl;
+  @override
+  @useResult
+  $Res call({int? startingStack, int? smallBlind});
+}
+
+/// @nodoc
+class _$GameSettingsModelResultCopyWithImpl<$Res>
+    implements $GameSettingsModelResultCopyWith<$Res> {
+  _$GameSettingsModelResultCopyWithImpl(this._self, this._then);
+
+  final GameSettingsModelResult _self;
+  final $Res Function(GameSettingsModelResult) _then;
+
+  /// Create a copy of GameSettingsModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? startingStack = freezed,
+    Object? smallBlind = freezed,
+  }) {
+    return _then(GameSettingsModelResult(
+      startingStack: freezed == startingStack
+          ? _self.startingStack
+          : startingStack // ignore: cast_nullable_to_non_nullable
+              as int?,
+      smallBlind: freezed == smallBlind
+          ? _self.smallBlind
+          : smallBlind // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }

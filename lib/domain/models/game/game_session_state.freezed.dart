@@ -18,7 +18,6 @@ mixin _$GameSessionState {
   Set<String> get foldedOrInactive;
   int get lapCounter;
   String? get currentPlayerUid;
-  String? get bigBlindPlayerUid;
   String? get firstPlayerUid;
 
   /// Create a copy of GameSessionState
@@ -41,8 +40,6 @@ mixin _$GameSessionState {
                 other.lapCounter == lapCounter) &&
             (identical(other.currentPlayerUid, currentPlayerUid) ||
                 other.currentPlayerUid == currentPlayerUid) &&
-            (identical(other.bigBlindPlayerUid, bigBlindPlayerUid) ||
-                other.bigBlindPlayerUid == bigBlindPlayerUid) &&
             (identical(other.firstPlayerUid, firstPlayerUid) ||
                 other.firstPlayerUid == firstPlayerUid));
   }
@@ -54,12 +51,11 @@ mixin _$GameSessionState {
       const DeepCollectionEquality().hash(foldedOrInactive),
       lapCounter,
       currentPlayerUid,
-      bigBlindPlayerUid,
       firstPlayerUid);
 
   @override
   String toString() {
-    return 'GameSessionState(bets: $bets, foldedOrInactive: $foldedOrInactive, lapCounter: $lapCounter, currentPlayerUid: $currentPlayerUid, bigBlindPlayerUid: $bigBlindPlayerUid, firstPlayerUid: $firstPlayerUid)';
+    return 'GameSessionState(bets: $bets, foldedOrInactive: $foldedOrInactive, lapCounter: $lapCounter, currentPlayerUid: $currentPlayerUid, firstPlayerUid: $firstPlayerUid)';
   }
 }
 
@@ -74,7 +70,6 @@ abstract mixin class $GameSessionStateCopyWith<$Res> {
       Set<String> foldedOrInactive,
       int lapCounter,
       String? currentPlayerUid,
-      String? bigBlindPlayerUid,
       String? firstPlayerUid});
 }
 
@@ -95,7 +90,6 @@ class _$GameSessionStateCopyWithImpl<$Res>
     Object? foldedOrInactive = null,
     Object? lapCounter = null,
     Object? currentPlayerUid = freezed,
-    Object? bigBlindPlayerUid = freezed,
     Object? firstPlayerUid = freezed,
   }) {
     return _then(_self.copyWith(
@@ -114,10 +108,6 @@ class _$GameSessionStateCopyWithImpl<$Res>
       currentPlayerUid: freezed == currentPlayerUid
           ? _self.currentPlayerUid
           : currentPlayerUid // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bigBlindPlayerUid: freezed == bigBlindPlayerUid
-          ? _self.bigBlindPlayerUid
-          : bigBlindPlayerUid // ignore: cast_nullable_to_non_nullable
               as String?,
       firstPlayerUid: freezed == firstPlayerUid
           ? _self.firstPlayerUid
@@ -220,26 +210,16 @@ extension GameSessionStatePatterns on GameSessionState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            Map<String, int> bets,
-            Set<String> foldedOrInactive,
-            int lapCounter,
-            String? currentPlayerUid,
-            String? bigBlindPlayerUid,
-            String? firstPlayerUid)?
+    TResult Function(Map<String, int> bets, Set<String> foldedOrInactive,
+            int lapCounter, String? currentPlayerUid, String? firstPlayerUid)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _GameSessionState() when $default != null:
-        return $default(
-            _that.bets,
-            _that.foldedOrInactive,
-            _that.lapCounter,
-            _that.currentPlayerUid,
-            _that.bigBlindPlayerUid,
-            _that.firstPlayerUid);
+        return $default(_that.bets, _that.foldedOrInactive, _that.lapCounter,
+            _that.currentPlayerUid, _that.firstPlayerUid);
       case _:
         return orElse();
     }
@@ -260,25 +240,15 @@ extension GameSessionStatePatterns on GameSessionState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            Map<String, int> bets,
-            Set<String> foldedOrInactive,
-            int lapCounter,
-            String? currentPlayerUid,
-            String? bigBlindPlayerUid,
-            String? firstPlayerUid)
+    TResult Function(Map<String, int> bets, Set<String> foldedOrInactive,
+            int lapCounter, String? currentPlayerUid, String? firstPlayerUid)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _GameSessionState():
-        return $default(
-            _that.bets,
-            _that.foldedOrInactive,
-            _that.lapCounter,
-            _that.currentPlayerUid,
-            _that.bigBlindPlayerUid,
-            _that.firstPlayerUid);
+        return $default(_that.bets, _that.foldedOrInactive, _that.lapCounter,
+            _that.currentPlayerUid, _that.firstPlayerUid);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -298,25 +268,15 @@ extension GameSessionStatePatterns on GameSessionState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            Map<String, int> bets,
-            Set<String> foldedOrInactive,
-            int lapCounter,
-            String? currentPlayerUid,
-            String? bigBlindPlayerUid,
-            String? firstPlayerUid)?
+    TResult? Function(Map<String, int> bets, Set<String> foldedOrInactive,
+            int lapCounter, String? currentPlayerUid, String? firstPlayerUid)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _GameSessionState() when $default != null:
-        return $default(
-            _that.bets,
-            _that.foldedOrInactive,
-            _that.lapCounter,
-            _that.currentPlayerUid,
-            _that.bigBlindPlayerUid,
-            _that.firstPlayerUid);
+        return $default(_that.bets, _that.foldedOrInactive, _that.lapCounter,
+            _that.currentPlayerUid, _that.firstPlayerUid);
       case _:
         return null;
     }
@@ -331,7 +291,6 @@ class _GameSessionState implements GameSessionState {
       required this.foldedOrInactive,
       required this.lapCounter,
       this.currentPlayerUid,
-      this.bigBlindPlayerUid,
       this.firstPlayerUid});
 
   @override
@@ -342,8 +301,6 @@ class _GameSessionState implements GameSessionState {
   final int lapCounter;
   @override
   final String? currentPlayerUid;
-  @override
-  final String? bigBlindPlayerUid;
   @override
   final String? firstPlayerUid;
 
@@ -367,8 +324,6 @@ class _GameSessionState implements GameSessionState {
                 other.lapCounter == lapCounter) &&
             (identical(other.currentPlayerUid, currentPlayerUid) ||
                 other.currentPlayerUid == currentPlayerUid) &&
-            (identical(other.bigBlindPlayerUid, bigBlindPlayerUid) ||
-                other.bigBlindPlayerUid == bigBlindPlayerUid) &&
             (identical(other.firstPlayerUid, firstPlayerUid) ||
                 other.firstPlayerUid == firstPlayerUid));
   }
@@ -380,12 +335,11 @@ class _GameSessionState implements GameSessionState {
       const DeepCollectionEquality().hash(foldedOrInactive),
       lapCounter,
       currentPlayerUid,
-      bigBlindPlayerUid,
       firstPlayerUid);
 
   @override
   String toString() {
-    return 'GameSessionState(bets: $bets, foldedOrInactive: $foldedOrInactive, lapCounter: $lapCounter, currentPlayerUid: $currentPlayerUid, bigBlindPlayerUid: $bigBlindPlayerUid, firstPlayerUid: $firstPlayerUid)';
+    return 'GameSessionState(bets: $bets, foldedOrInactive: $foldedOrInactive, lapCounter: $lapCounter, currentPlayerUid: $currentPlayerUid, firstPlayerUid: $firstPlayerUid)';
   }
 }
 
@@ -402,7 +356,6 @@ abstract mixin class _$GameSessionStateCopyWith<$Res>
       Set<String> foldedOrInactive,
       int lapCounter,
       String? currentPlayerUid,
-      String? bigBlindPlayerUid,
       String? firstPlayerUid});
 }
 
@@ -423,7 +376,6 @@ class __$GameSessionStateCopyWithImpl<$Res>
     Object? foldedOrInactive = null,
     Object? lapCounter = null,
     Object? currentPlayerUid = freezed,
-    Object? bigBlindPlayerUid = freezed,
     Object? firstPlayerUid = freezed,
   }) {
     return _then(_GameSessionState(
@@ -442,10 +394,6 @@ class __$GameSessionStateCopyWithImpl<$Res>
       currentPlayerUid: freezed == currentPlayerUid
           ? _self.currentPlayerUid
           : currentPlayerUid // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bigBlindPlayerUid: freezed == bigBlindPlayerUid
-          ? _self.bigBlindPlayerUid
-          : bigBlindPlayerUid // ignore: cast_nullable_to_non_nullable
               as String?,
       firstPlayerUid: freezed == firstPlayerUid
           ? _self.firstPlayerUid

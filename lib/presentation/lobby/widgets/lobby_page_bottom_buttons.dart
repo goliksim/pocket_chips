@@ -8,18 +8,22 @@ class LobbyPageBottomButtons extends StatelessWidget {
   final VoidCallback onStartGame;
   final VoidCallback openSettingsTap;
   final bool isGameActive;
+  final bool canEditSettings;
 
   const LobbyPageBottomButtons({
     super.key,
     required this.onStartGame,
     required this.openSettingsTap,
     required this.isGameActive,
+    required this.canEditSettings,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: stdButtonHeight * 2 + stdHorizontalOffset,
+      height: canEditSettings
+          ? stdButtonHeight * 2 + stdHorizontalOffset
+          : stdButtonHeight,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.max,
@@ -34,12 +38,13 @@ class LobbyPageBottomButtons extends StatelessWidget {
                 : context.strings.playp_start,
           ),
           // Settings
-          MyButton(
-            height: stdButtonHeight,
-            buttonColor: thisTheme.secondaryColor,
-            action: () => openSettingsTap(),
-            textString: context.strings.playp_set,
-          ),
+          if (canEditSettings)
+            MyButton(
+              height: stdButtonHeight,
+              buttonColor: thisTheme.secondaryColor,
+              action: () => openSettingsTap(),
+              textString: context.strings.playp_set,
+            ),
         ],
       ),
     );

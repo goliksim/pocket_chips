@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../../../../../../utils/theme/ui_values.dart';
 import '../card_widget.dart';
 
-Widget get cardSample => CardWidget(
+class CardFrontSample extends StatelessWidget {
+  const CardFrontSample({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CardWidget(
       child: ColoredBox(
         color: (thisTheme.name == 'dark')
             ? thisTheme.bankColor
@@ -18,3 +24,5 @@ Widget get cardSample => CardWidget(
         ),
       ),
     );
+  }
+}

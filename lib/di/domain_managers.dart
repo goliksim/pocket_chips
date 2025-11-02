@@ -13,8 +13,8 @@ import 'model_holders.dart';
 
 final initializationManagerProvider = Provider<InitializationManager>(
   (ref) => InitializationManager(
-    configModelHolder: ref.watch(configModelHolderProvider),
-    navigationManager: ref.watch(navigationManagerProvider),
+    configModelHolder: ref.read(configModelHolderProvider.notifier),
+    navigationManager: ref.read(navigationManagerProvider),
   ),
 );
 
@@ -28,14 +28,14 @@ final navigationKeyProvider = Provider(
 
 final navigationManagerProvider = Provider<NavigationManager>(
   (ref) => NavigationManager(
-    navigatorKey: ref.watch(navigationKeyProvider),
+    navigatorKey: ref.read(navigationKeyProvider),
   ),
 );
 
 final routeDelegateProvider = Provider<AppRouterDelegate>(
   (ref) => AppRouterDelegate(
-    navigationManager: ref.watch(navigationManagerProvider),
-    navigatorKey: ref.watch(navigationKeyProvider),
+    navigationManager: ref.read(navigationManagerProvider),
+    navigatorKey: ref.read(navigationKeyProvider),
   ),
 );
 
@@ -43,17 +43,14 @@ final routeInformationParserProvider = Provider<AppRouteInformationParser>(
   (_) => AppRouteInformationParser(),
 );
 
-final localeManagerProvider = Provider<LocaleManager>(
-  (ref) => LocaleManager(
-    configModelHolder: ref.watch(configModelHolderProvider),
-    addListener: (listener) =>
-        ref.listen(configModelHolderProvider, (_, __) => listener()),
-  ),
+//TODO разобраться с listen
+final localeManagerProvider = NotifierProvider<LocaleManager, Locale>(
+  LocaleManager.new,
 );
 
 final stringsProvider = Provider<AppLocalizations>(
   (ref) {
-    final locale = ref.watch(localeManagerProvider).lang;
+    final locale = ref.watch(localeManagerProvider);
 
     return lookupAppLocalizations(locale);
   },

@@ -8,7 +8,7 @@ import '../view_state/game_control_result.dart';
 import '../view_state/game_page_control_state.dart';
 import 'raise_provider.dart';
 
-class RaiseButtons extends StatelessWidget {
+class RaiseButtons extends StatefulWidget {
   final RaiseControlState state;
   final void Function(GameControlRaiseResult) onConfirm;
   final VoidCallback onClose;
@@ -20,13 +20,18 @@ class RaiseButtons extends StatelessWidget {
     super.key,
   });
 
+  @override
+  State<RaiseButtons> createState() => _RaiseButtonsState();
+}
+
+class _RaiseButtonsState extends State<RaiseButtons> {
   //Текст кнопки подтверждения
   String raiseBetString({required AppLocalizations strings, required int bet}) {
-    if (bet == state.maxPossibleBet) {
+    if (bet == widget.state.maxPossibleBet) {
       // ALL IN
       return strings.game_all;
     } else {
-      return state.isFirstBet
+      return widget.state.isFirstBet
           ? '${strings.game_bet} \$$bet'
           : '${strings.game_raise} \$$bet';
     }
@@ -46,7 +51,7 @@ class RaiseButtons extends StatelessWidget {
           child: ControlButtonWrapper(
             title: context.strings.game_raise_canc,
             color: thisTheme.subsubmainColor,
-            action: () => onClose(),
+            action: () => widget.onClose(),
           ),
         ),
         SizedBox(width: stdHorizontalOffset),
@@ -55,9 +60,12 @@ class RaiseButtons extends StatelessWidget {
           flex: 209,
           fit: FlexFit.tight,
           child: ControlButtonWrapper(
-            title: raiseBetString(strings: context.strings, bet: currentBet),
+            title: raiseBetString(
+              strings: context.strings,
+              bet: currentBet,
+            ),
             color: thisTheme.secondaryColor,
-            action: () => onConfirm(
+            action: () => widget.onConfirm(
               GameControlRaiseResult(raiseValue: currentBet),
             ),
           ),

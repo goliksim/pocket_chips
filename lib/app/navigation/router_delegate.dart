@@ -36,19 +36,12 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
             init: (_) => InitPage(
               viewModel: ref.watch(initPageViewModelProvider),
             ),
-            menu: (_) => HomePage(
-              viewModel: ref.watch(homePageViewModelProvider),
-            ),
-            lobby: (_) => LobbyPage(
-              viewModel: ref.watch(lobbyPageViewModelProvider),
-            ),
+            menu: (_) => HomePage(),
+            lobby: (_) => LobbyPage(),
             game: (_) {
               //final args = route.args;
 
-              return GamePage(
-                viewModel: ref.watch(gamePageViewModelProvider),
-                controlViewModel: ref.watch(gamePageControlViewModelProvider),
-              );
+              return GamePage();
             },
           ),
         ),
@@ -58,6 +51,7 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
     return Navigator(
       key: navigatorKey,
       pages: pages,
+      onDidRemovePage: (_) {},
     );
   }
 

@@ -52,15 +52,18 @@ extension GamePageControlStatePatterns on GamePageControlState {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(GamePageActiveControlState value)? active,
-    TResult Function(_GamePageControlState value)? breakdown,
+    TResult Function(_GamePageControlBreakDownState value)? breakdown,
+    TResult Function(_GamePageControlShowDownState value)? showdown,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case GamePageActiveControlState() when active != null:
         return active(_that);
-      case _GamePageControlState() when breakdown != null:
+      case _GamePageControlBreakDownState() when breakdown != null:
         return breakdown(_that);
+      case _GamePageControlShowDownState() when showdown != null:
+        return showdown(_that);
       case _:
         return orElse();
     }
@@ -82,14 +85,17 @@ extension GamePageControlStatePatterns on GamePageControlState {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(GamePageActiveControlState value) active,
-    required TResult Function(_GamePageControlState value) breakdown,
+    required TResult Function(_GamePageControlBreakDownState value) breakdown,
+    required TResult Function(_GamePageControlShowDownState value) showdown,
   }) {
     final _that = this;
     switch (_that) {
       case GamePageActiveControlState():
         return active(_that);
-      case _GamePageControlState():
+      case _GamePageControlBreakDownState():
         return breakdown(_that);
+      case _GamePageControlShowDownState():
+        return showdown(_that);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -110,14 +116,17 @@ extension GamePageControlStatePatterns on GamePageControlState {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(GamePageActiveControlState value)? active,
-    TResult? Function(_GamePageControlState value)? breakdown,
+    TResult? Function(_GamePageControlBreakDownState value)? breakdown,
+    TResult? Function(_GamePageControlShowDownState value)? showdown,
   }) {
     final _that = this;
     switch (_that) {
       case GamePageActiveControlState() when active != null:
         return active(_that);
-      case _GamePageControlState() when breakdown != null:
+      case _GamePageControlBreakDownState() when breakdown != null:
         return breakdown(_that);
+      case _GamePageControlShowDownState() when showdown != null:
+        return showdown(_that);
       case _:
         return null;
     }
@@ -140,14 +149,17 @@ extension GamePageControlStatePatterns on GamePageControlState {
     TResult Function(RaiseControlState raiseState, MainControlState mainState)?
         active,
     TResult Function(bool canStartBetting)? breakdown,
+    TResult Function()? showdown,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case GamePageActiveControlState() when active != null:
         return active(_that.raiseState, _that.mainState);
-      case _GamePageControlState() when breakdown != null:
+      case _GamePageControlBreakDownState() when breakdown != null:
         return breakdown(_that.canStartBetting);
+      case _GamePageControlShowDownState() when showdown != null:
+        return showdown();
       case _:
         return orElse();
     }
@@ -172,13 +184,16 @@ extension GamePageControlStatePatterns on GamePageControlState {
             RaiseControlState raiseState, MainControlState mainState)
         active,
     required TResult Function(bool canStartBetting) breakdown,
+    required TResult Function() showdown,
   }) {
     final _that = this;
     switch (_that) {
       case GamePageActiveControlState():
         return active(_that.raiseState, _that.mainState);
-      case _GamePageControlState():
+      case _GamePageControlBreakDownState():
         return breakdown(_that.canStartBetting);
+      case _GamePageControlShowDownState():
+        return showdown();
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -201,13 +216,16 @@ extension GamePageControlStatePatterns on GamePageControlState {
     TResult? Function(RaiseControlState raiseState, MainControlState mainState)?
         active,
     TResult? Function(bool canStartBetting)? breakdown,
+    TResult? Function()? showdown,
   }) {
     final _that = this;
     switch (_that) {
       case GamePageActiveControlState() when active != null:
         return active(_that.raiseState, _that.mainState);
-      case _GamePageControlState() when breakdown != null:
+      case _GamePageControlBreakDownState() when breakdown != null:
         return breakdown(_that.canStartBetting);
+      case _GamePageControlShowDownState() when showdown != null:
+        return showdown();
       case _:
         return null;
     }
@@ -315,8 +333,8 @@ class _$GamePageActiveControlStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _GamePageControlState implements GamePageControlState {
-  const _GamePageControlState({required this.canStartBetting});
+class _GamePageControlBreakDownState implements GamePageControlState {
+  const _GamePageControlBreakDownState({required this.canStartBetting});
 
   final bool canStartBetting;
 
@@ -324,15 +342,15 @@ class _GamePageControlState implements GamePageControlState {
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$GamePageControlStateCopyWith<_GamePageControlState> get copyWith =>
-      __$GamePageControlStateCopyWithImpl<_GamePageControlState>(
-          this, _$identity);
+  _$GamePageControlBreakDownStateCopyWith<_GamePageControlBreakDownState>
+      get copyWith => __$GamePageControlBreakDownStateCopyWithImpl<
+          _GamePageControlBreakDownState>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _GamePageControlState &&
+            other is _GamePageControlBreakDownState &&
             (identical(other.canStartBetting, canStartBetting) ||
                 other.canStartBetting == canStartBetting));
   }
@@ -347,22 +365,23 @@ class _GamePageControlState implements GamePageControlState {
 }
 
 /// @nodoc
-abstract mixin class _$GamePageControlStateCopyWith<$Res>
+abstract mixin class _$GamePageControlBreakDownStateCopyWith<$Res>
     implements $GamePageControlStateCopyWith<$Res> {
-  factory _$GamePageControlStateCopyWith(_GamePageControlState value,
-          $Res Function(_GamePageControlState) _then) =
-      __$GamePageControlStateCopyWithImpl;
+  factory _$GamePageControlBreakDownStateCopyWith(
+          _GamePageControlBreakDownState value,
+          $Res Function(_GamePageControlBreakDownState) _then) =
+      __$GamePageControlBreakDownStateCopyWithImpl;
   @useResult
   $Res call({bool canStartBetting});
 }
 
 /// @nodoc
-class __$GamePageControlStateCopyWithImpl<$Res>
-    implements _$GamePageControlStateCopyWith<$Res> {
-  __$GamePageControlStateCopyWithImpl(this._self, this._then);
+class __$GamePageControlBreakDownStateCopyWithImpl<$Res>
+    implements _$GamePageControlBreakDownStateCopyWith<$Res> {
+  __$GamePageControlBreakDownStateCopyWithImpl(this._self, this._then);
 
-  final _GamePageControlState _self;
-  final $Res Function(_GamePageControlState) _then;
+  final _GamePageControlBreakDownState _self;
+  final $Res Function(_GamePageControlBreakDownState) _then;
 
   /// Create a copy of GamePageControlState
   /// with the given fields replaced by the non-null parameter values.
@@ -370,7 +389,7 @@ class __$GamePageControlStateCopyWithImpl<$Res>
   $Res call({
     Object? canStartBetting = null,
   }) {
-    return _then(_GamePageControlState(
+    return _then(_GamePageControlBreakDownState(
       canStartBetting: null == canStartBetting
           ? _self.canStartBetting
           : canStartBetting // ignore: cast_nullable_to_non_nullable
@@ -380,9 +399,29 @@ class __$GamePageControlStateCopyWithImpl<$Res>
 }
 
 /// @nodoc
+
+class _GamePageControlShowDownState implements GamePageControlState {
+  const _GamePageControlShowDownState();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _GamePageControlShowDownState);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GamePageControlState.showdown()';
+  }
+}
+
+/// @nodoc
 mixin _$RaiseControlState {
   bool get canRaise;
-  bool get onlyAllInRaise;
   bool get isFirstBet;
   int get maxPossibleBet;
   int get minPossibleBet;
@@ -402,8 +441,6 @@ mixin _$RaiseControlState {
             other is RaiseControlState &&
             (identical(other.canRaise, canRaise) ||
                 other.canRaise == canRaise) &&
-            (identical(other.onlyAllInRaise, onlyAllInRaise) ||
-                other.onlyAllInRaise == onlyAllInRaise) &&
             (identical(other.isFirstBet, isFirstBet) ||
                 other.isFirstBet == isFirstBet) &&
             (identical(other.maxPossibleBet, maxPossibleBet) ||
@@ -413,12 +450,12 @@ mixin _$RaiseControlState {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, canRaise, onlyAllInRaise,
-      isFirstBet, maxPossibleBet, minPossibleBet);
+  int get hashCode => Object.hash(
+      runtimeType, canRaise, isFirstBet, maxPossibleBet, minPossibleBet);
 
   @override
   String toString() {
-    return 'RaiseControlState(canRaise: $canRaise, onlyAllInRaise: $onlyAllInRaise, isFirstBet: $isFirstBet, maxPossibleBet: $maxPossibleBet, minPossibleBet: $minPossibleBet)';
+    return 'RaiseControlState(canRaise: $canRaise, isFirstBet: $isFirstBet, maxPossibleBet: $maxPossibleBet, minPossibleBet: $minPossibleBet)';
   }
 }
 
@@ -429,11 +466,7 @@ abstract mixin class $RaiseControlStateCopyWith<$Res> {
       _$RaiseControlStateCopyWithImpl;
   @useResult
   $Res call(
-      {bool canRaise,
-      bool onlyAllInRaise,
-      bool isFirstBet,
-      int maxPossibleBet,
-      int minPossibleBet});
+      {bool canRaise, bool isFirstBet, int maxPossibleBet, int minPossibleBet});
 }
 
 /// @nodoc
@@ -450,7 +483,6 @@ class _$RaiseControlStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? canRaise = null,
-    Object? onlyAllInRaise = null,
     Object? isFirstBet = null,
     Object? maxPossibleBet = null,
     Object? minPossibleBet = null,
@@ -459,10 +491,6 @@ class _$RaiseControlStateCopyWithImpl<$Res>
       canRaise: null == canRaise
           ? _self.canRaise
           : canRaise // ignore: cast_nullable_to_non_nullable
-              as bool,
-      onlyAllInRaise: null == onlyAllInRaise
-          ? _self.onlyAllInRaise
-          : onlyAllInRaise // ignore: cast_nullable_to_non_nullable
               as bool,
       isFirstBet: null == isFirstBet
           ? _self.isFirstBet
@@ -573,16 +601,16 @@ extension RaiseControlStatePatterns on RaiseControlState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(bool canRaise, bool onlyAllInRaise, bool isFirstBet,
-            int maxPossibleBet, int minPossibleBet)?
+    TResult Function(bool canRaise, bool isFirstBet, int maxPossibleBet,
+            int minPossibleBet)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _RaiseControlState() when $default != null:
-        return $default(_that.canRaise, _that.onlyAllInRaise, _that.isFirstBet,
-            _that.maxPossibleBet, _that.minPossibleBet);
+        return $default(_that.canRaise, _that.isFirstBet, _that.maxPossibleBet,
+            _that.minPossibleBet);
       case _:
         return orElse();
     }
@@ -603,15 +631,15 @@ extension RaiseControlStatePatterns on RaiseControlState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(bool canRaise, bool onlyAllInRaise, bool isFirstBet,
-            int maxPossibleBet, int minPossibleBet)
+    TResult Function(bool canRaise, bool isFirstBet, int maxPossibleBet,
+            int minPossibleBet)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _RaiseControlState():
-        return $default(_that.canRaise, _that.onlyAllInRaise, _that.isFirstBet,
-            _that.maxPossibleBet, _that.minPossibleBet);
+        return $default(_that.canRaise, _that.isFirstBet, _that.maxPossibleBet,
+            _that.minPossibleBet);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -631,15 +659,15 @@ extension RaiseControlStatePatterns on RaiseControlState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(bool canRaise, bool onlyAllInRaise, bool isFirstBet,
-            int maxPossibleBet, int minPossibleBet)?
+    TResult? Function(bool canRaise, bool isFirstBet, int maxPossibleBet,
+            int minPossibleBet)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _RaiseControlState() when $default != null:
-        return $default(_that.canRaise, _that.onlyAllInRaise, _that.isFirstBet,
-            _that.maxPossibleBet, _that.minPossibleBet);
+        return $default(_that.canRaise, _that.isFirstBet, _that.maxPossibleBet,
+            _that.minPossibleBet);
       case _:
         return null;
     }
@@ -651,15 +679,12 @@ extension RaiseControlStatePatterns on RaiseControlState {
 class _RaiseControlState implements RaiseControlState {
   const _RaiseControlState(
       {required this.canRaise,
-      required this.onlyAllInRaise,
       required this.isFirstBet,
       required this.maxPossibleBet,
       required this.minPossibleBet});
 
   @override
   final bool canRaise;
-  @override
-  final bool onlyAllInRaise;
   @override
   final bool isFirstBet;
   @override
@@ -682,8 +707,6 @@ class _RaiseControlState implements RaiseControlState {
             other is _RaiseControlState &&
             (identical(other.canRaise, canRaise) ||
                 other.canRaise == canRaise) &&
-            (identical(other.onlyAllInRaise, onlyAllInRaise) ||
-                other.onlyAllInRaise == onlyAllInRaise) &&
             (identical(other.isFirstBet, isFirstBet) ||
                 other.isFirstBet == isFirstBet) &&
             (identical(other.maxPossibleBet, maxPossibleBet) ||
@@ -693,12 +716,12 @@ class _RaiseControlState implements RaiseControlState {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, canRaise, onlyAllInRaise,
-      isFirstBet, maxPossibleBet, minPossibleBet);
+  int get hashCode => Object.hash(
+      runtimeType, canRaise, isFirstBet, maxPossibleBet, minPossibleBet);
 
   @override
   String toString() {
-    return 'RaiseControlState(canRaise: $canRaise, onlyAllInRaise: $onlyAllInRaise, isFirstBet: $isFirstBet, maxPossibleBet: $maxPossibleBet, minPossibleBet: $minPossibleBet)';
+    return 'RaiseControlState(canRaise: $canRaise, isFirstBet: $isFirstBet, maxPossibleBet: $maxPossibleBet, minPossibleBet: $minPossibleBet)';
   }
 }
 
@@ -711,11 +734,7 @@ abstract mixin class _$RaiseControlStateCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {bool canRaise,
-      bool onlyAllInRaise,
-      bool isFirstBet,
-      int maxPossibleBet,
-      int minPossibleBet});
+      {bool canRaise, bool isFirstBet, int maxPossibleBet, int minPossibleBet});
 }
 
 /// @nodoc
@@ -732,7 +751,6 @@ class __$RaiseControlStateCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? canRaise = null,
-    Object? onlyAllInRaise = null,
     Object? isFirstBet = null,
     Object? maxPossibleBet = null,
     Object? minPossibleBet = null,
@@ -741,10 +759,6 @@ class __$RaiseControlStateCopyWithImpl<$Res>
       canRaise: null == canRaise
           ? _self.canRaise
           : canRaise // ignore: cast_nullable_to_non_nullable
-              as bool,
-      onlyAllInRaise: null == onlyAllInRaise
-          ? _self.onlyAllInRaise
-          : onlyAllInRaise // ignore: cast_nullable_to_non_nullable
               as bool,
       isFirstBet: null == isFirstBet
           ? _self.isFirstBet

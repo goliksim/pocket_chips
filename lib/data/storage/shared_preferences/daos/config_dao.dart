@@ -35,6 +35,8 @@ class ConfigDao extends Dao<ConfigEntity> {
 
   @override
   Future<void> write(ConfigEntity config) async {
+    prefs = await SharedPreferences.getInstance();
+
     final text = jsonEncode(config);
     logs.writeLog('Config info saved');
     prefs.setString(key, text);

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../domain/models/lobby/lobby_state_model.dart';
@@ -24,21 +25,21 @@ class GameTable extends StatelessWidget {
   ) =>
       adaptiveOffset +
       tableButtonWidth / 3 -
-      (stdButtonHeight * 1.75 * _getSin(index, totalAmount, multiply: -0.5));
+      (stdButtonHeight * 1.7 * _getSin(index, totalAmount, multiply: -0.5));
 
   double _playerBottomOffset(
     int index,
     int totalAmount,
     double tableHeight,
   ) =>
-      tableHeight / 3.3 - 3.2 * stdButtonHeight * _getCos(index, totalAmount);
+      tableHeight / 3.8 - 2.9 * stdButtonHeight * _getCos(index, totalAmount);
 
   double _chipBottomOffset(
     int index,
     int totalAmount,
   ) =>
-      -3.18 * stdButtonHeight * _getCos(index, totalAmount) +
-      3.55 * stdButtonHeight -
+      -2.9 * stdButtonHeight * _getCos(index, totalAmount) +
+      3.1 * stdButtonHeight -
       (_getCos(index, totalAmount) > 0.01
           ? -stdButtonHeight * 0.5
           : stdButtonHeight * 0.5);
@@ -79,8 +80,8 @@ class GameTable extends StatelessWidget {
     final playersOffset = showAddButton ? 1 : 0;
     final totalElementCount = players.length + playersOffset;
 
-    final totalBets =
-        players.map((e) => e.bet).whereType<int>().reduce((a, b) => a + b);
+    final bets = players.map((e) => e.bet).whereType<int>();
+    final totalBets = bets.sum;
 
     double tableButtonWidth =
         MediaQuery.of(context).size.width - adaptiveOffset;
@@ -114,20 +115,20 @@ class GameTable extends StatelessWidget {
         ),
         // 3 карты по середине
         Positioned(
-          bottom: 3.8 * stdButtonHeight,
+          bottom: tableHeight * 0.300,
           child: TableCards.firstRow(
             stateEnum: viewState.gameStatus,
           ),
         ),
         // 2 карты по середине
         Positioned(
-          bottom: 3 * stdButtonHeight,
+          bottom: tableHeight * 0.220,
           child: TableCards.secondRow(
             stateEnum: viewState.gameStatus,
           ),
         ),
         Positioned(
-          bottom: 2.5 * stdButtonHeight,
+          bottom: tableHeight * 0.155,
           child: Text(
             '${tableState.smallBlindValue} / ${tableState.smallBlindValue * 2}',
             style: TextStyle(
@@ -138,7 +139,7 @@ class GameTable extends StatelessWidget {
         ),
         // Общая ставка
         Positioned(
-          bottom: 2.175 * stdButtonHeight,
+          bottom: tableHeight * 0.125,
           child: FittedBox(
             child: Container(
               height: stdHeight / 2.5,
@@ -203,14 +204,13 @@ class GameTable extends StatelessWidget {
                             0,
                       ),
               ),
-              if ((player.bet != null && player.bet != 0) &&
-                  (!showAddButton || index != 0))
+              if ((player.bet != 0) && (!showAddButton || index != 0))
                 Positioned(
                   bottom: _chipBottomOffset(index, totalElementCount),
                   left: _chipsLeftOffset(
                       tableButtonWidth, index, totalElementCount),
                   child: _BetWidget(
-                    bet: player.bet!,
+                    bet: player.bet,
                   ),
                 ),
             ];

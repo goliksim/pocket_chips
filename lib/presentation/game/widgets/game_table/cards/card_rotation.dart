@@ -33,6 +33,7 @@ class RotationCard extends StatelessWidget {
           duration: Duration(milliseconds: durationByIndex(index)),
           transitionBuilder: (Widget widget, Animation<double> animation) {
             final rotateAnim = Tween(begin: pi, end: 0.0).animate(animation);
+
             return AnimatedBuilder(
               animation: rotateAnim,
               child: widget,
@@ -41,6 +42,7 @@ class RotationCard extends StatelessWidget {
                 var tilt = ((animation.value - 0.5).abs() - 0.5) * 0.003;
                 tilt *= isUnder ? -1.0 : 1.0;
                 final value = min(rotateAnim.value, pi / 2);
+
                 return Transform(
                   transform: Matrix4.rotationY(value)..setEntry(3, 0, tilt),
                   alignment: Alignment.center,

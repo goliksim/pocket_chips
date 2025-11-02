@@ -7,7 +7,8 @@ import '../view_state/lobby_player_item.dart';
 
 class PlayerCard extends StatelessWidget {
   final LobbyPlayerItem player;
-  final bool canReorderOrDismiss;
+  final bool canReorder;
+  final bool canDismiss;
   final bool isSaved;
 
   final Future<bool?> Function()? rightCallback;
@@ -16,12 +17,14 @@ class PlayerCard extends StatelessWidget {
 
   const PlayerCard({
     required this.player,
-    required this.canReorderOrDismiss,
+    required bool canReorderOrDismiss,
     this.leftCallback,
     this.rightCallback,
     this.onTap,
     super.key,
-  }) : isSaved = false;
+  })  : isSaved = false,
+        canDismiss = canReorderOrDismiss,
+        canReorder = canReorderOrDismiss;
 
   const PlayerCard.saved({
     required this.player,
@@ -30,15 +33,15 @@ class PlayerCard extends StatelessWidget {
     this.onTap,
     super.key,
   })  : isSaved = true,
-        canReorderOrDismiss = false;
+        canDismiss = true,
+        canReorder = false;
 
   @override
   Widget build(BuildContext context) {
     return Dismissible(
       key: Key(player.name),
-      direction: canReorderOrDismiss
-          ? DismissDirection.horizontal
-          : DismissDirection.none,
+      direction:
+          canDismiss ? DismissDirection.horizontal : DismissDirection.none,
       background: Container(
         color: thisTheme.bgrColor,
         child: Row(
@@ -173,7 +176,7 @@ class PlayerCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (!isSaved && canReorderOrDismiss)
+                if (canReorder)
                   Align(
                     alignment: Alignment.centerLeft,
                     child: AspectRatio(

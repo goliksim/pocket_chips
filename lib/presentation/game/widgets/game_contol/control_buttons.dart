@@ -22,9 +22,6 @@ class ControlButtons extends StatelessWidget {
 
   //Текст первой кнопки
   String _firstButtonTitle(AppLocalizations strings) {
-    if (state.raiseState.onlyAllInRaise) {
-      return strings.game_all;
-    }
     return state.raiseState.isFirstBet ? strings.game_bet : strings.game_raise;
 
     /*if (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank <=
@@ -41,24 +38,7 @@ class ControlButtons extends StatelessWidget {
   }
 
   // Реализация кнопки Raise
-  void _raiseAction() {
-    if (state.raiseState.onlyAllInRaise) {
-      controlAction(GameControlResult.allIn());
-    } else {
-      openRaiseField();
-    }
-
-    /*//Если денег хватает на рейз -> выводим окошко
-    if (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank >
-        thisGame.raiseBank) {
-      widget.changeRaiseButton(true);
-    } else {
-      //Иначе
-      thisGame.allIN();
-      widget.changeRaiseButton(false);
-    }
-    setState(() {});*/
-  }
+  void _raiseAction() => openRaiseField();
 
   //Текст средней кнопки
   String _middleButtonTitle(AppLocalizations strings) {
@@ -133,20 +113,20 @@ class ControlButtons extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         // Кнопка подтверждения Raise / Bet
-        Flexible(
-          flex: 1,
-          fit: FlexFit.tight,
-          child: ControlButtonWrapper(
-            title: _firstButtonTitle(strings),
-            color: thisTheme.primaryColor,
-            action: () => _raiseAction(),
-            enabled: _raiseButtonActive,
+        if (_raiseButtonActive)
+          Flexible(
+            flex: 1,
+            fit: FlexFit.tight,
+            child: ControlButtonWrapper(
+              title: _firstButtonTitle(strings),
+              color: thisTheme.primaryColor,
+              action: () => _raiseAction(),
+            ),
           ),
-        ),
         SizedBox(width: stdHorizontalOffset),
 
         Flexible(
-          flex: 1,
+          flex: _raiseButtonActive ? 1 : 2,
           fit: FlexFit.tight,
           child: ControlButtonWrapper(
             title: _middleButtonTitle(strings),
@@ -174,13 +154,11 @@ class ControlButtonWrapper extends StatelessWidget {
   final String title;
   final Color color;
   final VoidCallback action;
-  final bool enabled;
 
   const ControlButtonWrapper({
     required this.title,
     required this.color,
     required this.action,
-    this.enabled = true,
     super.key,
   });
 
@@ -189,9 +167,9 @@ class ControlButtonWrapper extends StatelessWidget {
     return MyButton(
       height: stdButtonHeight,
       width: double.infinity,
-      buttonColor: color.withAlpha((enabled) ? 255 : 80),
+      buttonColor: color,
       textString: title,
-      action: (enabled) ? action : () => DoNothingAction,
+      action: () => action(),
     );
   }
 }

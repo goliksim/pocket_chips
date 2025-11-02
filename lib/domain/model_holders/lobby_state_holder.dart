@@ -1,55 +1,49 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../di/domain_managers.dart';
+import '../../di/repositories.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/logs.dart';
 import '../models/game/game_state_enum.dart';
 import '../models/game_settings_model.dart';
 import '../models/lobby/lobby_state_model.dart';
 import '../models/player/player_model.dart';
-import '../repositories/app_repository.dart';
 import 'game_settings_provider.dart';
 
-class LobbyStateHolder extends AsyncNotifier<LobbyStateModel?>
+class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     implements GameSettingsProvider {
-  final AppRepository _repository;
-  final AppLocalizations _strings;
+  AppLocalizations get _strings => ref.read(stringsProvider);
 
-  LobbyStateHolder({
-    required AppRepository repository,
-    required AppLocalizations strings,
-  })  : _repository = repository,
-        _strings = strings;
+  LobbyStateModel get activeLobby => state.requireValue;
 
   @override
-  FutureOr<LobbyStateModel?> build() => _repository.getLobbyState();
+  FutureOr<LobbyStateModel> build() async {
+    logs.writeLog('LobbySH: READ DATA AND BUILD STATE');
+    final lobby = await ref.read(appRepositoryProvider).getLobbyState();
 
-  LobbyStateModel? get dataOrNull => state.value;
-
-  LobbyStateModel get activeLobby {
-    final state = dataOrNull;
-
-    if (state == null) {
-      throw (Exception('Call activeLobby without real lobby'));
-    }
-
-    return state;
+    return lobby ?? LobbyStateModel.empty();
   }
 
   Future<void> updateLobby(LobbyStateModel newState) async {
     state = AsyncValue.data(newState);
+    logs.writeLog('LobbySH: STATE UPDATED');
 
     try {
-      await _repository.updateLobbyState(newState);
+      await ref.read(appRepositoryProvider).updateLobbyState(newState);
     } catch (e) {
       logs.writeLog('Ошибка при сохранении лобби: $e');
     }
   }
 
-  Future<void> createNewLobby() async => updateLobby(
-        LobbyStateModel.empty(),
-      );
+  Future<void> createNewLobby() async {
+    logs.writeLog('LobbySH: create new lobby');
+    state = AsyncValue.data(
+      LobbyStateModel.empty(),
+    );
+  }
 
   Future<void> updateDefaultBank(int newBank) {
     final lobby = activeLobby;
@@ -59,7 +53,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel?>
         (_, __) => newBank,
       );
 
-    logs.writeLog('Initial stack changed to:\t $newBank');
+    logs.writeLog('LobbySH: default stack chenged to $newBank');
 
     return updateLobby(
       lobby.copyWith(
@@ -69,7 +63,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel?>
     );
   }
 
-  Future<void> resetLobby() {
+  Future<void> resetLobby() async {
     final lobby = activeLobby;
 
     final newBanks = Map.of(lobby.banks)
@@ -77,11 +71,9 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel?>
         (_, __) => lobby.defaultBank,
       );
 
-    // TODO: _gameStateMachine.reset();
+    logs.writeLog('LobbySH: reset with:\n lobbyBank: ${lobby.defaultBank}}');
 
-    logs.writeLog('Lobby reset with:\n lobbyBank: ${lobby.defaultBank}}');
-
-    return updateLobby(
+    await updateLobby(
       lobby.copyWith(
         banks: newBanks,
         gameState: GameStatusEnum.notStarted,
@@ -96,19 +88,21 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel?>
   }) async {
     final currentLobby = activeLobby;
 
+    // Проверка на статус лобби
+    if (!currentLobby.gameState.canEditPlayers) {
+      throw Exception('Cannot edit player list on this state');
+    }
+
     // Проверка на дубли
-    if (currentLobby.players.contains(player)) {
+    final samePlayer = currentLobby.players.firstWhereOrNull(
+        (p) => (p.name == player.name) && (p.assetUrl == player.assetUrl));
+    if (currentLobby.players.contains(player) || samePlayer != null) {
       throw Exception('${player.name} ${_strings.toast_alred}');
     }
 
     // Проверка на максимальное количество
-    if (currentLobby.players.length < maxPlayerCount) {
+    if (currentLobby.players.length >= maxPlayerCount) {
       throw Exception(_strings.toast_maxpl);
-    }
-
-    // Проверка на статус лобби
-    if (!currentLobby.gameState.canEditPlayers) {
-      throw Exception('Cannot edit player list on this state');
     }
 
     final newPlayers = [...currentLobby.players, player];
@@ -116,7 +110,8 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel?>
     final newBanks = Map<String, int>.from(currentLobby.banks)
       ..[player.uid] = bank;
 
-    final newDealerId = makeDealer ? player.uid : currentLobby.dealerId;
+    final newDealerId =
+        makeDealer ? player.uid : currentLobby.dealerId ?? newPlayers.first.uid;
 
     final newLobby = currentLobby.copyWith(
       players: newPlayers,
@@ -124,6 +119,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel?>
       dealerId: newDealerId,
     );
 
+    logs.writeLog('LobbySH: player ${player.name} added');
     await updateLobby(newLobby);
   }
 
@@ -161,6 +157,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel?>
       dealerId: newDealerId,
     );
 
+    logs.writeLog('LobbySH: player ${player.name} updated');
     await updateLobby(newLobby);
   }
 
@@ -188,8 +185,9 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel?>
 
     String? newDealerId = currentLobby.dealerId;
     if (newDealerId == playerUid) {
-      final nextIndex = removedIndex % newPlayers.length;
-      newDealerId = newPlayers.isNotEmpty ? newPlayers[nextIndex].uid : null;
+      newDealerId = newPlayers.isNotEmpty
+          ? newPlayers[removedIndex % newPlayers.length].uid
+          : null;
     }
 
     // Не изменяем currentPlayerId, так как удаление возможно только в перерывах,
@@ -201,10 +199,15 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel?>
       dealerId: newDealerId,
     );
 
+    logs.writeLog('LobbySH: player $playerUid removed');
     await updateLobby(newLobby);
   }
 
   Future<void> reorderPlayer(int oldIndex, int newIndex) async {
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+
     final currentLobby = activeLobby;
 
     if (!currentLobby.gameState.canEditPlayers) {
@@ -220,14 +223,15 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel?>
       players: newPlayers,
     );
 
+    logs.writeLog('LobbySH: players reordered');
     await updateLobby(newLobby);
   }
 
   @override
-  GameSettingsModel get getSettings {
+  GameSettingsModelArgs get getSettings {
     final lobby = activeLobby;
 
-    return GameSettingsModel(
+    return GameSettingsModelArgs(
       startingStack: lobby.defaultBank,
       canEditStack: lobby.gameState.isNotStarted,
       smallBlind: lobby.smallBlindValue,
@@ -235,9 +239,14 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel?>
   }
 
   @override
-  Future<void> saveSettings(GameSettingsModel settings) => updateLobby(
+  Future<void> saveSettings(GameSettingsModelResult settings) => updateLobby(
         activeLobby.copyWith(
-            defaultBank: settings.startingStack,
-            smallBlindValue: settings.smallBlind),
+          defaultBank: settings.startingStack ?? activeLobby.defaultBank,
+          smallBlindValue: settings.smallBlind ?? activeLobby.smallBlindValue,
+          banks: (settings.startingStack != null)
+              ? (Map.of(activeLobby.banks)
+                ..updateAll((_, __) => settings.startingStack!))
+              : activeLobby.banks,
+        ),
       );
 }

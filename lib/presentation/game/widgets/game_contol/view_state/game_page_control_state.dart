@@ -11,14 +11,15 @@ abstract class GamePageControlState with _$GamePageControlState {
 
   const factory GamePageControlState.breakdown({
     required bool canStartBetting,
-  }) = _GamePageControlState;
+  }) = _GamePageControlBreakDownState;
+
+  const factory GamePageControlState.showdown() = _GamePageControlShowDownState;
 }
 
 @freezed
 abstract class RaiseControlState with _$RaiseControlState {
   const factory RaiseControlState({
     required bool canRaise,
-    required bool onlyAllInRaise,
     required bool isFirstBet,
     required int maxPossibleBet,
     required int minPossibleBet,

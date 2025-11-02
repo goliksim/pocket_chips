@@ -29,22 +29,25 @@ class SavedPlayerListViewModel with ChangeNotifier {
         _toastManager = toastManager,
         _navigationManager = navigationManager,
         _strings = strings {
-    addListener(_update);
+    addListener(_init);
 
     _init();
   }
 
   void _init() {
-    players = _modelHolder.players
-        .map((p) =>
-            LobbyPlayerItem(uid: p.uid, name: p.name, assetUrl: p.assetUrl))
-        .toList();
-  }
+    players = [];
 
-  void _update() {
-    _init();
+    _modelHolder.future.then((p) {
+      players = p
+          .map((p) => LobbyPlayerItem(
+                uid: p.uid,
+                name: p.name,
+                assetUrl: p.assetUrl,
+              ))
+          .toList();
 
-    notifyListeners();
+      notifyListeners();
+    });
   }
 
   Future<bool> deletePlayer(String playerUid) async {

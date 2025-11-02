@@ -20,8 +20,8 @@ mixin _$GamePlayerItem {
   bool get isDealer;
   bool get isCurrent;
   bool get isFolded;
-  int? get bank;
-  int? get bet;
+  int get bank;
+  int get bet;
 
   /// Create a copy of GamePlayerItem
   /// with the given fields replaced by the non-null parameter values.
@@ -73,8 +73,8 @@ abstract mixin class $GamePlayerItemCopyWith<$Res> {
       bool isDealer,
       bool isCurrent,
       bool isFolded,
-      int? bank,
-      int? bet});
+      int bank,
+      int bet});
 }
 
 /// @nodoc
@@ -96,8 +96,8 @@ class _$GamePlayerItemCopyWithImpl<$Res>
     Object? isDealer = null,
     Object? isCurrent = null,
     Object? isFolded = null,
-    Object? bank = freezed,
-    Object? bet = freezed,
+    Object? bank = null,
+    Object? bet = null,
   }) {
     return _then(_self.copyWith(
       uid: null == uid
@@ -124,14 +124,14 @@ class _$GamePlayerItemCopyWithImpl<$Res>
           ? _self.isFolded
           : isFolded // ignore: cast_nullable_to_non_nullable
               as bool,
-      bank: freezed == bank
+      bank: null == bank
           ? _self.bank
           : bank // ignore: cast_nullable_to_non_nullable
-              as int?,
-      bet: freezed == bet
+              as int,
+      bet: null == bet
           ? _self.bet
           : bet // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
@@ -230,7 +230,7 @@ extension GamePlayerItemPatterns on GamePlayerItem {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(String uid, String name, String assetUrl, bool isDealer,
-            bool isCurrent, bool isFolded, int? bank, int? bet)?
+            bool isCurrent, bool isFolded, int bank, int bet)?
         $default, {
     required TResult orElse(),
   }) {
@@ -260,7 +260,7 @@ extension GamePlayerItemPatterns on GamePlayerItem {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(String uid, String name, String assetUrl, bool isDealer,
-            bool isCurrent, bool isFolded, int? bank, int? bet)
+            bool isCurrent, bool isFolded, int bank, int bet)
         $default,
   ) {
     final _that = this;
@@ -288,7 +288,7 @@ extension GamePlayerItemPatterns on GamePlayerItem {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(String uid, String name, String assetUrl, bool isDealer,
-            bool isCurrent, bool isFolded, int? bank, int? bet)?
+            bool isCurrent, bool isFolded, int bank, int bet)?
         $default,
   ) {
     final _that = this;
@@ -312,8 +312,8 @@ class _GamePlayerItem implements GamePlayerItem {
       required this.isDealer,
       required this.isCurrent,
       required this.isFolded,
-      this.bank,
-      this.bet});
+      required this.bank,
+      required this.bet});
 
   @override
   final String uid;
@@ -328,9 +328,9 @@ class _GamePlayerItem implements GamePlayerItem {
   @override
   final bool isFolded;
   @override
-  final int? bank;
+  final int bank;
   @override
-  final int? bet;
+  final int bet;
 
   /// Create a copy of GamePlayerItem
   /// with the given fields replaced by the non-null parameter values.
@@ -384,8 +384,8 @@ abstract mixin class _$GamePlayerItemCopyWith<$Res>
       bool isDealer,
       bool isCurrent,
       bool isFolded,
-      int? bank,
-      int? bet});
+      int bank,
+      int bet});
 }
 
 /// @nodoc
@@ -407,8 +407,8 @@ class __$GamePlayerItemCopyWithImpl<$Res>
     Object? isDealer = null,
     Object? isCurrent = null,
     Object? isFolded = null,
-    Object? bank = freezed,
-    Object? bet = freezed,
+    Object? bank = null,
+    Object? bet = null,
   }) {
     return _then(_GamePlayerItem(
       uid: null == uid
@@ -435,14 +435,14 @@ class __$GamePlayerItemCopyWithImpl<$Res>
           ? _self.isFolded
           : isFolded // ignore: cast_nullable_to_non_nullable
               as bool,
-      bank: freezed == bank
+      bank: null == bank
           ? _self.bank
           : bank // ignore: cast_nullable_to_non_nullable
-              as int?,
-      bet: freezed == bet
+              as int,
+      bet: null == bet
           ? _self.bet
           : bet // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }

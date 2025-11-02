@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
           builder: (_, ref, __) => MaterialApp.router(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            locale: ref.watch(localeManagerProvider).lang,
+            locale: ref.watch(localeManagerProvider),
             title: _appTitle,
             //TODO: normal theme
             theme: ThemeData(

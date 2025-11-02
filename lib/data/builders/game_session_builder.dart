@@ -4,19 +4,21 @@ import '../storage/entities/game_session_entity.dart';
 class GameSessionEntityBuilder {
   static GameSessionState fromEntity(GameSessionEntity entity) {
     return GameSessionState(
-      currentPlayerUid: entity.currentPlayerUid,
-      lapCounter: entity.lapCounter,
       bets: entity.bets,
+      lapCounter: entity.lapCounter,
       foldedOrInactive: entity.foldedOrInactive,
+      currentPlayerUid: entity.currentPlayerUid,
+      firstPlayerUid: entity.firstPlayerUid,
     );
   }
 
   static GameSessionEntity toEntity(GameSessionState model) {
     return GameSessionEntity(
-      currentPlayerUid: model.currentPlayerUid,
-      lapCounter: model.lapCounter,
       bets: model.bets,
+      lapCounter: model.lapCounter,
       foldedOrInactive: model.foldedOrInactive,
+      currentPlayerUid: model.currentPlayerUid,
+      firstPlayerUid: model.firstPlayerUid,
     );
   }
 }

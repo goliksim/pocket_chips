@@ -37,6 +37,8 @@ class SavedPlayerDao extends Dao<List<PlayerEntity>> {
 
   @override
   Future<void> write(List<PlayerEntity> savedPlayers) async {
+    prefs = await SharedPreferences.getInstance();
+
     String text = jsonEncode(savedPlayers.map((e) => e.toJson()).toList());
     logs.writeLog('Saved players info saved');
     prefs.setString(key, text);

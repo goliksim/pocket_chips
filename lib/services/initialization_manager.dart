@@ -21,10 +21,12 @@ class InitializationManager with ChangeNotifier {
   }
 
   Future<void> init() async {
-    await checkFirstLaunch().then(
+    final config = await _configModelHolder.build();
+
+    await checkFirstLaunch(config).then(
       (pushed) async {
         if (!pushed) {
-          await checkForUpdates();
+          await checkForUpdates(config);
         }
       },
     );
@@ -33,18 +35,12 @@ class InitializationManager with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> checkForUpdates() async {
-    final lastVersion = _configModelHolder.dataOrNull?.version;
+  Future<bool> checkForUpdates(ConfigModel config) async {
+    final lastVersion = config.version;
     final currentVersion = await _configModelHolder.getCurrentVersion();
 
-    if (lastVersion == null || currentVersion.compareTo(lastVersion) > 0) {
-      _configModelHolder.updateConfig(
-        _configModelHolder.dataOrNull?.copyWith(
-              version: currentVersion,
-              firstLaunch: false,
-            ) ??
-            ConfigModel.defaults(currentVersion),
-      );
+    if (currentVersion.compareTo(lastVersion) > 0) {
+      _configModelHolder.updateVerion(currentVersion);
 
       showUpdateInfo();
       return true;
@@ -53,17 +49,11 @@ class InitializationManager with ChangeNotifier {
     return false;
   }
 
-  Future<bool> checkFirstLaunch() async {
-    final firstLaunch = _configModelHolder.dataOrNull?.firstLaunch;
-    final currentVersion = await _configModelHolder.getCurrentVersion();
+  Future<bool> checkFirstLaunch(ConfigModel config) async {
+    final firstLaunch = config.firstLaunch;
 
-    if (firstLaunch ?? true) {
-      _configModelHolder.updateConfig(
-        _configModelHolder.dataOrNull?.copyWith(
-              firstLaunch: false,
-            ) ??
-            ConfigModel.defaults(currentVersion),
-      );
+    if (firstLaunch) {
+      showAboutInfo();
 
       return true;
     }

@@ -46,44 +46,47 @@ class _PickIconState extends State<PlayerLogoPicker> {
         width: stdButtonWidth,
         child: AspectRatio(
           aspectRatio: 5 / 2,
-          child: GridView.builder(
-            reverse: true,
-            scrollDirection: Axis.vertical,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisSpacing: 0,
-              mainAxisSpacing: 0,
-              crossAxisCount: 5,
-            ),
-            itemCount: _totalLogosCount,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () => _selectLogo(index),
-                child: Padding(
-                  padding: EdgeInsets.all(stdHorizontalOffset / 2),
-                  child: AnimatedContainer(
-                    height: stdButtonHeight,
-                    duration: const Duration(milliseconds: 150),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: (index == choosenIcon) ? 1.5 : 0,
-                        color: (index == choosenIcon)
-                            ? thisTheme.primaryColor
-                            : thisTheme.bgrColor,
-                      ),
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        filterQuality: FilterQuality.medium,
-                        fit: BoxFit.cover,
-                        image: AssetImage(
-                          'assets/faces/pokerfaces${index + 1}.jpg',
+          child: Center(
+            child: GridView.builder(
+              padding: EdgeInsets.zero,
+              reverse: true,
+              scrollDirection: Axis.vertical,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisSpacing: 0,
+                mainAxisSpacing: 0,
+                crossAxisCount: 5,
+              ),
+              itemCount: _totalLogosCount,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () => _selectLogo(index),
+                  child: Padding(
+                    padding: EdgeInsets.all(stdHorizontalOffset / 2),
+                    child: AnimatedContainer(
+                      height: stdButtonHeight,
+                      duration: const Duration(milliseconds: 150),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: (index == choosenIcon) ? 1.5 : 0,
+                          color: (index == choosenIcon)
+                              ? thisTheme.primaryColor
+                              : thisTheme.bgrColor,
+                        ),
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          filterQuality: FilterQuality.medium,
+                          fit: BoxFit.cover,
+                          image: AssetImage(
+                            'assets/faces/pokerfaces${index + 1}.jpg',
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),

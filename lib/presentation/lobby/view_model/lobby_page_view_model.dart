@@ -1,8 +1,14 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/navigation/models/app_route.dart';
 import '../../../app/navigation/navigation_manager.dart';
+import '../../../di/domain_managers.dart';
+import '../../../di/model_holders.dart';
+import '../../../di/view_models.dart';
 import '../../../domain/model_holders/lobby_state_holder.dart';
 import '../../../domain/model_holders/saved_players_model_holder.dart';
 import '../../../domain/models/game/game_state_enum.dart';
@@ -13,40 +19,25 @@ import '../../../utils/logs.dart';
 import '../player_list/view_state/lobby_player_item.dart';
 import '../view_state/lobby_page_state.dart';
 
-class LobbyPageViewModel with ChangeNotifier {
-  final LobbyStateHolder _lobbyStateHolder;
-  final SavedPlayersModelHolder _savedPlayersModelHolder;
-  final NavigationManager _navigationManager;
-  final ToastManager _toastManager;
-  final AppLocalizations _strings;
+class LobbyPageViewModel extends AsyncNotifier<LobbyPageState> {
+  LobbyStateHolder get _lobbyStateHolder =>
+      ref.read(lobbyStateHolderProvider.notifier);
+  SavedPlayersModelHolder get _savedPlayersModelHolder =>
+      ref.read(savedPlayersModelHolderProvider.notifier);
+  NavigationManager get _navigationManager =>
+      ref.read(navigationManagerProvider);
+  ToastManager get _toastManager => ref.read(toastManagerProvider);
+  AppLocalizations get _strings => ref.read(stringsProvider);
 
-  ScrollController scrollController = ScrollController();
+  @override
+  FutureOr<LobbyPageState> build() async {
+    _listenPlayersChanges();
 
-  late LobbyPageState lobbyState;
-
-  LobbyPageViewModel({
-    required LobbyStateHolder lobbyStateHolder,
-    required NavigationManager navigationManager,
-    required SavedPlayersModelHolder savedPlayersModelHolder,
-    required ToastManager toastManager,
-    required AppLocalizations strings,
-    required Function(VoidCallback) addListener,
-  })  : _lobbyStateHolder = lobbyStateHolder,
-        _navigationManager = navigationManager,
-        _savedPlayersModelHolder = savedPlayersModelHolder,
-        _strings = strings,
-        _toastManager = toastManager {
-    _init();
-
-    addListener(_init);
-  }
-
-  void _init() {
-    final lobby = _lobbyStateHolder.activeLobby;
+    final lobby = await ref.watch(lobbyStateHolderProvider.future);
 
     final canEditPlayers = lobby.gameState.canEditPlayers;
 
-    lobbyState = LobbyPageState(
+    return LobbyPageState(
       gameActive: lobby.gameState.isStarted,
       canEditPlayers: canEditPlayers,
       canAddPlayer: canEditPlayers && lobby.players.length < maxPlayerCount,
@@ -67,11 +58,11 @@ class LobbyPageViewModel with ChangeNotifier {
   void openPlayerEditor(String playerUid) =>
       _navigationManager.showPlayerEditor(playerUid);
 
-  void pop() => _navigationManager.pop();
+  void pop() => _navigationManager.popPage();
 
   Future<bool> savePlayer(String playerUid) async {
     final playerModel =
-        lobbyState.players.firstWhereOrNull((p) => p.uid == playerUid);
+        state.requireValue.players.firstWhereOrNull((p) => p.uid == playerUid);
 
     if (playerModel == null) {
       return false;
@@ -83,8 +74,6 @@ class LobbyPageViewModel with ChangeNotifier {
       _toastManager.showToast(
         '${playerModel.name} ${_strings.toast_saved}',
       );
-
-      logs.writeLog('Saving:\t${playerModel.toString()}');
     } on Exception catch (e) {
       _toastManager.showToast(e.toString());
     }
@@ -100,21 +89,14 @@ class LobbyPageViewModel with ChangeNotifier {
       action: () => _removePlayer(playerUid),
     );
 
-    return result ?? false;
+    return (result ?? false) ? _removePlayer(playerUid) : Future.value(false);
   }
 
   Future<void> onPlayerTap(String playerUid) =>
       _navigationManager.showPlayerEditor(playerUid);
 
-  //TODO не забыть о скроле вниз при добавлении нового игрока
-  void addButtonPressed() {
-    if (scrollController.hasClients) {
-      scrollController.animateTo(
-        scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 750),
-        curve: Curves.ease,
-      );
-    }
+  Future<void> addButtonPressed() async {
+    _navigationManager.showPlayerEditor(null);
   }
 
   Future<void> onReorderPlayer(int oldIndex, int newIndex) =>
@@ -133,7 +115,7 @@ class LobbyPageViewModel with ChangeNotifier {
       );
 
   Future<void> onStartGame() async {
-    final cannotStartGame = lobbyState.players.length < 2;
+    final cannotStartGame = state.requireValue.players.length < 2;
 
     if (cannotStartGame) {
       _toastManager.showToast(_strings.toast_moreplay2);
@@ -146,26 +128,55 @@ class LobbyPageViewModel with ChangeNotifier {
 
   Future<void> onSettingsTap() => _navigationManager.showLobbySettings();
 
-  Future<void> _removePlayer(String playerUid) async {
+  Future<bool> _removePlayer(String playerUid) async {
     final playerModel =
-        lobbyState.players.firstWhereOrNull((p) => p.uid == playerUid);
+        state.requireValue.players.firstWhereOrNull((p) => p.uid == playerUid);
 
     if (playerModel == null) {
-      return;
+      return false;
     }
 
     try {
       await _lobbyStateHolder.removePlayer(playerUid: playerUid);
 
-      _toastManager.showToast(
-        '${playerModel.name} ${_strings.toast_saved}',
-      );
-
       logs.writeLog('Saving:\t${playerModel.toString()}');
+      return true;
     } on Exception catch (e) {
       _toastManager.showToast(e.toString());
-    }
 
-    return;
+      return false;
+    }
+  }
+
+  void _listenPlayersChanges() {
+    ref.listen<AsyncValue<LobbyStateModel>>(
+      lobbyStateHolderProvider,
+      (previous, next) {
+        next.whenData(
+          (newLobby) {
+            previous?.whenData(
+              (oldLobby) {
+                if (newLobby.players.length > oldLobby.players.length) {
+                  Future.microtask(
+                    () {
+                      final scrollController = ref
+                          .read(lobbyScrollControllerProvider)
+                          .scrollController;
+                      if (scrollController.hasClients) {
+                        return scrollController.animateTo(
+                          scrollController.position.maxScrollExtent,
+                          duration: const Duration(milliseconds: 750),
+                          curve: Curves.easeOut,
+                        );
+                      }
+                    },
+                  );
+                }
+              },
+            );
+          },
+        );
+      },
+    );
   }
 }

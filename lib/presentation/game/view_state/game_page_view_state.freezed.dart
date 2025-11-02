@@ -15,6 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GamePageViewState {
   GameStatusEnum get gameStatus;
+  GamePageControlState get controlState;
   GameTableState get tableState;
   String get currentGameState;
   bool get canEditPlayer;
@@ -35,6 +36,8 @@ mixin _$GamePageViewState {
             other is GamePageViewState &&
             (identical(other.gameStatus, gameStatus) ||
                 other.gameStatus == gameStatus) &&
+            (identical(other.controlState, controlState) ||
+                other.controlState == controlState) &&
             (identical(other.tableState, tableState) ||
                 other.tableState == tableState) &&
             (identical(other.currentGameState, currentGameState) ||
@@ -46,12 +49,12 @@ mixin _$GamePageViewState {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, gameStatus, tableState,
-      currentGameState, canEditPlayer, currentPlayerName);
+  int get hashCode => Object.hash(runtimeType, gameStatus, controlState,
+      tableState, currentGameState, canEditPlayer, currentPlayerName);
 
   @override
   String toString() {
-    return 'GamePageViewState(gameStatus: $gameStatus, tableState: $tableState, currentGameState: $currentGameState, canEditPlayer: $canEditPlayer, currentPlayerName: $currentPlayerName)';
+    return 'GamePageViewState(gameStatus: $gameStatus, controlState: $controlState, tableState: $tableState, currentGameState: $currentGameState, canEditPlayer: $canEditPlayer, currentPlayerName: $currentPlayerName)';
   }
 }
 
@@ -63,11 +66,13 @@ abstract mixin class $GamePageViewStateCopyWith<$Res> {
   @useResult
   $Res call(
       {GameStatusEnum gameStatus,
+      GamePageControlState controlState,
       GameTableState tableState,
       String currentGameState,
       bool canEditPlayer,
       String? currentPlayerName});
 
+  $GamePageControlStateCopyWith<$Res> get controlState;
   $GameTableStateCopyWith<$Res> get tableState;
 }
 
@@ -85,6 +90,7 @@ class _$GamePageViewStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? gameStatus = null,
+    Object? controlState = null,
     Object? tableState = null,
     Object? currentGameState = null,
     Object? canEditPlayer = null,
@@ -95,6 +101,10 @@ class _$GamePageViewStateCopyWithImpl<$Res>
           ? _self.gameStatus
           : gameStatus // ignore: cast_nullable_to_non_nullable
               as GameStatusEnum,
+      controlState: null == controlState
+          ? _self.controlState
+          : controlState // ignore: cast_nullable_to_non_nullable
+              as GamePageControlState,
       tableState: null == tableState
           ? _self.tableState
           : tableState // ignore: cast_nullable_to_non_nullable
@@ -112,6 +122,16 @@ class _$GamePageViewStateCopyWithImpl<$Res>
           : currentPlayerName // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
+  }
+
+  /// Create a copy of GamePageViewState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GamePageControlStateCopyWith<$Res> get controlState {
+    return $GamePageControlStateCopyWith<$Res>(_self.controlState, (value) {
+      return _then(_self.copyWith(controlState: value));
+    });
   }
 
   /// Create a copy of GamePageViewState
@@ -220,6 +240,7 @@ extension GamePageViewStatePatterns on GamePageViewState {
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
             GameStatusEnum gameStatus,
+            GamePageControlState controlState,
             GameTableState tableState,
             String currentGameState,
             bool canEditPlayer,
@@ -232,6 +253,7 @@ extension GamePageViewStatePatterns on GamePageViewState {
       case _GamePageViewState() when $default != null:
         return $default(
             _that.gameStatus,
+            _that.controlState,
             _that.tableState,
             _that.currentGameState,
             _that.canEditPlayer,
@@ -258,6 +280,7 @@ extension GamePageViewStatePatterns on GamePageViewState {
   TResult when<TResult extends Object?>(
     TResult Function(
             GameStatusEnum gameStatus,
+            GamePageControlState controlState,
             GameTableState tableState,
             String currentGameState,
             bool canEditPlayer,
@@ -269,6 +292,7 @@ extension GamePageViewStatePatterns on GamePageViewState {
       case _GamePageViewState():
         return $default(
             _that.gameStatus,
+            _that.controlState,
             _that.tableState,
             _that.currentGameState,
             _that.canEditPlayer,
@@ -294,6 +318,7 @@ extension GamePageViewStatePatterns on GamePageViewState {
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
             GameStatusEnum gameStatus,
+            GamePageControlState controlState,
             GameTableState tableState,
             String currentGameState,
             bool canEditPlayer,
@@ -305,6 +330,7 @@ extension GamePageViewStatePatterns on GamePageViewState {
       case _GamePageViewState() when $default != null:
         return $default(
             _that.gameStatus,
+            _that.controlState,
             _that.tableState,
             _that.currentGameState,
             _that.canEditPlayer,
@@ -320,6 +346,7 @@ extension GamePageViewStatePatterns on GamePageViewState {
 class _GamePageViewState implements GamePageViewState {
   const _GamePageViewState(
       {required this.gameStatus,
+      required this.controlState,
       required this.tableState,
       required this.currentGameState,
       required this.canEditPlayer,
@@ -327,6 +354,8 @@ class _GamePageViewState implements GamePageViewState {
 
   @override
   final GameStatusEnum gameStatus;
+  @override
+  final GamePageControlState controlState;
   @override
   final GameTableState tableState;
   @override
@@ -351,6 +380,8 @@ class _GamePageViewState implements GamePageViewState {
             other is _GamePageViewState &&
             (identical(other.gameStatus, gameStatus) ||
                 other.gameStatus == gameStatus) &&
+            (identical(other.controlState, controlState) ||
+                other.controlState == controlState) &&
             (identical(other.tableState, tableState) ||
                 other.tableState == tableState) &&
             (identical(other.currentGameState, currentGameState) ||
@@ -362,12 +393,12 @@ class _GamePageViewState implements GamePageViewState {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, gameStatus, tableState,
-      currentGameState, canEditPlayer, currentPlayerName);
+  int get hashCode => Object.hash(runtimeType, gameStatus, controlState,
+      tableState, currentGameState, canEditPlayer, currentPlayerName);
 
   @override
   String toString() {
-    return 'GamePageViewState(gameStatus: $gameStatus, tableState: $tableState, currentGameState: $currentGameState, canEditPlayer: $canEditPlayer, currentPlayerName: $currentPlayerName)';
+    return 'GamePageViewState(gameStatus: $gameStatus, controlState: $controlState, tableState: $tableState, currentGameState: $currentGameState, canEditPlayer: $canEditPlayer, currentPlayerName: $currentPlayerName)';
   }
 }
 
@@ -381,11 +412,14 @@ abstract mixin class _$GamePageViewStateCopyWith<$Res>
   @useResult
   $Res call(
       {GameStatusEnum gameStatus,
+      GamePageControlState controlState,
       GameTableState tableState,
       String currentGameState,
       bool canEditPlayer,
       String? currentPlayerName});
 
+  @override
+  $GamePageControlStateCopyWith<$Res> get controlState;
   @override
   $GameTableStateCopyWith<$Res> get tableState;
 }
@@ -404,6 +438,7 @@ class __$GamePageViewStateCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? gameStatus = null,
+    Object? controlState = null,
     Object? tableState = null,
     Object? currentGameState = null,
     Object? canEditPlayer = null,
@@ -414,6 +449,10 @@ class __$GamePageViewStateCopyWithImpl<$Res>
           ? _self.gameStatus
           : gameStatus // ignore: cast_nullable_to_non_nullable
               as GameStatusEnum,
+      controlState: null == controlState
+          ? _self.controlState
+          : controlState // ignore: cast_nullable_to_non_nullable
+              as GamePageControlState,
       tableState: null == tableState
           ? _self.tableState
           : tableState // ignore: cast_nullable_to_non_nullable
@@ -431,6 +470,16 @@ class __$GamePageViewStateCopyWithImpl<$Res>
           : currentPlayerName // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
+  }
+
+  /// Create a copy of GamePageViewState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GamePageControlStateCopyWith<$Res> get controlState {
+    return $GamePageControlStateCopyWith<$Res>(_self.controlState, (value) {
+      return _then(_self.copyWith(controlState: value));
+    });
   }
 
   /// Create a copy of GamePageViewState

@@ -24,8 +24,8 @@ class GameSettingsDialog extends StatefulWidget {
 
 class _GameSettingsDialogState extends State<GameSettingsDialog>
     with ToastsMixin {
-  int tmpBank = 0; // временный банк
-  int smallBlind = 0; // малый блайнд
+  int? tmpBank; // временный банк
+  int? smallBlind; // малый блайнд
   //bool autoBool = false; // галочка автоповышения
   //bool anteBool = false; // галочка анте
   //bool everyLapBool = false;
@@ -34,7 +34,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
   //int firstLap = 0;
   //int autoTime = 0;
   final TextEditingController _bankController = TextEditingController();
-  final TextEditingController _smallBlindController = TextEditingController();
+  final TextEditingController _sbController = TextEditingController();
   //final TextEditingController _anteBlindController = TextEditingController();
   late FocusNode focusNode1;
   late FocusNode focusNode2;
@@ -44,7 +44,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
 
   var msgController = TextEditingController();
 
-  GameSettingsModel get state => widget.viewModel.state;
+  GameSettingsModelArgs get state => widget.viewModel.state;
 
   @override
   void initState() {
@@ -54,9 +54,6 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
     focusNode1 = FocusNode();
     focusNode2 = FocusNode();
     focusNode3 = FocusNode();
-
-    tmpBank = state.startingStack;
-    smallBlind = state.smallBlind;
 
     //anteBool = widget.thisLobby.lobbyAnteBool;
     //autoBool = widget.thisLobby.lobbyAutoBool;
@@ -73,69 +70,40 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
     _checkController(_bankController);
     final text = _bankController.text;
     if (text.isEmpty) {
-      tmpBank = state.startingStack;
+      tmpBank = null;
     } else {
       int parsedValue = int.parse(text);
       if (parsedValue < 1) {
-        _bankController.value = _bankController.value.copyWith(
-          text: '1',
-        );
+        _bankController.value = _bankController.value.copyWith(text: '1');
         tmpBank = 1;
         showToast(context.strings.toast_bank3);
       } else {
         tmpBank = parsedValue;
-      }
-
-      if (smallBlind > tmpBank ~/ 2) {
-        showToast(context.strings.toast_bank4);
       }
     }
     setState(() {});
   }
 
   void _smallBlindChanged(String value) {
-    _checkController(_smallBlindController);
-    if (_smallBlindController.text == '') {
-      _smallBlindController.clear();
+    _checkController(_sbController);
+    if (_sbController.text.isEmpty) {
+      _sbController.clear();
+      smallBlind = null;
       //smallBlind= widget.bank;
-    } else if ((int.parse(_smallBlindController.text)) >
-        (tmpBank.abs() - anteBlind) ~/ 2) {
-      /*
-                              _smallBlindController.value =
-                                  _smallBlindController.value.copyWith(
-                                text: "${tmpBank.abs() ~/ 2}",
-                                selection: TextSelection.fromPosition(
-              TextPosition(offset: "${tmpBank.abs() ~/ 2}".length)),
-                              );
-                              //print("first");
-                              smallBlind = tmpBank.abs() ~/ 2;
-                              anteBlind = tmpBank.abs() - smallBlind * 2;
-                              (anteBlind != 0)
-                                  ? _anteBlindController.value =
-                                      _anteBlindController.value.copyWith(
-                                      text: "${tmpBank.abs() - smallBlind * 2}",
-                                    )
-                                  : _anteBlindController.clear();
-                              
-                              */
-      showToast(
-        context.strings.toast_bank4,
-      );
+    } else {
+      final parsedValue = int.parse(_sbController.text);
 
-      //"Ante + Big Blind <= Bank");
+      if (parsedValue < 1) {
+        _sbController.value = _sbController.value.copyWith(text: '1');
+        smallBlind = 1;
+        showToast('The Small Blind cannot be zero');
+      } else {
+        smallBlind = parsedValue;
+      }
+
+      setState(() {});
+      //autoIntBlind = smallBlind * 2;
     }
-    if (_smallBlindController.text == '0') {
-      _smallBlindController.value = _smallBlindController.value.copyWith(
-        text: '1',
-      );
-      smallBlind = 1;
-      showToast('The Small Blind cannot be zero');
-    }
-    smallBlind = (_smallBlindController.text != '')
-        ? int.parse(_smallBlindController.text)
-        : state.smallBlind;
-    setState(() {});
-    //autoIntBlind = smallBlind * 2;
   }
 
   void _checkController(TextEditingController controller) {
@@ -276,7 +244,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                     height: stdButtonHeight / 2,
                     child: TextFormField(
                       focusNode: focusNode2,
-                      controller: _smallBlindController,
+                      controller: _sbController,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -290,7 +258,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                           fontSize: stdFontSize,
                           color: thisTheme.hintColor,
                         ),
-                        hintText: '$smallBlind',
+                        hintText: state.smallBlind.toString(),
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         counterText: '',
@@ -329,7 +297,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                   Expanded(
                     flex: 2,
                     child: Text(
-                      '${smallBlind * 2}',
+                      '${(smallBlind ?? state.smallBlind) * 2}',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: thisTheme.hintColor,
@@ -835,24 +803,25 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                 if ((focusNode1.hasFocus) || (focusNode2.hasFocus)) {
                   focusNode1.unfocus();
                   focusNode2.unfocus();
-                } else {
-                  //widget.thisLobby.lobbyAutoBool = autoBool;
-                  //widget.thisLobby.lobbyAnteBool = anteBool;
-
-                  //widget.thisLobby.lobbyAnte= anteBool? anteBlind: 0;
-                  //widget.thisLobby.lobbyFirstAnte = firstLap;
-
-                  //widget.thisLobby.lobbyFactor = autoDoubleFactor;
-                  //widget.thisLobby.lobbyAutoTime = autoTime;
-                  //widget.thisLobby.lobbyEveryLapBool = everyLapBool;
-
-                  widget.viewModel.saveSettings(
-                    state.copyWith(
-                      startingStack: tmpBank,
-                      smallBlind: smallBlind,
-                    ),
-                  );
                 }
+
+                //widget.thisLobby.lobbyAutoBool = autoBool;
+                //widget.thisLobby.lobbyAnteBool = anteBool;
+
+                //widget.thisLobby.lobbyAnte= anteBool? anteBlind: 0;
+                //widget.thisLobby.lobbyFirstAnte = firstLap;
+
+                //widget.thisLobby.lobbyFactor = autoDoubleFactor;
+                //widget.thisLobby.lobbyAutoTime = autoTime;
+                //widget.thisLobby.lobbyEveryLapBool = everyLapBool;
+
+                final newSettings = GameSettingsModelResult(
+                  startingStack: tmpBank,
+                  smallBlind: smallBlind,
+                );
+
+                logs.writeLog('GameSettings: save $newSettings');
+                widget.viewModel.saveSettings(newSettings);
               },
             ),
           ],

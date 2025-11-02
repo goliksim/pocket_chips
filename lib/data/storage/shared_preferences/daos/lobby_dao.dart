@@ -32,6 +32,8 @@ class LobbyDao extends Dao<LobbyStateEntity> {
 
   @override
   Future<void> write(LobbyStateEntity lobby) async {
+    prefs = await SharedPreferences.getInstance();
+
     final text = jsonEncode(lobby);
     logs.writeLog('Lobby info saved');
     prefs.setString(key, text);

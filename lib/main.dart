@@ -6,12 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/application.dart';
-import 'di/domain_managers.dart';
 
-void _runApp(ProviderContainer container) async {
+void _runApp() async {
   runApp(
-    UncontrolledProviderScope(
-      container: container,
+    ProviderScope(
       child: MyApp(),
     ),
   );
@@ -20,13 +18,10 @@ void _runApp(ProviderContainer container) async {
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final container = ProviderContainer();
-  await container.read(localeManagerProvider).initLocale();
-
   if (kIsWeb) {
     // Для веб-приложений может потребоваться своя логика инициализации.
     // Пока оставим как есть, но с возможностью расширения.
-    _runApp(container);
+    _runApp();
   } else if (Platform.isAndroid || Platform.isIOS) {
     //await Purchases.configure(PurchasesConfiguration('goog_oLBnINIENkDvkGoquoIjyBHPcoy'));
     if (Platform.isAndroid) {
@@ -42,7 +37,7 @@ Future main() async {
       await Future.delayed(const Duration(milliseconds: 100));
       //print('Orientation set to portrait');
 
-      _runApp(container);
+      _runApp();
     });
   }
 }

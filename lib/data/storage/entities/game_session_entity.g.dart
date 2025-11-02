@@ -13,6 +13,7 @@ GameSessionEntity _$GameSessionEntityFromJson(Map json) => GameSessionEntity(
           .toSet(),
       lapCounter: (json['lapCounter'] as num).toInt(),
       currentPlayerUid: json['currentPlayerUid'] as String?,
+      firstPlayerUid: json['firstPlayerUid'] as String?,
     );
 
 Map<String, dynamic> _$GameSessionEntityToJson(GameSessionEntity instance) =>
@@ -21,4 +22,5 @@ Map<String, dynamic> _$GameSessionEntityToJson(GameSessionEntity instance) =>
       'foldedOrInactive': instance.foldedOrInactive.toList(),
       'lapCounter': instance.lapCounter,
       'currentPlayerUid': instance.currentPlayerUid,
+      'firstPlayerUid': instance.firstPlayerUid,
     };

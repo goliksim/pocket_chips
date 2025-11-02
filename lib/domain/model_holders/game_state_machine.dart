@@ -1,53 +1,43 @@
 //ОСНОВНАЯ ИГРОВАЯ ЛОГИКА
 import 'dart:async';
-import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/navigation/navigation_manager.dart';
+import '../../di/domain_managers.dart';
+import '../../di/model_holders.dart';
+import '../../di/repositories.dart';
 import '../../l10n/app_localizations.dart';
-import '../../presentation/game/widgets/winner_page/view_state/possible_winner_item.dart';
 import '../../presentation/game/widgets/winner_page/view_state/winner_choice_args.dart';
+import '../../services/game_logic_service.dart';
 import '../../services/toast_manager.dart';
 import '../../utils/logs.dart';
 import '../models/game/game_session_state.dart';
 import '../models/game/game_state_enum.dart';
 import '../models/game/game_state_model.dart';
-import '../models/game_settings_model.dart';
 import '../models/lobby/lobby_state_model.dart';
 import '../models/player/player_id.dart';
 import '../models/player/player_model.dart';
-import '../repositories/app_repository.dart';
-import 'game_settings_provider.dart';
 import 'lobby_state_holder.dart';
 
-class GameStateMachine extends AsyncNotifier<GameStateModel>
-    implements GameSettingsProvider {
-  final LobbyStateHolder _lobbyStateHolder;
-
-  final NavigationManager _navigationManager;
-  final AppRepository _appRepository;
-  final AppLocalizations _strings;
-  final ToastManager _toastManager;
-
-  GameStateMachine({
-    required NavigationManager navigationManager,
-    required LobbyStateHolder lobbyStateHolder,
-    required AppRepository appRepository,
-    required ToastManager toastManager,
-    required AppLocalizations strings,
-  })  : _navigationManager = navigationManager,
-        _lobbyStateHolder = lobbyStateHolder,
-        _appRepository = appRepository,
-        _toastManager = toastManager,
-        _strings = strings;
+class GameStateMachine extends AsyncNotifier<GameStateModel> {
+  LobbyStateHolder get _lobbyStateHolder =>
+      ref.read(lobbyStateHolderProvider.notifier);
+  NavigationManager get _navigationManager =>
+      ref.read(navigationManagerProvider);
+  AppLocalizations get _strings => ref.read(stringsProvider);
+  ToastManager get _toastManager => ref.read(toastManagerProvider);
 
   @override
   FutureOr<GameStateModel> build() async {
-    final sessionState = await _appRepository.getGameSessionState();
+    logs.writeLog('GameSM: READ DATA AND BUILD STATE');
 
-    final lobbyState = _lobbyStateHolder.activeLobby;
+    final lobbyState = await ref.watch(lobbyStateHolderProvider.future);
+
+    final sessionState = lobbyState.gameState.isStarted
+        ? await ref.read(appRepositoryProvider).getGameSessionState()
+        : null;
 
     return GameStateModel(
       lobbyState: lobbyState,
@@ -60,274 +50,297 @@ class GameStateMachine extends AsyncNotifier<GameStateModel>
     );
   }
 
-  GameStateModel get stateModel => state.value!;
-  GameSessionState get sessionState => stateModel.sessionState;
-  LobbyStateModel get lobbyState => stateModel.lobbyState;
-
-  String get currentPlayerUid => sessionState.currentPlayerUid ?? 'none-uid';
-
-  List<PossibleWinnerItem> get possibleWinners => stateModel.activePlayers
-      .map(
-        (p) => PossibleWinnerItem(
-            uid: p.uid,
-            assetUrl: p.assetUrl,
-            name: p.name,
-            bid: sessionState.bets[p.uid]!),
-      )
-      .toList();
-
-  Iterable<PlayerModel> get activePlayers => stateModel.activePlayers;
-  bool get canStartOrContinueGame => stateModel.canStartOrContinueGame;
-
-  int get currentPlayerIndex => lobbyState.players
-      .indexWhere((p) => p.uid == sessionState.currentPlayerUid);
-
-  int get playersWithMoneyCount =>
-      lobbyState.banks.values.where((element) => element > 0).length;
-
-  bool get checkPlayersHaveMoney => playersWithMoneyCount > 0;
+  //GameStateModel get stateModel => state.value!;
+  //GameSessionState get sessionState => stateModel.sessionState;
+  //LobbyStateModel get lobbyState => stateModel.lobbyState;
 
   //Player controls
-  void executeRaise(int raiseValue) => _bet(raiseValue);
-  void executeAllIn() => _betAllIn();
-  void executeCall() => _bet(calculateCallValue());
-  void executeCheck() => _newPlayer();
-  void executeFold() => _fold();
+  Future<void> executeRaise(int raiseValue) => _executeBet(raiseValue);
 
-  void startBetting() {
-    if (canStartOrContinueGame) {
-      logs.writeLog('Start Betting. Lobby is active}');
+  Future<void> executeAllIn() {
+    final currentModel = state.requireValue;
+    final currentPlayerUid = _getCurrentPlayerUid(currentModel);
 
-      _updateLobbyState(
-        lobbyState.copyWith(
-          gameState: GameStatusEnum.preFlop,
-        ),
-      );
-      _updateSessionState(
-        sessionState.copyWith(
-          lapCounter: 0,
-        ),
-      );
+    final bank = currentModel.lobbyState.banks[currentPlayerUid] ?? 0;
 
-      _processFirstBlinds();
-      //TODO:
-      //lobbyStorage.write(lobbyState);
-      _newPlayer(jumpToUid: sessionState.firstPlayerUid);
+    logs.writeLog('GameSM: executeAllIn $bank');
+    return _executeBet(bank);
+  }
+
+  Future<void> executeCall() {
+    final model = state.requireValue;
+    final currentPlayerUid = model.sessionState.currentPlayerUid;
+
+    if (currentPlayerUid == null) {
+      throw Exception('currentPlayerUid is null');
+    }
+
+    return _executeBet(
+      state.requireValue.calculateCallValue(currentPlayerUid),
+    );
+  }
+
+  Future<void> executeCheck() async {
+    logs.writeLog('GameSM: executeCheck');
+
+    final nextState = _calculateNextPlayerState(state.requireValue);
+    await _updateGame(nextState);
+  }
+
+  Future<void> executeFold() async {
+    final currentModel = state.requireValue;
+    final sessionState = currentModel.sessionState;
+
+    final currentPlayerUid = _getCurrentPlayerUid(currentModel);
+
+    // 1. Update Folded map
+    final newFolded = Set.of(sessionState.foldedOrInactive)
+      ..add(currentPlayerUid);
+    final tempSession = sessionState.copyWith(foldedOrInactive: newFolded);
+    final tempGameModel = currentModel.copyWith(sessionState: tempSession);
+
+    // 2. If one player last, show winner
+    if (tempGameModel.activePlayers.length == 1) {
+      return showWinnersAndEndLap(model: tempGameModel);
     } else {
-      _toastManager.showToast(_strings.toast_moreplay);
+      // 3. Calculate final state
+      final nextState = _calculateNextPlayerState(tempGameModel);
+      await _updateGame(nextState);
     }
   }
 
+  Future<void> startBetting() async {
+    final currentModel = state.requireValue;
+
+    if (!currentModel.canStartOrContinueGame) {
+      //TODO: remove navigation from StateHolder
+      logs.writeLog('GameSM: cannot start betting');
+      _toastManager.showToast(_strings.toast_moreplay);
+      return;
+    }
+
+    logs.writeLog('GameSM: starting betting');
+
+    // 1. Create the initial state for the new hand
+    final initialHandState = currentModel.copyWith(
+      lobbyState: currentModel.lobbyState.copyWith(
+        gameState: GameStatusEnum.preFlop,
+      ),
+      sessionState: currentModel.sessionState.copyWith(lapCounter: 0),
+    );
+
+    // 2. Calculate the state after posting blinds
+    final stateAfterBlinds = _processFirstBlinds(initialHandState);
+
+    // 3. Update the game
+    await _updateGame(stateAfterBlinds);
+  }
+
   // Новый круг
-  Future showWinnersAndEndLap({bool fromFold = false}) async {
-    _updateLobbyState(
-      lobbyState.copyWith(
+  Future<void> showWinnersAndEndLap({
+    required GameStateModel model,
+  }) async {
+    // 1. Set state to showdown
+    final model1 = model.copyWith(
+      lobbyState: model.lobbyState.copyWith(
         gameState: GameStatusEnum.showdown,
       ),
     );
 
-    if (!fromFold) {
-      logs.writeLog('Call WinnerChooseWindow');
+    GameStateModel model2;
 
-      final markedWinners = await _navigationManager.showWinnerChooseDialog(
-        WinnerChoiceArgs(
-          title: _strings.game_win3,
-          possibleWinners: possibleWinners,
+    // 2.1 If win from folds, show 1 winner
+    final winFromFold = model1.activePlayers.length == 1;
+
+    if (winFromFold) {
+      final winner = model1.activePlayers.first;
+      final totalBets = model1.sessionState.bets.values.sum;
+      final newBanks = Map.of(model1.lobbyState.banks)
+        ..update(winner.uid, (value) => value + totalBets);
+
+      model2 = model1.copyWith(
+        lobbyState: model1.lobbyState.copyWith(
+          banks: newBanks,
         ),
       );
 
-      _moneyDistribution(markedWinners ?? {});
+      //TODO: remove navigation from StateHolder
+      unawaited(
+        _navigationManager.showWinner(winner),
+      );
     } else {
-      final winner = activePlayers.first;
-      final totalBets = sessionState.bets.values.reduce((a, b) => a + b);
-      lobbyState.banks.update(winner.uid, (value) => value + totalBets);
+      // 2.2. Else need to select winner
+      logs.writeLog('Call WinnerChooseWindow');
 
-      await _navigationManager.showWinner(winner);
+      //TODO: remove navigation from StateHolder
+      final markedWinners = await _navigationManager.showWinnerChooseDialog(
+        WinnerChoiceArgs(
+          title: _strings.game_win3,
+          possibleWinners: model1.possibleWinners,
+        ),
+      );
+
+      if (markedWinners == null) {
+        throw Exception('needToSelectWinners');
+      }
+
+      model2 = await _moneyDistribution(
+        model: model1,
+        winners: markedWinners,
+      );
     }
 
-    logs.writeLog('NEW Lap\tlobby state = 5\t lobbyIndex=-1;');
+    // 3. Reset folded states and bets
+    final model3 = _toBreakdown(model: model2);
 
-    _resetPlayers();
+    await _updateGame(model3);
+  }
 
-    _findNewDealer();
+  String _getCurrentPlayerUid(GameStateModel model) {
+    final currentPlayerUid = model.sessionState.currentPlayerUid;
 
-    _updateLobbyState(
-      lobbyState.copyWith(
-        gameState: GameStatusEnum.gameBreak,
+    if (currentPlayerUid == null) {
+      throw Exception('Run _getCurrentPlayerUid with no player');
+    }
+
+    return currentPlayerUid;
+  }
+
+  GameStateModel _processBet({
+    required GameStateModel model,
+    required PlayerId playerId,
+    required int bid,
+  }) {
+    final newBets = Map.of(model.sessionState.bets)
+      ..update(
+        playerId,
+        (value) => value + bid,
+        ifAbsent: () => bid,
+      );
+
+    final newBanks = Map.of(model.lobbyState.banks)
+      ..update(playerId, (value) => value - bid);
+
+    return GameStateModel(
+      lobbyState: model.lobbyState.copyWith(banks: newBanks),
+      sessionState: model.sessionState.copyWith(
+        bets: newBets,
       ),
     );
   }
 
-  // Проверка на выравнивание ставок
-  bool checkBidsEqual() {
-    int notZeroPlayers = 0;
+  Future<void> _executeBet(int bid) async {
+    logs.writeLog('GameSM: executeBet $bid');
+    final currentModel = state.requireValue;
+    final currentPlayerUid = _getCurrentPlayerUid(currentModel);
 
-    var maxBet = sessionState.bets.values.reduce(max);
-
-    for (var player in activePlayers) {
-      final bid = sessionState.bets[player.uid] ?? 0;
-      final bank = lobbyState.banks[player.uid] ?? 0;
-
-      bool equalBool = (bid == maxBet);
-      bool allInBool = ((bid > 0) && (bank <= 0));
-
-      if (bank > 0) {
-        notZeroPlayers += 1;
-      }
-
-      if (!(equalBool || allInBool)) {
-        return false;
-      }
-    }
-
-    //проверка на 1 оставшегося чела
-    if (notZeroPlayers <= 1) {
-      return true;
-    }
-
-    return sessionState.lapCounter != 0;
-  }
-
-  // Подсчет величины рейза-ререйза
-  int calculateRaiseValue() {
-    // Сколько нужно добавить для выравнивания
-    int toEqual = sessionState.bets.values.reduce(max) -
-        (sessionState.bets[currentPlayerUid] ?? 0);
-
-    // Подходит под ставку или ход в олл ин, если остался условно 1 бакс (бет)
-    List<int> bids = activePlayers
-        .map((p) => sessionState.bets[p.uid] ?? 0)
-        .toSet()
-        .toList()
-      ..sort();
-
-    // Последнее повышение
-    int lastRaise = 0;
-    if (bids.length > 1) {
-      lastRaise = bids[bids.length - 1] - bids[bids.length - 2];
-    }
-
-    int result = toEqual + [lastRaise, lobbyState.bigBlindValue].reduce(max);
-
-    return result;
-  }
-
-  int calculateCallValue() {
-    final maxBet = sessionState.bets.values.reduce(max);
-    final currentBet = sessionState.bets[sessionState.currentPlayerUid] ?? 0;
-
-    return maxBet - currentBet;
-  }
-
-  // PRIVATE PART
-
-  void _bet(int bid) {
-    _processBet(currentPlayerUid, bid);
-
-    // После выравнивания ставок на всех улицах, кроме префлопа сразу прыгаем на следующую улицу
-    if (sessionState.lapCounter > 0 && checkBidsEqual()) {
-      _newState();
-    } else {
-      _newPlayer();
-    }
-  }
-
-  void _betAllIn() {
-    int bid = _calculateMaxBid();
-
-    return _bet(bid);
-  }
-
-  void _processBet(String playerUid, int bid, {int? overrideBank}) {
-    sessionState.bets.update(
-      playerUid,
-      (value) => value + bid,
-      ifAbsent: () => bid,
+    // 1. Update bet and banks map
+    final newSession = _processBet(
+      model: currentModel,
+      playerId: currentPlayerUid,
+      bid: bid,
     );
-    lobbyState.banks
-        .update(playerUid, (value) => overrideBank ?? (value - bid));
+
+    // 2. Calculate the next player and game phase
+    final finalState = _calculateNextPlayerState(newSession);
+
+    // 3. Update the game state
+    await _updateGame(finalState);
   }
 
-  Future<void> _fold() async {
-    sessionState.foldedOrInactive.add(currentPlayerUid);
-
-    if (canStartOrContinueGame) {
-      _newPlayer();
-    } else {
-      showWinnersAndEndLap(fromFold: true);
-    }
-  }
-
-  Future<void> _moneyDistribution(Set<String> winners) async {
+  Future<GameStateModel> _moneyDistribution({
+    required GameStateModel model,
+    required Set<String> winners,
+  }) async {
     // Упорядоченное множество ставок
+    logs.writeLog('GameSM: distrubuteMoney $winners');
+
+    var lobbyState = model.lobbyState;
+    var sessionState = model.sessionState;
+
     List<int> bets = sessionState.bets.values.toSet().toList()..sort();
 
     if (bets[0] == 0) {
       bets.removeAt(0);
     }
 
-    logs.writeLog('Bids - $bets');
-
     // Проходимся по каждому разному значению ставок
+    logs.writeLog('GameSM: distrubution bets $bets');
     for (int bid in bets) {
+      logs.writeLog('GameSM: distrubution $bid');
       if (bid <= 0) continue;
 
-      logs.writeLog('Winners - $winners');
-
       // Проверка на сайд-спот
-      if (winners.isEmpty && canStartOrContinueGame) {
+      if (winners.isEmpty && model.canStartOrContinueGame) {
+        logs.writeLog('GameSM: call winnerChooseDialog');
         final newWinners = await _navigationManager.showWinnerChooseDialog(
           WinnerChoiceArgs(
             title: _strings.game_win4,
-            possibleWinners: possibleWinners,
+            possibleWinners: model.possibleWinners,
           ),
         );
 
-        return _moneyDistribution(newWinners ?? {});
+        if (newWinners == null) {
+          throw Exception('needToSelectWinner');
+        }
+
+        return _moneyDistribution(
+          model: model,
+          winners: newWinners,
+        );
       }
 
       // Та сумма которая будет распределяться по победителям для данной ставки
       int sumToDivide = 0;
 
       // Проходимся по ставкам и проверяем, ставил ли кто-то данную ставку
-      for (var entry in sessionState.bets.entries) {
+      for (final entry in sessionState.bets.entries) {
         // Если челик такую ставку поставил
         if (entry.value >= bid) {
           // Если не победитель, то вносим ее в общий банк
           if (!winners.contains(entry.key)) {
+            logs.writeLog(
+                'GameSM: ${entry.value} not winner, increase dividingSum');
             sumToDivide += bid;
           } else {
+            logs.writeLog('GameSM: ${entry.value} is winner bet, returning');
             // Если это победитель, то он свое вернул
-            lobbyState.banks.update(entry.key, (value) => value + bid);
+            final newBanks = Map.of(lobbyState.banks)
+              ..update(entry.key, (value) => value + bid);
+
+            lobbyState = lobbyState.copyWith(banks: newBanks);
           }
         }
       }
+      logs.writeLog('GameSM: sumToDivide $sumToDivide');
 
       // Заканчиваем цикл если остаток остался, а челиксы закончились
       // Возвращаем деньги тому, кто поставил больше всех бабок
       if (winners.isEmpty) {
         //_pop();
-        for (var player in activePlayers) {
-          lobbyState.banks.update(player.uid,
+        final newBanks = Map.of(lobbyState.banks);
+        for (final player in model.activePlayers) {
+          newBanks.update(player.uid,
               (value) => value + (sessionState.bets[player.uid] ?? 0));
-          //lobbyState.players[i].bank +=
-          //    (lobbyState.players[i].bid > 0) ? lobbyState.players[i].bid : 0;
         }
-        return;
+        lobbyState = lobbyState.copyWith(banks: newBanks);
+
+        return model.copyWith(lobbyState: lobbyState);
       }
 
       final winnersCount = winners.length;
 
       // Разделенная добыча делится на победителей, причем тока тех, кто еще в игре
-      logs.writeLog('Devide on $winnersCount');
-      for (var winnerUid in winners) {
+      for (final winnerUid in winners) {
         if (sessionState.bets[winnerUid]! > 0) {
-          lobbyState.banks.update(
-              winnerUid, (value) => value + (sumToDivide ~/ winnersCount));
-
           logs.writeLog(
-            'For ${lobbyState.players.firstWhereOrNull((p) => p.uid == winnerUid)?.name} - ${lobbyState.banks[winnerUid]}',
-          );
+              'GameSM: adding ${sumToDivide ~/ winnersCount} to $winnerUid');
+          final newBanks = Map.of(lobbyState.banks)
+            ..update(
+              winnerUid,
+              (value) => value + (sumToDivide ~/ winnersCount),
+            );
+          lobbyState = lobbyState.copyWith(banks: newBanks);
         }
       }
 
@@ -335,314 +348,402 @@ class GameStateMachine extends AsyncNotifier<GameStateModel>
       for (int m = 0; m < bets.length; m++) {
         bets[m] -= bid;
       }
-      logs.writeLog('Bids - $bets');
+      logs.writeLog('GameSM: distrubution new bets $bets');
 
       // Выключаем из посчета игроков, чья ставка была равно отработанной
-      for (var player in activePlayers) {
+      final newFolded = Set.of(sessionState.foldedOrInactive);
+      final newBets = Map.of(sessionState.bets);
+
+      for (final player in model.activePlayers) {
         if (sessionState.bets[player.uid] == bid) {
-          sessionState.foldedOrInactive.add(player.uid);
+          newFolded.add(player.uid);
           winners.remove(player.uid);
         }
 
         // Уменьшаем ставки игроков, так как сумма равная [bid] уже отыграла
-        sessionState.bets.update(player.uid, (value) => value - bid);
+        newBets.update(
+          player.uid,
+          (value) => value - bid,
+          ifAbsent: () => 0,
+        );
       }
+
+      sessionState = sessionState.copyWith(
+        foldedOrInactive: newFolded,
+        bets: newBets,
+      );
+
+      model = model.copyWith(sessionState: sessionState);
     }
 
-    // pop();
-    return;
+    return model.copyWith(
+      lobbyState: lobbyState,
+      sessionState: sessionState,
+    );
   }
 
   // Переходы между игроками
-  Future<void> _newPlayer({PlayerId? jumpToUid}) async {
-    // Если у игроков деньги все уже пустые, то скипаем
-    if (!checkPlayersHaveMoney) {
-      logs.writeLog('No one player with money\n${lobbyState.banks}');
-      return showWinnersAndEndLap();
+
+  GameStateModel _calculateNextPlayerState(GameStateModel currentModel) {
+    logs.writeLog('GameSM: finding next player state');
+    var currentSession = currentModel.sessionState;
+    final currentLobby = currentModel.lobbyState;
+
+    final bidsEqual = _checkBidsEqual(currentModel);
+
+    // 1. FORCE SHOWDOWN IF BETS EQUAL AND ONLY ONE LAST WITH MONEY
+    if (bidsEqual && currentModel.activePlayersWithMoneyCount <= 1) {
+      logs.writeLog('GameSM: [CNPS] force to showdown');
+      return currentModel.copyWith(
+        lobbyState: currentLobby.copyWith(
+          gameState: GameStatusEnum.showdown,
+        ),
+      );
     }
 
-    final PlayerId newPlayerUid;
-
-    if (jumpToUid != null) {
-      newPlayerUid = jumpToUid;
-    } else {
-      int newIndex = (currentPlayerIndex + 1) % lobbyState.players.length;
-
-      newPlayerUid = lobbyState.players[newIndex].uid;
-
-      final bidsEqual = checkBidsEqual();
-      final firstLap = sessionState.lapCounter <= 0;
-
-      if (!firstLap && bidsEqual) {
-        return _newState();
-      } else {
-        if (newPlayerUid == sessionState.firstPlayerUid && bidsEqual) {
-          return _newState();
-        }
-      }
-    }
-
-    if (playersWithMoneyCount < 2) {
-      final maxBid = sessionState.bets.values.reduce(max);
-
-      if (sessionState.bets[newPlayerUid] == maxBid) {
-        showWinnersAndEndLap();
-      }
-    }
-
-    // Пропуск лоха без денег
-    final playerBank = lobbyState.banks[newPlayerUid] ?? 0;
-    if (playerBank <= 0) {
-      return _newPlayer();
-    }
-
-    // Если челикс фолданул, скипаем его
-    if (sessionState.foldedOrInactive.contains(newPlayerUid)) {
-      return _newPlayer();
-    }
-
-    //raiseBank = minTmpFunction(bidsEqual);
-
-    int lapCounter = sessionState.lapCounter;
-
-    if (newPlayerUid == sessionState.firstPlayerUid) {
-      lapCounter += 1;
-    }
-
-    _updateSessionState(
-      sessionState.copyWith(
-        lapCounter: lapCounter,
-        currentPlayerUid: newPlayerUid,
-      ),
+    // 2. Calculate New Player
+    final (nextPlayerUid, shouldIncrementLap) = _nextPlayerUid(
+      model: currentModel,
+      fromUid: _getCurrentPlayerUid(currentModel),
     );
-    //TODO SAVE
 
-    logs.writeLog(
-      'Turn of ${lobbyState.players.firstWhere((p) => p.uid == newPlayerUid).name}',
+    // 3. Update lapCount if needed
+    if (shouldIncrementLap) {
+      logs.writeLog('GameSM: [CNPS] increment lapCounter');
+      currentSession = currentSession.copyWith(
+        lapCounter: currentSession.lapCounter + 1,
+      );
+    }
+
+    // 4. If one lap ended and bets are equal -> can jump to new street
+    if (bidsEqual && currentSession.lapCounter > 0) {
+      logs.writeLog('GameSM: [CNPS] need new street');
+      return _calculateNewStreet(
+        GameStateModel(
+          lobbyState: currentLobby,
+          sessionState: currentSession,
+        ),
+      );
+    }
+
+    // 5. Update current player and return
+    currentSession = currentSession.copyWith(
+      currentPlayerUid: nextPlayerUid,
     );
-    //TODO:
-    //lobbyStorage.write(lobbyState);
-    return;
+
+    return currentModel.copyWith(sessionState: currentSession);
   }
 
-  int _calculateMaxBid() {
-    // Сколько нужно добавить для выравнивания
-    int playerModey(PlayerId playerUid) {
-      int thisBank = lobbyState.banks[playerUid] ?? 0;
-      int thisMax = thisBank + (sessionState.bets[playerUid] ?? 0);
+  // Ищем следующего игрока, скипаем фолд и олинщиков.
+  // Повышаем круг, если нужно
+  (PlayerId?, bool) _nextPlayerUid({
+    required GameStateModel model,
+    required PlayerId fromUid,
+  }) {
+    final players = model.lobbyState.players;
+    final fromIndex = players.indexWhere((p) => p.uid == fromUid);
 
-      return thisMax;
-    }
+    var shouldIncrementLap = false;
 
-    int thisBank = lobbyState.banks[currentPlayerUid] ?? 0;
-    final thisMax = playerModey(currentPlayerUid);
+    for (int i = 1; i <= players.length; i++) {
+      final nextIndex = (fromIndex + i) % players.length;
+      final nextPlayer = players[nextIndex];
 
-    int maxBid = thisMax;
-    for (final player in lobbyState.players) {
-      if (!sessionState.foldedOrInactive.contains(player.uid)) {
-        var playerMoney = playerModey(player.uid);
+      final hasMoney = (model.lobbyState.banks[nextPlayer.uid] ?? 0) > 0;
+      final isActive = model.isPlayerActive(nextPlayer.uid);
 
-        if (thisMax > playerMoney) {
-          var toEqual = thisMax - playerMoney;
-          if (toEqual < maxBid) {
-            maxBid = toEqual;
-          }
-        }
+      shouldIncrementLap =
+          (nextPlayer.uid == model.sessionState.firstPlayerUid);
+
+      if (hasMoney && isActive) {
+        logs.writeLog('GameSM: next player should be ${nextPlayer.name}');
+        return (nextPlayer.uid, shouldIncrementLap);
       }
     }
-    if (maxBid == thisMax) maxBid = 0;
 
-    return thisBank - maxBid;
+    return (null, false);
   }
 
   // Новая улица
-  void _newState() async {
-    // Проверяем, шобы ставки были одинаковы
+  GameStateModel _calculateNewStreet(GameStateModel currentModel) {
+    final nextStreet = currentModel.lobbyState.gameState.next;
 
-    if (checkBidsEqual()) {
-      //переходим в новое состояние
+    logs.writeLog('GameSM: setup new street ${nextStreet.name}');
 
-      _updateSessionState(
-        sessionState.copyWith(
-          lapCounter: sessionState.lapCounter + 1,
-        ),
+    final newLobbyState = currentModel.lobbyState.copyWith(
+      gameState: currentModel.lobbyState.gameState.next,
+    );
+
+    // 1. RETURN CURRENT STATE IN SHOWDOWN
+    if (nextStreet == GameStatusEnum.showdown) {
+      logs.writeLog('GameSM: new street is showdown, returning to UI');
+      return currentModel.copyWith(
+        lobbyState: newLobbyState,
       );
-      _updateLobbyState(
-        lobbyState.copyWith(
-          gameState: lobbyState.gameState.next,
-        ),
-      );
-
-      //TODO:
-      //lobbyStorage.write(lobbyState);
     }
-    //после префлопа первый игрок - смол блайнд
-    if (lobbyState.gameState == GameStatusEnum.flop) {
-      for (int i = 1; i < lobbyState.players.length; i++) {
-        final dealerPosition =
-            lobbyState.players.indexWhere((p) => p.uid == lobbyState.dealerId);
 
-        int localIndex = (i + dealerPosition) % lobbyState.players.length;
-        final localPlayer = lobbyState.players[localIndex];
+    // 2. Reset lap counter for new street
+    var newSessionState = currentModel.sessionState.copyWith(
+      lapCounter: 0,
+    );
 
-        if (!sessionState.foldedOrInactive.contains(localPlayer.uid)) {
-          _updateSessionState(
-            sessionState.copyWith(
-              firstPlayerUid: localPlayer.uid,
-            ),
-          );
+    // 3. Reset firstPlayer
+    final dealerPosition = newLobbyState.players
+        .indexWhere((p) => p.uid == newLobbyState.dealerId);
 
-          break;
-        }
-      }
-    }
-    if (lobbyState.gameState == GameStatusEnum.showdown) {
-      await showWinnersAndEndLap();
-      return null;
-    }
-    _newPlayer(jumpToUid: sessionState.firstPlayerUid);
-  }
+    for (int i = 1; i < newLobbyState.players.length; i++) {
+      int localIndex = (i + dealerPosition) % newLobbyState.players.length;
+      final localPlayer = newLobbyState.players[localIndex];
 
-  void _resetPlayers() {
-    // Cтираем старые ставки и тех, кто фолданул
-    for (final player in lobbyState.players) {
-      _updateSessionState(
-        sessionState.copyWith(bets: {}, foldedOrInactive: {}),
-      );
-
-      final playerBank = lobbyState.banks[player.uid] ?? 0;
-      if (playerBank <= 0) {
-        sessionState.foldedOrInactive.add(player.uid);
-      }
-    }
-  }
-
-  void _findNewDealer() {
-    final dealerPosition =
-        lobbyState.players.indexWhere((p) => p.uid == lobbyState.dealerId);
-
-    // finding dealer
-    for (int i = 1; i < lobbyState.players.length; i++) {
-      int localIndex = (i + dealerPosition) % lobbyState.players.length;
-      final localPlayer = lobbyState.players[localIndex];
-
-      if (!sessionState.foldedOrInactive.contains(localPlayer.uid)) {
-        _updateLobbyState(
-          lobbyState.copyWith(
-            dealerId: localPlayer.uid,
-          ),
+      if (currentModel.isPlayerActive(localPlayer.uid)) {
+        logs.writeLog(
+            'GameSM: first player in new street is ${localPlayer.name}');
+        newSessionState = newSessionState.copyWith(
+          currentPlayerUid: localPlayer.uid,
+          firstPlayerUid: localPlayer.uid,
         );
-
-        logs.writeLog('new dealer index: $localIndex');
         break;
       }
     }
+
+    return GameStateModel(
+      lobbyState: newLobbyState,
+      sessionState: newSessionState,
+    );
+  }
+
+  GameStateModel _toBreakdown({required GameStateModel model}) {
+    logs.writeLog('GameSM: prepare state for breakdown');
+    final lobby = model.lobbyState;
+    // Cтираем старые ставки и тех, кто фолданул
+    final newFolded = <PlayerId>{};
+    for (final player in lobby.players) {
+      final playerBank = lobby.banks[player.uid] ?? 0;
+      if (playerBank <= 0) {
+        newFolded.add(player.uid);
+      }
+    }
+    return model.copyWith(
+      sessionState: model.sessionState.copyWith(
+        bets: {},
+        foldedOrInactive: newFolded,
+        currentPlayerUid: null,
+        lapCounter: 0,
+      ),
+      lobbyState: model.lobbyState.copyWith(
+        dealerId: _getNewDealerUid(model: model),
+        gameState: GameStatusEnum.gameBreak,
+      ),
+    );
+  }
+
+  String? _getNewDealerUid({required GameStateModel model}) {
+    final lobby = model.lobbyState;
+    final dealerPosition =
+        lobby.players.indexWhere((p) => p.uid == lobby.dealerId);
+
+    // finding dealer
+    for (int i = 1; i < lobby.players.length; i++) {
+      int localIndex = (i + dealerPosition) % lobby.players.length;
+      final localPlayer = lobby.players[localIndex];
+
+      final playerBank = lobby.banks[localPlayer.uid] ?? 0;
+      if (model.isPlayerActive(localPlayer.uid) && playerBank > 0) {
+        logs.writeLog('GameSM: new dealer is ${localPlayer.name}');
+        return localPlayer.uid;
+      }
+    }
+
+    return lobby.dealerId;
   }
 
   // Первые ставки
-  void _processFirstBlinds() {
-    logs.writeLog('First Blind');
+  GameStateModel _processFirstBlinds(GameStateModel model) {
+    logs.writeLog('GameSM: processing first blinds');
 
-    final dealerPosition =
-        lobbyState.players.indexWhere((p) => p.uid == lobbyState.dealerId);
+    var editableModel = model;
+    LobbyStateModel currentLobby() => editableModel.lobbyState;
+    GameSessionState currentSession() => editableModel.sessionState;
 
-    int bigBlindPosition = dealerPosition;
+    GameStateModel processBetOrAllIn({
+      required GameStateModel model,
+      required PlayerModel player,
+      required int value,
+    }) {
+      final currentLobby = model.lobbyState;
 
-    // Ищем смолблайнд
-    for (int i = 1; i < lobbyState.players.length; i++) {
-      int localIndex = (i + dealerPosition) % lobbyState.players.length;
-
-      final localPlayer = lobbyState.players[localIndex];
-
-      if (!sessionState.foldedOrInactive.contains(localPlayer.uid)) {
-        final bank = lobbyState.banks[localPlayer.uid] ?? 0;
-        // Ставка тех денег, что есть
-        if (bank < lobbyState.smallBlindValue) {
-          _processBet(
-            localPlayer.uid,
-            bank,
-            overrideBank: 0,
-          );
-        } else {
-          // Ставка для смолблайнд
-          _processBet(localPlayer.uid, lobbyState.smallBlindValue);
-        }
-        logs.writeLog('smallBlindIndex - $localIndex');
-        break;
-      }
-    } // Ищем бигблайнд
-    for (int i = 1; i < lobbyState.players.length + 1; i++) {
-      int localIndex = (i + dealerPosition) % lobbyState.players.length;
-
-      final localPlayer = lobbyState.players[localIndex];
-
-      if (!sessionState.foldedOrInactive.contains(localPlayer.uid) &&
-          sessionState.bets[localPlayer.uid] == 0) {
-        final bank = lobbyState.banks[localPlayer.uid] ?? 0;
-
-        // Ставка тех денег, что есть
-        if (bank < lobbyState.bigBlindValue) {
-          _processBet(
-            localPlayer.uid,
-            bank,
-            overrideBank: 0,
-          );
-        } else {
-          // Ставка для бигблайнда
-          _processBet(localPlayer.uid, lobbyState.bigBlindValue);
-        }
-
-        logs.writeLog('bigBlindIndex - $localIndex');
-        //lobbyState.dealerIndex = (i+lobbyState.dealerIndex)%maxPlayerCount;
-
-        bigBlindPosition = localIndex;
+      final bank = currentLobby.banks[player.uid] ?? 0;
+      // Ставка тех денег, что есть
+      if (bank < value) {
+        return _processBet(
+          model: editableModel,
+          playerId: player.uid,
+          bid: bank,
+        );
+      } else {
+        // Ставка для смолблайнд
+        return _processBet(
+          model: editableModel,
+          playerId: player.uid,
+          bid: value,
+        );
       }
     }
 
+    final dealerPosition = currentLobby()
+        .players
+        .indexWhere((p) => p.uid == currentLobby().dealerId);
+
+    int bigBlindPosition = dealerPosition;
+
+    //Head up случай
+    if (editableModel.activePlayers.length == 2) {
+      logs.writeLog('GameSM: head-up case found');
+      final firstPlayer = editableModel.activePlayers.elementAt(0);
+
+      editableModel = processBetOrAllIn(
+        model: editableModel,
+        player: firstPlayer,
+        value: currentLobby().smallBlindValue,
+      );
+
+      editableModel = processBetOrAllIn(
+        model: editableModel,
+        player: editableModel.activePlayers.elementAt(1),
+        value: currentLobby().bigBlindValue,
+      );
+
+      // FORCE SHOWDOWN IF BETS EQUAL AND ONLY ONE LAST WITH MONEY
+      if (_checkBidsEqual(editableModel) &&
+          editableModel.activePlayersWithMoneyCount <= 1) {
+        logs.writeLog('GameSM: head-up showdown forcing');
+        return editableModel.copyWith(
+          lobbyState: currentLobby().copyWith(
+            gameState: GameStatusEnum.showdown,
+          ),
+        );
+      }
+
+      logs.writeLog('GameSM: [H-UP] first player would be ${firstPlayer.name}');
+      return editableModel.copyWith(
+        sessionState: editableModel.sessionState.copyWith(
+          currentPlayerUid: firstPlayer.uid,
+          firstPlayerUid: firstPlayer.uid,
+        ),
+      );
+    }
+
+    (GameStateModel, int) makeBetByCondition({
+      required GameStateModel model,
+      required bool Function(PlayerId) condition,
+      required int value,
+    }) {
+      final currentLobby = model.lobbyState;
+
+      for (int i = 1; i < currentLobby.players.length; i++) {
+        int localIndex = (i + dealerPosition) % currentLobby.players.length;
+
+        final localPlayer = currentLobby.players[localIndex];
+
+        if (condition(localPlayer.uid)) {
+          model = processBetOrAllIn(
+            model: editableModel,
+            player: localPlayer,
+            value: value,
+          );
+
+          return (model, localIndex);
+        }
+      }
+
+      return (model, bigBlindPosition);
+    }
+
+    // Ставим смолблайнд
+    (editableModel, _) = makeBetByCondition(
+      model: model,
+      condition: (uid) => editableModel.isPlayerActive(uid),
+      value: currentLobby().smallBlindValue,
+    );
+
+    // Ставим бигблайнд
+    (editableModel, bigBlindPosition) = makeBetByCondition(
+      model: model,
+      condition: (uid) => (editableModel.isPlayerActive(uid) &&
+          (currentSession().bets[uid] ?? 0) == 0),
+      value: currentLobby().bigBlindValue,
+    );
+
+    //TODO - change BigblindPostion;
+
     // Ищем первого игрока
-    for (int i = 1; i < lobbyState.players.length; i++) {
-      int localIndex = (i + bigBlindPosition) % lobbyState.players.length;
+    for (int i = 1; i < currentLobby().players.length; i++) {
+      int localIndex = (i + bigBlindPosition) % currentLobby().players.length;
 
-      final localPlayer = lobbyState.players[localIndex];
+      final localPlayer = currentLobby().players[localIndex];
 
-      if (!sessionState.foldedOrInactive.contains(localPlayer.uid)) {
-        _updateSessionState(
-          sessionState.copyWith(
+      if (editableModel.isPlayerActive(localPlayer.uid)) {
+        editableModel = editableModel.copyWith(
+          sessionState: editableModel.sessionState.copyWith(
             currentPlayerUid: localPlayer.uid,
             firstPlayerUid: localPlayer.uid,
           ),
         );
 
-        logs.writeLog('firstPlayer - ${localPlayer.name}');
-
+        logs.writeLog('GameSM: first player would be ${localPlayer.name}');
         break;
       }
     }
+    return editableModel;
   }
 
-  @override
-  GameSettingsModel get getSettings => GameSettingsModel(
-        smallBlind: lobbyState.smallBlindValue,
-        startingStack: lobbyState.defaultBank,
-        canEditStack: lobbyState.gameState.canEditPlayers,
-      );
+  bool _checkBidsEqual(GameStateModel model) {
+    //int notZeroPlayers = 0;
 
-  @override
-  Future<void> saveSettings(GameSettingsModel settings) => _updateLobbyState(
-        lobbyState.copyWith(
-          smallBlindValue: settings.smallBlind,
-          defaultBank: settings.startingStack,
-        ),
-      );
+    final activePlayers = model.activePlayers;
 
-  Future<void> _updateLobbyState(LobbyStateModel newLobby) =>
-      _lobbyStateHolder.updateLobby(newLobby);
+    final bets = activePlayers.map((p) => model.sessionState.bets[p.uid] ?? 0);
+    if (bets.isEmpty) return true;
 
-  Future<void> _updateSessionState(GameSessionState newSession) async {
-    state = AsyncData(stateModel.copyWith(sessionState: newSession));
+    final maxBet = bets.max;
+
+    for (final player in activePlayers) {
+      final bid = model.sessionState.bets[player.uid] ?? 0;
+      final bank = model.lobbyState.banks[player.uid] ?? 0;
+
+      bool equalBool = (bid == maxBet);
+      bool allInBool = ((bid > 0) && (bank <= 0));
+
+      /*if (bank > 0) {
+        notZeroPlayers += 1;
+      }*/
+
+      if (!(equalBool || allInBool)) {
+        logs.writeLog('GameSM: bets are not equal');
+        return false;
+      }
+    }
+
+    //Если все ОлИн или выровняли ставки, но один остался с банком,
+    // То ему нет смысла рейзить
+    /*if (notZeroPlayers <= 1) {
+      return true;
+    }*/
+
+    logs.writeLog('GameSM: bets are equal');
+    return true;
+  }
+
+  Future<void> _updateGame(GameStateModel newModel) async {
+    logs.writeLog('GameSM: UPDATE GAME');
+    state = AsyncData(newModel);
+
+    await _lobbyStateHolder.updateLobby(newModel.lobbyState);
 
     try {
-      await _appRepository.updateGameSessionState(newSession);
+      await ref
+          .read(appRepositoryProvider)
+          .updateGameSessionState(newModel.sessionState);
     } catch (e) {
       logs.writeLog('Ошибка при сохранении сессии: $e');
     }

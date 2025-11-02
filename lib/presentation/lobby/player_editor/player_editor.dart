@@ -230,7 +230,9 @@ class PlayerEditorPageState extends State<PlayerEditorPage> {
                                 child: Text(
                                   context.strings.playp_edit_win3,
                                   style: TextStyle(
-                                    color: thisTheme.onBackground,
+                                    color: player.forceDeadler
+                                        ? thisTheme.hintColor
+                                        : thisTheme.onBackground,
                                     fontSize: stdFontSize * 0.85,
                                     fontWeight: FontWeight.normal,
                                   ),
@@ -247,7 +249,8 @@ class PlayerEditorPageState extends State<PlayerEditorPage> {
                                           ? thisTheme.primaryColor
                                           : thisTheme.hintColor,
                                     ),
-                                    value: player.makeDealer,
+                                    value: player.makeDealer ||
+                                        player.forceDeadler,
                                     onChanged: widget.viewModel.makeDealer,
                                   ),
                                 ),
@@ -261,8 +264,8 @@ class PlayerEditorPageState extends State<PlayerEditorPage> {
                               ? thisTheme.primaryColor
                               : thisTheme.bankColor,
                           textString: widget.viewModel.newPlayerEditing
-                              ? context.strings.playp_edit_conf
-                              : context.strings.playp_edit_add,
+                              ? context.strings.playp_edit_add
+                              : context.strings.playp_edit_conf,
                           action: () async {
                             if (!validInput) {
                               return;

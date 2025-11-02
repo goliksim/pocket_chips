@@ -1,33 +1,53 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../di/view_models.dart';
 import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
+import '../common/widgets/loading_page.dart';
 import '../common/widgets/ui_widgets.dart';
 import 'player_list/player_list_view.dart';
-import 'view_model/lobby_page_view_model.dart';
+import 'view_state/lobby_page_state.dart';
 import 'widgets/attention_add_player_button.dart';
 import 'widgets/lobby_page_bottom_buttons.dart';
 import 'widgets/lobby_reset_game_button.dart';
 import 'widgets/lobby_stack_button.dart';
 
-class LobbyPage extends StatelessWidget {
-  final LobbyPageViewModel viewModel;
-
-  const LobbyPage({
-    required this.viewModel,
-    super.key,
-  });
+class LobbyPage extends ConsumerStatefulWidget {
+  const LobbyPage({super.key});
 
   @override
-  Widget build(BuildContext context) => ListenableBuilder(
-        listenable: viewModel,
-        builder: (_, __) {
-          final state = viewModel.lobbyState;
-          final players = state.players;
+  ConsumerState<LobbyPage> createState() => _LobbyPageState();
+}
 
-          return PatternContainer(
+class _LobbyPageState extends ConsumerState<LobbyPage> {
+  LobbyPageState? viewState;
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen(
+      lobbyPageViewModelProvider,
+      (_, next) {
+        next.whenData(
+          (data) {
+            setState(() {
+              viewState = data;
+            });
+          },
+        );
+      },
+    );
+
+    final controller = ref.read(lobbyScrollControllerProvider).scrollController;
+    final viewModel = ref.read(lobbyPageViewModelProvider.notifier);
+
+    final state = viewState;
+
+    return state == null
+        ? LoadingPage()
+        : PatternContainer(
             padding: EdgeInsets.only(
               top: stdCutoutWidth * 0.75,
               bottom: stdCutoutWidthDown * 0.75,
@@ -98,9 +118,10 @@ class LobbyPage extends StatelessWidget {
                           children: [
                             //PlayerList
                             Flexible(
-                              child: players.isNotEmpty
+                              child: state.players.isNotEmpty
                                   ? PlayerList(
-                                      players: players,
+                                      scrollController: controller,
+                                      players: state.players,
                                       rightItemCallback: viewModel.savePlayer,
                                       leftItemCallback: viewModel.removePlayer,
                                       canReorder: state.canEditPlayers,
@@ -116,24 +137,28 @@ class LobbyPage extends StatelessWidget {
                           width: double.infinity,
                         ),*/
                             if (state.canAddPlayer)
-                              AttentionAddPlayerButton(
-                                onTap: () => viewModel.addButtonPressed(),
-                                needToAnimate: () => players.isEmpty,
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: stdHorizontalOffset / 2,
+                                ),
+                                child: AttentionAddPlayerButton(
+                                  onTap: () => viewModel.addButtonPressed(),
+                                  needToAnimate: () => state.players.isEmpty,
+                                ),
                               ),
                             //FreeSpace
                           ],
                         ),
                       ),
-                      /*SizedBox(
-                  height: (thisLobby.lobbyPlayers.length != maxPlayerCount)
-                      ? stdHorizontalOffset
-                      : 0,
-                  width: double.infinity,
-                ),*/
+                      SizedBox(
+                        height: stdHorizontalOffset / 2,
+                        width: double.infinity,
+                      ),
                       LobbyPageBottomButtons(
                         onStartGame: () => viewModel.onStartGame(),
                         openSettingsTap: () => viewModel.onSettingsTap(),
                         isGameActive: state.gameActive,
+                        canEditSettings: state.canEditPlayers,
                       )
                     ],
                   ),
@@ -141,6 +166,5 @@ class LobbyPage extends StatelessWidget {
               ),
             ),
           );
-        },
-      );
+  }
 }

@@ -1,31 +1,52 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../di/view_models.dart';
 import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
+import '../common/widgets/loading_page.dart';
 import '../common/widgets/ui_widgets.dart';
-import 'view_model/game_page_view_model.dart';
+import 'view_state/game_page_view_state.dart';
 import 'widgets/game_contol/game_control.dart';
-import 'widgets/game_contol/view_model/game_control_view_model.dart';
 import 'widgets/game_table/game_table.dart';
 
-class GamePage extends StatelessWidget {
-  final GamePageViewModel viewModel;
-  final GameControlViewModel controlViewModel;
-
-  const GamePage({
-    required this.viewModel,
-    required this.controlViewModel,
-    super.key,
-  });
+class GamePage extends ConsumerStatefulWidget {
+  const GamePage({super.key});
 
   @override
-  Widget build(BuildContext context) => ListenableBuilder(
-        listenable: viewModel,
-        builder: (_, __) {
-          final viewState = viewModel.viewState;
+  ConsumerState<GamePage> createState() => _GamePageState();
+}
 
-          return PatternContainer(
+class _GamePageState extends ConsumerState<GamePage> {
+  GamePageViewState? state;
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen(
+      gamePageViewModelProvider,
+      (_, next) {
+        next.maybeWhen(
+          loading: () {},
+          orElse: () {},
+        );
+
+        next.whenData(
+          (data) {
+            setState(() {
+              state = data;
+            });
+          },
+        );
+      },
+    );
+
+    final viewModel = ref.read(gamePageViewModelProvider.notifier);
+    final viewState = state;
+
+    return viewState == null
+        ? LoadingPage()
+        : PatternContainer(
             opacity: 0.5,
             padding: EdgeInsets.only(
               top: stdCutoutWidth * 0.75,
@@ -35,15 +56,13 @@ class GamePage extends StatelessWidget {
               resizeToAvoidBottomInset: false,
               appBar: AppBar(
                 toolbarHeight: stdButtonHeight * 0.75,
-                leading: ModalRoute.of(context)?.canPop == true
-                    ? IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: Icon(
-                          Icons.arrow_back,
-                          size: stdIconSize,
-                        ),
-                      )
-                    : null,
+                leading: IconButton(
+                  onPressed: () => viewModel.pop(),
+                  icon: Icon(
+                    Icons.arrow_back,
+                    size: stdIconSize,
+                  ),
+                ),
                 iconTheme: IconThemeData(
                   color: thisTheme.onBackground, //change your color here
                 ),
@@ -116,13 +135,12 @@ class GamePage extends StatelessWidget {
                       adaptiveOffset,
                     ),
                     child: GameControl(
-                      viewModel: controlViewModel,
+                      viewModel: viewModel,
                     ),
                   ),
                 ],
               ),
             ),
           );
-        },
-      );
+  }
 }

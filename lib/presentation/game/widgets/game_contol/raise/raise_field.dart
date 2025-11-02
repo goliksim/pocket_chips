@@ -47,7 +47,7 @@ class RaiseFieldWidgetState extends State<RaiseFieldWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = CurrentBetValueProvider.of(context);
+    final provider = RaiseProviderScope.of(context);
     final currentBet = provider.currentBet;
 
     return ClipRRect(
@@ -68,7 +68,9 @@ class RaiseFieldWidgetState extends State<RaiseFieldWidget> {
                 child: _CoinsRow(
                   onTap: (coin) {
                     if (currentBet + coin <= widget.state.maxPossibleBet) {
-                      provider.changeBet(currentBet + coin);
+                      setState(() {
+                        provider.changeBet(currentBet + coin);
+                      });
                     }
                   },
                   chips: _chipsToShow,

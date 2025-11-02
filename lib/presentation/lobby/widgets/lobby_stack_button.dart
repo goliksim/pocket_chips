@@ -20,7 +20,7 @@ class LobbyStackButton extends StatelessWidget {
       side: null,
       height: stdButtonHeight,
       buttonColor: thisTheme.bankColor,
-      action: () async {},
+      action: () => onTap(),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

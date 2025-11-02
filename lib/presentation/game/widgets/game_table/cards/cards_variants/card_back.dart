@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../../../../../../utils/theme/ui_values.dart';
 import '../card_widget.dart';
 
-Widget get cardBack => CardWidget(
+class CardBack extends StatelessWidget {
+  const CardBack({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CardWidget(
       child: ColorFiltered(
         colorFilter: (thisTheme.name == 'dark')
             ? ColorFilter.mode(
@@ -24,3 +30,5 @@ Widget get cardBack => CardWidget(
         ),
       ),
     );
+  }
+}

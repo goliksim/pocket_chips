@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:onboarding/onboarding.dart';
 
@@ -21,14 +22,18 @@ class UpdateDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final version = viewModel.stateModel.maybeWhen(
+      data: (data) => data.version,
+      orElse: () => null,
+    );
+
     return OnboardingDialog(
       onComplete: () => viewModel.onComplete(),
       pages: [
         // first page
         PageModel(
           widget: OnboardingPage(
-            title:
-                '${context.strings.update_title} ${viewModel.currentVersion}',
+            title: '${context.strings.update_title} $version',
             children: [
               SizedBox(height: stdHorizontalOffset),
               Text(

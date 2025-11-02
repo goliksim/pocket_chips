@@ -9,5 +9,11 @@ abstract class GameSettingsModel with _$GameSettingsModel {
     required bool canEditStack,
     required int smallBlind,
     // TODO: add ante
-  }) = _GameSettingsModel;
+  }) = GameSettingsModelArgs;
+
+  const factory GameSettingsModel.result({
+    required int? startingStack,
+    required int? smallBlind,
+    // TODO: add ante
+  }) = GameSettingsModelResult;
 }

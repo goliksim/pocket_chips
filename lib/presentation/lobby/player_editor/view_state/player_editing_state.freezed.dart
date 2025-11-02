@@ -15,6 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PlayerEditingState {
   String get assetUrl;
+  bool get forceDeadler;
   bool get makeDealer;
   String? get nameInput;
   int get bankInput;
@@ -34,6 +35,8 @@ mixin _$PlayerEditingState {
             other is PlayerEditingState &&
             (identical(other.assetUrl, assetUrl) ||
                 other.assetUrl == assetUrl) &&
+            (identical(other.forceDeadler, forceDeadler) ||
+                other.forceDeadler == forceDeadler) &&
             (identical(other.makeDealer, makeDealer) ||
                 other.makeDealer == makeDealer) &&
             (identical(other.nameInput, nameInput) ||
@@ -43,12 +46,12 @@ mixin _$PlayerEditingState {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, assetUrl, makeDealer, nameInput, bankInput);
+  int get hashCode => Object.hash(
+      runtimeType, assetUrl, forceDeadler, makeDealer, nameInput, bankInput);
 
   @override
   String toString() {
-    return 'PlayerEditingState(assetUrl: $assetUrl, makeDealer: $makeDealer, nameInput: $nameInput, bankInput: $bankInput)';
+    return 'PlayerEditingState(assetUrl: $assetUrl, forceDeadler: $forceDeadler, makeDealer: $makeDealer, nameInput: $nameInput, bankInput: $bankInput)';
   }
 }
 
@@ -59,7 +62,11 @@ abstract mixin class $PlayerEditingStateCopyWith<$Res> {
       _$PlayerEditingStateCopyWithImpl;
   @useResult
   $Res call(
-      {String assetUrl, bool makeDealer, String? nameInput, int bankInput});
+      {String assetUrl,
+      bool forceDeadler,
+      bool makeDealer,
+      String? nameInput,
+      int bankInput});
 }
 
 /// @nodoc
@@ -76,6 +83,7 @@ class _$PlayerEditingStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? assetUrl = null,
+    Object? forceDeadler = null,
     Object? makeDealer = null,
     Object? nameInput = freezed,
     Object? bankInput = null,
@@ -85,6 +93,10 @@ class _$PlayerEditingStateCopyWithImpl<$Res>
           ? _self.assetUrl
           : assetUrl // ignore: cast_nullable_to_non_nullable
               as String,
+      forceDeadler: null == forceDeadler
+          ? _self.forceDeadler
+          : forceDeadler // ignore: cast_nullable_to_non_nullable
+              as bool,
       makeDealer: null == makeDealer
           ? _self.makeDealer
           : makeDealer // ignore: cast_nullable_to_non_nullable
@@ -194,16 +206,16 @@ extension PlayerEditingStatePatterns on PlayerEditingState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String assetUrl, bool makeDealer, String? nameInput, int bankInput)?
+    TResult Function(String assetUrl, bool forceDeadler, bool makeDealer,
+            String? nameInput, int bankInput)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _PlayerEditingState() when $default != null:
-        return $default(
-            _that.assetUrl, _that.makeDealer, _that.nameInput, _that.bankInput);
+        return $default(_that.assetUrl, _that.forceDeadler, _that.makeDealer,
+            _that.nameInput, _that.bankInput);
       case _:
         return orElse();
     }
@@ -224,15 +236,15 @@ extension PlayerEditingStatePatterns on PlayerEditingState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String assetUrl, bool makeDealer, String? nameInput, int bankInput)
+    TResult Function(String assetUrl, bool forceDeadler, bool makeDealer,
+            String? nameInput, int bankInput)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _PlayerEditingState():
-        return $default(
-            _that.assetUrl, _that.makeDealer, _that.nameInput, _that.bankInput);
+        return $default(_that.assetUrl, _that.forceDeadler, _that.makeDealer,
+            _that.nameInput, _that.bankInput);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -252,15 +264,15 @@ extension PlayerEditingStatePatterns on PlayerEditingState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String assetUrl, bool makeDealer, String? nameInput, int bankInput)?
+    TResult? Function(String assetUrl, bool forceDeadler, bool makeDealer,
+            String? nameInput, int bankInput)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _PlayerEditingState() when $default != null:
-        return $default(
-            _that.assetUrl, _that.makeDealer, _that.nameInput, _that.bankInput);
+        return $default(_that.assetUrl, _that.forceDeadler, _that.makeDealer,
+            _that.nameInput, _that.bankInput);
       case _:
         return null;
     }
@@ -272,12 +284,15 @@ extension PlayerEditingStatePatterns on PlayerEditingState {
 class _PlayerEditingState implements PlayerEditingState {
   const _PlayerEditingState(
       {required this.assetUrl,
+      required this.forceDeadler,
       required this.makeDealer,
       required this.nameInput,
       required this.bankInput});
 
   @override
   final String assetUrl;
+  @override
+  final bool forceDeadler;
   @override
   final bool makeDealer;
   @override
@@ -300,6 +315,8 @@ class _PlayerEditingState implements PlayerEditingState {
             other is _PlayerEditingState &&
             (identical(other.assetUrl, assetUrl) ||
                 other.assetUrl == assetUrl) &&
+            (identical(other.forceDeadler, forceDeadler) ||
+                other.forceDeadler == forceDeadler) &&
             (identical(other.makeDealer, makeDealer) ||
                 other.makeDealer == makeDealer) &&
             (identical(other.nameInput, nameInput) ||
@@ -309,12 +326,12 @@ class _PlayerEditingState implements PlayerEditingState {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, assetUrl, makeDealer, nameInput, bankInput);
+  int get hashCode => Object.hash(
+      runtimeType, assetUrl, forceDeadler, makeDealer, nameInput, bankInput);
 
   @override
   String toString() {
-    return 'PlayerEditingState(assetUrl: $assetUrl, makeDealer: $makeDealer, nameInput: $nameInput, bankInput: $bankInput)';
+    return 'PlayerEditingState(assetUrl: $assetUrl, forceDeadler: $forceDeadler, makeDealer: $makeDealer, nameInput: $nameInput, bankInput: $bankInput)';
   }
 }
 
@@ -327,7 +344,11 @@ abstract mixin class _$PlayerEditingStateCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String assetUrl, bool makeDealer, String? nameInput, int bankInput});
+      {String assetUrl,
+      bool forceDeadler,
+      bool makeDealer,
+      String? nameInput,
+      int bankInput});
 }
 
 /// @nodoc
@@ -344,6 +365,7 @@ class __$PlayerEditingStateCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? assetUrl = null,
+    Object? forceDeadler = null,
     Object? makeDealer = null,
     Object? nameInput = freezed,
     Object? bankInput = null,
@@ -353,6 +375,10 @@ class __$PlayerEditingStateCopyWithImpl<$Res>
           ? _self.assetUrl
           : assetUrl // ignore: cast_nullable_to_non_nullable
               as String,
+      forceDeadler: null == forceDeadler
+          ? _self.forceDeadler
+          : forceDeadler // ignore: cast_nullable_to_non_nullable
+              as bool,
       makeDealer: null == makeDealer
           ? _self.makeDealer
           : makeDealer // ignore: cast_nullable_to_non_nullable

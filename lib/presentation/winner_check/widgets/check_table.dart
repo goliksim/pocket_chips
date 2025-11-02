@@ -28,6 +28,7 @@ class _CheckTableState extends State<CheckTable> with ToastsMixin {
     if (context.notInCards(card)) {
       context.tableCards![index] = card;
       context.updateCombinations();
+      widget.callback();
     } else {
       showToast(context.strings.check_toast);
     }
@@ -63,7 +64,7 @@ class _CheckTableState extends State<CheckTable> with ToastsMixin {
           ),
           Flexible(
             child: RotationCard(
-              count: 0,
+              count: 3,
               conditionByIndex: (int index) =>
                   context.tableCards![index] != null,
               durationByIndex: (int index) => 500,
@@ -77,14 +78,14 @@ class _CheckTableState extends State<CheckTable> with ToastsMixin {
                 action: (card) {
                   updateTable(index, card);
                 },
-                child: cardBack,
+                child: CardBack(),
               ),
               padding: EdgeInsets.all(stdHorizontalOffset / 2),
             ),
           ),
           Flexible(
             child: RotationCard(
-              count: 1,
+              count: 2,
               conditionByIndex: (int index) =>
                   context.tableCards![index + 3] != null,
               durationByIndex: (int index) => 500,
@@ -98,7 +99,7 @@ class _CheckTableState extends State<CheckTable> with ToastsMixin {
                 action: (card) {
                   updateTable(index + 3, card);
                 },
-                child: cardBack,
+                child: CardBack(),
               ),
               padding: EdgeInsets.all(stdHorizontalOffset / 2),
             ),

@@ -1,39 +1,48 @@
+import 'dart:async';
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mailer/flutter_mailer.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/navigation/navigation_manager.dart';
+import '../../di/domain_managers.dart';
+import '../../di/model_holders.dart';
 import '../../domain/model_holders/config_model_holder.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/local_path.dart';
+import 'view_state/onboarding_view_state.dart';
 
-class OnboardingViewModel extends ChangeNotifier {
-  final ConfigModelHolder _configModelHolder;
-  final NavigationManager _navigationManager;
-  final AppLocalizations _string;
+class OnboardingViewModel extends AsyncNotifier<OnboardingViewState> {
+  ConfigModelHolder get _configModelHolder =>
+      ref.read(configModelHolderProvider.notifier);
+  NavigationManager get _navigationManager =>
+      ref.read(navigationManagerProvider);
+  AppLocalizations get _strings => ref.watch(stringsProvider);
 
-  String? currentVersion;
+  AsyncValue<OnboardingViewState> get stateModel => state;
 
-  OnboardingViewModel({
-    required ConfigModelHolder configModelHolder,
-    required NavigationManager navigationManager,
-    required AppLocalizations strings,
-  })  : _configModelHolder = configModelHolder,
-        _navigationManager = navigationManager,
-        _string = strings {
-    _init();
+  bool get canSendMail => !kIsWeb && Platform.isAndroid;
+
+  @override
+  FutureOr<OnboardingViewState> build() async {
+    final config = await ref.watch(configModelHolderProvider.future);
+
+    log('OnboardingViewState');
+
+    return OnboardingViewState(
+      isFirstLaunch: config.firstLaunch,
+      version: config.version,
+    );
   }
 
-  bool get isFirstLaunch => _configModelHolder.dataOrNull?.firstLaunch ?? false;
-
   void onComplete() {
-    final currentConfig = _configModelHolder.dataOrNull;
+    final isFirstLaunch = stateModel.requireValue.isFirstLaunch;
 
-    if (currentConfig != null && currentConfig.firstLaunch) {
-      _configModelHolder.updateConfig(
-        currentConfig.copyWith(
-          firstLaunch: false,
-        ),
-      );
+    if (isFirstLaunch) {
+      _configModelHolder.setFirstLaunch();
     }
   }
 
@@ -43,7 +52,7 @@ class OnboardingViewModel extends ChangeNotifier {
     final path = await localPath;
 
     final MailOptions mailOptions = MailOptions(
-      body: _string.about_link_6,
+      body: _strings.about_link_6,
       subject: 'PC: problem or advice ',
       recipients: ['goliksim@gmail.com'],
       isHTML: true,
@@ -52,7 +61,9 @@ class OnboardingViewModel extends ChangeNotifier {
       ],
     );
 
-    await FlutterMailer.send(mailOptions);
+    if (canSendMail) {
+      await FlutterMailer.send(mailOptions);
+    }
   }
 
   //TODO: implement
@@ -60,26 +71,9 @@ class OnboardingViewModel extends ChangeNotifier {
 
   void setLocale(Locale locale) {
     {
-      //TODO: implement changing
-
-      final currentConfig = _configModelHolder.dataOrNull;
-
-      if (currentConfig == null) {
-        return;
-      }
-
-      _configModelHolder.updateConfig(
-        currentConfig.copyWith(
-          locale: locale.languageCode,
-        ),
+      _configModelHolder.changeLocale(
+        locale.languageCode,
       );
     }
-  }
-
-  Future<void> _init() async {
-    currentVersion = _configModelHolder.dataOrNull?.version ??
-        await _configModelHolder.getCurrentVersion();
-
-    notifyListeners();
   }
 }

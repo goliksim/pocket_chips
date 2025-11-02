@@ -116,9 +116,9 @@ class _CheckPlayerState extends State<CheckPlayer> with ToastsMixin {
                 action: (card) {
                   updateHand(index, card);
                 },
-                child: cardBack,
+                child: CardBack(),
               ),
-              count: 1,
+              count: 2,
               conditionByIndex: (int index) => widget.cards[index] != null,
               durationByIndex: (int index) => 500,
               padding: EdgeInsets.all(stdHorizontalOffset / 3),

@@ -8,12 +8,14 @@ class GameSessionEntity {
   final Set<String> foldedOrInactive;
   final int lapCounter;
   final String? currentPlayerUid;
+  final String? firstPlayerUid;
 
   const GameSessionEntity({
     required this.bets,
     required this.foldedOrInactive,
     required this.lapCounter,
     this.currentPlayerUid,
+    this.firstPlayerUid,
   });
 
   factory GameSessionEntity.fromJson(Map<String, dynamic> json) =>

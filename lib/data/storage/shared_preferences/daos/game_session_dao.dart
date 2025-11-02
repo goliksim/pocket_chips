@@ -31,6 +31,8 @@ class GameSessionDao extends Dao<GameSessionEntity> {
 
   @override
   Future<void> write(GameSessionEntity gameSession) async {
+    prefs = await SharedPreferences.getInstance();
+
     final text = jsonEncode(gameSession);
     logs.writeLog('GameSession info saved');
     prefs.setString(key, text);

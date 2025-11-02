@@ -124,11 +124,11 @@ class _InitPageState extends State<InitPage>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
+                    AspectRatio(
+                      aspectRatio: 0.8,
                       child: ChipsImage(),
                     ),
-                    SizedBox(
-                      height: stdButtonHeight * 2 + stdHorizontalOffset * 2,
+                    Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -150,7 +150,6 @@ class _InitPageState extends State<InitPage>
                               fontSize: stdFontSize,
                             ),
                           ),
-                          SizedBox(height: stdButtonHeight * 1),
                         ],
                       ),
                     ),

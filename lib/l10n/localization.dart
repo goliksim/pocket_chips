@@ -1,35 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl_standalone.dart';
 
-import '../domain/model_holders/config_model_holder.dart';
+import '../di/model_holders.dart';
+import '../domain/models/config_model.dart';
 
-class LocaleManager with ChangeNotifier {
-  final ConfigModelHolder _configModelHolder;
+class LocaleManager extends Notifier<Locale> {
+  @override
+  Locale build() {
+    ref.listen(
+      configModelHolderProvider,
+      (_, value) {
+        value.whenOrNull(
+          data: _updateFromConfig,
+        );
+      },
+    );
 
-  static Locale? _lang;
-
-  LocaleManager({
-    required ConfigModelHolder configModelHolder,
-    required Function(VoidCallback) addListener,
-  }) : _configModelHolder = configModelHolder {
-    addListener(notifyListeners);
+    return Locale('en');
   }
 
-  Future<void> initLocale() async {
-    final appConfig = _configModelHolder.dataOrNull;
-
-    if (appConfig != null && appConfig.locale != '') {
-      _lang = Locale(appConfig.locale);
+  Future<void> _updateFromConfig(ConfigModel config) async {
+    if (config.locale.isNotEmpty) {
+      state = Locale(config.locale);
     } else {
-      final locale = await findSystemLocale();
-      _lang = Locale(locale.split('_')[0]);
+      final systemLocale = await findSystemLocale();
+      state = Locale(systemLocale.split('_')[0]);
     }
   }
 
-  Locale get lang => _lang!;
-
-  void changeLocale(Locale newLocale) {
-    _lang = newLocale;
-    notifyListeners();
-  }
+  void changeLocale(Locale newLocale) => ref
+      .read(configModelHolderProvider.notifier)
+      .changeLocale(newLocale.languageCode);
 }

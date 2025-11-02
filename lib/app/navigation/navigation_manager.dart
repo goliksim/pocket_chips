@@ -46,13 +46,13 @@ class NavigationManager extends ChangeNotifier {
         context: context,
         child: Consumer(
           builder: (_, ref, __) => UpdateDialog(
-            viewModel: ref.watch(onboardingViewModelProvider),
+            viewModel: ref.watch(onboardingViewModelProvider.notifier),
           ),
         ),
         builder: (BuildContext context) {
           return Consumer(
             builder: (_, ref, __) => UpdateDialog(
-              viewModel: ref.watch(onboardingViewModelProvider),
+              viewModel: ref.watch(onboardingViewModelProvider.notifier),
             ),
           );
         },
@@ -64,17 +64,9 @@ class NavigationManager extends ChangeNotifier {
         context: context,
         child: PopScope(
           canPop: canPop,
-          child: Consumer(
-            builder: (_, ref, __) => AboutDialog(
-              viewModel: ref.watch(onboardingViewModelProvider),
-            ),
-          ),
+          child: AboutDialog(),
         ),
-        builder: (BuildContext context) => Consumer(
-          builder: (_, ref, __) => AboutDialog(
-            viewModel: ref.watch(onboardingViewModelProvider),
-          ),
-        ),
+        builder: (BuildContext context) => AboutDialog(),
       );
 
   Future<void> showWinnerSolver() => transitionDialog(
@@ -141,24 +133,6 @@ class NavigationManager extends ChangeNotifier {
         },
       );
 
-  Future<void> showGameSettings() => transitionDialog(
-        duration: const Duration(milliseconds: 400),
-        type: 'SlideDown',
-        context: context,
-        child: Consumer(
-          builder: (_, ref, __) => GameSettingsDialog(
-            viewModel: ref.watch(gameSettingsViewModelProvider),
-          ),
-        ),
-        builder: (BuildContext context) {
-          return Consumer(
-            builder: (_, ref, __) => GameSettingsDialog(
-              viewModel: ref.watch(gameSettingsViewModelProvider),
-            ),
-          );
-        },
-      );
-
   Future<void> showPlayerEditor(PlayerId? playerUid) => transitionDialog(
         duration: const Duration(milliseconds: 400),
         type: 'Scale1',
@@ -192,18 +166,21 @@ class NavigationManager extends ChangeNotifier {
         transitionBuilder: dialogWave1,
       );
 
-  Future<void> showWinner(PlayerModel winner) async {
-    showGeneralDialog(
-      transitionDuration: const Duration(milliseconds: 500),
-      context: context,
-      pageBuilder: (_, __, ___) {
-        return WinnerWindow(
+  Future<void> showWinner(PlayerModel winner) => transitionDialog(
+        duration: const Duration(milliseconds: 500),
+        context: context,
+        child: WinnerWindow(
           winner: winner,
-        );
-      },
-      transitionBuilder: getTransition('Scale1'),
-    );
-  }
+          pop: pop,
+        ),
+        builder: (_) {
+          return WinnerWindow(
+            winner: winner,
+            pop: pop,
+          );
+        },
+        type: 'Scale1',
+      );
 
   Future<Set<String>?> showWinnerChooseDialog(
     WinnerChoiceArgs args,
@@ -256,6 +233,14 @@ class NavigationManager extends ChangeNotifier {
       Navigator.of(context).pop();
     }
 
+    /*_state.maybeMap(
+      orElse: () {},
+      lobby: (_) => goTo(AppRoute.menu()),
+      game: (_) => goTo(AppRoute.lobby()),
+    );*/
+  }
+
+  void popPage() {
     _state.maybeMap(
       orElse: () {},
       lobby: (_) => goTo(AppRoute.menu()),

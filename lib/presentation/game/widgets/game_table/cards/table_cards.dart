@@ -53,8 +53,8 @@ class TableCards extends StatelessWidget {
               state % 5 + (state % 5 > 0 ? 2 : 0)),
           durationByIndex: (int index) =>
               500 + (index + cardIndexAddition) * 100,
-          firstSide: (int index) => cardBack,
-          secondSide: (int index) => cardSample,
+          firstSide: (int index) => CardBack(),
+          secondSide: (int index) => CardFrontSample(),
           padding: EdgeInsets.symmetric(horizontal: stdHorizontalOffset / 6),
         ),
       ),
