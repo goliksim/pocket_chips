@@ -76,3 +76,7 @@ Map<int, Color> colorLight = {
   800: const Color.fromRGBO(76, 175, 80, .9),
   900: const Color.fromRGBO(76, 175, 80, 1),
 };
+
+extension ThemeExtension on Themes {
+  bool get isDark => name == 'dark';
+}

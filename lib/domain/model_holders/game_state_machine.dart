@@ -39,76 +39,30 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
         ? await ref.read(appRepositoryProvider).getGameSessionState()
         : null;
 
+    final finalSessionState = sessionState ?? GameSessionState.initial();
+
+    final foldedByBank = <GameStatusEnum>{
+      GameStatusEnum.notStarted,
+      GameStatusEnum.gameBreak
+    }.contains(lobbyState.gameState)
+        ? lobbyState.banks.entries
+            .map((e) => e.value <= 0 ? e.key : null)
+            .nonNulls
+            .toSet()
+        : <String>{};
+
+    final finalFoldedPlayers = finalSessionState.foldedPlayers
+      ..addAll(foldedByBank);
+
     return GameStateModel(
       lobbyState: lobbyState,
-      sessionState: sessionState ??
-          GameSessionState(
-            bets: {},
-            foldedOrInactive: {},
-            lapCounter: 0,
-          ),
+      sessionState: finalSessionState.copyWith(
+        foldedPlayers: finalFoldedPlayers,
+      ),
     );
   }
-
-  //GameStateModel get stateModel => state.value!;
-  //GameSessionState get sessionState => stateModel.sessionState;
-  //LobbyStateModel get lobbyState => stateModel.lobbyState;
 
   //Player controls
-  Future<void> executeRaise(int raiseValue) => _executeBet(raiseValue);
-
-  Future<void> executeAllIn() {
-    final currentModel = state.requireValue;
-    final currentPlayerUid = _getCurrentPlayerUid(currentModel);
-
-    final bank = currentModel.lobbyState.banks[currentPlayerUid] ?? 0;
-
-    logs.writeLog('GameSM: executeAllIn $bank');
-    return _executeBet(bank);
-  }
-
-  Future<void> executeCall() {
-    final model = state.requireValue;
-    final currentPlayerUid = model.sessionState.currentPlayerUid;
-
-    if (currentPlayerUid == null) {
-      throw Exception('currentPlayerUid is null');
-    }
-
-    return _executeBet(
-      state.requireValue.calculateCallValue(currentPlayerUid),
-    );
-  }
-
-  Future<void> executeCheck() async {
-    logs.writeLog('GameSM: executeCheck');
-
-    final nextState = _calculateNextPlayerState(state.requireValue);
-    await _updateGame(nextState);
-  }
-
-  Future<void> executeFold() async {
-    final currentModel = state.requireValue;
-    final sessionState = currentModel.sessionState;
-
-    final currentPlayerUid = _getCurrentPlayerUid(currentModel);
-
-    // 1. Update Folded map
-    final newFolded = Set.of(sessionState.foldedOrInactive)
-      ..add(currentPlayerUid);
-    final tempSession = sessionState.copyWith(foldedOrInactive: newFolded);
-    final tempGameModel = currentModel.copyWith(sessionState: tempSession);
-
-    // 2. If one player last, show winner
-    if (tempGameModel.activePlayers.length == 1) {
-      return showWinnersAndEndLap(model: tempGameModel);
-    } else {
-      // 3. Calculate final state
-      final nextState = _calculateNextPlayerState(tempGameModel);
-      await _updateGame(nextState);
-    }
-  }
-
   Future<void> startBetting() async {
     final currentModel = state.requireValue;
 
@@ -134,6 +88,55 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
     // 3. Update the game
     await _updateGame(stateAfterBlinds);
+  }
+
+  Future<void> executeRaise(int raiseValue) => _executeBet(raiseValue);
+
+  Future<void> executeAllIn() {
+    final currentModel = state.requireValue;
+    final currentPlayerUid = _getCurrentPlayerUid(currentModel);
+
+    final bank = currentModel.lobbyState.banks[currentPlayerUid] ?? 0;
+
+    logs.writeLog('GameSM: executeAllIn $bank');
+    return _executeBet(bank);
+  }
+
+  Future<void> executeCall() {
+    final model = state.requireValue;
+    final currentPlayerUid = model.sessionState.currentPlayerUid;
+
+    if (currentPlayerUid == null) {
+      throw Exception('currentPlayerUid is null');
+    }
+
+    final (callValue, _) =
+        state.requireValue.calculateCallValue(currentPlayerUid);
+
+    return _executeBet(callValue);
+  }
+
+  Future<void> executeCheck() async {
+    logs.writeLog('GameSM: executeCheck');
+
+    final nextState = _calculateNextPlayerState(state.requireValue);
+    await _updateGame(nextState);
+  }
+
+  Future<void> executeFold() async {
+    final currentModel = state.requireValue;
+    final sessionState = currentModel.sessionState;
+
+    final currentPlayerUid = _getCurrentPlayerUid(currentModel);
+
+    // 1. Update Folded map
+    final newFolded = Set.of(sessionState.foldedPlayers)..add(currentPlayerUid);
+    final tempSession = sessionState.copyWith(foldedPlayers: newFolded);
+    final tempGameModel = currentModel.copyWith(sessionState: tempSession);
+
+    // 3. Calculate final state
+    final nextState = _calculateNextPlayerState(tempGameModel);
+    await _updateGame(nextState);
   }
 
   // Новый круг
@@ -219,13 +222,15 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       );
 
     final newBanks = Map.of(model.lobbyState.banks)
-      ..update(playerId, (value) => value - bid);
+      ..update(
+        playerId,
+        (value) => value - bid,
+        ifAbsent: () => 0,
+      );
 
-    return GameStateModel(
+    return model.copyWith(
       lobbyState: model.lobbyState.copyWith(banks: newBanks),
-      sessionState: model.sessionState.copyWith(
-        bets: newBets,
-      ),
+      sessionState: model.sessionState.copyWith(bets: newBets),
     );
   }
 
@@ -271,7 +276,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       if (bid <= 0) continue;
 
       // Проверка на сайд-спот
-      if (winners.isEmpty && model.canStartOrContinueGame) {
+      if (winners.isEmpty && model.possibleWinners.length > 1) {
         logs.writeLog('GameSM: call winnerChooseDialog');
         final newWinners = await _navigationManager.showWinnerChooseDialog(
           WinnerChoiceArgs(
@@ -300,7 +305,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
           // Если не победитель, то вносим ее в общий банк
           if (!winners.contains(entry.key)) {
             logs.writeLog(
-                'GameSM: ${entry.value} not winner, increase dividingSum');
+                'GameSM: ${entry.key} not winner, increase dividingSum');
             sumToDivide += bid;
           } else {
             logs.writeLog('GameSM: ${entry.value} is winner bet, returning');
@@ -332,7 +337,9 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
       // Разделенная добыча делится на победителей, причем тока тех, кто еще в игре
       for (final winnerUid in winners) {
-        if (sessionState.bets[winnerUid]! > 0) {
+        final bet = sessionState.bets[winnerUid] ?? 0;
+
+        if (bet > 0) {
           logs.writeLog(
               'GameSM: adding ${sumToDivide ~/ winnersCount} to $winnerUid');
           final newBanks = Map.of(lobbyState.banks)
@@ -351,12 +358,11 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       logs.writeLog('GameSM: distrubution new bets $bets');
 
       // Выключаем из посчета игроков, чья ставка была равно отработанной
-      final newFolded = Set.of(sessionState.foldedOrInactive);
+
       final newBets = Map.of(sessionState.bets);
 
-      for (final player in model.activePlayers) {
+      for (final player in model.lobbyState.players) {
         if (sessionState.bets[player.uid] == bid) {
-          newFolded.add(player.uid);
           winners.remove(player.uid);
         }
 
@@ -369,11 +375,13 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       }
 
       sessionState = sessionState.copyWith(
-        foldedOrInactive: newFolded,
         bets: newBets,
       );
 
-      model = model.copyWith(sessionState: sessionState);
+      model = model.copyWith(
+        sessionState: sessionState,
+        lobbyState: lobbyState,
+      );
     }
 
     return model.copyWith(
@@ -449,13 +457,10 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       final nextIndex = (fromIndex + i) % players.length;
       final nextPlayer = players[nextIndex];
 
-      final hasMoney = (model.lobbyState.banks[nextPlayer.uid] ?? 0) > 0;
-      final isActive = model.isPlayerActive(nextPlayer.uid);
-
-      shouldIncrementLap =
+      shouldIncrementLap = shouldIncrementLap ||
           (nextPlayer.uid == model.sessionState.firstPlayerUid);
 
-      if (hasMoney && isActive) {
+      if (model.isPlayerActiveWithMoney(nextPlayer.uid)) {
         logs.writeLog('GameSM: next player should be ${nextPlayer.name}');
         return (nextPlayer.uid, shouldIncrementLap);
       }
@@ -495,7 +500,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       int localIndex = (i + dealerPosition) % newLobbyState.players.length;
       final localPlayer = newLobbyState.players[localIndex];
 
-      if (currentModel.isPlayerActive(localPlayer.uid)) {
+      if (currentModel.isPlayerActiveWithMoney(localPlayer.uid)) {
         logs.writeLog(
             'GameSM: first player in new street is ${localPlayer.name}');
         newSessionState = newSessionState.copyWith(
@@ -514,24 +519,20 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
   GameStateModel _toBreakdown({required GameStateModel model}) {
     logs.writeLog('GameSM: prepare state for breakdown');
-    final lobby = model.lobbyState;
-    // Cтираем старые ставки и тех, кто фолданул
-    final newFolded = <PlayerId>{};
-    for (final player in lobby.players) {
-      final playerBank = lobby.banks[player.uid] ?? 0;
-      if (playerBank <= 0) {
-        newFolded.add(player.uid);
-      }
-    }
-    return model.copyWith(
+
+    final model1 = model.copyWith(
       sessionState: model.sessionState.copyWith(
         bets: {},
-        foldedOrInactive: newFolded,
+        foldedPlayers: {},
+        firstPlayerUid: null,
         currentPlayerUid: null,
         lapCounter: 0,
       ),
-      lobbyState: model.lobbyState.copyWith(
-        dealerId: _getNewDealerUid(model: model),
+    );
+
+    return model1.copyWith(
+      lobbyState: model1.lobbyState.copyWith(
+        dealerId: _getNewDealerUid(model: model1),
         gameState: GameStatusEnum.gameBreak,
       ),
     );
@@ -547,13 +548,12 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       int localIndex = (i + dealerPosition) % lobby.players.length;
       final localPlayer = lobby.players[localIndex];
 
-      final playerBank = lobby.banks[localPlayer.uid] ?? 0;
-      if (model.isPlayerActive(localPlayer.uid) && playerBank > 0) {
+      if (model.isPlayerActiveWithMoney(localPlayer.uid)) {
         logs.writeLog('GameSM: new dealer is ${localPlayer.name}');
         return localPlayer.uid;
       }
     }
-
+    logs.writeLog('GameSM: new dealer not found, returning ${lobby.dealerId}');
     return lobby.dealerId;
   }
 
@@ -566,28 +566,20 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     GameSessionState currentSession() => editableModel.sessionState;
 
     GameStateModel processBetOrAllIn({
-      required GameStateModel model,
+      required GameStateModel modelToProcess,
       required PlayerModel player,
       required int value,
     }) {
-      final currentLobby = model.lobbyState;
+      final currentLobby = modelToProcess.lobbyState;
 
       final bank = currentLobby.banks[player.uid] ?? 0;
-      // Ставка тех денег, что есть
-      if (bank < value) {
-        return _processBet(
-          model: editableModel,
-          playerId: player.uid,
-          bid: bank,
-        );
-      } else {
-        // Ставка для смолблайнд
-        return _processBet(
-          model: editableModel,
-          playerId: player.uid,
-          bid: value,
-        );
-      }
+
+      return _processBet(
+        model: modelToProcess,
+        playerId: player.uid,
+        // Ставка тех денег, что есть
+        bid: bank < value ? bank : value,
+      );
     }
 
     final dealerPosition = currentLobby()
@@ -596,58 +588,22 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
     int bigBlindPosition = dealerPosition;
 
-    //Head up случай
-    if (editableModel.activePlayers.length == 2) {
-      logs.writeLog('GameSM: head-up case found');
-      final firstPlayer = editableModel.activePlayers.elementAt(0);
-
-      editableModel = processBetOrAllIn(
-        model: editableModel,
-        player: firstPlayer,
-        value: currentLobby().smallBlindValue,
-      );
-
-      editableModel = processBetOrAllIn(
-        model: editableModel,
-        player: editableModel.activePlayers.elementAt(1),
-        value: currentLobby().bigBlindValue,
-      );
-
-      // FORCE SHOWDOWN IF BETS EQUAL AND ONLY ONE LAST WITH MONEY
-      if (_checkBidsEqual(editableModel) &&
-          editableModel.activePlayersWithMoneyCount <= 1) {
-        logs.writeLog('GameSM: head-up showdown forcing');
-        return editableModel.copyWith(
-          lobbyState: currentLobby().copyWith(
-            gameState: GameStatusEnum.showdown,
-          ),
-        );
-      }
-
-      logs.writeLog('GameSM: [H-UP] first player would be ${firstPlayer.name}');
-      return editableModel.copyWith(
-        sessionState: editableModel.sessionState.copyWith(
-          currentPlayerUid: firstPlayer.uid,
-          firstPlayerUid: firstPlayer.uid,
-        ),
-      );
-    }
-
     (GameStateModel, int) makeBetByCondition({
       required GameStateModel model,
       required bool Function(PlayerId) condition,
       required int value,
+      int initialOffset = 1,
     }) {
       final currentLobby = model.lobbyState;
 
-      for (int i = 1; i < currentLobby.players.length; i++) {
+      for (int i = initialOffset; i < currentLobby.players.length; i++) {
         int localIndex = (i + dealerPosition) % currentLobby.players.length;
 
         final localPlayer = currentLobby.players[localIndex];
 
         if (condition(localPlayer.uid)) {
           model = processBetOrAllIn(
-            model: editableModel,
+            modelToProcess: editableModel,
             player: localPlayer,
             value: value,
           );
@@ -659,11 +615,15 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       return (model, bigBlindPosition);
     }
 
+    //Head up случай
+    final isHandsUp = editableModel.activePlayersWithMoney.length == 2;
+
     // Ставим смолблайнд
     (editableModel, _) = makeBetByCondition(
       model: model,
       condition: (uid) => editableModel.isPlayerActive(uid),
       value: currentLobby().smallBlindValue,
+      initialOffset: isHandsUp ? 0 : 1,
     );
 
     // Ставим бигблайнд
@@ -674,7 +634,15 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       value: currentLobby().bigBlindValue,
     );
 
-    //TODO - change BigblindPostion;
+    if (_checkBidsEqual(editableModel) &&
+        editableModel.activePlayersWithMoneyCount <= 1) {
+      logs.writeLog('GameSM: head-up showdown forcing');
+      return editableModel.copyWith(
+        lobbyState: currentLobby().copyWith(
+          gameState: GameStatusEnum.showdown,
+        ),
+      );
+    }
 
     // Ищем первого игрока
     for (int i = 1; i < currentLobby().players.length; i++) {
@@ -698,8 +666,6 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
   }
 
   bool _checkBidsEqual(GameStateModel model) {
-    //int notZeroPlayers = 0;
-
     final activePlayers = model.activePlayers;
 
     final bets = activePlayers.map((p) => model.sessionState.bets[p.uid] ?? 0);
@@ -711,24 +677,14 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       final bid = model.sessionState.bets[player.uid] ?? 0;
       final bank = model.lobbyState.banks[player.uid] ?? 0;
 
-      bool equalBool = (bid == maxBet);
-      bool allInBool = ((bid > 0) && (bank <= 0));
+      bool isEqual = (bid == maxBet);
+      bool isAllIn = ((bid > 0) && (bank <= 0));
 
-      /*if (bank > 0) {
-        notZeroPlayers += 1;
-      }*/
-
-      if (!(equalBool || allInBool)) {
+      if (!(isEqual || isAllIn)) {
         logs.writeLog('GameSM: bets are not equal');
         return false;
       }
     }
-
-    //Если все ОлИн или выровняли ставки, но один остался с банком,
-    // То ему нет смысла рейзить
-    /*if (notZeroPlayers <= 1) {
-      return true;
-    }*/
 
     logs.writeLog('GameSM: bets are equal');
     return true;

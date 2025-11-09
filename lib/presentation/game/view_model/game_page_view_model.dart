@@ -61,7 +61,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
                   isDealer: p.uid == gameModel.lobbyState.dealerId,
                   isCurrent: p.uid == gameModel.sessionState.currentPlayerUid,
                   isFolded:
-                      gameModel.sessionState.foldedOrInactive.contains(p.uid),
+                      gameModel.sessionState.foldedPlayers.contains(p.uid),
                   bank: gameModel.lobbyState.banks[p.uid] ?? 0,
                   bet: gameModel.sessionState.bets[p.uid] ?? 0,
                 ))
@@ -183,24 +183,26 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
               .sessionState.bets[gameModel.sessionState.currentPlayerUid] ??
           0;
 
-      final raiseBank = gameModel.calculateRaiseValue(currentPlayerUid);
+      final (raiseBank, raiseIsAllIn) =
+          gameModel.calculateRaiseValue(currentPlayerUid);
 
-      final callValue = gameModel.calculateCallValue(currentPlayerUid);
+      final (callValue, callIsAllIn) =
+          gameModel.calculateCallValue(currentPlayerUid);
       final betBool = gameModel.checkBidsEqual();
 
       final currentPlayerCanSkip = (currentBet == maxBet);
-      final canRaise = currentBank > raiseBank;
+      final canRaise =
+          !callIsAllIn && (currentBank > raiseBank || raiseIsAllIn);
 
       final isFirstBet = betBool && gameState != GameStatusEnum.preFlop;
 
       final maxPossibleBet = currentBank;
       final minPossibleBet = raiseBank;
 
-      final callIsAllIn = callValue >= currentBank;
-
       return GamePageControlState.active(
         raiseState: RaiseControlState(
           canRaise: canRaise,
+          raiseIsAllIn: raiseIsAllIn,
           isFirstBet: isFirstBet,
           maxPossibleBet: maxPossibleBet,
           minPossibleBet: minPossibleBet,

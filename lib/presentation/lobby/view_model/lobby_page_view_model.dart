@@ -137,7 +137,7 @@ class LobbyPageViewModel extends AsyncNotifier<LobbyPageState> {
     }
 
     try {
-      await _lobbyStateHolder.removePlayer(playerUid: playerUid);
+      await _lobbyStateHolder.removePlayer(playerUid);
 
       logs.writeLog('Saving:\t${playerModel.toString()}');
       return true;

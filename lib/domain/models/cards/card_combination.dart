@@ -11,14 +11,14 @@ class Combination implements Comparable<Combination> {
 
   @override
   int compareTo(Combination other) {
-    // Сначала сравниваем по силе (strength)
+    // Сначала сравниваем типу комбинации (hand)
     int handComparison = hand.index.compareTo(other.hand.index);
 
     if (handComparison != 0) {
       return handComparison;
     }
 
-    // Если сила одинакова, сравниваем по типу комбинации (hand)
+    // Если сила одинакова, сравниваем по cиле (strength)
     return strength.compareTo(other.strength);
   }
 

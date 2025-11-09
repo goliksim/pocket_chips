@@ -1,5 +1,5 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../app/navigation/navigation_manager.dart';
@@ -8,6 +8,7 @@ import '../../../../domain/models/game/game_state_enum.dart';
 import '../../../../domain/models/lobby/lobby_state_model.dart';
 import '../../../../domain/models/player/player_model.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../services/assets_provider.dart';
 import '../../../../services/toast_manager.dart';
 import '../view_state/player_editing_state.dart';
 
@@ -18,7 +19,6 @@ class PlayerEditorViewModel with ChangeNotifier {
   final AppLocalizations _strings;
   final String? _playerUid;
 
-  static const String standartLogo = 'assets/faces/pokerfaces0.jpg';
   static const String standartName = '';
 
   late PlayerEditingState playerState;
@@ -54,8 +54,8 @@ class PlayerEditorViewModel with ChangeNotifier {
     final playerForEditing = newPlayer ? null : lobbyPlayer;
 
     playerState = PlayerEditingState(
-      nameInput: playerForEditing?.name ?? standartName,
-      assetUrl: playerForEditing?.assetUrl ?? standartLogo,
+      nameInput: playerForEditing?.name,
+      assetUrl: playerForEditing?.assetUrl ?? AssetsProvider.emptyPlayerAsset,
       bankInput: lobbyPlayerBank ?? lobby.defaultBank,
       forceDeadler: lobby.dealerId == null,
       makeDealer: lobby.dealerId == _playerUid && _playerUid != null,
@@ -93,7 +93,7 @@ class PlayerEditorViewModel with ChangeNotifier {
   }
 
   void changeBank(String bank) {
-    final int newBank;
+    final int? newBank;
 
     if (bank.isNotEmpty) {
       newBank = int.parse(bank);
@@ -106,16 +106,27 @@ class PlayerEditorViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  bool get validBank {
+  bool get _validBank {
     final bankInput = playerState.bankInput;
-    return bankInput > 0;
+    return kDebugMode || (bankInput != null && bankInput > 0);
   }
 
-  bool get validateInput {
-    final validIcon = playerState.assetUrl != standartLogo;
-    final validName = playerState.nameInput?.isNotEmpty ?? false;
+  bool get _validIcon =>
+      playerState.assetUrl != AssetsProvider.emptyPlayerAsset;
+  bool get _validName => playerState.nameInput?.isNotEmpty ?? false;
 
-    return validIcon && validName && validBank;
+  bool get validateInput => _validIcon && _validName && _validBank;
+
+  void notifyWrongInput() {
+    if (!_validName) {
+      return _toastManager.showToast('Please enter player name');
+    }
+    if (!_validIcon) {
+      return _toastManager.showToast('Please select icon for player');
+    }
+    if (!_validBank) {
+      return _toastManager.showToast(_strings.toast_bank3);
+    }
   }
 
   Future<void> confirmEditing() async {
@@ -147,7 +158,7 @@ class PlayerEditorViewModel with ChangeNotifier {
     }
 
     // Проверяем банк на минимальный блайнд
-    final bank = playerState.bankInput;
+    final bank = playerState.bankInput!;
     final currentBigBlind = lobby.bigBlindValue;
     if (bank < currentBigBlind) {
       _toastManager.showToast(

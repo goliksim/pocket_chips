@@ -40,7 +40,7 @@ class CheckCardsInherited extends InheritedWidget {
   }
 
   void updateCombinations() {
-    var (win, comb) = determineWinner(playerCards, tableCards);
+    var (win, comb) = WinnerSolver.determineWinner(playerCards, tableCards);
     combinations = comb;
     winner = win;
   }

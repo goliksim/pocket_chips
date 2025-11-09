@@ -8,7 +8,7 @@ part of 'game_session_entity.dart';
 
 GameSessionEntity _$GameSessionEntityFromJson(Map json) => GameSessionEntity(
       bets: Map<String, int>.from(json['bets'] as Map),
-      foldedOrInactive: (json['foldedOrInactive'] as List<dynamic>)
+      foldedPlayersInactive: (json['foldedPlayersInactive'] as List<dynamic>)
           .map((e) => e as String)
           .toSet(),
       lapCounter: (json['lapCounter'] as num).toInt(),
@@ -19,7 +19,7 @@ GameSessionEntity _$GameSessionEntityFromJson(Map json) => GameSessionEntity(
 Map<String, dynamic> _$GameSessionEntityToJson(GameSessionEntity instance) =>
     <String, dynamic>{
       'bets': instance.bets,
-      'foldedOrInactive': instance.foldedOrInactive.toList(),
+      'foldedPlayersInactive': instance.foldedPlayersInactive.toList(),
       'lapCounter': instance.lapCounter,
       'currentPlayerUid': instance.currentPlayerUid,
       'firstPlayerUid': instance.firstPlayerUid,

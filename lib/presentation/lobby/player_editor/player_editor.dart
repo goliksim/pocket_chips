@@ -1,7 +1,10 @@
 // Кнопка добавления игрока
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../services/assets_provider.dart';
+import '../../../services/toast_manager.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 import '../../common/widgets/ui_widgets.dart';
@@ -19,10 +22,7 @@ class PlayerEditorPage extends StatefulWidget {
   PlayerEditorPageState createState() => PlayerEditorPageState();
 }
 
-class PlayerEditorPageState extends State<PlayerEditorPage> {
-  static const String _frameAssetName = 'assets/faces/edit_frame.png';
-
-  final TextEditingController _bankController = TextEditingController();
+class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
   late FocusNode focusNodeName = FocusNode();
   late FocusNode focusNodeStack = FocusNode();
 
@@ -39,14 +39,12 @@ class PlayerEditorPageState extends State<PlayerEditorPage> {
   void _onBankChanged(String value) {
     value = value.replaceAll(RegExp(r'[^0-9]'), '');
 
+    if (!kDebugMode && value == '0') {
+      value = '1';
+    }
+
     widget.viewModel.changeBank(value);
-
-    _bankController.value = _bankController.value.copyWith(
-      text: value,
-    );
   }
-
-  bool get _validateBank => widget.viewModel.validBank;
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
@@ -97,14 +95,14 @@ class PlayerEditorPageState extends State<PlayerEditorPage> {
                           border: Border.all(
                             width: 1.5,
                             color: (player.assetUrl !=
-                                    PlayerEditorViewModel.standartLogo)
+                                    AssetsProvider.emptyPlayerAsset)
                                 ? thisTheme.primaryColor
                                 : thisTheme.bgrColor,
                           ),
                           shape: BoxShape.circle,
-                          image: const DecorationImage(
+                          image: DecorationImage(
                             filterQuality: FilterQuality.medium,
-                            image: AssetImage(_frameAssetName),
+                            image: AssetsProvider.playerIconEditFrame,
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -181,7 +179,6 @@ class PlayerEditorPageState extends State<PlayerEditorPage> {
                           SizedBox(
                             height: stdButtonHeight * 0.6,
                             child: TextFormField(
-                              controller: _bankController,
                               keyboardType: TextInputType.number,
                               focusNode: focusNodeStack,
                               style: TextStyle(
@@ -203,14 +200,14 @@ class PlayerEditorPageState extends State<PlayerEditorPage> {
                                   borderSide:
                                       // цвет линнии в окне
                                       BorderSide(
-                                    color: _validateBank
+                                    color: (player.bankInput != null)
                                         ? thisTheme.primaryColor
                                         : thisTheme.hintColor,
                                   ),
                                 ),
                                 focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                    color: _validateBank
+                                    color: (player.bankInput != null)
                                         ? thisTheme.primaryColor
                                         : thisTheme.hintColor,
                                   ),
@@ -268,7 +265,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> {
                               : context.strings.playp_edit_conf,
                           action: () async {
                             if (!validInput) {
-                              return;
+                              return widget.viewModel.notifyWrongInput();
                             }
                             // закрываем клаву, при нажатии кнопки
                             if (focusNodeName.hasFocus ||

@@ -11,16 +11,16 @@ class RaiseProviderScope extends StatefulWidget {
   final int currentBet;
 
   @override
-  State<RaiseProviderScope> createState() => _RaiseProviderScopeState();
+  State<RaiseProviderScope> createState() => RaiseProviderScopeState();
 
-  static _RaiseProviderScopeState of(BuildContext context) {
-    final state = context.findAncestorStateOfType<_RaiseProviderScopeState>();
+  static RaiseProviderScopeState of(BuildContext context) {
+    final state = context.findAncestorStateOfType<RaiseProviderScopeState>();
     assert(state != null, 'No RaiseProviderScope found in context');
     return state!;
   }
 }
 
-class _RaiseProviderScopeState extends State<RaiseProviderScope> {
+class RaiseProviderScopeState extends State<RaiseProviderScope> {
   late int _currentBet;
   int get currentBet => _currentBet;
 

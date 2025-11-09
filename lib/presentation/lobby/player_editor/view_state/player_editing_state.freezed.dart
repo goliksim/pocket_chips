@@ -18,7 +18,7 @@ mixin _$PlayerEditingState {
   bool get forceDeadler;
   bool get makeDealer;
   String? get nameInput;
-  int get bankInput;
+  int? get bankInput;
 
   /// Create a copy of PlayerEditingState
   /// with the given fields replaced by the non-null parameter values.
@@ -66,7 +66,7 @@ abstract mixin class $PlayerEditingStateCopyWith<$Res> {
       bool forceDeadler,
       bool makeDealer,
       String? nameInput,
-      int bankInput});
+      int? bankInput});
 }
 
 /// @nodoc
@@ -86,7 +86,7 @@ class _$PlayerEditingStateCopyWithImpl<$Res>
     Object? forceDeadler = null,
     Object? makeDealer = null,
     Object? nameInput = freezed,
-    Object? bankInput = null,
+    Object? bankInput = freezed,
   }) {
     return _then(_self.copyWith(
       assetUrl: null == assetUrl
@@ -105,10 +105,10 @@ class _$PlayerEditingStateCopyWithImpl<$Res>
           ? _self.nameInput
           : nameInput // ignore: cast_nullable_to_non_nullable
               as String?,
-      bankInput: null == bankInput
+      bankInput: freezed == bankInput
           ? _self.bankInput
           : bankInput // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ));
   }
 }
@@ -207,7 +207,7 @@ extension PlayerEditingStatePatterns on PlayerEditingState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(String assetUrl, bool forceDeadler, bool makeDealer,
-            String? nameInput, int bankInput)?
+            String? nameInput, int? bankInput)?
         $default, {
     required TResult orElse(),
   }) {
@@ -237,7 +237,7 @@ extension PlayerEditingStatePatterns on PlayerEditingState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(String assetUrl, bool forceDeadler, bool makeDealer,
-            String? nameInput, int bankInput)
+            String? nameInput, int? bankInput)
         $default,
   ) {
     final _that = this;
@@ -265,7 +265,7 @@ extension PlayerEditingStatePatterns on PlayerEditingState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(String assetUrl, bool forceDeadler, bool makeDealer,
-            String? nameInput, int bankInput)?
+            String? nameInput, int? bankInput)?
         $default,
   ) {
     final _that = this;
@@ -298,7 +298,7 @@ class _PlayerEditingState implements PlayerEditingState {
   @override
   final String? nameInput;
   @override
-  final int bankInput;
+  final int? bankInput;
 
   /// Create a copy of PlayerEditingState
   /// with the given fields replaced by the non-null parameter values.
@@ -348,7 +348,7 @@ abstract mixin class _$PlayerEditingStateCopyWith<$Res>
       bool forceDeadler,
       bool makeDealer,
       String? nameInput,
-      int bankInput});
+      int? bankInput});
 }
 
 /// @nodoc
@@ -368,7 +368,7 @@ class __$PlayerEditingStateCopyWithImpl<$Res>
     Object? forceDeadler = null,
     Object? makeDealer = null,
     Object? nameInput = freezed,
-    Object? bankInput = null,
+    Object? bankInput = freezed,
   }) {
     return _then(_PlayerEditingState(
       assetUrl: null == assetUrl
@@ -387,10 +387,10 @@ class __$PlayerEditingStateCopyWithImpl<$Res>
           ? _self.nameInput
           : nameInput // ignore: cast_nullable_to_non_nullable
               as String?,
-      bankInput: null == bankInput
+      bankInput: freezed == bankInput
           ? _self.bankInput
           : bankInput // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ));
   }
 }

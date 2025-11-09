@@ -1,6 +1,7 @@
 // Static Raise Window
 import 'package:flutter/material.dart';
 
+import '../../../../../services/assets_provider.dart';
 import '../../../../../utils/theme/ui_values.dart';
 import '../view_state/game_page_control_state.dart';
 import 'raise_provider.dart';
@@ -48,7 +49,6 @@ class RaiseFieldWidgetState extends State<RaiseFieldWidget> {
   @override
   Widget build(BuildContext context) {
     final provider = RaiseProviderScope.of(context);
-    final currentBet = provider.currentBet;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(stdBorderRadius),
@@ -67,9 +67,11 @@ class RaiseFieldWidgetState extends State<RaiseFieldWidget> {
                 borderRadius: BorderRadius.circular(stdButtonHeight * 0.75),
                 child: _CoinsRow(
                   onTap: (coin) {
-                    if (currentBet + coin <= widget.state.maxPossibleBet) {
+                    final bet = provider.currentBet;
+
+                    if (bet + coin <= widget.state.maxPossibleBet) {
                       setState(() {
-                        provider.changeBet(currentBet + coin);
+                        provider.changeBet(bet + coin);
                       });
                     }
                   },
@@ -80,7 +82,7 @@ class RaiseFieldWidgetState extends State<RaiseFieldWidget> {
             _RaiseSlider(
               minBet: widget.state.minPossibleBet,
               maxBet: widget.state.maxPossibleBet,
-              value: currentBet,
+              value: provider.currentBet,
               onChanged: (newValue) {
                 provider.changeBet(newValue);
               },
@@ -132,10 +134,7 @@ class _CoinsRow extends StatelessWidget {
                     ),
                   ),
                 ),
-                child: Image.asset(
-                  'assets/chips/chips_$coin.png',
-                  filterQuality: FilterQuality.medium,
-                ),
+                child: AssetsProvider.chipsByValue(coin),
                 onPressed: () => onTap(coin),
               ),
             ),

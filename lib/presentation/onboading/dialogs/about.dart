@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../di/view_models.dart';
+import '../../../services/assets_provider.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 import '../../common/widgets/ui_widgets.dart';
@@ -30,7 +31,7 @@ class AboutDialog extends StatefulWidget {
 class _AboutDialogState extends State<AboutDialog> {
   LobbyPlayerItem tutorPlayer = LobbyPlayerItem(
     name: 'TestPlayer',
-    assetUrl: 'assets/faces/pokerfaces0.jpg',
+    assetUrl: AssetsProvider.emptyPlayerAsset,
     bank: 500,
     uid: Uuid().v4(),
   );
@@ -501,9 +502,8 @@ class _AboutDialogState extends State<AboutDialog> {
                                                 ),
                                               ),
                                             ),
-                                            child: Image.asset(
-                                              'assets/chips/chips_$a.png',
-                                            ),
+                                            child:
+                                                AssetsProvider.chipsByValue(a),
                                             onPressed: () {
                                               if (tmpBid + a <= 5000) {
                                                 tmpBid += a;
@@ -672,7 +672,7 @@ class _AboutDialogState extends State<AboutDialog> {
                           height: stdButtonHeight / 2,
                           width: stdButtonHeight / 2,
                           buttonColor: thisTheme.bgrColor,
-                          child: Image.asset('assets/social/tele.png'),
+                          child: AssetsProvider.socialTelegramIcon,
                           action: () async {
                             const url = 'https://t.me/goliksim';
                             if (!await launch(url)) {
@@ -684,7 +684,7 @@ class _AboutDialogState extends State<AboutDialog> {
                           height: stdButtonHeight / 2,
                           width: stdButtonHeight / 2,
                           buttonColor: thisTheme.bgrColor,
-                          child: Image.asset('assets/social/git.png'),
+                          child: AssetsProvider.socialGitIcon,
                           action: () async {
                             const url = 'https://github.com/goliksim';
                             if (!await launch(url)) {
@@ -697,7 +697,7 @@ class _AboutDialogState extends State<AboutDialog> {
                             height: stdButtonHeight / 2,
                             width: stdButtonHeight / 2,
                             buttonColor: thisTheme.bgrColor,
-                            child: Image.asset('assets/social/mail.png'),
+                            child: AssetsProvider.socialMainIcon,
                             action: () async => viewModel.sendMail(),
                           ),
                       ],

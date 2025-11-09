@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../services/assets_provider.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 
@@ -207,7 +208,7 @@ class PatternContainer extends StatelessWidget {
           filterQuality: FilterQuality.high,
           opacity: 0.3 * opacity,
           //colorFilter: ColorFilter.mode(thisTheme.primaryColor, BlendMode.srcATop),
-          image: const AssetImage('assets/pattern.png'),
+          image: AssetsProvider.backgroundPattern,
           fit: BoxFit.cover,
         ),
       ),

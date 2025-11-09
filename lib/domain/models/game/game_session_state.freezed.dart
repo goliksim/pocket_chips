@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GameSessionState {
   Map<String, int> get bets;
-  Set<String> get foldedOrInactive;
+  Set<String> get foldedPlayers;
   int get lapCounter;
   String? get currentPlayerUid;
   String? get firstPlayerUid;
@@ -35,7 +35,7 @@ mixin _$GameSessionState {
             other is GameSessionState &&
             const DeepCollectionEquality().equals(other.bets, bets) &&
             const DeepCollectionEquality()
-                .equals(other.foldedOrInactive, foldedOrInactive) &&
+                .equals(other.foldedPlayers, foldedPlayers) &&
             (identical(other.lapCounter, lapCounter) ||
                 other.lapCounter == lapCounter) &&
             (identical(other.currentPlayerUid, currentPlayerUid) ||
@@ -48,14 +48,14 @@ mixin _$GameSessionState {
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(bets),
-      const DeepCollectionEquality().hash(foldedOrInactive),
+      const DeepCollectionEquality().hash(foldedPlayers),
       lapCounter,
       currentPlayerUid,
       firstPlayerUid);
 
   @override
   String toString() {
-    return 'GameSessionState(bets: $bets, foldedOrInactive: $foldedOrInactive, lapCounter: $lapCounter, currentPlayerUid: $currentPlayerUid, firstPlayerUid: $firstPlayerUid)';
+    return 'GameSessionState(bets: $bets, foldedPlayers: $foldedPlayers, lapCounter: $lapCounter, currentPlayerUid: $currentPlayerUid, firstPlayerUid: $firstPlayerUid)';
   }
 }
 
@@ -67,7 +67,7 @@ abstract mixin class $GameSessionStateCopyWith<$Res> {
   @useResult
   $Res call(
       {Map<String, int> bets,
-      Set<String> foldedOrInactive,
+      Set<String> foldedPlayers,
       int lapCounter,
       String? currentPlayerUid,
       String? firstPlayerUid});
@@ -87,7 +87,7 @@ class _$GameSessionStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? bets = null,
-    Object? foldedOrInactive = null,
+    Object? foldedPlayers = null,
     Object? lapCounter = null,
     Object? currentPlayerUid = freezed,
     Object? firstPlayerUid = freezed,
@@ -97,9 +97,9 @@ class _$GameSessionStateCopyWithImpl<$Res>
           ? _self.bets
           : bets // ignore: cast_nullable_to_non_nullable
               as Map<String, int>,
-      foldedOrInactive: null == foldedOrInactive
-          ? _self.foldedOrInactive
-          : foldedOrInactive // ignore: cast_nullable_to_non_nullable
+      foldedPlayers: null == foldedPlayers
+          ? _self.foldedPlayers
+          : foldedPlayers // ignore: cast_nullable_to_non_nullable
               as Set<String>,
       lapCounter: null == lapCounter
           ? _self.lapCounter
@@ -210,7 +210,7 @@ extension GameSessionStatePatterns on GameSessionState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(Map<String, int> bets, Set<String> foldedOrInactive,
+    TResult Function(Map<String, int> bets, Set<String> foldedPlayers,
             int lapCounter, String? currentPlayerUid, String? firstPlayerUid)?
         $default, {
     required TResult orElse(),
@@ -218,7 +218,7 @@ extension GameSessionStatePatterns on GameSessionState {
     final _that = this;
     switch (_that) {
       case _GameSessionState() when $default != null:
-        return $default(_that.bets, _that.foldedOrInactive, _that.lapCounter,
+        return $default(_that.bets, _that.foldedPlayers, _that.lapCounter,
             _that.currentPlayerUid, _that.firstPlayerUid);
       case _:
         return orElse();
@@ -240,14 +240,14 @@ extension GameSessionStatePatterns on GameSessionState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(Map<String, int> bets, Set<String> foldedOrInactive,
+    TResult Function(Map<String, int> bets, Set<String> foldedPlayers,
             int lapCounter, String? currentPlayerUid, String? firstPlayerUid)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _GameSessionState():
-        return $default(_that.bets, _that.foldedOrInactive, _that.lapCounter,
+        return $default(_that.bets, _that.foldedPlayers, _that.lapCounter,
             _that.currentPlayerUid, _that.firstPlayerUid);
       case _:
         throw StateError('Unexpected subclass');
@@ -268,14 +268,14 @@ extension GameSessionStatePatterns on GameSessionState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(Map<String, int> bets, Set<String> foldedOrInactive,
+    TResult? Function(Map<String, int> bets, Set<String> foldedPlayers,
             int lapCounter, String? currentPlayerUid, String? firstPlayerUid)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _GameSessionState() when $default != null:
-        return $default(_that.bets, _that.foldedOrInactive, _that.lapCounter,
+        return $default(_that.bets, _that.foldedPlayers, _that.lapCounter,
             _that.currentPlayerUid, _that.firstPlayerUid);
       case _:
         return null;
@@ -288,7 +288,7 @@ extension GameSessionStatePatterns on GameSessionState {
 class _GameSessionState implements GameSessionState {
   const _GameSessionState(
       {required this.bets,
-      required this.foldedOrInactive,
+      required this.foldedPlayers,
       required this.lapCounter,
       this.currentPlayerUid,
       this.firstPlayerUid});
@@ -296,7 +296,7 @@ class _GameSessionState implements GameSessionState {
   @override
   final Map<String, int> bets;
   @override
-  final Set<String> foldedOrInactive;
+  final Set<String> foldedPlayers;
   @override
   final int lapCounter;
   @override
@@ -319,7 +319,7 @@ class _GameSessionState implements GameSessionState {
             other is _GameSessionState &&
             const DeepCollectionEquality().equals(other.bets, bets) &&
             const DeepCollectionEquality()
-                .equals(other.foldedOrInactive, foldedOrInactive) &&
+                .equals(other.foldedPlayers, foldedPlayers) &&
             (identical(other.lapCounter, lapCounter) ||
                 other.lapCounter == lapCounter) &&
             (identical(other.currentPlayerUid, currentPlayerUid) ||
@@ -332,14 +332,14 @@ class _GameSessionState implements GameSessionState {
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(bets),
-      const DeepCollectionEquality().hash(foldedOrInactive),
+      const DeepCollectionEquality().hash(foldedPlayers),
       lapCounter,
       currentPlayerUid,
       firstPlayerUid);
 
   @override
   String toString() {
-    return 'GameSessionState(bets: $bets, foldedOrInactive: $foldedOrInactive, lapCounter: $lapCounter, currentPlayerUid: $currentPlayerUid, firstPlayerUid: $firstPlayerUid)';
+    return 'GameSessionState(bets: $bets, foldedPlayers: $foldedPlayers, lapCounter: $lapCounter, currentPlayerUid: $currentPlayerUid, firstPlayerUid: $firstPlayerUid)';
   }
 }
 
@@ -353,7 +353,7 @@ abstract mixin class _$GameSessionStateCopyWith<$Res>
   @useResult
   $Res call(
       {Map<String, int> bets,
-      Set<String> foldedOrInactive,
+      Set<String> foldedPlayers,
       int lapCounter,
       String? currentPlayerUid,
       String? firstPlayerUid});
@@ -373,7 +373,7 @@ class __$GameSessionStateCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? bets = null,
-    Object? foldedOrInactive = null,
+    Object? foldedPlayers = null,
     Object? lapCounter = null,
     Object? currentPlayerUid = freezed,
     Object? firstPlayerUid = freezed,
@@ -383,9 +383,9 @@ class __$GameSessionStateCopyWithImpl<$Res>
           ? _self.bets
           : bets // ignore: cast_nullable_to_non_nullable
               as Map<String, int>,
-      foldedOrInactive: null == foldedOrInactive
-          ? _self.foldedOrInactive
-          : foldedOrInactive // ignore: cast_nullable_to_non_nullable
+      foldedPlayers: null == foldedPlayers
+          ? _self.foldedPlayers
+          : foldedPlayers // ignore: cast_nullable_to_non_nullable
               as Set<String>,
       lapCounter: null == lapCounter
           ? _self.lapCounter

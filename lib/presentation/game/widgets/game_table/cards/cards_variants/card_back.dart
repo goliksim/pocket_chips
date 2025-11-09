@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../../../../../services/assets_provider.dart';
+import '../../../../../../utils/theme/themes.dart';
 import '../../../../../../utils/theme/ui_values.dart';
 import '../card_widget.dart';
 
@@ -22,11 +24,7 @@ class CardBack extends StatelessWidget {
               ),
         child: Image(
           fit: BoxFit.cover,
-          image: AssetImage(
-            (thisTheme.name == 'dark')
-                ? 'assets/сard_back_dark.jpg'
-                : 'assets/сard_back.jpg',
-          ),
+          image: AssetsProvider.cardBack(thisTheme.isDark),
         ),
       ),
     );

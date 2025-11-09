@@ -23,7 +23,6 @@ class HomePage extends ConsumerWidget {
 
     final shouldDrawContinue = asyncState.maybeWhen(
       data: (data) => data,
-      loading: () => false,
       orElse: () => false,
     );
 

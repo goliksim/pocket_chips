@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../services/assets_provider.dart';
 import '../../../../utils/theme/ui_values.dart';
 
 class PlayerLogoPicker extends StatefulWidget {
@@ -21,9 +22,11 @@ class _PickIconState extends State<PlayerLogoPicker> {
       choosenIcon = index;
     });
 
-    await Future.delayed(const Duration(milliseconds: 500)).then((_) {
-      _pop('assets/faces/pokerfaces${index + 1}.jpg');
-    });
+    await Future.delayed(const Duration(milliseconds: 500)).then(
+      (_) {
+        _pop(AssetsProvider.playerAssetByIndex(index));
+      },
+    );
   }
 
   void _pop(String newLogo) => Navigator.of(context).pop(newLogo);
@@ -77,9 +80,7 @@ class _PickIconState extends State<PlayerLogoPicker> {
                         image: DecorationImage(
                           filterQuality: FilterQuality.medium,
                           fit: BoxFit.cover,
-                          image: AssetImage(
-                            'assets/faces/pokerfaces${index + 1}.jpg',
-                          ),
+                          image: AssetsProvider.playerIconByIndex(index),
                         ),
                       ),
                     ),

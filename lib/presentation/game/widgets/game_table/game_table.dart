@@ -4,6 +4,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../domain/models/lobby/lobby_state_model.dart';
+import '../../../../services/assets_provider.dart';
+import '../../../../utils/theme/themes.dart';
 import '../../../../utils/theme/ui_values.dart';
 import '../../view_model/game_page_view_model.dart';
 import '../add_player_button.dart';
@@ -107,9 +109,7 @@ class GameTable extends StatelessWidget {
                 BlendMode.srcATop,
               ),
               fit: BoxFit.contain,
-              image: AssetImage(
-                'assets/table_${thisTheme.name}.png',
-              ),
+              image: AssetsProvider.table(thisTheme.isDark),
             ),
           ),
         ),

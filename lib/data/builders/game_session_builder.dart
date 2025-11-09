@@ -6,7 +6,7 @@ class GameSessionEntityBuilder {
     return GameSessionState(
       bets: entity.bets,
       lapCounter: entity.lapCounter,
-      foldedOrInactive: entity.foldedOrInactive,
+      foldedPlayers: entity.foldedPlayersInactive,
       currentPlayerUid: entity.currentPlayerUid,
       firstPlayerUid: entity.firstPlayerUid,
     );
@@ -16,7 +16,7 @@ class GameSessionEntityBuilder {
     return GameSessionEntity(
       bets: model.bets,
       lapCounter: model.lapCounter,
-      foldedOrInactive: model.foldedOrInactive,
+      foldedPlayersInactive: model.foldedPlayers,
       currentPlayerUid: model.currentPlayerUid,
       firstPlayerUid: model.firstPlayerUid,
     );

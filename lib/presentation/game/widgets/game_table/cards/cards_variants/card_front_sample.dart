@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../../../../../services/assets_provider.dart';
+import '../../../../../../utils/theme/themes.dart';
 import '../../../../../../utils/theme/ui_values.dart';
 import '../card_widget.dart';
 
@@ -16,11 +18,7 @@ class CardFrontSample extends StatelessWidget {
             : thisTheme.playerColor,
         child: Image(
           fit: BoxFit.cover,
-          image: AssetImage(
-            (thisTheme.name == 'dark')
-                ? 'assets/card_front_dark.png'
-                : 'assets/card_front.png',
-          ),
+          image: AssetsProvider.cardFront(thisTheme.isDark),
         ),
       ),
     );

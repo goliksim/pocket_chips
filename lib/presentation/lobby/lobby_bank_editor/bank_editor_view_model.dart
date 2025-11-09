@@ -1,4 +1,4 @@
-import 'package:flutter/semantics.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../domain/model_holders/lobby_state_holder.dart';
 import '../../../l10n/app_localizations.dart';
@@ -26,12 +26,8 @@ class BankEditorViewModel {
         _pop = pop;
 
   Future<void> changeBank(int newBank) async {
-    if (newBank <= 0) {
+    if (!kDebugMode && newBank <= 0) {
       return;
-    }
-
-    if (newBank == currentDefaultBank) {
-      return _pop();
     }
 
     await _lobbyStateHolder.updateDefaultBank(newBank);

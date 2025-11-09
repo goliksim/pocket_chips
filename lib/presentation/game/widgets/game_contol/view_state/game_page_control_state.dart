@@ -20,6 +20,7 @@ abstract class GamePageControlState with _$GamePageControlState {
 abstract class RaiseControlState with _$RaiseControlState {
   const factory RaiseControlState({
     required bool canRaise,
+    required bool raiseIsAllIn,
     required bool isFirstBet,
     required int maxPossibleBet,
     required int minPossibleBet,

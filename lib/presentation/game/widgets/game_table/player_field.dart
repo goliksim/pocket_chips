@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../services/assets_provider.dart';
 import '../../../../utils/theme/ui_values.dart';
 import '../../../common/widgets/ui_widgets.dart';
 import '../../view_state/game_player_item.dart';
@@ -71,9 +72,7 @@ List<Widget> reversablePlayerWidgetList(GamePlayerItem player) {
                   shape: BoxShape.circle,
                   image: DecorationImage(
                     filterQuality: FilterQuality.medium,
-                    image: const AssetImage(
-                      'assets/chips/dealer.png',
-                    ),
+                    image: AssetsProvider.dealerAsset,
                     colorFilter: ColorFilter.mode(
                       Colors.white.withAlpha(
                         player.isFolded ? 50 : 255,

@@ -422,6 +422,7 @@ class _GamePageControlShowDownState implements GamePageControlState {
 /// @nodoc
 mixin _$RaiseControlState {
   bool get canRaise;
+  bool get raiseIsAllIn;
   bool get isFirstBet;
   int get maxPossibleBet;
   int get minPossibleBet;
@@ -441,6 +442,8 @@ mixin _$RaiseControlState {
             other is RaiseControlState &&
             (identical(other.canRaise, canRaise) ||
                 other.canRaise == canRaise) &&
+            (identical(other.raiseIsAllIn, raiseIsAllIn) ||
+                other.raiseIsAllIn == raiseIsAllIn) &&
             (identical(other.isFirstBet, isFirstBet) ||
                 other.isFirstBet == isFirstBet) &&
             (identical(other.maxPossibleBet, maxPossibleBet) ||
@@ -450,12 +453,12 @@ mixin _$RaiseControlState {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, canRaise, isFirstBet, maxPossibleBet, minPossibleBet);
+  int get hashCode => Object.hash(runtimeType, canRaise, raiseIsAllIn,
+      isFirstBet, maxPossibleBet, minPossibleBet);
 
   @override
   String toString() {
-    return 'RaiseControlState(canRaise: $canRaise, isFirstBet: $isFirstBet, maxPossibleBet: $maxPossibleBet, minPossibleBet: $minPossibleBet)';
+    return 'RaiseControlState(canRaise: $canRaise, raiseIsAllIn: $raiseIsAllIn, isFirstBet: $isFirstBet, maxPossibleBet: $maxPossibleBet, minPossibleBet: $minPossibleBet)';
   }
 }
 
@@ -466,7 +469,11 @@ abstract mixin class $RaiseControlStateCopyWith<$Res> {
       _$RaiseControlStateCopyWithImpl;
   @useResult
   $Res call(
-      {bool canRaise, bool isFirstBet, int maxPossibleBet, int minPossibleBet});
+      {bool canRaise,
+      bool raiseIsAllIn,
+      bool isFirstBet,
+      int maxPossibleBet,
+      int minPossibleBet});
 }
 
 /// @nodoc
@@ -483,6 +490,7 @@ class _$RaiseControlStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? canRaise = null,
+    Object? raiseIsAllIn = null,
     Object? isFirstBet = null,
     Object? maxPossibleBet = null,
     Object? minPossibleBet = null,
@@ -491,6 +499,10 @@ class _$RaiseControlStateCopyWithImpl<$Res>
       canRaise: null == canRaise
           ? _self.canRaise
           : canRaise // ignore: cast_nullable_to_non_nullable
+              as bool,
+      raiseIsAllIn: null == raiseIsAllIn
+          ? _self.raiseIsAllIn
+          : raiseIsAllIn // ignore: cast_nullable_to_non_nullable
               as bool,
       isFirstBet: null == isFirstBet
           ? _self.isFirstBet
@@ -601,16 +613,16 @@ extension RaiseControlStatePatterns on RaiseControlState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(bool canRaise, bool isFirstBet, int maxPossibleBet,
-            int minPossibleBet)?
+    TResult Function(bool canRaise, bool raiseIsAllIn, bool isFirstBet,
+            int maxPossibleBet, int minPossibleBet)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _RaiseControlState() when $default != null:
-        return $default(_that.canRaise, _that.isFirstBet, _that.maxPossibleBet,
-            _that.minPossibleBet);
+        return $default(_that.canRaise, _that.raiseIsAllIn, _that.isFirstBet,
+            _that.maxPossibleBet, _that.minPossibleBet);
       case _:
         return orElse();
     }
@@ -631,15 +643,15 @@ extension RaiseControlStatePatterns on RaiseControlState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(bool canRaise, bool isFirstBet, int maxPossibleBet,
-            int minPossibleBet)
+    TResult Function(bool canRaise, bool raiseIsAllIn, bool isFirstBet,
+            int maxPossibleBet, int minPossibleBet)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _RaiseControlState():
-        return $default(_that.canRaise, _that.isFirstBet, _that.maxPossibleBet,
-            _that.minPossibleBet);
+        return $default(_that.canRaise, _that.raiseIsAllIn, _that.isFirstBet,
+            _that.maxPossibleBet, _that.minPossibleBet);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -659,15 +671,15 @@ extension RaiseControlStatePatterns on RaiseControlState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(bool canRaise, bool isFirstBet, int maxPossibleBet,
-            int minPossibleBet)?
+    TResult? Function(bool canRaise, bool raiseIsAllIn, bool isFirstBet,
+            int maxPossibleBet, int minPossibleBet)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _RaiseControlState() when $default != null:
-        return $default(_that.canRaise, _that.isFirstBet, _that.maxPossibleBet,
-            _that.minPossibleBet);
+        return $default(_that.canRaise, _that.raiseIsAllIn, _that.isFirstBet,
+            _that.maxPossibleBet, _that.minPossibleBet);
       case _:
         return null;
     }
@@ -679,12 +691,15 @@ extension RaiseControlStatePatterns on RaiseControlState {
 class _RaiseControlState implements RaiseControlState {
   const _RaiseControlState(
       {required this.canRaise,
+      required this.raiseIsAllIn,
       required this.isFirstBet,
       required this.maxPossibleBet,
       required this.minPossibleBet});
 
   @override
   final bool canRaise;
+  @override
+  final bool raiseIsAllIn;
   @override
   final bool isFirstBet;
   @override
@@ -707,6 +722,8 @@ class _RaiseControlState implements RaiseControlState {
             other is _RaiseControlState &&
             (identical(other.canRaise, canRaise) ||
                 other.canRaise == canRaise) &&
+            (identical(other.raiseIsAllIn, raiseIsAllIn) ||
+                other.raiseIsAllIn == raiseIsAllIn) &&
             (identical(other.isFirstBet, isFirstBet) ||
                 other.isFirstBet == isFirstBet) &&
             (identical(other.maxPossibleBet, maxPossibleBet) ||
@@ -716,12 +733,12 @@ class _RaiseControlState implements RaiseControlState {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, canRaise, isFirstBet, maxPossibleBet, minPossibleBet);
+  int get hashCode => Object.hash(runtimeType, canRaise, raiseIsAllIn,
+      isFirstBet, maxPossibleBet, minPossibleBet);
 
   @override
   String toString() {
-    return 'RaiseControlState(canRaise: $canRaise, isFirstBet: $isFirstBet, maxPossibleBet: $maxPossibleBet, minPossibleBet: $minPossibleBet)';
+    return 'RaiseControlState(canRaise: $canRaise, raiseIsAllIn: $raiseIsAllIn, isFirstBet: $isFirstBet, maxPossibleBet: $maxPossibleBet, minPossibleBet: $minPossibleBet)';
   }
 }
 
@@ -734,7 +751,11 @@ abstract mixin class _$RaiseControlStateCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {bool canRaise, bool isFirstBet, int maxPossibleBet, int minPossibleBet});
+      {bool canRaise,
+      bool raiseIsAllIn,
+      bool isFirstBet,
+      int maxPossibleBet,
+      int minPossibleBet});
 }
 
 /// @nodoc
@@ -751,6 +772,7 @@ class __$RaiseControlStateCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? canRaise = null,
+    Object? raiseIsAllIn = null,
     Object? isFirstBet = null,
     Object? maxPossibleBet = null,
     Object? minPossibleBet = null,
@@ -759,6 +781,10 @@ class __$RaiseControlStateCopyWithImpl<$Res>
       canRaise: null == canRaise
           ? _self.canRaise
           : canRaise // ignore: cast_nullable_to_non_nullable
+              as bool,
+      raiseIsAllIn: null == raiseIsAllIn
+          ? _self.raiseIsAllIn
+          : raiseIsAllIn // ignore: cast_nullable_to_non_nullable
               as bool,
       isFirstBet: null == isFirstBet
           ? _self.isFirstBet

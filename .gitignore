@@ -1,6 +1,11 @@
 # Miscellaneous
 *.class
 
+# Codegen
+*.freezed.dart
+*.g.dart
+*.mocks.dart
+
 *.pyc
 *.swp
 .DS_Store
@@ -17,7 +22,6 @@ migrate_working_dir/
 *.ipr
 *.iws
 *.lock
-*.json
 *.apk
 *.app
 *.aab

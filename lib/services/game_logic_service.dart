@@ -7,10 +7,13 @@ import '../domain/models/player/player_model.dart';
 import '../presentation/game/widgets/winner_page/view_state/possible_winner_item.dart';
 
 extension GameStateModelX on GameStateModel {
-  Iterable<PlayerModel> get activePlayers => lobbyState.players
-      .whereNot((e) => sessionState.foldedOrInactive.contains(e.uid));
+  bool isPlayerActive(PlayerId playerUid) =>
+      !sessionState.foldedPlayers.contains(playerUid);
 
-  bool get canStartOrContinueGame => activePlayers.length >= 2;
+  Iterable<PlayerModel> get activePlayers =>
+      lobbyState.players.where((e) => isPlayerActive(e.uid));
+
+  bool get canStartOrContinueGame => activePlayersWithMoney.length >= 2;
 
   List<PossibleWinnerItem> get possibleWinners => activePlayers
       .map(
@@ -21,17 +24,22 @@ extension GameStateModelX on GameStateModel {
           bid: sessionState.bets[p.uid] ?? 0,
         ),
       )
+      .where((p) => p.bid > 0)
       .toList();
 
   int get currentPlayerIndex => lobbyState.players
       .indexWhere((p) => p.uid == sessionState.currentPlayerUid);
 
-  int get activePlayersWithMoneyCount =>
-      activePlayers.where((p) => (lobbyState.banks[p.uid] ?? 0) > 0).length;
+  bool isPlayerActiveWithMoney(PlayerId playerUid) =>
+      isPlayerActive(playerUid) && ((lobbyState.banks[playerUid] ?? 0) > 0);
 
-  bool isPlayerActive(PlayerId playerUid) =>
-      !sessionState.foldedOrInactive.contains(playerUid);
+  Iterable<PlayerModel> get activePlayersWithMoney =>
+      lobbyState.players.where((p) => isPlayerActiveWithMoney(p.uid));
 
+  int get activePlayersWithMoneyCount => activePlayersWithMoney.length;
+}
+
+extension GameSessionStateX on GameStateModel {
   bool checkBidsEqual() {
     int notZeroPlayers = 0;
 
@@ -61,11 +69,14 @@ extension GameStateModelX on GameStateModel {
     return sessionState.lapCounter != 0;
   }
 
-  // Подсчет величины рейза-ререйза
-  int calculateRaiseValue(String currentPlayerUid) {
+  // TODO: добавить настройки (запрет перебивания олл-ин рейза, если он меньше минимального рейза)
+  // https://www.reddit.com/r/poker/comments/oqrmyk/minimal_raise/?tl=ru
+
+  /// Подсчет величины рейза-ререйза
+  (int, bool) calculateRaiseValue(String currentPlayerUid) {
     // Сколько нужно добавить для выравнивания
-    int toEqual = sessionState.bets.values.maxOrNull ??
-        0 - (sessionState.bets[currentPlayerUid] ?? 0);
+    int toEqual = (sessionState.bets.values.maxOrNull ?? 0) -
+        (sessionState.bets[currentPlayerUid] ?? 0);
 
     // Подходит под ставку или ход в олл ин, если остался условно 1 бакс (бет)
     List<int> bids = activePlayers
@@ -82,13 +93,20 @@ extension GameStateModelX on GameStateModel {
 
     int result = toEqual + [lastRaise, lobbyState.bigBlindValue].max;
 
-    return result;
+    final bool raiseIsAllIn =
+        result >= (lobbyState.banks[currentPlayerUid] ?? 0);
+
+    return (result, raiseIsAllIn);
   }
 
-  int calculateCallValue(String currentPlayerUid) {
-    final maxBet = sessionState.bets.values.maxOrNull ?? 0;
+  (int, bool) calculateCallValue(String currentPlayerUid) {
+    final maxBet =
+        [sessionState.bets.values.maxOrNull ?? 0, lobbyState.bigBlindValue].max;
     final currentBet = sessionState.bets[currentPlayerUid] ?? 0;
 
-    return maxBet - currentBet;
+    final result = maxBet - currentBet;
+    final callIsAllIn = (result >= (lobbyState.banks[currentPlayerUid] ?? 0));
+
+    return (result, callIsAllIn);
   }
 }

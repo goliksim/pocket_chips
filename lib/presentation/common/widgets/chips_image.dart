@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../services/assets_provider.dart';
 import '../../../utils/theme/ui_values.dart';
 
 class ChipsImage extends StatelessWidget {
@@ -19,9 +20,7 @@ class ChipsImage extends StatelessWidget {
           ),
           fit: BoxFit.contain,
           filterQuality: FilterQuality.high,
-          image: const AssetImage(
-            'assets/init_logo.png',
-          ),
+          image: AssetsProvider.mainChipsLogo,
         ),
       ),
       height: MediaQuery.of(context).size.width,

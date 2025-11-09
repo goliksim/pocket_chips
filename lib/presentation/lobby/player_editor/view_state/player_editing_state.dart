@@ -9,6 +9,6 @@ abstract class PlayerEditingState with _$PlayerEditingState {
     required bool forceDeadler,
     required bool makeDealer,
     required String? nameInput,
-    required int bankInput,
+    required int? bankInput,
   }) = _PlayerEditingState;
 }

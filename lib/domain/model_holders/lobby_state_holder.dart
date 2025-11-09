@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../di/domain_managers.dart';
 import '../../di/repositories.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/toast_manager.dart';
 import '../../utils/logs.dart';
 import '../models/game/game_state_enum.dart';
 import '../models/game_settings_model.dart';
@@ -16,6 +17,7 @@ import 'game_settings_provider.dart';
 class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     implements GameSettingsProvider {
   AppLocalizations get _strings => ref.read(stringsProvider);
+  ToastManager get _toastManager => ref.read(toastManagerProvider);
 
   LobbyStateModel get activeLobby => state.requireValue;
 
@@ -28,7 +30,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
   }
 
   Future<void> updateLobby(LobbyStateModel newState) async {
-    state = AsyncValue.data(newState);
+    state = AsyncData(newState);
     logs.writeLog('LobbySH: STATE UPDATED');
 
     try {
@@ -125,8 +127,8 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
 
   Future<void> updatePlayer({
     required PlayerModel player,
-    required int bank,
     required bool makeDealer,
+    int? bank,
   }) async {
     final currentLobby = activeLobby;
 
@@ -135,13 +137,23 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
       throw Exception('Cannot edit player list on this state');
     }
 
+    // Проверка на дубли
+    final samePlayer = currentLobby.players.firstWhereOrNull((p) =>
+        (p.name == player.name) &&
+        (p.assetUrl == player.assetUrl) &&
+        (p.uid != player.uid));
+    if (samePlayer != null) {
+      throw Exception('${player.name} ${_strings.toast_alred}');
+    }
+
     // Replace player entry in players list
     final newPlayers = currentLobby.players
         .map((p) => p.uid == player.uid ? player : p)
         .toList();
 
-    final newBanks = Map<String, int>.from(currentLobby.banks)
-      ..[player.uid] = bank;
+    final newBanks = (bank != null)
+        ? (Map<String, int>.from(currentLobby.banks)..[player.uid] = bank)
+        : currentLobby.banks;
 
     String? newDealerId = currentLobby.dealerId;
     if (makeDealer) {
@@ -149,6 +161,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     } else if (newDealerId == player.uid) {
       // Make first player the dealer
       newDealerId = newPlayers.first.uid;
+      _toastManager.showToast('Dealer changed to ${newPlayers.first.name}');
     }
 
     final newLobby = currentLobby.copyWith(
@@ -161,17 +174,17 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     await updateLobby(newLobby);
   }
 
-  Future<void> removePlayer({required String playerUid}) async {
+  Future<void> removePlayer(String playerUid) async {
     final currentLobby = activeLobby;
-
-    // Проверка на существование
-    if (!currentLobby.players.any((p) => p.uid == playerUid)) {
-      return;
-    }
 
     // Проверка на статус лобби
     if (!currentLobby.gameState.canEditPlayers) {
       throw Exception('Cannot edit player list on this state');
+    }
+
+    // Проверка на существование
+    if (!currentLobby.players.any((p) => p.uid == playerUid)) {
+      throw Exception('Player $playerUid not found');
     }
 
     final newPlayers =
@@ -233,7 +246,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
 
     return GameSettingsModelArgs(
       startingStack: lobby.defaultBank,
-      canEditStack: lobby.gameState.isNotStarted,
+      canEditStack: lobby.gameState.canEditPlayers,
       smallBlind: lobby.smallBlindValue,
     );
   }

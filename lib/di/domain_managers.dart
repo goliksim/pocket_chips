@@ -43,7 +43,6 @@ final routeInformationParserProvider = Provider<AppRouteInformationParser>(
   (_) => AppRouteInformationParser(),
 );
 
-//TODO разобраться с listen
 final localeManagerProvider = NotifierProvider<LocaleManager, Locale>(
   LocaleManager.new,
 );

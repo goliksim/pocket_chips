@@ -22,6 +22,10 @@ class ControlButtons extends StatelessWidget {
 
   //Текст первой кнопки
   String _firstButtonTitle(AppLocalizations strings) {
+    if (state.raiseState.raiseIsAllIn) {
+      return strings.game_all;
+    }
+
     return state.raiseState.isFirstBet ? strings.game_bet : strings.game_raise;
 
     /*if (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank <=
@@ -38,7 +42,13 @@ class ControlButtons extends StatelessWidget {
   }
 
   // Реализация кнопки Raise
-  void _raiseAction() => openRaiseField();
+  void _raiseAction() {
+    if (state.raiseState.raiseIsAllIn) {
+      controlAction(GameControlResult.allIn());
+    }
+
+    openRaiseField();
+  }
 
   //Текст средней кнопки
   String _middleButtonTitle(AppLocalizations strings) {
