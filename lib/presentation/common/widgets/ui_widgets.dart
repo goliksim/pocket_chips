@@ -20,91 +20,89 @@ class ConfirmationWindow extends StatelessWidget {
   final Function action;
 
   @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      elevation: 0,
-      backgroundColor: thisTheme.bgrColor,
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: adaptiveOffset,
-      ), //windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width)),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
-      ),
-      child: Container(
-        padding: EdgeInsets.all(
-          stdHorizontalOffset,
+  Widget build(BuildContext context) => Dialog(
+        elevation: 0,
+        backgroundColor: context.theme.bgrColor,
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: adaptiveOffset,
+        ), //windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
         ),
-        width: stdButtonWidth,
-        height: stdDialogHeight / 1.3,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              alignment: Alignment.center,
-              height: stdButtonHeight * 0.5,
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: thisTheme.onBackground,
-                  fontSize: stdFontSize,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            Center(
-              child: FittedBox(
-                fit: BoxFit.fitHeight,
+        child: Container(
+          padding: EdgeInsets.all(
+            stdHorizontalOffset,
+          ),
+          width: stdButtonWidth,
+          height: stdDialogHeight / 1.3,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Container(
+                alignment: Alignment.center,
+                height: stdButtonHeight * 0.5,
                 child: Text(
-                  message,
-                  textAlign: TextAlign.center,
+                  title,
                   style: TextStyle(
-                    color: thisTheme.onBackground,
+                    color: context.theme.onBackground,
                     fontSize: stdFontSize,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Expanded(
-                  child: MyButton(
-                    height: stdButtonHeight * 0.75,
-                    width: double.infinity,
-                    buttonColor: thisTheme.bgrColor,
-                    textString: actionTitle,
-                    textStyle: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      color: thisTheme.subsubmainColor,
+              Center(
+                child: FittedBox(
+                  fit: BoxFit.fitHeight,
+                  child: Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: context.theme.onBackground,
                       fontSize: stdFontSize,
                     ),
-                    action: () async {
-                      Navigator.of(context).pop(true);
-                      action();
-                    },
                   ),
                 ),
-                Expanded(
-                  child: MyButton(
-                    height: stdButtonHeight * 0.75,
-                    width: double.infinity,
-                    buttonColor: thisTheme.bgrColor,
-                    textString: context.strings.conf_canc,
-                    textStyle: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      color: thisTheme.primaryColor,
-                      fontSize: stdFontSize,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Expanded(
+                    child: MyButton(
+                      height: stdButtonHeight * 0.75,
+                      width: double.infinity,
+                      buttonColor: context.theme.bgrColor,
+                      textString: actionTitle,
+                      textStyle: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        color: context.theme.subsubmainColor,
+                        fontSize: stdFontSize,
+                      ),
+                      action: () async {
+                        Navigator.of(context).pop(true);
+                        action();
+                      },
                     ),
-                    action: () => Navigator.of(context).pop(false),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  Expanded(
+                    child: MyButton(
+                      height: stdButtonHeight * 0.75,
+                      width: double.infinity,
+                      buttonColor: context.theme.bgrColor,
+                      textString: context.strings.conf_canc,
+                      textStyle: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        color: context.theme.primaryColor,
+                        fontSize: stdFontSize,
+                      ),
+                      action: () => Navigator.of(context).pop(false),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 }
 
 //Класс Большинства кнопочек
@@ -146,43 +144,41 @@ class MyButton extends StatelessWidget {
   final BorderSide? side;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: (height != null) ? height : stdButtonHeight,
-      alignment: alignment,
-      width: (width != null) ? width : stdButtonWidth,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          side: side,
-          elevation: stdElevation,
-          shape: RoundedRectangleBorder(
-            borderRadius: (borderRadius != null)
-                ? borderRadius!
-                : BorderRadius.circular(stdBorderRadius),
+  Widget build(BuildContext context) => Container(
+        height: (height != null) ? height : stdButtonHeight,
+        alignment: alignment,
+        width: (width != null) ? width : stdButtonWidth,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            side: side,
+            elevation: stdElevation,
+            shape: RoundedRectangleBorder(
+              borderRadius: (borderRadius != null)
+                  ? borderRadius!
+                  : BorderRadius.circular(stdBorderRadius),
+            ),
+            padding: padding,
+            foregroundColor: context.theme.bgrColor,
+            backgroundColor: buttonColor,
+            //textStyle: (textStyle!=null)?textStyle:TextStyle(color: context.theme.onPrimary, fontFamily: 'Ubuntu' ,fontSize: stdFontSize, fontWeight: FontWeight.w500),
           ),
-          padding: padding,
-          foregroundColor: thisTheme.bgrColor,
-          backgroundColor: buttonColor,
-          //textStyle: (textStyle!=null)?textStyle:TextStyle(color: thisTheme.onPrimary, fontFamily: 'Ubuntu' ,fontSize: stdFontSize, fontWeight: FontWeight.w500),
+          onPressed: () => action?.call(),
+          onLongPress: longAction == null ? null : () => longAction?.call(),
+          child: (textString != null)
+              ? Text(
+                  textString!,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: (textStyle != null)
+                      ? textStyle
+                      : context.theme.stdTextStyle.copyWith(
+                          fontSize: stdFontSize,
+                        ),
+                )
+              : child,
         ),
-        child: (textString != null)
-            ? Text(
-                textString!,
-                textAlign: TextAlign.center,
-                style: (textStyle != null)
-                    ? textStyle
-                    : stdTextStyle.copyWith(fontSize: stdFontSize),
-              )
-            : child,
-        onPressed: () {
-          if (action != null) action!();
-        },
-        onLongPress: () {
-          if (longAction != null) longAction!();
-        },
-      ),
-    );
-  }
+      );
 }
 
 //Фон с патерном
@@ -198,35 +194,30 @@ class PatternContainer extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: padding,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: thisTheme.bgrColor,
-        image: DecorationImage(
-          filterQuality: FilterQuality.high,
-          opacity: 0.3 * opacity,
-          //colorFilter: ColorFilter.mode(thisTheme.primaryColor, BlendMode.srcATop),
-          image: AssetsProvider.backgroundPattern,
-          fit: BoxFit.cover,
+  Widget build(BuildContext context) => Container(
+        padding: padding,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: context.theme.bgrColor,
+          image: DecorationImage(
+            filterQuality: FilterQuality.high,
+            opacity: 0.3 * opacity,
+            //colorFilter: ColorFilter.mode(context.theme.primaryColor, BlendMode.srcATop),
+            image: AssetsProvider.backgroundPattern,
+            fit: BoxFit.cover,
+          ),
         ),
-      ),
-      child: child,
-    );
-  }
+        child: child,
+      );
 }
 
-Widget proxyDecorator(Widget child, int index, Animation<double> animation) {
-  return AnimatedBuilder(
-    animation: animation,
-    builder: (BuildContext context, Widget? child) {
-      return Material(
+Widget proxyDecorator(Widget child, int index, Animation<double> animation) =>
+    AnimatedBuilder(
+      animation: animation,
+      builder: (BuildContext context, Widget? child) => Material(
         elevation: 0,
         color: Colors.transparent,
         child: child,
-      );
-    },
-    child: child,
-  );
-}
+      ),
+      child: child,
+    );

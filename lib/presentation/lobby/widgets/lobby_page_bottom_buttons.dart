@@ -19,34 +19,32 @@ class LobbyPageBottomButtons extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: canEditSettings
-          ? stdButtonHeight * 2 + stdHorizontalOffset
-          : stdButtonHeight,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          MyButton(
-            height: stdButtonHeight,
-            buttonColor: thisTheme.primaryColor,
-            action: () => onStartGame(),
-            textString: isGameActive
-                ? context.strings.home_cont
-                : context.strings.playp_start,
-          ),
-          // Settings
-          if (canEditSettings)
+  Widget build(BuildContext context) => SizedBox(
+        height: canEditSettings
+            ? stdButtonHeight * 2 + stdHorizontalOffset
+            : stdButtonHeight,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
             MyButton(
               height: stdButtonHeight,
-              buttonColor: thisTheme.secondaryColor,
-              action: () => openSettingsTap(),
-              textString: context.strings.playp_set,
+              buttonColor: context.theme.primaryColor,
+              action: () => onStartGame(),
+              textString: isGameActive
+                  ? context.strings.home_cont
+                  : context.strings.playp_start,
             ),
-        ],
-      ),
-    );
-  }
+            // Settings
+            if (canEditSettings)
+              MyButton(
+                height: stdButtonHeight,
+                buttonColor: context.theme.secondaryColor,
+                action: () => openSettingsTap(),
+                textString: context.strings.playp_set,
+              ),
+          ],
+        ),
+      );
 }

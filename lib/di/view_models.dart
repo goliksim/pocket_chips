@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/models/lobby/lobby_state_model.dart';
+import '../presentation/game/view_model/game_page_table_offset_controller.dart';
 import '../presentation/game/view_model/game_page_view_model.dart';
 import '../presentation/game/view_state/game_page_view_state.dart';
 import '../presentation/game/widgets/winner_page/view_state/winner_choice_args.dart';
@@ -10,6 +11,7 @@ import '../presentation/init/init_page_view_model.dart';
 import '../presentation/lobby/lobby_bank_editor/bank_editor_view_model.dart';
 import '../presentation/lobby/player_editor/view_model/player_editor_view_model.dart';
 import '../presentation/lobby/player_list/view_model/saved_player_list_view_model.dart';
+import '../presentation/lobby/player_list/view_state/lobby_player_item.dart';
 import '../presentation/lobby/view_model/lobby_page_view_model.dart';
 import '../presentation/lobby/view_model/lobby_scroll_controller.dart';
 import '../presentation/lobby/view_state/lobby_page_state.dart';
@@ -47,10 +49,6 @@ final lobbyScrollControllerProvider =
     // Создаем контроллер
     final controller = LobbyScrollController();
 
-    controller.scrollController.addListener(() {
-      //final c = ref.read(lobbyScrollControllerProvider);
-    });
-
     // Указываем, что его не нужно уничтожать, пока есть активные подписчики
     ref.keepAlive();
     // Уничтожаем контроллер, когда провайдер будет уничтожен
@@ -61,26 +59,16 @@ final lobbyScrollControllerProvider =
   },
 );
 
-//TODO: подумать над подпиской
-final savedPlayerListViewModelProvider =
-    Provider.autoDispose<SavedPlayerListViewModel>(
-  (ref) => SavedPlayerListViewModel(
-    modelHolder: ref.watch(savedPlayersModelHolderProvider.notifier),
-    addListener: (listener) => ref.listen(
-      savedPlayersModelHolderProvider,
-      (_, __) => listener(),
-    ),
-    lobbyStateHolder: ref.read(lobbyStateHolderProvider.notifier),
-    navigationManager: ref.read(navigationManagerProvider),
-    toastManager: ref.read(toastManagerProvider),
-    strings: ref.read(stringsProvider),
-  ),
+final savedPlayerListViewModelProvider = AsyncNotifierProvider.autoDispose<
+    SavedPlayerListViewModel, List<LobbyPlayerItem>>(
+  SavedPlayerListViewModel.new,
 );
 
 final playerEditorViewModelProvider =
     Provider.autoDispose.family<PlayerEditorViewModel, String?>(
   (ref, uid) => PlayerEditorViewModel(
     lobbyStateHolder: ref.read(lobbyStateHolderProvider.notifier),
+    savedPlayersModelHolder: ref.read(savedPlayersModelHolderProvider.notifier),
     navigationManager: ref.read(navigationManagerProvider),
     toastManager: ref.read(toastManagerProvider),
     strings: ref.read(stringsProvider),
@@ -107,6 +95,11 @@ final gamePageViewModelProvider =
     AsyncNotifierProvider.autoDispose<GamePageViewModel, GamePageViewState>(
   GamePageViewModel.new,
   retry: (retryCount, error) => null,
+);
+
+final gameTableOffsetControllerProvider =
+    NotifierProvider<GameTableOffsetController, int>(
+  GameTableOffsetController.new,
 );
 
 final lobbySettingsViewModelProvider =

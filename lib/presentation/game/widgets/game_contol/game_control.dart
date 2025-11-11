@@ -51,13 +51,14 @@ class _GameControlState extends State<GameControl> {
         child: Builder(
           builder: (context) => Column(
             children: [
-              SizedBox(
-                height: stdButtonHeight * 1.6,
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 150),
-                  transitionBuilder:
-                      (Widget child, Animation<double> animation) {
-                    return FadeTransition(
+              state.maybeMap(
+                active: (activeState) => SizedBox(
+                  height: stdButtonHeight * 1.6,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 150),
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) =>
+                            FadeTransition(
                       opacity: animation,
                       child: SlideTransition(
                         position: Tween<Offset>(
@@ -71,19 +72,25 @@ class _GameControlState extends State<GameControl> {
                         ),
                         child: child,
                       ),
-                    );
-                  },
-                  child: SizedBox(
-                    height:
-                        2 * stdButtonHeight * 0.75 + stdHorizontalOffset / 2,
-                    key: ValueKey(raiseButtonPressed),
-                    child: raiseButtonPressed
-                        ? RaiseFieldWidget(
-                            state: (state as GamePageActiveControlState)
-                                .raiseState,
-                          )
-                        : null,
+                    ),
+                    child: SizedBox(
+                      height:
+                          2 * stdButtonHeight * 0.75 + stdHorizontalOffset / 2,
+                      key: ValueKey(raiseButtonPressed),
+                      child: raiseButtonPressed
+                          ? RaiseFieldWidget(
+                              maxPossibleBet:
+                                  activeState.raiseState.maxPossibleBet,
+                              minPossibleBet:
+                                  activeState.raiseState.minPossibleBet,
+                            )
+                          : null,
+                    ),
                   ),
+                ),
+                orElse: () => SizedBox(
+                  height: stdButtonHeight * 1.6,
+                  child: null,
                 ),
               ),
               SizedBox(height: stdHorizontalOffset),

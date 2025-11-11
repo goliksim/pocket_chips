@@ -8,8 +8,6 @@ part 'game_table_state.freezed.dart';
 abstract class GameTableState with _$GameTableState {
   const factory GameTableState({
     required List<GamePlayerItem> players,
-    required int tableRotationOffset,
     required int smallBlindValue,
-    List<double>? tablePlayersOffsets,
   }) = _GameTableState;
 }

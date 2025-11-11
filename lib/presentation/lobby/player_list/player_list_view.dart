@@ -2,6 +2,7 @@
 // В дальнейшем думал сделать перемещение игроков местами но пока не получилось.
 import 'package:flutter/material.dart';
 
+import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 import '../../common/widgets/ui_widgets.dart';
 import 'view_state/lobby_player_item.dart';
@@ -31,42 +32,40 @@ class PlayerList extends StatelessWidget {
   final ValueNotifier<int> reorderableIndex = ValueNotifier(-1);
 
   @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(stdBorderRadius),
-      child: SizedBox(
-        height: players.length * (stdButtonHeight + stdHorizontalOffset),
-        child: ReorderableListView.builder(
-          buildDefaultDragHandles: canReorder,
-          scrollController: scrollController,
-          proxyDecorator: proxyDecorator,
-          onReorderStart: (index) {
-            if (canReorder) {
-              reorderableIndex.value = index;
-            }
-          },
-          onReorderEnd: (index) {
-            if (canReorder) {
-              reorderableIndex.value = -1;
-            }
-          },
-          onReorder: onReorder,
-          physics: const BouncingScrollPhysics(),
-          itemCount: players.length,
-          itemBuilder: (context, index) {
-            final player = players[index];
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(stdBorderRadius),
+        child: SizedBox(
+          height: players.length * (stdButtonHeight + stdHorizontalOffset),
+          child: ReorderableListView.builder(
+            buildDefaultDragHandles: canReorder,
+            scrollController: scrollController,
+            proxyDecorator: proxyDecorator,
+            onReorderStart: (index) {
+              if (canReorder) {
+                reorderableIndex.value = index;
+              }
+            },
+            onReorderEnd: (index) {
+              if (canReorder) {
+                reorderableIndex.value = -1;
+              }
+            },
+            onReorder: onReorder,
+            physics: const BouncingScrollPhysics(),
+            itemCount: players.length,
+            itemBuilder: (context, index) {
+              final player = players[index];
 
-            return Padding(
-              key: ValueKey(player.uid),
-              padding: EdgeInsets.symmetric(vertical: stdHorizontalOffset / 2),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(stdBorderRadius),
-                child: ValueListenableBuilder<int>(
-                  valueListenable: reorderableIndex,
-                  builder: (BuildContext context, int value, Widget? child) {
-                    // This builder will only get called when the _counter
-                    // is updated.
-                    return _ReorderableWrapper(
+              return Padding(
+                key: ValueKey(player.uid),
+                padding:
+                    EdgeInsets.symmetric(vertical: stdHorizontalOffset / 2),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(stdBorderRadius),
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: reorderableIndex,
+                    builder: (BuildContext context, int value, Widget? child) =>
+                        _ReorderableWrapper(
                       isOrdering: index == value,
                       child: PlayerCard(
                         canReorderOrDismiss: canReorder,
@@ -79,16 +78,14 @@ class PlayerList extends StatelessWidget {
                             Future.value(false),
                         onTap: () => onItemTap?.call(player.uid),
                       ),
-                    );
-                  },
+                    ),
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
-      ),
-    );
-  }
+      );
 }
 
 class _ReorderableWrapper extends StatelessWidget {
@@ -101,18 +98,16 @@ class _ReorderableWrapper extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return isOrdering
-        ? Card(
-            margin: EdgeInsets.zero,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(stdBorderRadius),
-              side: BorderSide(
-                color: thisTheme.primaryColor,
-              ),
+  Widget build(BuildContext context) => isOrdering
+      ? Card(
+          margin: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(stdBorderRadius),
+            side: BorderSide(
+              color: context.theme.primaryColor,
             ),
-            child: child,
-          )
-        : child;
-  }
+          ),
+          child: child,
+        )
+      : child;
 }

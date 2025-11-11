@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -40,7 +38,7 @@ class UpdateDialog extends StatelessWidget {
                 '- ${context.strings.update_1}\n',
                 style: TextStyle(
                   height: 1.5,
-                  color: thisTheme.onBackground,
+                  color: context.theme.onBackground,
                   fontWeight: FontWeight.w500,
                   fontSize: stdFontSize * 0.7,
                 ),
@@ -56,7 +54,7 @@ class UpdateDialog extends StatelessWidget {
                       '- ${context.strings.update_2}',
                       style: TextStyle(
                         height: 1.5,
-                        color: thisTheme.primaryColor,
+                        color: context.theme.primaryColor,
                         fontWeight: FontWeight.w500,
                         fontSize: stdFontSize * 0.7,
                       ),
@@ -69,22 +67,22 @@ class UpdateDialog extends StatelessWidget {
                         children: [
                           Icon(
                             MdiIcons.cardsPlayingDiamondMultiple,
-                            color: thisTheme.onBackground.withOpacity(1),
+                            color: context.theme.onBackground,
                             size: stdIconSize * 0.75,
                           ),
                           Icon(
                             MdiIcons.cardsPlayingClubMultiple,
-                            color: thisTheme.onBackground.withOpacity(1),
+                            color: context.theme.onBackground,
                             size: stdIconSize * 0.75,
                           ),
                           Icon(
                             MdiIcons.arrowRight,
-                            color: thisTheme.onBackground.withOpacity(1),
+                            color: context.theme.onBackground,
                             size: stdIconSize * 0.75,
                           ),
                           Icon(
                             MdiIcons.crown,
-                            color: thisTheme.onBackground.withOpacity(1),
+                            color: context.theme.onBackground,
                             size: stdIconSize * 0.75,
                           ),
                         ],
@@ -97,7 +95,7 @@ class UpdateDialog extends StatelessWidget {
                 '${context.strings.update_3}:\n',
                 style: TextStyle(
                   height: 1.5,
-                  color: thisTheme.onBackground,
+                  color: context.theme.onBackground,
                   fontWeight: FontWeight.w500,
                   fontSize: stdFontSize * 0.65,
                 ),
@@ -109,7 +107,7 @@ class UpdateDialog extends StatelessWidget {
                   '${context.strings.update_4}\n${context.strings.update_5}',
                   style: TextStyle(
                     height: 1.5,
-                    color: thisTheme.onBackground,
+                    color: context.theme.onBackground,
                     fontWeight: FontWeight.w500,
                     fontSize: stdFontSize * 0.65,
                   ),
@@ -122,7 +120,7 @@ class UpdateDialog extends StatelessWidget {
                   '\n- ${context.strings.update_6}',
                   style: TextStyle(
                     height: 1.5,
-                    color: thisTheme.onBackground,
+                    color: context.theme.onBackground,
                     fontWeight: FontWeight.w500,
                     fontSize: stdFontSize * 0.65,
                   ),
@@ -135,7 +133,7 @@ class UpdateDialog extends StatelessWidget {
                   '\n- ${context.strings.update_7}',
                   style: TextStyle(
                     height: 1.5,
-                    color: thisTheme.onBackground,
+                    color: context.theme.onBackground,
                     fontWeight: FontWeight.w500,
                     fontSize: stdFontSize * 0.65,
                   ),

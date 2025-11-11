@@ -53,10 +53,21 @@ class LobbyPageViewModel extends AsyncNotifier<LobbyPageState> {
 
   void openSavedPlayersList() => _navigationManager.showSavedPlayers();
 
-  void openNewPlayerEditor() => _navigationManager.showPlayerEditor(null);
+  void openNewPlayerEditor() {
+    if (state.requireValue.canEditPlayers) {
+      _navigationManager.showPlayerEditor(null);
+    } else {
+      _toastManager.showToast('Cannot edit player list on this state');
+    }
+  }
 
-  void openPlayerEditor(String playerUid) =>
+  void openPlayerEditor(String playerUid) {
+    if (state.requireValue.canEditPlayers) {
       _navigationManager.showPlayerEditor(playerUid);
+    } else {
+      _toastManager.showToast('Cannot edit player list on this state');
+    }
+  }
 
   void pop() => _navigationManager.popPage();
 
@@ -86,17 +97,10 @@ class LobbyPageViewModel extends AsyncNotifier<LobbyPageState> {
       title: _strings.conf_del_tittle,
       actionTitle: _strings.conf_del_butt,
       message: _strings.conf_del_text,
-      action: () => _removePlayer(playerUid),
+      action: () {},
     );
 
     return (result ?? false) ? _removePlayer(playerUid) : Future.value(false);
-  }
-
-  Future<void> onPlayerTap(String playerUid) =>
-      _navigationManager.showPlayerEditor(playerUid);
-
-  Future<void> addButtonPressed() async {
-    _navigationManager.showPlayerEditor(null);
   }
 
   Future<void> onReorderPlayer(int oldIndex, int newIndex) =>

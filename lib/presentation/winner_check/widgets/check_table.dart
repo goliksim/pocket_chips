@@ -35,80 +35,78 @@ class _CheckTableState extends State<CheckTable> with ToastsMixin {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(width: 2.0, color: thisTheme.bankColor),
-        borderRadius: BorderRadius.all(
-          Radius.circular(
-            stdBorderRadius,
-          ), //                 <--- border radius here
+  Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(
+          border: Border.all(width: 2.0, color: context.theme.bankColor),
+          borderRadius: BorderRadius.all(
+            Radius.circular(
+              stdBorderRadius,
+            ), //                 <--- border radius here
+          ),
         ),
-      ),
-      height: 300.h,
-      child: Column(
-        children: [
-          SizedBox(
-            height: stdButtonHeight * 0.5,
-            child: Center(
-              child: FittedBox(
-                child: Text(
-                  context.strings.check_table,
-                  style: TextStyle(
-                    color: thisTheme.onBackground,
-                    fontSize: stdFontSize,
+        height: 300.h,
+        child: Column(
+          children: [
+            SizedBox(
+              height: stdButtonHeight * 0.5,
+              child: Center(
+                child: FittedBox(
+                  child: Text(
+                    context.strings.check_table,
+                    style: TextStyle(
+                      color: context.theme.onBackground,
+                      fontSize: stdFontSize,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          Flexible(
-            child: RotationCard(
-              count: 3,
-              conditionByIndex: (int index) =>
-                  context.tableCards![index] != null,
-              durationByIndex: (int index) => 500,
-              firstSide: (int index) => CardButton(
-                action: (card) {
-                  updateTable(index, card);
-                },
-                child: CardFront(card: context.tableCards![index]),
+            Flexible(
+              child: RotationCard(
+                count: 3,
+                conditionByIndex: (int index) =>
+                    context.tableCards![index] != null,
+                durationByIndex: (int index) => 500,
+                firstSide: (int index) => CardButton(
+                  action: (card) {
+                    updateTable(index, card);
+                  },
+                  child: CardFront(card: context.tableCards![index]),
+                ),
+                secondSide: (int index) => CardButton(
+                  action: (card) {
+                    updateTable(index, card);
+                  },
+                  child: CardBack(),
+                ),
+                padding: EdgeInsets.all(stdHorizontalOffset / 2),
               ),
-              secondSide: (int index) => CardButton(
-                action: (card) {
-                  updateTable(index, card);
-                },
-                child: CardBack(),
-              ),
-              padding: EdgeInsets.all(stdHorizontalOffset / 2),
             ),
-          ),
-          Flexible(
-            child: RotationCard(
-              count: 2,
-              conditionByIndex: (int index) =>
-                  context.tableCards![index + 3] != null,
-              durationByIndex: (int index) => 500,
-              firstSide: (int index) => CardButton(
-                action: (card) {
-                  updateTable(index + 3, card);
-                },
-                child: CardFront(card: context.tableCards![index + 3]),
+            Flexible(
+              child: RotationCard(
+                count: 2,
+                conditionByIndex: (int index) =>
+                    context.tableCards![index + 3] != null,
+                durationByIndex: (int index) => 500,
+                firstSide: (int index) => CardButton(
+                  action: (card) {
+                    updateTable(index + 3, card);
+                  },
+                  child: CardFront(card: context.tableCards![index + 3]),
+                ),
+                secondSide: (int index) => CardButton(
+                  action: (card) {
+                    updateTable(index + 3, card);
+                  },
+                  child: CardBack(),
+                ),
+                padding: EdgeInsets.all(stdHorizontalOffset / 2),
               ),
-              secondSide: (int index) => CardButton(
-                action: (card) {
-                  updateTable(index + 3, card);
-                },
-                child: CardBack(),
-              ),
-              padding: EdgeInsets.all(stdHorizontalOffset / 2),
             ),
-          ),
-          SizedBox(
-            height: stdButtonHeight * 0.25,
-          ),
-        ],
-      ),
-    );
-  }
+            SizedBox(
+              height: stdButtonHeight * 0.25,
+            ),
+          ],
+        ),
+      );
 }

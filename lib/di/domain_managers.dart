@@ -9,6 +9,7 @@ import '../l10n/app_localizations.dart';
 import '../l10n/localization.dart';
 import '../services/initialization_manager.dart';
 import '../services/toast_manager.dart';
+import '../utils/theme/theme_manager.dart';
 import 'model_holders.dart';
 
 final initializationManagerProvider = Provider<InitializationManager>(
@@ -57,4 +58,8 @@ final stringsProvider = Provider<AppLocalizations>(
 
 final toastManagerProvider = Provider(
   (ref) => ToastManager(),
+);
+
+final themeManagerProvider = NotifierProvider<ThemeManager, ThemeMode>(
+  ThemeManager.new,
 );

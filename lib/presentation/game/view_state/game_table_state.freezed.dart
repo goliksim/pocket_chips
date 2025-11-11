@@ -15,9 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GameTableState {
   List<GamePlayerItem> get players;
-  int get tableRotationOffset;
   int get smallBlindValue;
-  List<double>? get tablePlayersOffsets;
 
   /// Create a copy of GameTableState
   /// with the given fields replaced by the non-null parameter values.
@@ -33,25 +31,17 @@ mixin _$GameTableState {
         (other.runtimeType == runtimeType &&
             other is GameTableState &&
             const DeepCollectionEquality().equals(other.players, players) &&
-            (identical(other.tableRotationOffset, tableRotationOffset) ||
-                other.tableRotationOffset == tableRotationOffset) &&
             (identical(other.smallBlindValue, smallBlindValue) ||
-                other.smallBlindValue == smallBlindValue) &&
-            const DeepCollectionEquality()
-                .equals(other.tablePlayersOffsets, tablePlayersOffsets));
+                other.smallBlindValue == smallBlindValue));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(players),
-      tableRotationOffset,
-      smallBlindValue,
-      const DeepCollectionEquality().hash(tablePlayersOffsets));
+  int get hashCode => Object.hash(runtimeType,
+      const DeepCollectionEquality().hash(players), smallBlindValue);
 
   @override
   String toString() {
-    return 'GameTableState(players: $players, tableRotationOffset: $tableRotationOffset, smallBlindValue: $smallBlindValue, tablePlayersOffsets: $tablePlayersOffsets)';
+    return 'GameTableState(players: $players, smallBlindValue: $smallBlindValue)';
   }
 }
 
@@ -61,11 +51,7 @@ abstract mixin class $GameTableStateCopyWith<$Res> {
           GameTableState value, $Res Function(GameTableState) _then) =
       _$GameTableStateCopyWithImpl;
   @useResult
-  $Res call(
-      {List<GamePlayerItem> players,
-      int tableRotationOffset,
-      int smallBlindValue,
-      List<double>? tablePlayersOffsets});
+  $Res call({List<GamePlayerItem> players, int smallBlindValue});
 }
 
 /// @nodoc
@@ -82,27 +68,17 @@ class _$GameTableStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? players = null,
-    Object? tableRotationOffset = null,
     Object? smallBlindValue = null,
-    Object? tablePlayersOffsets = freezed,
   }) {
     return _then(_self.copyWith(
       players: null == players
           ? _self.players
           : players // ignore: cast_nullable_to_non_nullable
               as List<GamePlayerItem>,
-      tableRotationOffset: null == tableRotationOffset
-          ? _self.tableRotationOffset
-          : tableRotationOffset // ignore: cast_nullable_to_non_nullable
-              as int,
       smallBlindValue: null == smallBlindValue
           ? _self.smallBlindValue
           : smallBlindValue // ignore: cast_nullable_to_non_nullable
               as int,
-      tablePlayersOffsets: freezed == tablePlayersOffsets
-          ? _self.tablePlayersOffsets
-          : tablePlayersOffsets // ignore: cast_nullable_to_non_nullable
-              as List<double>?,
     ));
   }
 }
@@ -200,16 +176,14 @@ extension GameTableStatePatterns on GameTableState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(List<GamePlayerItem> players, int tableRotationOffset,
-            int smallBlindValue, List<double>? tablePlayersOffsets)?
+    TResult Function(List<GamePlayerItem> players, int smallBlindValue)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _GameTableState() when $default != null:
-        return $default(_that.players, _that.tableRotationOffset,
-            _that.smallBlindValue, _that.tablePlayersOffsets);
+        return $default(_that.players, _that.smallBlindValue);
       case _:
         return orElse();
     }
@@ -230,15 +204,13 @@ extension GameTableStatePatterns on GameTableState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(List<GamePlayerItem> players, int tableRotationOffset,
-            int smallBlindValue, List<double>? tablePlayersOffsets)
+    TResult Function(List<GamePlayerItem> players, int smallBlindValue)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _GameTableState():
-        return $default(_that.players, _that.tableRotationOffset,
-            _that.smallBlindValue, _that.tablePlayersOffsets);
+        return $default(_that.players, _that.smallBlindValue);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -258,15 +230,13 @@ extension GameTableStatePatterns on GameTableState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(List<GamePlayerItem> players, int tableRotationOffset,
-            int smallBlindValue, List<double>? tablePlayersOffsets)?
+    TResult? Function(List<GamePlayerItem> players, int smallBlindValue)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _GameTableState() when $default != null:
-        return $default(_that.players, _that.tableRotationOffset,
-            _that.smallBlindValue, _that.tablePlayersOffsets);
+        return $default(_that.players, _that.smallBlindValue);
       case _:
         return null;
     }
@@ -276,20 +246,12 @@ extension GameTableStatePatterns on GameTableState {
 /// @nodoc
 
 class _GameTableState implements GameTableState {
-  const _GameTableState(
-      {required this.players,
-      required this.tableRotationOffset,
-      required this.smallBlindValue,
-      this.tablePlayersOffsets});
+  const _GameTableState({required this.players, required this.smallBlindValue});
 
   @override
   final List<GamePlayerItem> players;
   @override
-  final int tableRotationOffset;
-  @override
   final int smallBlindValue;
-  @override
-  final List<double>? tablePlayersOffsets;
 
   /// Create a copy of GameTableState
   /// with the given fields replaced by the non-null parameter values.
@@ -305,25 +267,17 @@ class _GameTableState implements GameTableState {
         (other.runtimeType == runtimeType &&
             other is _GameTableState &&
             const DeepCollectionEquality().equals(other.players, players) &&
-            (identical(other.tableRotationOffset, tableRotationOffset) ||
-                other.tableRotationOffset == tableRotationOffset) &&
             (identical(other.smallBlindValue, smallBlindValue) ||
-                other.smallBlindValue == smallBlindValue) &&
-            const DeepCollectionEquality()
-                .equals(other.tablePlayersOffsets, tablePlayersOffsets));
+                other.smallBlindValue == smallBlindValue));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(players),
-      tableRotationOffset,
-      smallBlindValue,
-      const DeepCollectionEquality().hash(tablePlayersOffsets));
+  int get hashCode => Object.hash(runtimeType,
+      const DeepCollectionEquality().hash(players), smallBlindValue);
 
   @override
   String toString() {
-    return 'GameTableState(players: $players, tableRotationOffset: $tableRotationOffset, smallBlindValue: $smallBlindValue, tablePlayersOffsets: $tablePlayersOffsets)';
+    return 'GameTableState(players: $players, smallBlindValue: $smallBlindValue)';
   }
 }
 
@@ -335,11 +289,7 @@ abstract mixin class _$GameTableStateCopyWith<$Res>
       __$GameTableStateCopyWithImpl;
   @override
   @useResult
-  $Res call(
-      {List<GamePlayerItem> players,
-      int tableRotationOffset,
-      int smallBlindValue,
-      List<double>? tablePlayersOffsets});
+  $Res call({List<GamePlayerItem> players, int smallBlindValue});
 }
 
 /// @nodoc
@@ -356,27 +306,17 @@ class __$GameTableStateCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? players = null,
-    Object? tableRotationOffset = null,
     Object? smallBlindValue = null,
-    Object? tablePlayersOffsets = freezed,
   }) {
     return _then(_GameTableState(
       players: null == players
           ? _self.players
           : players // ignore: cast_nullable_to_non_nullable
               as List<GamePlayerItem>,
-      tableRotationOffset: null == tableRotationOffset
-          ? _self.tableRotationOffset
-          : tableRotationOffset // ignore: cast_nullable_to_non_nullable
-              as int,
       smallBlindValue: null == smallBlindValue
           ? _self.smallBlindValue
           : smallBlindValue // ignore: cast_nullable_to_non_nullable
               as int,
-      tablePlayersOffsets: freezed == tablePlayersOffsets
-          ? _self.tablePlayersOffsets
-          : tablePlayersOffsets // ignore: cast_nullable_to_non_nullable
-              as List<double>?,
     ));
   }
 }

@@ -27,8 +27,8 @@ extension GameStateModelX on GameStateModel {
       .where((p) => p.bid > 0)
       .toList();
 
-  int get currentPlayerIndex => lobbyState.players
-      .indexWhere((p) => p.uid == sessionState.currentPlayerUid);
+  PlayerModel? get currentPlayer =>
+      lobbyState.players.findByUid(sessionState.currentPlayerUid);
 
   bool isPlayerActiveWithMoney(PlayerId playerUid) =>
       isPlayerActive(playerUid) && ((lobbyState.banks[playerUid] ?? 0) > 0);

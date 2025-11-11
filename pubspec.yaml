@@ -3,7 +3,7 @@ description: Pocket poker chips for your phone. Play poker with only cards.
 
 publish_to: 'none' 
 
-version: 1.0.5+11
+version: 2.0.0+0
 
 environment:
   sdk: '>=3.0.3 <4.0.0'

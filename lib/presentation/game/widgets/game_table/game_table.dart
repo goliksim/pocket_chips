@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../domain/models/lobby/lobby_state_model.dart';
 import '../../../../services/assets_provider.dart';
-import '../../../../utils/theme/themes.dart';
+import '../../../../utils/extensions.dart';
 import '../../../../utils/theme/ui_values.dart';
 import '../../view_model/game_page_view_model.dart';
 import '../add_player_button.dart';
@@ -14,9 +14,11 @@ import 'player_field.dart';
 
 class GameTable extends StatelessWidget {
   final GamePageViewModel viewModel;
+  final int tableRotationOffset;
 
   const GameTable({
     required this.viewModel,
+    this.tableRotationOffset = 0,
     super.key,
   });
 
@@ -52,7 +54,7 @@ class GameTable extends StatelessWidget {
     int addButton,
   ) =>
       adaptiveOffset +
-      (tableButtonWidth) / 2.9 -
+      (tableButtonWidth) / 3.6 -
       (stdButtonHeight * 1.3 * _getSin(a, addButton, multiply: -1));
 
   double _getCos(int index, int totalAmount) {
@@ -103,19 +105,19 @@ class GameTable extends StatelessWidget {
             image: DecorationImage(
               filterQuality: FilterQuality.high,
               colorFilter: ColorFilter.mode(
-                thisTheme.primaryColor.withAlpha(
-                  thisTheme.name == 'light' ? 20 : 0,
+                context.theme.primaryColor.withAlpha(
+                  context.theme.name == 'light' ? 20 : 0,
                 ),
                 BlendMode.srcATop,
               ),
               fit: BoxFit.contain,
-              image: AssetsProvider.table(thisTheme.isDark),
+              image: AssetsProvider.table(context.theme.isDark),
             ),
           ),
         ),
         // 3 карты по середине
         Positioned(
-          bottom: tableHeight * 0.300,
+          bottom: tableHeight * 0.295,
           child: TableCards.firstRow(
             stateEnum: viewState.gameStatus,
           ),
@@ -127,12 +129,13 @@ class GameTable extends StatelessWidget {
             stateEnum: viewState.gameStatus,
           ),
         ),
+        // Блайнды
         Positioned(
           bottom: tableHeight * 0.155,
           child: Text(
-            '${tableState.smallBlindValue} / ${tableState.smallBlindValue * 2}',
+            '${tableState.smallBlindValue.toSeparated} / ${(tableState.smallBlindValue * 2).toSeparated}',
             style: TextStyle(
-              color: thisTheme.onBackground.withAlpha(75),
+              color: context.theme.onBackground.withAlpha(200),
               fontSize: stdFontSize * 0.6,
             ),
           ),
@@ -147,14 +150,14 @@ class GameTable extends StatelessWidget {
                 horizontal: stdHorizontalOffset / 2,
               ),
               decoration: BoxDecoration(
-                color: thisTheme.primaryColor,
+                color: context.theme.primaryColor,
                 borderRadius: BorderRadius.circular(
                   stdBorderRadius,
                 ),
               ),
               child: Center(
                 child: Text(
-                  '\$ $totalBets',
+                  totalBets.toSeparatedBank,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: stdFontSize * 0.75,
@@ -164,17 +167,14 @@ class GameTable extends StatelessWidget {
             ),
           ),
         ),
-        // Карточки игроков
-        for (int index = 0; index < totalElementCount; index++)
 
-          // Ставки игроков
-          ...List.generate(totalElementCount, (index) => index)
-              .expand((int playerIndex) {
+        ...List.generate(totalElementCount, (index) => index).expand(
+          (int index) {
             final player = players[
-                (index - playersOffset - tableState.tableRotationOffset) %
-                    players.length];
+                (index - playersOffset - tableRotationOffset) % players.length];
 
             return [
+              // Карточки игроков
               Positioned(
                 bottom: _playerBottomOffset(
                   index,
@@ -204,17 +204,22 @@ class GameTable extends StatelessWidget {
                             0,
                       ),
               ),
+              // Ставки игроков
               if ((player.bet != 0) && (!showAddButton || index != 0))
                 Positioned(
                   bottom: _chipBottomOffset(index, totalElementCount),
                   left: _chipsLeftOffset(
-                      tableButtonWidth, index, totalElementCount),
+                    tableButtonWidth,
+                    index,
+                    totalElementCount,
+                  ),
                   child: _BetWidget(
                     bet: player.bet,
                   ),
                 ),
             ];
-          })
+          },
+        )
       ],
     );
   }
@@ -228,27 +233,27 @@ class _BetWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return FittedBox(
-      child: Container(
-        width: stdHeight * 2,
-        alignment: Alignment.center,
+  Widget build(BuildContext context) => FittedBox(
         child: Container(
-          height: stdHeight / 2.5,
-          padding: const EdgeInsets.symmetric(horizontal: 5),
-          decoration: BoxDecoration(
-            color: thisTheme.playerColor,
-            borderRadius: BorderRadius.circular(stdBorderRadius),
-          ),
-          child: Text(
-            '\$ $bet',
-            style: TextStyle(
-              color: thisTheme.onBackground.withAlpha(150),
-              fontSize: stdFontSize * 0.75,
+          width: stdHeight * 3,
+          alignment: Alignment.center,
+          child: Container(
+            height: stdHeight / 2.5,
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            decoration: BoxDecoration(
+              color: context.theme.playerColor,
+              borderRadius: BorderRadius.circular(stdBorderRadius),
+            ),
+            child: Text(
+              bet.toSeparatedBank,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: context.theme.onBackground.withAlpha(200),
+                fontSize: stdFontSize * 0.75,
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }

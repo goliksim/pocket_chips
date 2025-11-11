@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'package:flutter/material.dart';
 
 import '../../domain/models/game_settings_model.dart';
@@ -120,81 +118,136 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      elevation: 0,
-      backgroundColor: thisTheme.bgrColor,
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: adaptiveOffset,
-      ), //windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width)),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(20.0)),
-      ),
-      child: AnimatedContainer(
-        width: stdButtonWidth,
-        padding: EdgeInsets.all(
-          stdHorizontalOffset,
+  Widget build(BuildContext context) => Dialog(
+        elevation: 0,
+        backgroundColor: context.theme.bgrColor,
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: adaptiveOffset,
+        ), //windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width)),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20.0)),
         ),
-        duration: Duration(
-            milliseconds:
-                200), //Duration(milliseconds: (autoBool || anteBool) ? 100 : 200),
-        height: stdDialogHeight * 1.5,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Tittle
-            SizedBox(
-              height: stdButtonHeight * 0.5,
-              child: Center(
-                child: FittedBox(
-                  child: Text(
-                    context.strings.sett_title,
-                    style: TextStyle(
-                      color: thisTheme.onBackground,
-                      fontSize: stdFontSize,
-                      fontWeight: FontWeight.bold,
+        child: AnimatedContainer(
+          width: stdButtonWidth,
+          padding: EdgeInsets.all(
+            stdHorizontalOffset,
+          ),
+          duration: Duration(
+              milliseconds:
+                  200), //Duration(milliseconds: (autoBool || anteBool) ? 100 : 200),
+          height: stdDialogHeight * 1.5,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Tittle
+              SizedBox(
+                height: stdButtonHeight * 0.5,
+                child: Center(
+                  child: FittedBox(
+                    child: Text(
+                      context.strings.sett_title,
+                      style: TextStyle(
+                        color: context.theme.onBackground,
+                        fontSize: stdFontSize,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
 
-            // Bank
-            if (state.canEditStack)
+              // Bank
+              if (state.canEditStack)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: stdHorizontalOffset,
+                  ),
+                  height: stdHeight * 0.8,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        context.strings.sett_win1,
+                        overflow: TextOverflow.fade,
+                        softWrap: false,
+                        style: TextStyle(
+                          color: context.theme.onBackground,
+                          fontSize: stdFontSize,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                      SizedBox(width: stdHorizontalOffset),
+                      Expanded(
+                        child: Container(
+                          //width: stdButtonHeight,
+                          height: stdButtonHeight / 2,
+                          alignment: Alignment.centerRight,
+                          child: Form(
+                            key: _formKey,
+                            child: TextFormField(
+                              focusNode: focusNode1,
+                              controller: _bankController,
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                color: context.theme.onBackground,
+                                fontSize: stdFontSize,
+                              ),
+                              maxLength: 8,
+                              textAlignVertical: TextAlignVertical.bottom,
+                              decoration: InputDecoration(
+                                hintStyle: TextStyle(
+                                  fontSize: stdFontSize,
+                                  color: context.theme.hintColor,
+                                ),
+                                hintText: '${state.startingStack}',
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                counterText: '',
+                              ),
+                              onChanged: _onBankChanged,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              // Small Blind
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: stdHorizontalOffset,
                 ),
+                //color: Colors.red,
                 height: stdHeight * 0.8,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Text(
-                        context.strings.sett_win1,
-                        overflow: TextOverflow.fade,
-                        softWrap: false,
-                        style: TextStyle(
-                          color: thisTheme.onBackground,
-                          fontSize: stdFontSize,
-                          fontWeight: FontWeight.normal,
-                        ),
+                    Text(
+                      context.strings.sett_win2,
+                      overflow: TextOverflow.fade,
+                      softWrap: false,
+                      style: TextStyle(
+                        color: context.theme.onBackground,
+                        fontSize: stdFontSize,
+                        fontWeight: FontWeight.normal,
                       ),
                     ),
-                    Container(
-                      width: stdButtonHeight,
-                      height: stdButtonHeight / 2,
-                      alignment: Alignment.centerLeft,
-                      child: Form(
-                        key: _formKey,
+                    SizedBox(width: stdHorizontalOffset),
+                    Expanded(
+                      child: SizedBox(
+                        height: stdButtonHeight / 2,
                         child: TextFormField(
-                          focusNode: focusNode1,
-                          controller: _bankController,
+                          focusNode: focusNode2,
+                          controller: _sbController,
+                          maxLines: 1,
                           keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
+
+                          textAlign: TextAlign.right,
                           style: TextStyle(
-                            color: thisTheme.onBackground,
+                            color: context.theme.onBackground,
                             fontSize: stdFontSize,
                           ),
                           maxLength: 5,
@@ -202,115 +255,62 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                           decoration: InputDecoration(
                             hintStyle: TextStyle(
                               fontSize: stdFontSize,
-                              color: thisTheme.hintColor,
+                              color: context.theme.hintColor,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            hintText: '${state.startingStack}',
+                            hintText: state.smallBlind.toString(),
                             enabledBorder: InputBorder.none,
                             focusedBorder: InputBorder.none,
                             counterText: '',
                           ),
-                          onChanged: _onBankChanged,
+                          //initialValue: newName,
+                          onChanged: _smallBlindChanged,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-            // Small Blind
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: stdHorizontalOffset,
-              ),
-              //color: Colors.red,
-              height: stdHeight * 0.8,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      context.strings.sett_win2,
-                      overflow: TextOverflow.fade,
-                      softWrap: false,
-                      style: TextStyle(
-                        color: thisTheme.onBackground,
-                        fontSize: stdFontSize,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: stdButtonHeight,
-                    height: stdButtonHeight / 2,
-                    child: TextFormField(
-                      focusNode: focusNode2,
-                      controller: _sbController,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: thisTheme.onBackground,
-                        fontSize: stdFontSize,
-                      ),
-                      maxLength: 5,
-                      textAlignVertical: TextAlignVertical.bottom,
-                      decoration: InputDecoration(
-                        hintStyle: TextStyle(
-                          fontSize: stdFontSize,
-                          color: thisTheme.hintColor,
-                        ),
-                        hintText: state.smallBlind.toString(),
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        counterText: '',
-                      ),
-                      //initialValue: newName,
-                      onChanged: _smallBlindChanged,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Big Blind
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: stdHorizontalOffset,
-              ),
-              //color: Colors.red,
-              height: stdHeight * 0.8,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    flex: 5,
-                    child: Text(
+              // Big Blind
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: stdHorizontalOffset,
+                ),
+                //color: Colors.red,
+                height: stdHeight * 0.8,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
                       context.strings.sett_win3,
                       overflow: TextOverflow.fade,
                       softWrap: false,
                       style: TextStyle(
-                        color: thisTheme.hintColor,
+                        color: context.theme.hintColor,
                         fontSize: stdFontSize,
                         fontWeight: FontWeight.normal,
                       ),
                     ),
-                  ),
-                  const Flexible(flex: 2, child: SizedBox()),
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      '${(smallBlind ?? state.smallBlind) * 2}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: thisTheme.hintColor,
-                        fontSize: stdFontSize,
-                        fontWeight: FontWeight.normal,
+                    SizedBox(width: stdHorizontalOffset),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        '${(smallBlind ?? state.smallBlind) * 2}',
+                        textAlign: TextAlign.right,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: context.theme.hintColor,
+                          fontSize: stdFontSize,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            // Auto Rise
-            /*SizedBox(
+              // Auto Rise
+              /*SizedBox(
 
                 //color: Colors.red,
                 height: stdHeight * 0.75,
@@ -321,7 +321,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                       flex: 7,
                       child: Text('Auto Rise',
                           style: TextStyle(
-                              color: thisTheme.textColor,
+                              color: context.theme.textColor,
                               fontSize: stdFontSize * 0.8,
                               fontWeight: FontWeight.normal)),
                     ),
@@ -332,8 +332,8 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                         child: Checkbox(
                           checkColor: Colors.white,
                           fillColor: MaterialStateProperty.all<Color>(autoBool
-                              ? thisTheme.primaryColor
-                              : thisTheme.bankColor),
+                              ? context.theme.primaryColor
+                              : context.theme.bankColor),
                           value: autoBool,
                           onChanged: (bool? value) {
                             setState(() {
@@ -359,7 +359,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                     //hasIcon: false,
                     canTapOnHeader: false,
                     isExpanded: anteBool,
-                    backgroundColor: thisTheme.bgrColor,
+                    backgroundColor: context.theme.bgrColor,
                     headerBuilder: (BuildContext context, bool isExpanded) {
                       return Column(
                         children: [
@@ -377,7 +377,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                     flex: anteBool ? 8 : 7,
                                     child: Text('Ante',
                                         style: TextStyle(
-                                            color: thisTheme.textColor,
+                                            color: context.theme.textColor,
                                             fontSize: stdFontSize * 0.8,
                                             fontWeight: FontWeight.normal)),
                                   ),
@@ -390,8 +390,8 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                         fillColor:
                                             MaterialStateProperty.all<Color>(
                                                 anteBool
-                                                    ? thisTheme.primaryColor
-                                                    : thisTheme.bankColor),
+                                                    ? context.theme.primaryColor
+                                                    : context.theme.bankColor),
                                         value: anteBool,
                                         onChanged: (bool? value) {
                                           setState(() {
@@ -413,7 +413,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               //margin: const EdgeInsets.symmetric(horizontal: stdEdgeOffset),
-                              color: thisTheme.textColor,
+                              color: context.theme.textColor,
                               width: anteBool ? 250 : 0,
                               height: 1,
                             ),
@@ -442,7 +442,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                     flex: 4,
                                     child: Text('1st value',
                                         style: TextStyle(
-                                            color: thisTheme.textColor,
+                                            color: context.theme.textColor,
                                             fontSize: stdFontSize * 0.8,
                                             fontWeight: FontWeight.normal)),
                                   ),
@@ -455,7 +455,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                         keyboardType: TextInputType.number,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          color: thisTheme.textColor,
+                                          color: context.theme.textColor,
                                           fontSize: stdFontSize * 0.8,
                                         ),
                                         maxLength: 5,
@@ -464,7 +464,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                         decoration: InputDecoration(
                                             hintStyle: TextStyle(
                                               fontSize: stdFontSize * 0.8,
-                                              color: thisTheme.bankColor,
+                                              color: context.theme.bankColor,
                                             ),
                                             hintText: "$anteBlind",
                                             enabledBorder: InputBorder.none,
@@ -540,7 +540,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                     flex: 1,
                                     child: Text('1st lap',
                                         style: TextStyle(
-                                            color: thisTheme.textColor,
+                                            color: context.theme.textColor,
                                             fontSize: stdFontSize * 0.8,
                                             fontWeight: FontWeight.normal)),
                                   ),
@@ -551,11 +551,11 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                       child: NumberPicker(
                                           haptics: true,
                                           selectedTextStyle: TextStyle(
-                                              color: thisTheme.primaryColor,
+                                              color: context.theme.primaryColor,
                                               fontSize: stdFontSize * 0.8,
                                               fontWeight: FontWeight.normal),
                                           textStyle: TextStyle(
-                                              color: thisTheme.bankColor,
+                                              color: context.theme.bankColor,
                                               fontSize: stdFontSize * 0.7,
                                               fontWeight: FontWeight.normal),
                                           itemWidth: stdHeight,
@@ -599,7 +599,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                     //hasIcon: false,
                     canTapOnHeader: false,
                     isExpanded: (autoBool || anteBool),
-                    backgroundColor: thisTheme.bgrColor,
+                    backgroundColor: context.theme.bgrColor,
                     headerBuilder: (BuildContext context, bool isExpanded) {
                       return const SizedBox(height: 0,);
                     },
@@ -619,7 +619,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                             child: Center(
                               child: Text("Time Manager",
                                   style: TextStyle(
-                                      color: thisTheme.textColor,
+                                      color: context.theme.textColor,
                                       fontSize: stdFontSize * 0.85,
                                       fontWeight: FontWeight.normal)),
                             ),
@@ -630,7 +630,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                             child: AnimatedContainer(
                               duration: Duration(milliseconds:anteBool? 400: 200),
                               //margin: const EdgeInsets.symmetric(horizontal: stdEdgeOffset),
-                              color: thisTheme.textColor,
+                              color: context.theme.textColor,
                               width: (autoBool || anteBool) ? 250 : 0,
                               height: 1,
                             ),
@@ -646,7 +646,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                     flex: 1,
                                     child: Text('Factor',
                                         style: TextStyle(
-                                            color: thisTheme.textColor,
+                                            color: context.theme.textColor,
                                             fontSize: stdFontSize * 0.8,
                                             fontWeight: FontWeight.normal)),
                                   ),
@@ -659,11 +659,11 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                           haptics: true,
                                           //zeroPad: true,
                                           selectedTextStyle: TextStyle(
-                                              color: thisTheme.primaryColor,
+                                              color: context.theme.primaryColor,
                                               fontSize: stdFontSize * 0.8,
                                               fontWeight: FontWeight.normal),
                                           textStyle: TextStyle(
-                                              color: thisTheme.bankColor,
+                                              color: context.theme.bankColor,
                                               fontSize: stdFontSize * 0.7,
                                               fontWeight: FontWeight.normal),
                                           itemWidth: stdHeight,
@@ -700,8 +700,8 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                     child: Text('Period',
                                         style: TextStyle(
                                             color: everyLapBool
-                                                ? thisTheme.bankColor
-                                                : thisTheme.textColor,
+                                                ? context.theme.bankColor
+                                                : context.theme.textColor,
                                             fontSize: stdFontSize * 0.8,
                                             fontWeight: FontWeight.normal)),
                                   ),
@@ -714,12 +714,12 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                           haptics: true,
                                           selectedTextStyle: TextStyle(
                                               color: everyLapBool
-                                                  ? thisTheme.bankColor
-                                                  : thisTheme.primaryColor,
+                                                  ? context.theme.bankColor
+                                                  : context.theme.primaryColor,
                                               fontSize: stdFontSize * 0.8,
                                               fontWeight: FontWeight.normal),
                                           textStyle: TextStyle(
-                                              color: thisTheme.bankColor,
+                                              color: context.theme.bankColor,
                                               fontSize: stdFontSize * 0.7,
                                               fontWeight: FontWeight.normal),
                                           itemWidth: stdHeight,
@@ -742,8 +742,8 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                             color: everyLapBool
-                                                ? thisTheme.bankColor
-                                                : thisTheme.textColor,
+                                                ? context.theme.bankColor
+                                                : context.theme.textColor,
                                             fontSize: stdFontSize * 0.85,
                                             fontWeight: FontWeight.normal)),
                                   ),
@@ -761,7 +761,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                     flex: 7,
                                     child: Text('Every Lap',
                                         style: TextStyle(
-                                            color: thisTheme.textColor,
+                                            color: context.theme.textColor,
                                             fontSize: stdFontSize * 0.8,
                                             fontWeight: FontWeight.normal)),
                                   ),
@@ -774,8 +774,8 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                                         fillColor:
                                             MaterialStateProperty.all<Color>(
                                                 everyLapBool
-                                                    ? thisTheme.primaryColor
-                                                    : thisTheme.bankColor),
+                                                    ? context.theme.primaryColor
+                                                    : context.theme.bankColor),
                                         value: everyLapBool,
                                         onChanged: (bool? value) {
                                           setState(() {
@@ -793,40 +793,39 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                   ),
                 ]),
                 */
-            // Save Button
-            MyButton(
-              height: stdButtonHeight * 0.75,
-              width: double.infinity,
-              buttonColor: thisTheme.primaryColor,
-              textString: context.strings.sett_conf,
-              action: () async {
-                if ((focusNode1.hasFocus) || (focusNode2.hasFocus)) {
-                  focusNode1.unfocus();
-                  focusNode2.unfocus();
-                }
+              // Save Button
+              MyButton(
+                height: stdButtonHeight * 0.75,
+                width: double.infinity,
+                buttonColor: context.theme.primaryColor,
+                textString: context.strings.sett_conf,
+                action: () async {
+                  if ((focusNode1.hasFocus) || (focusNode2.hasFocus)) {
+                    focusNode1.unfocus();
+                    focusNode2.unfocus();
+                  }
 
-                //widget.thisLobby.lobbyAutoBool = autoBool;
-                //widget.thisLobby.lobbyAnteBool = anteBool;
+                  //widget.thisLobby.lobbyAutoBool = autoBool;
+                  //widget.thisLobby.lobbyAnteBool = anteBool;
 
-                //widget.thisLobby.lobbyAnte= anteBool? anteBlind: 0;
-                //widget.thisLobby.lobbyFirstAnte = firstLap;
+                  //widget.thisLobby.lobbyAnte= anteBool? anteBlind: 0;
+                  //widget.thisLobby.lobbyFirstAnte = firstLap;
 
-                //widget.thisLobby.lobbyFactor = autoDoubleFactor;
-                //widget.thisLobby.lobbyAutoTime = autoTime;
-                //widget.thisLobby.lobbyEveryLapBool = everyLapBool;
+                  //widget.thisLobby.lobbyFactor = autoDoubleFactor;
+                  //widget.thisLobby.lobbyAutoTime = autoTime;
+                  //widget.thisLobby.lobbyEveryLapBool = everyLapBool;
 
-                final newSettings = GameSettingsModelResult(
-                  startingStack: tmpBank,
-                  smallBlind: smallBlind,
-                );
+                  final newSettings = GameSettingsModelResult(
+                    startingStack: tmpBank,
+                    smallBlind: smallBlind,
+                  );
 
-                logs.writeLog('GameSettings: save $newSettings');
-                widget.viewModel.saveSettings(newSettings);
-              },
-            ),
-          ],
+                  logs.writeLog('GameSettings: save $newSettings');
+                  widget.viewModel.saveSettings(newSettings);
+                },
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 }

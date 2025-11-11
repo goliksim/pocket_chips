@@ -44,12 +44,10 @@ class RaiseProviderScopeState extends State<RaiseProviderScope> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return CurrentBetValueProvider(
-      currentBet: _currentBet,
-      child: widget.child,
-    );
-  }
+  Widget build(BuildContext context) => CurrentBetValueProvider(
+        currentBet: _currentBet,
+        child: widget.child,
+      );
 }
 
 class CurrentBetValueProvider extends InheritedWidget {
@@ -69,7 +67,6 @@ class CurrentBetValueProvider extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(CurrentBetValueProvider oldWidget) {
-    return currentBet != oldWidget.currentBet;
-  }
+  bool updateShouldNotify(CurrentBetValueProvider oldWidget) =>
+      currentBet != oldWidget.currentBet;
 }

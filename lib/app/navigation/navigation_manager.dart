@@ -17,21 +17,38 @@ import '../../presentation/onboading/dialogs/about.dart';
 import '../../presentation/onboading/dialogs/update.dart';
 import '../../presentation/settings/game_settings_dialog.dart';
 import '../../presentation/winner_check/winner_check.dart';
+import 'models/app_pages.dart';
 import 'models/app_route.dart';
 
 class NavigationManager extends ChangeNotifier {
   final GlobalKey<NavigatorState> navigatorKey;
-  AppRoute _state = AppRoute.init();
+
+  List<AppRoute> _stack = [AppRoute.init()];
 
   NavigationManager({
     required this.navigatorKey,
   });
 
-  AppRoute get state => _state;
+  AppRoute get state => _stack.last;
+  List<AppRoute> get stack => List.unmodifiable(_stack);
   BuildContext get context => navigatorKey.currentState!.context;
 
   void goTo(AppRoute routeTarget) {
-    _state = routeTarget;
+    if (_stack.length == 1 &&
+        _stack.first.page == AppPage.init &&
+        routeTarget.page == AppPage.menu) {
+      _stack = [routeTarget];
+      notifyListeners();
+      return;
+    }
+
+    if (_stack.isNotEmpty && _stack.last.page == routeTarget.page) {
+      _stack[_stack.length - 1] = routeTarget;
+      notifyListeners();
+      return;
+    }
+
+    _stack.add(routeTarget);
     notifyListeners();
   }
 
@@ -42,25 +59,21 @@ class NavigationManager extends ChangeNotifier {
 
   Future<void> showUpdateDialog() => transitionDialog(
         duration: const Duration(milliseconds: 400),
-        type: 'Scale',
         context: context,
         child: Consumer(
           builder: (_, ref, __) => UpdateDialog(
             viewModel: ref.watch(onboardingViewModelProvider.notifier),
           ),
         ),
-        builder: (BuildContext context) {
-          return Consumer(
-            builder: (_, ref, __) => UpdateDialog(
-              viewModel: ref.watch(onboardingViewModelProvider.notifier),
-            ),
-          );
-        },
+        builder: (BuildContext context) => Consumer(
+          builder: (_, ref, __) => UpdateDialog(
+            viewModel: ref.watch(onboardingViewModelProvider.notifier),
+          ),
+        ),
       );
 
   Future<void> showAboutDialog({bool canPop = true}) => transitionDialog(
         duration: const Duration(milliseconds: 400),
-        type: 'Scale',
         context: context,
         child: PopScope(
           canPop: canPop,
@@ -71,34 +84,21 @@ class NavigationManager extends ChangeNotifier {
 
   Future<void> showWinnerSolver() => transitionDialog(
         duration: const Duration(milliseconds: 400),
-        type: 'Scale',
         context: context,
         child: const WinnerChecker(),
-        builder: (BuildContext context) {
-          return const WinnerChecker();
-        },
+        builder: (BuildContext context) => const WinnerChecker(),
       );
 
   Future<void> showSavedPlayers() => transitionDialog(
         duration: const Duration(milliseconds: 400),
-        type: 'SlideUp',
+        type: DialogTransitionType.slideUp,
         context: context,
-        child: Consumer(
-          builder: (_, ref, __) => SavedPlayerList(
-            viewModel: ref.watch(savedPlayerListViewModelProvider),
-          ),
-        ),
-        builder: (BuildContext context) {
-          return Consumer(
-            builder: (_, ref, __) => SavedPlayerList(
-              viewModel: ref.watch(savedPlayerListViewModelProvider),
-            ),
-          );
-        },
+        child: SavedPlayerList(),
+        builder: (BuildContext context) => SavedPlayerList(),
       );
 
   Future<void> showStartingStackEditor() => transitionDialog(
-        type: 'SlideUp',
+        type: DialogTransitionType.slideUp,
         context: context,
         duration: const Duration(milliseconds: 400),
         child: Consumer(
@@ -106,37 +106,31 @@ class NavigationManager extends ChangeNotifier {
             viewModel: ref.watch(bankEditorViewModelProvider),
           ),
         ),
-        builder: (BuildContext context) {
-          return Consumer(
-            builder: (_, ref, __) => BankEditorDialog(
-              viewModel: ref.watch(bankEditorViewModelProvider),
-            ),
-          );
-        },
+        builder: (BuildContext context) => Consumer(
+          builder: (_, ref, __) => BankEditorDialog(
+            viewModel: ref.watch(bankEditorViewModelProvider),
+          ),
+        ),
       );
 
   Future<void> showLobbySettings() => transitionDialog(
         duration: const Duration(milliseconds: 400),
-        type: 'SlideDown',
+        type: DialogTransitionType.slideDown,
         context: context,
         child: Consumer(
           builder: (_, ref, __) => GameSettingsDialog(
             viewModel: ref.watch(lobbySettingsViewModelProvider),
           ),
         ),
-        builder: (BuildContext context) {
-          return Consumer(
-            builder: (_, ref, __) => GameSettingsDialog(
-              viewModel: ref.watch(lobbySettingsViewModelProvider),
-            ),
-          );
-        },
+        builder: (BuildContext context) => Consumer(
+          builder: (_, ref, __) => GameSettingsDialog(
+            viewModel: ref.watch(lobbySettingsViewModelProvider),
+          ),
+        ),
       );
 
   Future<void> showPlayerEditor(PlayerId? playerUid) => transitionDialog(
         duration: const Duration(milliseconds: 400),
-        type: 'Scale1',
-        //barrierColor: null,
         context: context,
         child: Consumer(
           builder: (_, ref, __) => PlayerEditorPage(
@@ -145,25 +139,21 @@ class NavigationManager extends ChangeNotifier {
             ),
           ),
         ),
-        builder: (BuildContext context) {
-          return Consumer(
-            builder: (_, ref, __) => PlayerEditorPage(
-              viewModel: ref.watch(
-                playerEditorViewModelProvider(playerUid),
-              ),
+        builder: (BuildContext context) => Consumer(
+          builder: (_, ref, __) => PlayerEditorPage(
+            viewModel: ref.watch(
+              playerEditorViewModelProvider(playerUid),
             ),
-          );
-        },
+          ),
+        ),
       );
 
   Future<String?> openPlayerLogoEditor() => showGeneralDialog<String>(
         barrierColor: Colors.transparent,
         transitionDuration: const Duration(milliseconds: 400),
         context: context,
-        pageBuilder: (_, __, ___) {
-          return PlayerLogoPicker();
-        },
-        transitionBuilder: dialogWave1,
+        pageBuilder: (_, __, ___) => PlayerLogoPicker(),
+        transitionBuilder: dialogWaveBuilder,
       );
 
   Future<void> showWinner(PlayerModel winner) => transitionDialog(
@@ -173,13 +163,10 @@ class NavigationManager extends ChangeNotifier {
           winner: winner,
           pop: pop,
         ),
-        builder: (_) {
-          return WinnerWindow(
-            winner: winner,
-            pop: pop,
-          );
-        },
-        type: 'Scale1',
+        builder: (_) => WinnerWindow(
+          winner: winner,
+          pop: pop,
+        ),
       );
 
   Future<Set<String>?> showWinnerChooseDialog(
@@ -188,7 +175,6 @@ class NavigationManager extends ChangeNotifier {
       transitionDialog<Set<String>>(
         barrierDismissible: false,
         duration: const Duration(milliseconds: 400),
-        type: 'Scale1',
         context: context,
         child: Consumer(
           builder: (_, ref, __) => WinnerChoiceWindow(
@@ -198,16 +184,14 @@ class NavigationManager extends ChangeNotifier {
             ),
           ),
         ),
-        builder: (BuildContext context) {
-          return Consumer(
-            builder: (_, ref, __) => WinnerChoiceWindow(
-              title: args.title,
-              viewModel: ref.watch(
-                winnerChooseViewModelProvider(args),
-              ),
+        builder: (BuildContext context) => Consumer(
+          builder: (_, ref, __) => WinnerChoiceWindow(
+            title: args.title,
+            viewModel: ref.watch(
+              winnerChooseViewModelProvider(args),
             ),
-          );
-        },
+          ),
+        ),
       );
 
   Future<bool?> showConfirmationDialog({
@@ -218,33 +202,25 @@ class NavigationManager extends ChangeNotifier {
   }) =>
       showDialog<bool>(
         context: context,
-        builder: (BuildContext thisContext) {
-          return ConfirmationWindow(
-            title: title,
-            actionTitle: actionTitle,
-            message: message,
-            action: () => action(),
-          );
-        },
+        builder: (BuildContext thisContext) => ConfirmationWindow(
+          title: title,
+          actionTitle: actionTitle,
+          message: message,
+          action: () => action(),
+        ),
       );
 
   void pop() {
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
     }
-
-    /*_state.maybeMap(
-      orElse: () {},
-      lobby: (_) => goTo(AppRoute.menu()),
-      game: (_) => goTo(AppRoute.lobby()),
-    );*/
   }
 
   void popPage() {
-    _state.maybeMap(
-      orElse: () {},
-      lobby: (_) => goTo(AppRoute.menu()),
-      game: (_) => goTo(AppRoute.lobby()),
-    );
+    if (_stack.length > 1) {
+      _stack.removeLast();
+      notifyListeners();
+      return;
+    }
   }
 }

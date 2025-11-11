@@ -36,9 +36,8 @@ class AppRouteInformationParser extends RouteInformationParser<AppRoute> {
   }
 
   @override
-  RouteInformation? restoreRouteInformation(AppRoute configuration) {
-    return RouteInformation(
-      uri: Uri(path: configuration.page.path),
-    );
-  }
+  RouteInformation? restoreRouteInformation(AppRoute configuration) =>
+      RouteInformation(
+        uri: Uri(path: configuration.page.path),
+      );
 }

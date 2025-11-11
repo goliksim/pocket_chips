@@ -19,7 +19,7 @@ final lobbyStateHolderProvider =
 );
 
 final savedPlayersModelHolderProvider =
-    AsyncNotifierProvider.autoDispose<SavedPlayersModelHolder, SavedPlayers>(
+    AsyncNotifierProvider<SavedPlayersModelHolder, SavedPlayers>(
   SavedPlayersModelHolder.new,
 );
 

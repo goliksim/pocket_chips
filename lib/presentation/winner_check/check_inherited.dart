@@ -46,12 +46,11 @@ class CheckCardsInherited extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(CheckCardsInherited oldWidget) {
-    return (oldWidget.tableCards != tableCards ||
-        playerCards != playerCards ||
-        oldWidget.winner != winner ||
-        oldWidget.combinations != combinations);
-  }
+  bool updateShouldNotify(CheckCardsInherited oldWidget) =>
+      (oldWidget.tableCards != tableCards ||
+          playerCards != playerCards ||
+          oldWidget.winner != winner ||
+          oldWidget.combinations != combinations);
 
   static CheckCardsInherited of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<CheckCardsInherited>()!;

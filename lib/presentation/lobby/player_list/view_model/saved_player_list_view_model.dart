@@ -1,53 +1,40 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/navigation/navigation_manager.dart';
+import '../../../../di/domain_managers.dart';
+import '../../../../di/model_holders.dart';
 import '../../../../domain/model_holders/lobby_state_holder.dart';
 import '../../../../domain/model_holders/saved_players_model_holder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../services/toast_manager.dart';
 import '../view_state/lobby_player_item.dart';
 
-class SavedPlayerListViewModel with ChangeNotifier {
-  final SavedPlayersModelHolder _modelHolder;
-  final LobbyStateHolder _lobbyStateHolder;
-  final NavigationManager _navigationManager;
-  final ToastManager _toastManager;
-  final AppLocalizations _strings;
+class SavedPlayerListViewModel extends AsyncNotifier<List<LobbyPlayerItem>> {
+  SavedPlayersModelHolder get _modelHolder =>
+      ref.read(savedPlayersModelHolderProvider.notifier);
+  LobbyStateHolder get _lobbyStateHolder =>
+      ref.read(lobbyStateHolderProvider.notifier);
+  NavigationManager get _navigationManager =>
+      ref.read(navigationManagerProvider);
+  ToastManager get _toastManager => ref.read(toastManagerProvider);
+  AppLocalizations get _strings => ref.read(stringsProvider);
 
-  late List<LobbyPlayerItem> players;
+  @override
+  FutureOr<List<LobbyPlayerItem>> build() async {
+    final players = await ref.watch(savedPlayersModelHolderProvider.future);
 
-  SavedPlayerListViewModel({
-    required SavedPlayersModelHolder modelHolder,
-    required LobbyStateHolder lobbyStateHolder,
-    required NavigationManager navigationManager,
-    required Function(VoidCallback) addListener,
-    required ToastManager toastManager,
-    required AppLocalizations strings,
-  })  : _modelHolder = modelHolder,
-        _lobbyStateHolder = lobbyStateHolder,
-        _toastManager = toastManager,
-        _navigationManager = navigationManager,
-        _strings = strings {
-    addListener(_init);
-
-    _init();
-  }
-
-  void _init() {
-    players = [];
-
-    _modelHolder.future.then((p) {
-      players = p
-          .map((p) => LobbyPlayerItem(
-                uid: p.uid,
-                name: p.name,
-                assetUrl: p.assetUrl,
-              ))
-          .toList();
-
-      notifyListeners();
-    });
+    return players
+        .map(
+          (p) => LobbyPlayerItem(
+            name: p.name,
+            uid: p.uid,
+            assetUrl: p.assetUrl,
+          ),
+        )
+        .toList();
   }
 
   Future<bool> deletePlayer(String playerUid) async {
@@ -55,15 +42,16 @@ class SavedPlayerListViewModel with ChangeNotifier {
       title: _strings.conf_del_tittle,
       actionTitle: _strings.conf_del_butt,
       message: _strings.conf_del_text,
-      action: () => _delete(playerUid),
+      action: () {},
     );
 
-    return result ?? false;
+    return (result ?? false) ? _delete(playerUid) : Future.value(false);
   }
 
   Future<bool> usePlayer(String playerUid) async {
-    final player =
-        players.firstWhereOrNull((p) => p.uid == playerUid)?.toDomain;
+    final player = state.requireValue
+        .firstWhereOrNull((p) => p.uid == playerUid)
+        ?.toDomain;
 
     if (player == null) {
       return false;
@@ -81,7 +69,15 @@ class SavedPlayerListViewModel with ChangeNotifier {
     return false;
   }
 
-  Future<void> _delete(String playerUid) async {
-    await _modelHolder.removePlayer(playerUid);
+  Future<bool> _delete(String playerUid) async {
+    try {
+      await _modelHolder.removePlayer(playerUid);
+
+      return true;
+    } on Exception catch (e) {
+      _toastManager.showToast(e.toString());
+
+      return false;
+    }
   }
 }

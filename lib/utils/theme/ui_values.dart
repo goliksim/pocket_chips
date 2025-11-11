@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'themes.dart';
 
 // Глобальные переменные размеров
 double stdCutoutWidth = 0;
@@ -21,18 +18,3 @@ double adaptiveOffset = 15.h;
 double stdElevation = 0;
 
 // Глобальные переменные темы. Доступны всем файлам приложухи вроде как.
-List themeList = [light, dark];
-Themes thisTheme = dark;
-
-TextStyle appBarStyle() => TextStyle(
-      fontFamily: 'Ubuntu',
-      color: thisTheme.onBackground,
-      fontWeight: FontWeight.w500,
-      fontSize: stdFontSize,
-    );
-
-TextStyle stdTextStyle = TextStyle(
-  fontFamily: 'Ubuntu',
-  color: thisTheme.onPrimary,
-  fontWeight: FontWeight.w500,
-);

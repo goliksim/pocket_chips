@@ -62,13 +62,9 @@ class Card {
   CardSuit suit;
   int key;
 
-  String get suitString {
-    return mapSuitReversed[suit]!;
-  }
+  String get suitString => mapSuitReversed[suit]!;
 
-  String get keyString {
-    return cardTextReversed[key]!;
-  }
+  String get keyString => cardTextReversed[key]!;
 
   @override
   String toString() {

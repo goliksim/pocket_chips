@@ -30,7 +30,6 @@ class LobbyStateEntity {
   Map<String, dynamic> toJson() => _$LobbyStateEntityToJson(this);
 
   @override
-  String toString() {
-    return '[LobbyStateEntity] - players: $players, banks: $banks, smallBlindValue: $smallBlindValue, dealerId: $dealerId, defaultBank: $defaultBank, gameState: $gameState';
-  }
+  String toString() =>
+      '[LobbyStateEntity] - players: $players, banks: $banks, smallBlindValue: $smallBlindValue, dealerId: $dealerId, defaultBank: $defaultBank, gameState: $gameState';
 }

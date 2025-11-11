@@ -22,6 +22,8 @@ class SavedPlayersModelHolder extends AsyncNotifier<SavedPlayers> {
       }
 
       await ref.read(appRepositoryProvider).addPlayer(newPlayer);
+
+      runBuild();
     } catch (e) {
       logs.writeLog('Ошибка при сохранении игрока: $e');
 
@@ -29,11 +31,21 @@ class SavedPlayersModelHolder extends AsyncNotifier<SavedPlayers> {
     }
   }
 
+  Future<void> updatePlayer({required PlayerModel player}) async {
+    try {
+      await ref.read(appRepositoryProvider).updatePlayer(player);
+
+      runBuild();
+    } catch (e) {
+      logs.writeLog('Ошибка при обновлении данных игрока: $e');
+    }
+  }
+
   Future<void> removePlayer(String playerUid) async {
     try {
       await ref.read(appRepositoryProvider).removePlayer(playerUid);
 
-      ref.invalidateSelf();
+      runBuild();
     } catch (e) {
       logs.writeLog('Ошибка при удалении игрока: $e');
     }

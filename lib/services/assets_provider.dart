@@ -23,7 +23,7 @@ class AssetsProvider {
   static const String emptyPlayerAsset = 'assets/faces/pokerfaces_empty.jpg';
 
   static Image get socialGitIcon => Image.asset('assets/social/git.png');
-  static Image get socialMainIcon => Image.asset('assets/social/main.png');
+  static Image get socialMailIcon => Image.asset('assets/social/mail.png');
   static Image get socialTelegramIcon => Image.asset('assets/social/tele.png');
 
   static ImageProvider cardBack(bool isDark) =>

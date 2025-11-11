@@ -22,7 +22,6 @@ class ConfigEntity {
   Map<String, dynamic> toJson() => _$ConfigEntityToJson(this);
 
   @override
-  String toString() {
-    return '[ConfigEntitiy] - isDark: $isDark, firstLaunch: $firstLaunch, locale: $locale, version: $version';
-  }
+  String toString() =>
+      '[ConfigEntitiy] - isDark: $isDark, firstLaunch: $firstLaunch, locale: $locale, version: $version';
 }

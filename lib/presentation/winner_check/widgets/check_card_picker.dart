@@ -19,17 +19,17 @@ class _CardPickerState extends State<CardPicker> {
   int? pickedKey;
   String? pickedSuit;
 
-  void updateKey(int key) {
+  void _updateKey(int key) {
     pickedKey = key;
     setState(() {});
   }
 
-  void updateSuit(String suit) {
+  void _updateSuit(String suit) {
     pickedSuit = suit;
     setState(() {});
   }
 
-  void returnCard(BuildContext context) {
+  void _returnCard(BuildContext context) {
     if (pickedKey != null && pickedSuit != null) {
       Future.delayed(const Duration(milliseconds: 400)).then(
         (_) {
@@ -44,10 +44,10 @@ class _CardPickerState extends State<CardPicker> {
 
   @override
   Widget build(BuildContext context) {
-    returnCard(context);
+    _returnCard(context);
     return Dialog(
       elevation: 0,
-      backgroundColor: thisTheme.bgrColor,
+      backgroundColor: context.theme.bgrColor,
       insetPadding: EdgeInsets.symmetric(
         horizontal: adaptiveOffset,
       ), //windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width)),
@@ -69,7 +69,7 @@ class _CardPickerState extends State<CardPicker> {
                   child: Text(
                     context.strings.check_picker,
                     style: TextStyle(
-                      color: thisTheme.onBackground,
+                      color: context.theme.onBackground,
                       fontSize: stdFontSize,
                     ),
                   ),
@@ -84,7 +84,14 @@ class _CardPickerState extends State<CardPicker> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   for (int index = 14; index > 8; index--)
-                    Flexible(child: keyButton(index, pickedKey, updateKey)),
+                    Flexible(
+                      child: _keyButton(
+                        index,
+                        pickedKey,
+                        _updateKey,
+                        context,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -93,7 +100,14 @@ class _CardPickerState extends State<CardPicker> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   for (int index = 8; index >= 2; index--)
-                    Flexible(child: keyButton(index, pickedKey, updateKey)),
+                    Flexible(
+                      child: _keyButton(
+                        index,
+                        pickedKey,
+                        _updateKey,
+                        context,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -106,10 +120,11 @@ class _CardPickerState extends State<CardPicker> {
                 children: [
                   for (int index = 0; index < 4; index++)
                     Flexible(
-                      child: suitButton(
+                      child: _suitButton(
                         ['s', 'c', 'h', 'd'][index],
                         pickedSuit,
-                        updateSuit,
+                        _updateSuit,
+                        context,
                       ),
                     ),
                 ],
@@ -122,19 +137,25 @@ class _CardPickerState extends State<CardPicker> {
   }
 }
 
-Widget keyButton(int index, int? picked, Function(int) action) => AspectRatio(
+Widget _keyButton(
+  int index,
+  int? picked,
+  Function(int) action,
+  BuildContext context,
+) =>
+    AspectRatio(
       aspectRatio: 1,
       child: GestureDetector(
         onTap: () => action(index),
         child: Card(
           margin: EdgeInsets.all(stdHorizontalOffset / 6),
-          color: thisTheme.bgrColor,
+          color: context.theme.bgrColor,
           shape: RoundedRectangleBorder(
             side: BorderSide(
               width: 1,
               color: index != picked
-                  ? thisTheme.bankColor
-                  : thisTheme.primaryColor,
+                  ? context.theme.bankColor
+                  : context.theme.primaryColor,
             ),
             borderRadius:
                 BorderRadius.all(Radius.circular(stdBorderRadius / 2)),
@@ -143,7 +164,7 @@ Widget keyButton(int index, int? picked, Function(int) action) => AspectRatio(
             child: Text(
               c.cardTextReversed[index]!,
               style: TextStyle(
-                color: thisTheme.onBackground,
+                color: context.theme.onBackground,
                 fontSize: stdFontSize,
               ),
             ),
@@ -152,19 +173,25 @@ Widget keyButton(int index, int? picked, Function(int) action) => AspectRatio(
       ),
     );
 
-Widget suitButton(String suit, String? picked, Function(String) action) =>
+Widget _suitButton(
+  String suit,
+  String? picked,
+  Function(String) action,
+  BuildContext context,
+) =>
     AspectRatio(
       aspectRatio: 1,
       child: GestureDetector(
         onTap: () => action(suit),
         child: Card(
           margin: EdgeInsets.all(stdHorizontalOffset / 6),
-          color: thisTheme.bankColor,
+          color: context.theme.bankColor,
           shape: RoundedRectangleBorder(
             side: BorderSide(
               width: 1,
-              color:
-                  suit != picked ? thisTheme.bankColor : thisTheme.primaryColor,
+              color: suit != picked
+                  ? context.theme.bankColor
+                  : context.theme.primaryColor,
             ),
             borderRadius:
                 BorderRadius.all(Radius.circular(stdBorderRadius / 2)),
@@ -173,7 +200,7 @@ Widget suitButton(String suit, String? picked, Function(String) action) =>
             child: Icon(
               c.cardsIconMap[suit],
               color: ['s', 'c'].any((e) => e == suit)
-                  ? thisTheme.onBackground
+                  ? context.theme.onBackground
                   : Colors.red,
               size: stdFontSize,
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../services/assets_provider.dart';
+import '../../../../utils/extensions.dart';
 import '../../../../utils/theme/ui_values.dart';
 
 class PlayerLogoPicker extends StatefulWidget {
@@ -32,37 +33,35 @@ class _PickIconState extends State<PlayerLogoPicker> {
   void _pop(String newLogo) => Navigator.of(context).pop(newLogo);
 
   @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      elevation: 0,
-      backgroundColor: thisTheme.bgrColor,
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: adaptiveOffset,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
-      ),
-      child: Container(
-        alignment: Alignment.center,
-        padding: EdgeInsets.all(stdHorizontalOffset),
-        height: stdDialogHeight * 1.2,
-        width: stdButtonWidth,
-        child: AspectRatio(
-          aspectRatio: 5 / 2,
-          child: Center(
-            child: GridView.builder(
-              padding: EdgeInsets.zero,
-              reverse: true,
-              scrollDirection: Axis.vertical,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisSpacing: 0,
-                mainAxisSpacing: 0,
-                crossAxisCount: 5,
-              ),
-              itemCount: _totalLogosCount,
-              itemBuilder: (context, index) {
-                return GestureDetector(
+  Widget build(BuildContext context) => Dialog(
+        elevation: 0,
+        backgroundColor: context.theme.bgrColor,
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: adaptiveOffset,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
+        ),
+        child: Container(
+          alignment: Alignment.center,
+          padding: EdgeInsets.all(stdHorizontalOffset),
+          height: stdDialogHeight * 1.2,
+          width: stdButtonWidth,
+          child: AspectRatio(
+            aspectRatio: 5 / 2,
+            child: Center(
+              child: GridView.builder(
+                padding: EdgeInsets.zero,
+                reverse: true,
+                scrollDirection: Axis.vertical,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisSpacing: 0,
+                  mainAxisSpacing: 0,
+                  crossAxisCount: 5,
+                ),
+                itemCount: _totalLogosCount,
+                itemBuilder: (context, index) => GestureDetector(
                   onTap: () => _selectLogo(index),
                   child: Padding(
                     padding: EdgeInsets.all(stdHorizontalOffset / 2),
@@ -73,8 +72,8 @@ class _PickIconState extends State<PlayerLogoPicker> {
                         border: Border.all(
                           width: (index == choosenIcon) ? 1.5 : 0,
                           color: (index == choosenIcon)
-                              ? thisTheme.primaryColor
-                              : thisTheme.bgrColor,
+                              ? context.theme.primaryColor
+                              : context.theme.bgrColor,
                         ),
                         shape: BoxShape.circle,
                         image: DecorationImage(
@@ -85,12 +84,10 @@ class _PickIconState extends State<PlayerLogoPicker> {
                       ),
                     ),
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }

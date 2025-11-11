@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +9,6 @@ import '../../../di/model_holders.dart';
 import '../../../domain/model_holders/game_state_machine.dart';
 import '../../../domain/models/game/game_state_enum.dart';
 import '../../../domain/models/game/game_state_model.dart';
-import '../../../domain/models/lobby/lobby_state_model.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../l10n/localization_extension.dart';
 import '../../../services/game_logic_service.dart';
@@ -40,11 +38,6 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
     final gameState = gameModel.lobbyState.gameState;
     final players = gameModel.lobbyState.players;
 
-    final int dealerIndex =
-        players.indexWhere((p) => p.uid == gameModel.lobbyState.dealerId);
-
-    final int tableRotationOffset = players.length ~/ 2 - dealerIndex;
-
     if (gameState == GameStatusEnum.showdown) {
       logs.writeLog('GameVM: showing winner window');
       _gameStateMachine.showWinnersAndEndLap(model: gameModel);
@@ -66,7 +59,8 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
                   bet: gameModel.sessionState.bets[p.uid] ?? 0,
                 ))
             .toList(),
-        tableRotationOffset: tableRotationOffset,
+        // TODO: players noise offset
+        //tableRotationOffset: tableRotationOffset,
         smallBlindValue: gameModel.lobbyState.smallBlindValue,
       ),
       gameStatus: gameState,
@@ -74,43 +68,8 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         strings: _strings,
         state: gameState,
       ),
+      currentPlayerName: gameModel.currentPlayer?.name,
       canEditPlayer: gameState.canEditPlayers,
-    );
-  }
-
-  // Крутим стол
-  void mixPlayersPosition() {
-    logs.writeLog('GameVM: player rotation');
-    var tableRotationOffset = viewState.tableState.tableRotationOffset;
-
-    tableRotationOffset =
-        (tableRotationOffset.abs() + 1) % viewState.tableState.players.length;
-
-    state = AsyncData(
-      viewState.copyWith(
-        tableState: viewState.tableState.copyWith(
-          tableRotationOffset: tableRotationOffset,
-        ),
-      ),
-    );
-  }
-
-  // Меняем отступы у игроков
-  void changeOffset() {
-    Random rnd = Random();
-
-    List<double> arr = [];
-    for (int p = 0; p < maxPlayerCount; p++) {
-      arr.add((rnd.nextInt(40) - 20) / 360 * 2 * pi);
-    }
-    arr[0] = 0.0;
-
-    state = AsyncData(
-      viewState.copyWith(
-        tableState: viewState.tableState.copyWith(
-          tablePlayersOffsets: arr,
-        ),
-      ),
     );
   }
 
@@ -126,8 +85,11 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
     );
   }
 
-  Future<void> openPlayerEditor(String? playerUid) =>
-      _navigationManager.showPlayerEditor(playerUid);
+  Future<void> openPlayerEditor(String? playerUid) async {
+    if (state.requireValue.canEditPlayer) {
+      return _navigationManager.showPlayerEditor(playerUid);
+    }
+  }
 
   Future<void> showSavedPlayers() => _navigationManager.showSavedPlayers();
 

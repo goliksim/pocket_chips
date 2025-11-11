@@ -89,25 +89,21 @@ class AttentionAddPlayerButtonState extends State<AttentionButton>
   }
 
   /// convert 0-1 to 0-1-0
-  double _shake(double value) {
-    return widget.curve.transform(value);
-  }
+  double _shake(double value) => widget.curve.transform(value);
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (context, child) => Transform.scale(
-        scale: 1.0 - widget.maxSize * _shake(controller.value),
-        child: child,
-      ),
-      child: MyButton(
-        height: stdButtonHeight,
-        width: double.infinity,
-        buttonColor: widget.bgColor,
-        child: widget.textWidget,
-        action: () => widget.onTap(),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: controller,
+        builder: (context, child) => Transform.scale(
+          scale: 1.0 - widget.maxSize * _shake(controller.value),
+          child: child,
+        ),
+        child: MyButton(
+          height: stdButtonHeight,
+          width: double.infinity,
+          buttonColor: widget.bgColor,
+          child: widget.textWidget,
+          action: () => widget.onTap(),
+        ),
+      );
 }

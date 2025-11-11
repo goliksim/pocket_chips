@@ -42,6 +42,12 @@ class ConfigModelHolder extends AsyncNotifier<ConfigModel> {
         ),
       );
 
+  Future<void> updateTheme({required bool isDark}) => updateConfig(
+        state.value?.copyWith(
+          isDark: isDark,
+        ),
+      );
+
   Future<void> updateVerion(String newVersion) => updateConfig(
         state.value?.copyWith(
           version: newVersion,

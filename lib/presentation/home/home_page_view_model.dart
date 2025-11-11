@@ -6,8 +6,8 @@ import '../../app/navigation/models/app_route.dart';
 import '../../app/navigation/navigation_manager.dart';
 import '../../di/domain_managers.dart';
 import '../../di/model_holders.dart';
-import '../../di/repositories.dart';
 import '../../domain/model_holders/lobby_state_holder.dart';
+import '../../domain/models/game/game_state_enum.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/logs.dart';
 
@@ -21,25 +21,17 @@ class HomePageViewModel extends AsyncNotifier<bool> {
 
   @override
   FutureOr<bool> build() async {
-    final lobbyState = await ref.read(appRepositoryProvider).getLobbyState();
+    final lobbyState = await ref.watch(lobbyStateHolderProvider.future);
 
-    return lobbyState != null;
+    return lobbyState.gameState.isStarted || lobbyState.players.isNotEmpty;
   }
 
   Future<void> showAboutInfo() => _navigationManager.showAboutDialog(
         canPop: true,
       );
 
-  //TODO: implement
-  void changeTheme() {
-    throw UnimplementedError();
-    /*Navigator.pushReplacement(
-                    context,
-                    simpleThemePageRoute(
-                      HomePage(isDark: !widget.isDark),
-                    ),
-                  );*/
-  }
+  Future<void> changeTheme() async =>
+      ref.read(themeManagerProvider.notifier).changeTheme();
 
   Future<void> createNewGame() async {
     final haveActiveLobby = state.value ?? false;

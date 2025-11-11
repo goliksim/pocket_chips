@@ -27,18 +27,6 @@ class ControlButtons extends StatelessWidget {
     }
 
     return state.raiseState.isFirstBet ? strings.game_bet : strings.game_raise;
-
-    /*if (thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bank <=
-            thisGame.raiseBank &&
-        thisLobby.allMoney > thisLobby.maxBid) {
-      return context.locale.game_all;
-    } else {
-      if (thisLobby.betBool && thisLobby.lobbyState != 0) {
-        return context.locale.game_bet;
-      } else {
-        return context.locale.game_raise;
-      }
-    }*/
   }
 
   // Реализация кнопки Raise
@@ -51,34 +39,15 @@ class ControlButtons extends StatelessWidget {
   }
 
   //Текст средней кнопки
-  String _middleButtonTitle(AppLocalizations strings) {
-    return state.mainState.map(
+  String _middleButtonTitle(AppLocalizations strings) => state.mainState.map(
         check: (_) => strings.game_check,
         call: (state) {
-          final callText = '${strings.game_call} \$${state.callValue}';
+          final prefix =
+              state.callIsAllIn ? strings.game_all : strings.game_call;
 
-          return state.callIsAllIn ? strings.game_all : callText;
-        });
-
-    /*if (state.mainState.canCheck){
-      return strings.game_check;
-    }
-
-    final callText = '${strings.game_call} \$${(maxBid - thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid)}';
-
-    return state.mainState.callIsAllIn? strings.game_all: callText; 
-
-    if (thisLobby.betBool) {
-      return context.locale.game_check;
-    } else {
-      //Call/All IN
-      final maxBid = thisLobby.maxBid;
-      if (thisLobby.allMoney > maxBid) {
-        return '${context.locale.game_call} \$${(maxBid - thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid)}';
-      }
-      return context.locale.game_all;
-    }*/
-  }
+          return '$prefix\n${state.callValue.toSeparatedBank}';
+        },
+      );
 
   // Реализация средней кнопки
   void _universalAction() {
@@ -94,23 +63,6 @@ class ControlButtons extends StatelessWidget {
         }
       },
     );
-
-    /*final maxBid = thisLobby.maxBid;
-    final bid = thisLobby.lobbyPlayers[thisLobby.lobbyIndex].bid;
-    //Обычное действие Check/Call/All In
-    if (bid == maxBid) {
-      thisGame.newPlayer();
-    } else {
-      if (thisLobby.allMoney > maxBid) {
-        // CALL
-        thisGame.bet(maxBid - bid);
-      } else {
-        // ALL IN
-        thisGame.allIN();
-      }
-    }
-    widget.changeRaiseButton(false);
-    setState(() {});*/
   }
 
   bool get _raiseButtonActive => state.raiseState.canRaise;
@@ -125,33 +77,33 @@ class ControlButtons extends StatelessWidget {
         // Кнопка подтверждения Raise / Bet
         if (_raiseButtonActive)
           Flexible(
-            flex: 1,
+            flex: 10,
             fit: FlexFit.tight,
             child: ControlButtonWrapper(
               title: _firstButtonTitle(strings),
-              color: thisTheme.primaryColor,
+              color: context.theme.primaryColor,
               action: () => _raiseAction(),
             ),
           ),
         SizedBox(width: stdHorizontalOffset),
 
         Flexible(
-          flex: _raiseButtonActive ? 1 : 2,
+          flex: _raiseButtonActive ? 20 : 31,
           fit: FlexFit.tight,
           child: ControlButtonWrapper(
             title: _middleButtonTitle(strings),
-            color: thisTheme.secondaryColor,
+            color: context.theme.secondaryColor,
             action: () => _universalAction(),
           ),
         ), // Кнопка Call/Check/Skip
         // Кнопка Fold
         SizedBox(width: stdHorizontalOffset),
         Flexible(
-          flex: 1,
+          flex: 10,
           fit: FlexFit.tight,
           child: ControlButtonWrapper(
             title: context.strings.game_fold,
-            color: thisTheme.additionButtonColor,
+            color: context.theme.additionButtonColor,
             action: () => controlAction(GameControlResult.fold()),
           ),
         ),
@@ -173,13 +125,11 @@ class ControlButtonWrapper extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return MyButton(
-      height: stdButtonHeight,
-      width: double.infinity,
-      buttonColor: color,
-      textString: title,
-      action: () => action(),
-    );
-  }
+  Widget build(BuildContext context) => MyButton(
+        height: stdButtonHeight,
+        width: double.infinity,
+        buttonColor: color,
+        textString: title,
+        action: () => action(),
+      );
 }

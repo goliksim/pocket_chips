@@ -1,11 +1,10 @@
-// ignore_for_file: avoid_print
-
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pocket_chips/domain/models/cards/card_model.dart';
 import 'package:pocket_chips/domain/winner_solver.dart';
+import 'package:pocket_chips/utils/logs.dart';
 
 Future<Map<String, dynamic>?> readJsonFromFile(String filePath) async {
   try {
@@ -14,7 +13,7 @@ Future<Map<String, dynamic>?> readJsonFromFile(String filePath) async {
     final jsonMap = json.decode(contents);
     return jsonMap;
   } catch (e) {
-    print('Error reading JSON file: $e');
+    logs.writeLog('Error reading JSON file: $e');
     return null;
   }
 }
@@ -53,18 +52,19 @@ void main() async {
         var (int winner, combinations) =
             WinnerSolver.determineWinner([pl1, pl2], table);
 
-        print(
+        logs.writeLog(
           'Player 1 Cards: ${pl1.map((card) => '$card').join(', ')}  Combination: ${combinations[0]}',
         );
-        print(
+        logs.writeLog(
           'Player 2 Cards: ${pl2.map((card) => '$card').join(', ')}  Combination: ${combinations[1]}',
         );
-        print('Table Cards: ${table.map((card) => '$card').join(', ')}');
+        logs.writeLog(
+            'Table Cards: ${table.map((card) => '$card').join(', ')}');
 
         if (winner == 0) {
-          print('It\'s a tie!');
+          logs.writeLog('It\'s a tie!');
         } else {
-          print('Player $winner wins!');
+          logs.writeLog('Player $winner wins!');
         }
 
         expect(winner, result);

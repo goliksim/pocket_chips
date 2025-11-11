@@ -21,4 +21,6 @@ abstract class AppRepository {
   Future<void> addPlayer(PlayerModel player);
 
   Future<void> removePlayer(String playerUid);
+
+  Future<void> updatePlayer(PlayerModel player);
 }

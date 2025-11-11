@@ -29,11 +29,11 @@ class _RaiseButtonsState extends State<RaiseButtons> {
   String raiseBetString({required AppLocalizations strings, required int bet}) {
     if (bet == widget.state.maxPossibleBet) {
       // ALL IN
-      return strings.game_all;
+      return '${strings.game_all}\n${bet.toSeparatedBank}';
     } else {
       return widget.state.isFirstBet
-          ? '${strings.game_bet} \$$bet'
-          : '${strings.game_raise} \$$bet';
+          ? '${strings.game_bet}\n${bet.toSeparatedBank}'
+          : '${strings.game_raise}\n${bet.toSeparatedBank}';
     }
   }
 
@@ -46,25 +46,25 @@ class _RaiseButtonsState extends State<RaiseButtons> {
       children: [
         // Кнопка Cancel
         Flexible(
-          flex: 100,
+          flex: 10,
           fit: FlexFit.tight,
           child: ControlButtonWrapper(
             title: context.strings.game_raise_canc,
-            color: thisTheme.subsubmainColor,
+            color: context.theme.subsubmainColor,
             action: () => widget.onClose(),
           ),
         ),
         SizedBox(width: stdHorizontalOffset),
         // Кнопка подтверждения Raise/Bet
         Flexible(
-          flex: 209,
+          flex: 31,
           fit: FlexFit.tight,
           child: ControlButtonWrapper(
             title: raiseBetString(
               strings: context.strings,
               bet: currentBet,
             ),
-            color: thisTheme.secondaryColor,
+            color: context.theme.secondaryColor,
             action: () => widget.onConfirm(
               GameControlRaiseResult(raiseValue: currentBet),
             ),

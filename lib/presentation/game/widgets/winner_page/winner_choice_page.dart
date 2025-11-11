@@ -25,7 +25,7 @@ class WinnerChoiceWindow extends StatelessWidget {
 
           return Dialog(
             elevation: 0,
-            backgroundColor: thisTheme.bgrColor,
+            backgroundColor: context.theme.bgrColor,
             insetPadding: EdgeInsets.symmetric(
               horizontal: adaptiveOffset,
             ),
@@ -52,7 +52,7 @@ class WinnerChoiceWindow extends StatelessWidget {
                       child: Text(
                         title ?? context.strings.game_win3,
                         style: TextStyle(
-                          color: thisTheme.onBackground,
+                          color: context.theme.onBackground,
                           fontSize: stdFontSize,
                         ),
                       ),
@@ -73,7 +73,7 @@ class WinnerChoiceWindow extends StatelessWidget {
                                 child: MyButton(
                                   height: stdButtonHeight * 0.75 +
                                       stdHorizontalOffset / 2,
-                                  buttonColor: thisTheme.bankColor,
+                                  buttonColor: context.theme.bankColor,
                                   action: () => viewModel.onItemTap(winner.uid),
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(
@@ -110,18 +110,24 @@ class WinnerChoiceWindow extends StatelessWidget {
                                               children: [
                                                 Text(
                                                   winner.name,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   style: TextStyle(
-                                                    color:
-                                                        thisTheme.onBackground,
+                                                    color: context
+                                                        .theme.onBackground,
                                                     fontSize:
                                                         stdFontSize * 0.75,
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${context.strings.game_bet}: ${winner.bid}',
+                                                  '${context.strings.game_bet}: ${winner.bid.toSeparatedBank}',
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   style: TextStyle(
-                                                    color:
-                                                        thisTheme.onBackground,
+                                                    color: context
+                                                        .theme.onBackground,
                                                     fontSize:
                                                         stdFontSize * 0.75,
                                                   ),
@@ -133,7 +139,8 @@ class WinnerChoiceWindow extends StatelessWidget {
                                         AspectRatio(
                                           aspectRatio: 1,
                                           child: Checkbox(
-                                            activeColor: thisTheme.primaryColor,
+                                            activeColor:
+                                                context.theme.primaryColor,
                                             value: markedState[winner.uid],
                                             onChanged: (bool? value) =>
                                                 viewModel.onItemTap(winner.uid),
@@ -157,10 +164,10 @@ class WinnerChoiceWindow extends StatelessWidget {
                         MyButton(
                           height: stdButtonHeight * 0.75 * 0.75,
                           width: stdButtonHeight * 0.75 * 0.75,
-                          buttonColor: thisTheme.secondaryColor,
+                          buttonColor: context.theme.secondaryColor,
                           child: Icon(
                             Icons.help_outline,
-                            color: thisTheme.onPrimary,
+                            color: context.theme.onPrimary,
                           ),
                           action: () => viewModel.showWinnerSolver(),
                         ),
@@ -169,7 +176,7 @@ class WinnerChoiceWindow extends StatelessWidget {
                           child: MyButton(
                             height: stdButtonHeight * 0.75 * 0.75,
                             width: double.infinity,
-                            buttonColor: thisTheme.primaryColor,
+                            buttonColor: context.theme.primaryColor,
                             textString: context.strings.game_win_conf,
                             action: () => viewModel.confirmChoice(),
                           ),

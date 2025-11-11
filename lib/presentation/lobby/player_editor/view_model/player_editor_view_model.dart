@@ -1,10 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../app/navigation/navigation_manager.dart';
 import '../../../../domain/model_holders/lobby_state_holder.dart';
-import '../../../../domain/models/game/game_state_enum.dart';
+import '../../../../domain/model_holders/saved_players_model_holder.dart';
 import '../../../../domain/models/lobby/lobby_state_model.dart';
 import '../../../../domain/models/player/player_model.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -14,6 +13,7 @@ import '../view_state/player_editing_state.dart';
 
 class PlayerEditorViewModel with ChangeNotifier {
   final NavigationManager _navigationManager;
+  final SavedPlayersModelHolder _savedPlayersModelHolder;
   final LobbyStateHolder _lobbyStateHolder;
   final ToastManager _toastManager;
   final AppLocalizations _strings;
@@ -22,17 +22,18 @@ class PlayerEditorViewModel with ChangeNotifier {
   static const String standartName = '';
 
   late PlayerEditingState playerState;
-  late bool canEdit;
 
   bool get newPlayerEditing => _playerUid == null;
 
   PlayerEditorViewModel({
     required LobbyStateHolder lobbyStateHolder,
+    required SavedPlayersModelHolder savedPlayersModelHolder,
     required NavigationManager navigationManager,
     required ToastManager toastManager,
     required AppLocalizations strings,
     String? playerUid,
   })  : _lobbyStateHolder = lobbyStateHolder,
+        _savedPlayersModelHolder = savedPlayersModelHolder,
         _navigationManager = navigationManager,
         _toastManager = toastManager,
         _strings = strings,
@@ -60,8 +61,6 @@ class PlayerEditorViewModel with ChangeNotifier {
       forceDeadler: lobby.dealerId == null,
       makeDealer: lobby.dealerId == _playerUid && _playerUid != null,
     );
-
-    canEdit = (newPlayer || lobby.gameState.canEditPlayers);
   }
 
   Future<void> openLogoEditor() async {
@@ -131,7 +130,7 @@ class PlayerEditorViewModel with ChangeNotifier {
 
   Future<void> confirmEditing() async {
     // проверка чтобы челикс не ввел пустой символ
-    SystemChrome.restoreSystemUIOverlays();
+    //SystemChrome.restoreSystemUIOverlays();
 
     final lobby = _lobbyStateHolder.activeLobby;
 
@@ -181,6 +180,9 @@ class PlayerEditorViewModel with ChangeNotifier {
         player: playerModel,
         bank: bank,
         makeDealer: playerState.makeDealer,
+      );
+      await _savedPlayersModelHolder.updatePlayer(
+        player: playerModel,
       );
 
       return _pop();

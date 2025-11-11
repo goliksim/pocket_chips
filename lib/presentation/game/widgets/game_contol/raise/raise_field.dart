@@ -2,15 +2,17 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../services/assets_provider.dart';
+import '../../../../../utils/extensions.dart';
 import '../../../../../utils/theme/ui_values.dart';
-import '../view_state/game_page_control_state.dart';
 import 'raise_provider.dart';
 
 class RaiseFieldWidget extends StatefulWidget {
-  final RaiseControlState state;
+  final int maxPossibleBet;
+  final int minPossibleBet;
 
   const RaiseFieldWidget({
-    required this.state,
+    required this.maxPossibleBet,
+    required this.minPossibleBet,
     super.key,
   });
 
@@ -39,7 +41,7 @@ class RaiseFieldWidgetState extends State<RaiseFieldWidget> {
     super.initState();
 
     _chipsToShow = _getChipsFromBetRange(
-      widget.state.maxPossibleBet - widget.state.minPossibleBet,
+      widget.maxPossibleBet - widget.minPossibleBet,
     );
   }
 
@@ -53,7 +55,7 @@ class RaiseFieldWidgetState extends State<RaiseFieldWidget> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(stdBorderRadius),
       child: ColoredBox(
-        color: thisTheme.playerColor,
+        color: context.theme.playerColor,
         child: Column(
           children: [
             Padding(
@@ -69,7 +71,7 @@ class RaiseFieldWidgetState extends State<RaiseFieldWidget> {
                   onTap: (coin) {
                     final bet = provider.currentBet;
 
-                    if (bet + coin <= widget.state.maxPossibleBet) {
+                    if (bet + coin <= widget.maxPossibleBet) {
                       setState(() {
                         provider.changeBet(bet + coin);
                       });
@@ -80,8 +82,8 @@ class RaiseFieldWidgetState extends State<RaiseFieldWidget> {
               ),
             ),
             _RaiseSlider(
-              minBet: widget.state.minPossibleBet,
-              maxBet: widget.state.maxPossibleBet,
+              minBet: widget.minPossibleBet,
+              maxBet: widget.maxPossibleBet,
               value: provider.currentBet,
               onChanged: (newValue) {
                 provider.changeBet(newValue);
@@ -104,44 +106,42 @@ class _CoinsRow extends StatelessWidget {
   final List<int> chips;
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisSize: MainAxisSize.min, // <-- notice 'min' here. Important
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          for (int coin in chips)
-            Container(
-              width: stdButtonHeight * 0.75,
-              height: stdButtonHeight * 0.75,
-              margin: const EdgeInsets.symmetric(
-                vertical: 0,
-                horizontal: 2.5,
-              ),
-              //padding: const EdgeInsets.symmetric(horizontal: 5),
-              decoration: BoxDecoration(
-                color: thisTheme.playerColor,
-                borderRadius: BorderRadius.circular(stdBorderRadius),
-              ),
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.all(4),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      stdBorderRadius,
+  Widget build(BuildContext context) => SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisSize: MainAxisSize.min, // <-- notice 'min' here. Important
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            for (int coin in chips)
+              Container(
+                width: stdButtonHeight * 0.75,
+                height: stdButtonHeight * 0.75,
+                margin: const EdgeInsets.symmetric(
+                  vertical: 0,
+                  horizontal: 2.5,
+                ),
+                //padding: const EdgeInsets.symmetric(horizontal: 5),
+                decoration: BoxDecoration(
+                  color: context.theme.playerColor,
+                  borderRadius: BorderRadius.circular(stdBorderRadius),
+                ),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.all(4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        stdBorderRadius,
+                      ),
                     ),
                   ),
+                  child: AssetsProvider.chipsByValue(coin),
+                  onPressed: () => onTap(coin),
                 ),
-                child: AssetsProvider.chipsByValue(coin),
-                onPressed: () => onTap(coin),
               ),
-            ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
 }
 
 //Слайдер выбора ставки
@@ -181,52 +181,56 @@ class _RaiseSliderState extends State<_RaiseSlider> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: stdHorizontalOffset),
-      child: SizedBox(
-        height: stdButtonHeight * 0.75,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '${widget.minBet}',
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                fontSize: stdFontSize,
-                color: thisTheme.onBackground,
+  Widget build(BuildContext context) => Padding(
+        padding: EdgeInsets.symmetric(horizontal: stdHorizontalOffset),
+        child: SizedBox(
+          height: stdButtonHeight * 0.75,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Flexible(
+                child: Text(
+                  widget.minBet.toCompact,
+                  textAlign: TextAlign.right,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: stdFontSize,
+                    color: context.theme.onBackground,
+                  ),
+                ),
               ),
-            ),
-            SizedBox(width: stdHorizontalOffset / 2),
-            Flexible(
-              flex: 6,
-              fit: FlexFit.tight,
-              child: Slider(
-                label: '$tmpBid',
-                value: tmpBid.toDouble(),
-                onChanged: (newValue) {
-                  widget.onChanged(newValue.toInt());
+              Expanded(
+                flex: 3,
+                child: Slider(
+                  label: '$tmpBid',
+                  value: tmpBid.toDouble(),
+                  onChanged: (newValue) {
+                    widget.onChanged(newValue.toInt());
 
-                  setState(() {
-                    tmpBid = newValue.toInt();
-                  });
-                },
-                min: widget.minBet.toDouble(),
-                max: widget.maxBet.toDouble(),
+                    setState(() {
+                      tmpBid = newValue.toInt();
+                    });
+                  },
+                  min: widget.minBet.toDouble(),
+                  max: widget.maxBet.toDouble(),
+                ),
               ),
-            ),
-            SizedBox(width: stdHorizontalOffset / 2),
-            Text(
-              '${widget.maxBet}',
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                fontSize: stdFontSize,
-                color: thisTheme.onBackground,
+              Flexible(
+                child: Text(
+                  widget.maxBet.toCompact,
+                  textAlign: TextAlign.left,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: stdFontSize,
+                    color: context.theme.onBackground,
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 }

@@ -75,6 +75,17 @@ class SavedPlayerDao extends Dao<List<PlayerEntity>> {
     await write(list);
   }
 
+  /// Update player
+  Future<void> updatePlayer(PlayerEntity player) async {
+    final current = await read();
+    // ensure we work with a mutable list
+    final list = current.toList();
+
+    await write(
+      list.map((p) => p.uid == player.uid ? player : p).toList(),
+    );
+  }
+
   /// Delete a saved player by uid. If uid not found, nothing happens.
   Future<void> deleteByUid(String uid) async {
     final current = await read();

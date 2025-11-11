@@ -77,6 +77,10 @@ class AppRepositoryImpl implements AppRepository {
       localStorage.savedPlayersDao.add(PlayerEntityBuilder.toEntity(player));
 
   @override
+  Future<void> updatePlayer(PlayerModel player) => localStorage.savedPlayersDao
+      .updatePlayer(PlayerEntityBuilder.toEntity(player));
+
+  @override
   Future<void> removePlayer(PlayerId playerUid) =>
       localStorage.savedPlayersDao.deleteByUid(playerUid);
 

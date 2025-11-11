@@ -14,18 +14,16 @@ class MyApp extends StatelessWidget {
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      builder: (BuildContext context, Widget? child) => MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
+  Widget build(BuildContext context) => ScreenUtilInit(
+        builder: (BuildContext context, Widget? child) => MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: const MyHomePage(title: 'Flutter Demo Home Page'),
         ),
-        home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      ),
-      designSize: const Size(320, 640),
-    );
-  }
+        designSize: const Size(320, 640),
+      );
 }
 
 class MyHomePage extends StatefulWidget {
@@ -42,16 +40,14 @@ class _MyHomePageState extends State<MyHomePage> {
       PlatformDispatcher.instance.implicitView!.physicalSize;
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-          actions: const [],
-        ),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            return Padding(
+  Widget build(BuildContext context) => SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(widget.title),
+            actions: const [],
+          ),
+          body: LayoutBuilder(
+            builder: (context, constraints) => Padding(
               padding: EdgeInsets.all(10.0.h),
               child: (constraints.maxWidth > 620.h)
                   ? Center(
@@ -67,12 +63,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: widgets(context, physicalScreenSize),
                       ),
                     ),
-            );
-          },
+            ),
+          ),
         ),
-      ),
-    );
-  }
+      );
 }
 
 List<Widget> widgets(BuildContext context, Size physicalScreenSize) => [

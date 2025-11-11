@@ -6,10 +6,8 @@ class LoadingPage extends StatelessWidget {
   const LoadingPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return PatternContainer(
-        child: Center(
-      child: CircularProgressIndicator(),
-    ));
-  }
+  Widget build(BuildContext context) => PatternContainer(
+          child: Center(
+        child: CircularProgressIndicator(),
+      ));
 }

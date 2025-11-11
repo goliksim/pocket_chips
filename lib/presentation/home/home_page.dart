@@ -1,21 +1,143 @@
-// ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../app/theme_provider.dart';
+import '../../di/domain_managers.dart';
 import '../../di/view_models.dart';
 import '../../utils/extensions.dart';
+import '../../utils/theme/themes.dart';
 import '../../utils/theme/ui_values.dart';
 import '../common/widgets/attention_button.dart';
 import '../common/widgets/chips_image.dart';
 import '../common/widgets/ui_widgets.dart';
 
+class AnimatedHomePage extends ConsumerStatefulWidget {
+  const AnimatedHomePage({
+    super.key,
+  });
+
+  @override
+  ConsumerState<AnimatedHomePage> createState() => _AnimatedHomePageState();
+}
+
+class _AnimatedHomePageState extends ConsumerState<AnimatedHomePage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _themeController;
+  late final Animation<double> _themeAnim;
+  Themes? _oldTheme;
+
+  bool _isAnimating = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _themeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _themeAnim = CurvedAnimation(
+      parent: _themeController,
+      curve: Curves.fastOutSlowIn,
+      reverseCurve: Curves.fastOutSlowIn,
+    );
+
+    // When animation completes, drop the old theme so only the new theme remains.
+    _themeController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _isAnimating = false;
+        _oldTheme = null;
+        // ensure rebuild to remove the underneath old-theme widget
+        if (mounted) setState(() {});
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _themeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext _) {
+    // Listen theme mode changes. Capture previous theme and run animation.
+    ref.listen<ThemeMode>(themeManagerProvider, (previous, next) {
+      if (previous != null && previous != next) {
+        _oldTheme =
+            (previous == ThemeMode.dark) ? Themes.dark() : Themes.light();
+        _isAnimating = true;
+        _themeController.forward(from: 0);
+      }
+    });
+
+    // If we're animating, render old theme content underneath and new theme
+    // content on top inside a ShaderMask that reveals it. Otherwise render
+    // single content with current theme.
+    final currentTheme = context.theme;
+
+    if (_isAnimating && _oldTheme != null) {
+      final old = _oldTheme!;
+
+      return Stack(
+        children: [
+          // old theme (underneath)
+          ThemeProvider(
+            theme: old,
+            child: HomePage(),
+          ),
+
+          // new theme revealed with radial mask
+          ThemeProvider(
+            theme: currentTheme,
+            child: AnimatedBuilder(
+              animation: _themeAnim,
+              builder: (context, child) => ShaderMask(
+                shaderCallback: (rect) => RadialGradient(
+                  radius: Tween<double>(begin: 0, end: 15.h).evaluate(
+                    CurvedAnimation(
+                      parent: _themeAnim,
+                      curve: Curves.fastOutSlowIn.flipped,
+                      reverseCurve: Curves.fastOutSlowIn,
+                    ),
+                  ),
+                  colors: const [
+                    Colors.white,
+                    Colors.transparent,
+                    Colors.transparent,
+                  ],
+                  stops: const [0.4, 0.45, 1],
+                  center: const FractionalOffset(1.0, 0.0),
+                ).createShader(rect),
+                child: child,
+              ),
+              child: HomePage(),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // default: no animation, just current theme
+    return ThemeProvider(
+      theme: currentTheme,
+      child: HomePage(),
+    );
+  }
+}
+
 class HomePage extends ConsumerWidget {
-  final String title = 'POCKET CHIPS';
+  final title = 'POCKET CHIPS';
 
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     final viewModel = ref.watch(homePageViewModelProvider.notifier);
     final asyncState = ref.watch(homePageViewModelProvider);
 
@@ -38,14 +160,14 @@ class HomePage extends ConsumerWidget {
           automaticallyImplyLeading: false,
           backgroundColor: const Color(0x00000000),
           iconTheme: IconThemeData(
-            color: thisTheme.onBackground,
+            color: context.theme.onBackground,
           ),
           elevation: 0,
           centerTitle: true,
           title: Text(
             title,
             textAlign: TextAlign.center,
-            style: appBarStyle().copyWith(
+            style: context.theme.appBarStyle.copyWith(
               fontWeight: FontWeight.w700,
               fontSize: stdFontSize / 20 * 28,
             ),
@@ -55,9 +177,9 @@ class HomePage extends ConsumerWidget {
               aspectRatio: 1,
               child: IconButton(
                 icon: Icon(
-                  (thisTheme == themeList[0])
-                      ? Icons.mode_night_outlined
-                      : Icons.nightlight_round,
+                  (context.theme.isDark)
+                      ? Icons.nightlight_round
+                      : Icons.mode_night_outlined,
                   size: stdIconSize,
                 ),
                 tooltip: context.strings.tooltip_theme,
@@ -97,7 +219,7 @@ class HomePage extends ConsumerWidget {
                                   width: double.infinity,
                                   borderRadius:
                                       BorderRadius.circular(stdBorderRadius),
-                                  buttonColor: thisTheme.primaryColor,
+                                  buttonColor: context.theme.primaryColor,
                                   textString: context.strings.home_cont,
                                   action: () {
                                     if (shouldDrawContinue) {
@@ -113,12 +235,12 @@ class HomePage extends ConsumerWidget {
                                 onTap: () => viewModel.createNewGame(),
                                 needToAnimate: () => !shouldDrawContinue,
                                 bgColor: shouldDrawContinue
-                                    ? thisTheme.secondaryColor
-                                    : thisTheme.primaryColor,
-                                textColor: thisTheme.onBackground,
+                                    ? context.theme.secondaryColor
+                                    : context.theme.primaryColor,
+                                textColor: context.theme.onBackground,
                                 textWidget: Text(
                                   context.strings.home_new,
-                                  style: stdTextStyle.copyWith(
+                                  style: context.theme.stdTextStyle.copyWith(
                                     fontSize: stdFontSize,
                                   ),
                                 ),
@@ -134,7 +256,7 @@ class HomePage extends ConsumerWidget {
                                       borderRadius: BorderRadius.circular(
                                           stdBorderRadius),
                                       buttonColor:
-                                          thisTheme.additionButtonColor,
+                                          context.theme.additionButtonColor,
                                       textString: context.strings.home_abo,
                                       action: () => viewModel.showAboutInfo(),
                                     ),
@@ -149,7 +271,7 @@ class HomePage extends ConsumerWidget {
                                         borderRadius: BorderRadius.circular(
                                             stdBorderRadius),
                                         buttonColor:
-                                            thisTheme.additionButtonColor,
+                                            context.theme.additionButtonColor,
                                         textString:
                                             context.strings.home_win_check,
                                         action: () =>

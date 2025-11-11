@@ -167,7 +167,7 @@ class _DonateWindowState extends State<DonateWindow> {
               Text(
                 context.locale.support_tittle,
                 style: TextStyle(
-                  color: thisTheme.onBackground,
+                  color: context.theme.onBackground,
                   fontWeight: FontWeight.w500,
                   fontSize: stdFontSize,
                 ),
@@ -181,8 +181,8 @@ class _DonateWindowState extends State<DonateWindow> {
                     ):MyButton(height: stdButtonHeight,
                     width: double.infinity,
                     borderRadius: BorderRadius.circular(stdBorderRadius),
-                    textStyle: stdTextStyle.copyWith(color: thisTheme.onBackground.withOpacity(loaded? 1.0:0.5), fontSize: stdFontSize*0.8),
-                    buttonColor: thisTheme.playerColor,
+                    textStyle: stdTextStyle.copyWith(color: context.theme.onBackground.withOpacity(loaded? 1.0:0.5), fontSize: stdFontSize*0.8),
+                    buttonColor: context.theme.playerColor,
                     textString: 'View interstitial ads',
                     action: placements[AdManager.interstitialVideoAdPlacementId] == true && loaded
                       ? () => showAd(AdManager.interstitialVideoAdPlacementId)
@@ -196,7 +196,7 @@ class _DonateWindowState extends State<DonateWindow> {
             //icon
             Icon(
               MdiIcons.cardsSpade,
-              color: thisTheme.onBackground,
+              color: context.theme.onBackground,
               size: stdIconSize * 1.15,
             ),
             //button
@@ -217,7 +217,7 @@ class _DonateWindowState extends State<DonateWindow> {
                           child: Text(
                             context.locale.support_free,
                             style: TextStyle(
-                              color: thisTheme.onBackground,
+                              color: context.theme.onBackground,
                             ),
                           ),
                         ),
@@ -259,7 +259,7 @@ class _DonateWindowState extends State<DonateWindow> {
                             fontSize: stdFontSize * 0.9,
                           ),
                         ),
-                        //Text('Buy',style: TextStyle(color: thisTheme.onBackground,fontSize: stdFontSize*0.7))
+                        //Text('Buy',style: TextStyle(color: context.theme.onBackground,fontSize: stdFontSize*0.7))
                       ],
                     ),
               //action
@@ -296,7 +296,7 @@ class _DonateWindowState extends State<DonateWindow> {
                           fontSize: stdFontSize * 0.9,
                         ),
                       ),
-                      //Text('Buy',style: TextStyle(color: thisTheme.onBackground,fontSize: stdFontSize*0.7))
+                      //Text('Buy',style: TextStyle(color: context.theme.onBackground,fontSize: stdFontSize*0.7))
                     ],
                   ),
             //action
@@ -334,7 +334,7 @@ class _DonateWindowState extends State<DonateWindow> {
                           fontSize: stdFontSize * 0.9,
                         ),
                       ),
-                      //Text('Buy',style: TextStyle(color: thisTheme.onBackground,fontSize: stdFontSize*0.7))
+                      //Text('Buy',style: TextStyle(color: context.theme.onBackground,fontSize: stdFontSize*0.7))
                     ],
                   ),
             //action
@@ -352,16 +352,16 @@ class _DonateWindowState extends State<DonateWindow> {
           MyButton(
             side: BorderSide(
               width: 1.5,
-              color: thisTheme.secondaryColor.withOpacity(0.6),
+              color: context.theme.secondaryColor.withOpacity(0.6),
             ),
             height: stdButtonHeight * 0.6,
             width: double.infinity,
             borderRadius: BorderRadius.circular(stdBorderRadius),
             textStyle: stdTextStyle.copyWith(
-              color: thisTheme.secondaryColor.withOpacity(0.6),
+              color: context.theme.secondaryColor.withOpacity(0.6),
               fontSize: stdFontSize * 0.8,
             ),
-            buttonColor: thisTheme.bgrColor,
+            buttonColor: context.theme.bgrColor,
             textString: context.locale.support_close,
             action: () async {
               Navigator.pop(context);
@@ -383,7 +383,7 @@ class _DonateWindowState extends State<DonateWindow> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: thisTheme.bankColor,
+                  color: context.theme.bankColor,
                   borderRadius: BorderRadius.circular(stdBorderRadius),
                 ),
                 child: Row(
@@ -408,7 +408,7 @@ class _DonateWindowState extends State<DonateWindow> {
                         text,
                         textAlign: TextAlign.center,
                         style: stdTextStyle.copyWith(
-                          color: thisTheme.onBackground,
+                          color: context.theme.onBackground,
                           fontSize: stdFontSize * 0.8,
                         ),
                       ),
@@ -427,7 +427,7 @@ class _DonateWindowState extends State<DonateWindow> {
                 height: stdButtonHeight,
                 width: double.infinity,
                 borderRadius: BorderRadius.circular(stdBorderRadius),
-                buttonColor: thisTheme.playerColor,
+                buttonColor: context.theme.playerColor,
                 child: button,
                 action: action,
               ),

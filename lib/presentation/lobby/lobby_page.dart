@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -34,6 +32,7 @@ class LobbyPage extends ConsumerWidget {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
+            scrolledUnderElevation: 0,
             toolbarHeight: stdButtonHeight * 0.75,
             leading: IconButton(
               onPressed: () => viewModel.pop(),
@@ -43,11 +42,13 @@ class LobbyPage extends ConsumerWidget {
               ),
             ),
             iconTheme: IconThemeData(
-              color: thisTheme.onBackground,
+              color: context.theme.onBackground,
             ),
             backgroundColor: const Color(0x00000000),
-            titleTextStyle:
-                appBarStyle().copyWith(fontSize: stdFontSize / 20 * 24),
+            titleTextStyle: context.theme.stdTextStyle.copyWith(
+              fontSize: stdFontSize / 20 * 24,
+              color: context.theme.onBackground,
+            ),
             elevation: 0,
             title: Text(context.strings.playp_tittle),
             centerTitle: true,
@@ -55,7 +56,7 @@ class LobbyPage extends ConsumerWidget {
               AspectRatio(
                 aspectRatio: 1,
                 child: IconButton(
-                  splashColor: thisTheme.bankColor,
+                  splashColor: context.theme.bankColor,
                   highlightColor: Colors.transparent,
                   icon: Icon(
                     Icons.folder_shared,
@@ -86,7 +87,7 @@ class LobbyPage extends ConsumerWidget {
                         )
                       : LobbyStackButton(
                           onTap: () => viewModel.openStartingStackEditor(),
-                          startingStack: state.startingStack.toString(),
+                          startingStack: state.startingStack,
                         ),
                   SizedBox(
                     height: stdHorizontalOffset,
@@ -105,7 +106,11 @@ class LobbyPage extends ConsumerWidget {
                                   leftItemCallback: viewModel.removePlayer,
                                   canReorder: state.canEditPlayers,
                                   onReorder: viewModel.onReorderPlayer,
-                                  onItemTap: viewModel.onPlayerTap,
+                                  onItemTap: (uid) {
+                                    if (state.canEditPlayers) {
+                                      viewModel.openPlayerEditor(uid);
+                                    }
+                                  },
                                 )
                               : const SizedBox(),
                         ),
@@ -121,7 +126,7 @@ class LobbyPage extends ConsumerWidget {
                               vertical: stdHorizontalOffset / 2,
                             ),
                             child: AttentionAddPlayerButton(
-                              onTap: () => viewModel.addButtonPressed(),
+                              onTap: () => viewModel.openNewPlayerEditor(),
                               needToAnimate: () => state.players.isEmpty,
                             ),
                           ),

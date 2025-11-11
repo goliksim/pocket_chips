@@ -17,40 +17,43 @@ class BreakdownButtons extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        MyButton(
-          height: stdButtonHeight,
-          width: stdButtonHeight,
-          buttonColor: thisTheme.additionButtonColor,
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: Icon(
-              Icons.settings,
-              color: thisTheme.onPrimary,
-              size: stdIconSize,
-              //size: stdIconSize,
+  Widget build(BuildContext context) => Row(
+        children: [
+          Flexible(
+            flex: 10,
+            child: MyButton(
+              height: stdButtonHeight,
+              width: double.infinity,
+              buttonColor: context.theme.additionButtonColor,
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Icon(
+                  Icons.settings,
+                  color: context.theme.onPrimary,
+                  size: stdIconSize,
+                  //size: stdIconSize,
+                ),
+              ),
+              action: () => openSettings(),
             ),
           ),
-          action: () => openSettings(),
-        ),
-        SizedBox(width: stdHorizontalOffset),
-        Expanded(
-          child: MyButton(
-            height: stdButtonHeight,
-            width: double.infinity,
-            buttonColor:
-                thisTheme.primaryColor.withAlpha(canStartBetting ? 255 : 75),
-            textStyle: stdTextStyle.copyWith(
-              fontSize: stdFontSize,
-              color: thisTheme.onPrimary.withAlpha(canStartBetting ? 255 : 75),
+          SizedBox(width: stdHorizontalOffset),
+          Expanded(
+            flex: 31,
+            child: MyButton(
+              height: stdButtonHeight,
+              width: double.infinity,
+              buttonColor: context.theme.primaryColor
+                  .withAlpha(canStartBetting ? 255 : 75),
+              textStyle: context.theme.stdTextStyle.copyWith(
+                fontSize: stdFontSize,
+                color: context.theme.onPrimary
+                    .withAlpha(canStartBetting ? 255 : 75),
+              ),
+              textString: context.strings.game_start,
+              action: () => startBetting(),
             ),
-            textString: context.strings.game_start,
-            action: () => startBetting(),
           ),
-        ),
-      ],
-    );
-  }
+        ],
+      );
 }

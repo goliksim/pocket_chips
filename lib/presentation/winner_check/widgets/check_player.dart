@@ -71,77 +71,75 @@ class _CheckPlayerState extends State<CheckPlayer> with ToastsMixin {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          width: 2.0,
-          color: thisTheme.bankColor.withAlpha(0),
+  Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            width: 2.0,
+            color: context.theme.bankColor.withAlpha(0),
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(
+              stdBorderRadius,
+            ), //                 <--- border radius here
+          ),
         ),
-        borderRadius: BorderRadius.all(
-          Radius.circular(
-            stdBorderRadius,
-          ), //                 <--- border radius here
-        ),
-      ),
-      height: 170.h,
-      child: Column(
-        children: [
-          SizedBox(
-            height: stdButtonHeight * 0.5,
-            child: Center(
-              child: FittedBox(
-                fit: BoxFit.fitHeight,
-                child: Text(
-                  '  ${context.strings.check_player} ${widget.number + 1}${widget.winner ? ' 👑' : ''}',
-                  style: TextStyle(
-                    color: thisTheme.onBackground,
-                    fontSize: stdFontSize,
+        height: 170.h,
+        child: Column(
+          children: [
+            SizedBox(
+              height: stdButtonHeight * 0.5,
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.fitHeight,
+                  child: Text(
+                    '  ${context.strings.check_player} ${widget.number + 1}${widget.winner ? ' 👑' : ''}',
+                    style: TextStyle(
+                      color: context.theme.onBackground,
+                      fontSize: stdFontSize,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          Flexible(
-            child: RotationCard(
-              firstSide: (int index) => CardButton(
-                action: (card) {
-                  updateHand(index, card);
-                },
-                child: CardFront(
-                  card: context.playerCards![widget.number][index],
+            Flexible(
+              child: RotationCard(
+                firstSide: (int index) => CardButton(
+                  action: (card) {
+                    updateHand(index, card);
+                  },
+                  child: CardFront(
+                    card: context.playerCards![widget.number][index],
+                  ),
                 ),
+                secondSide: (int index) => CardButton(
+                  action: (card) {
+                    updateHand(index, card);
+                  },
+                  child: CardBack(),
+                ),
+                count: 2,
+                conditionByIndex: (int index) => widget.cards[index] != null,
+                durationByIndex: (int index) => 500,
+                padding: EdgeInsets.all(stdHorizontalOffset / 3),
               ),
-              secondSide: (int index) => CardButton(
-                action: (card) {
-                  updateHand(index, card);
-                },
-                child: CardBack(),
-              ),
-              count: 2,
-              conditionByIndex: (int index) => widget.cards[index] != null,
-              durationByIndex: (int index) => 500,
-              padding: EdgeInsets.all(stdHorizontalOffset / 3),
             ),
-          ),
-          SizedBox(
-            height: stdButtonHeight * 0.4,
-            child: Center(
-              child: FittedBox(
-                child: Text(
-                  widget.combination == null
-                      ? '...'
-                      : handName(widget.combination!, context),
-                  style: TextStyle(
-                    color: thisTheme.primaryColor,
-                    fontSize: stdFontSize * 0.9,
+            SizedBox(
+              height: stdButtonHeight * 0.4,
+              child: Center(
+                child: FittedBox(
+                  child: Text(
+                    widget.combination == null
+                        ? '...'
+                        : handName(widget.combination!, context),
+                    style: TextStyle(
+                      color: context.theme.primaryColor,
+                      fontSize: stdFontSize * 0.9,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
 }

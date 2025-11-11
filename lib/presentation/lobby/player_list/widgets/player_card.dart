@@ -37,162 +37,172 @@ class PlayerCard extends StatelessWidget {
         canReorder = false;
 
   @override
-  Widget build(BuildContext context) {
-    return Dismissible(
-      key: Key(player.name),
-      direction:
-          canDismiss ? DismissDirection.horizontal : DismissDirection.none,
-      background: Container(
-        color: thisTheme.bgrColor,
-        child: Row(
-          children: [
-            AspectRatio(
-              aspectRatio: 1,
-              child: Icon(
-                isSaved ? Icons.add : Icons.save,
-                color: thisTheme.onBackground,
-                size: stdIconSize,
+  Widget build(BuildContext context) => Dismissible(
+        key: Key(player.name),
+        direction:
+            canDismiss ? DismissDirection.horizontal : DismissDirection.none,
+        background: Container(
+          color: context.theme.bgrColor,
+          child: Row(
+            children: [
+              AspectRatio(
+                aspectRatio: 1,
+                child: Icon(
+                  isSaved ? Icons.add : Icons.save,
+                  color: context.theme.onBackground,
+                  size: stdIconSize,
+                ),
               ),
-            ),
-            Text(
-              isSaved
-                  ? ' ${context.strings.playp_playr_diss1}'
-                  : ' ${context.strings.playp_playr_diss2}',
-              style: TextStyle(
-                color: thisTheme.onBackground,
-                fontSize: stdFontSize * 0.75,
+              Text(
+                isSaved
+                    ? ' ${context.strings.playp_playr_diss1}'
+                    : ' ${context.strings.playp_playr_diss2}',
+                style: TextStyle(
+                  color: context.theme.onBackground,
+                  fontSize: stdFontSize * 0.75,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      secondaryBackground: Container(
-        color: thisTheme.bgrColor,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              isSaved
-                  ? ' ${context.strings.playp_playr_diss3}'
-                  : ' ${context.strings.playp_playr_diss4}',
-              style: TextStyle(
-                color: thisTheme.subsubmainColor,
-                fontSize: stdFontSize * 0.75,
+        secondaryBackground: Container(
+          color: context.theme.bgrColor,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                isSaved
+                    ? ' ${context.strings.playp_playr_diss3}'
+                    : ' ${context.strings.playp_playr_diss4}',
+                style: TextStyle(
+                  color: context.theme.subsubmainColor,
+                  fontSize: stdFontSize * 0.75,
+                ),
               ),
-            ),
-            AspectRatio(
-              aspectRatio: 1,
-              child: Icon(
-                Icons.delete,
-                color: thisTheme.subsubmainColor,
-                size: stdIconSize,
+              AspectRatio(
+                aspectRatio: 1,
+                child: Icon(
+                  Icons.delete,
+                  color: context.theme.subsubmainColor,
+                  size: stdIconSize,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      confirmDismiss: (DismissDirection direction) async =>
-          direction == DismissDirection.startToEnd
-              ? rightCallback?.call()
-              : leftCallback?.call(),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(stdBorderRadius),
-        child: GestureDetector(
-          onTap: () => onTap?.call(),
-          child: Container(
-            height: isSaved ? stdButtonHeight * 0.75 : stdButtonHeight,
-            color: thisTheme.playerColor,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      AspectRatio(
-                        aspectRatio: 1 / 1,
-                        child: Padding(
-                          padding:
-                              EdgeInsets.all(0.20 * stdButtonHeight * 0.75),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                filterQuality: FilterQuality.medium,
-                                image: AssetImage(
-                                  player.assetUrl,
+        confirmDismiss: (DismissDirection direction) async =>
+            direction == DismissDirection.startToEnd
+                ? rightCallback?.call()
+                : leftCallback?.call(),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(stdBorderRadius),
+          child: GestureDetector(
+            onTap: () => onTap?.call(),
+            child: Container(
+              height: isSaved ? stdButtonHeight * 0.75 : stdButtonHeight,
+              color: context.theme.playerColor,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  if (canReorder)
+                    Padding(
+                      key: ValueKey(canReorder),
+                      padding: EdgeInsets.only(left: stdHorizontalOffset / 2),
+                      child: Icon(
+                        Icons.drag_indicator,
+                        color: context.theme.onBackground.withAlpha(128),
+                        size: stdIconSize * 0.75,
+                      ),
+                    ),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        AspectRatio(
+                          aspectRatio: 1 / 1,
+                          child: Padding(
+                            padding:
+                                EdgeInsets.all(0.20 * stdButtonHeight * 0.75),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  filterQuality: FilterQuality.medium,
+                                  image: AssetImage(
+                                    player.assetUrl,
+                                  ),
+                                  fit: BoxFit.fill,
                                 ),
-                                fit: BoxFit.fill,
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      Flexible(
-                        child: Container(
-                          margin: EdgeInsets.symmetric(
-                            horizontal: stdButtonHeight * 0.1,
-                            vertical: stdButtonHeight * 0.15,
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${player.name}  ', //+ ((index == thisLobby.dealerIndex && !widget.saved)?" - dealer":""),
-                                    style: TextStyle(
-                                      color: thisTheme.onBackground,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: stdFontSize * 0.8,
-                                    ),
-                                  ),
-                                  if (player.isDealer && !isSaved)
-                                    Tooltip(
-                                      message: context.strings.tooltip_dealer,
-                                      verticalOffset: stdButtonHeight / 6,
-                                      child: Icon(
-                                        MdiIcons.cardsPlaying,
-                                        color: thisTheme.onBackground,
-                                        size: stdIconSize / 1.5,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              if (player.bank != null)
+                        Flexible(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(
+                              horizontal: stdButtonHeight * 0.1,
+                              vertical: stdButtonHeight * 0.15,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                                 Text(
-                                  '\$ ${player.bank}',
+                                  '${player.name}  ',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    color: thisTheme.onBackground,
-                                    fontSize: stdFontSize * 0.75,
+                                    color: context.theme.onBackground,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: stdFontSize * 0.8,
                                   ),
                                 ),
-                            ],
+                                if (player.bank != null)
+                                  Text(
+                                    player.bank!.toSeparatedBank,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      color: context.theme.onBackground,
+                                      fontSize: stdFontSize * 0.75,
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                if (canReorder)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: AspectRatio(
-                      aspectRatio: 1 / 1,
+                  if (player.isDealer && !isSaved)
+                    Padding(
+                      padding: EdgeInsets.only(
+                        right: stdHorizontalOffset +
+                            (canReorder ? 0 : stdHorizontalOffset),
+                      ),
+                      child: Tooltip(
+                        message: context.strings.tooltip_dealer,
+                        verticalOffset: stdButtonHeight / 6,
+                        child: Icon(
+                          MdiIcons.cardsPlaying,
+                          color: context.theme.primaryColor,
+                          size: stdIconSize * 0.9,
+                        ),
+                      ),
+                    ),
+                  if (canReorder)
+                    Padding(
+                      padding: EdgeInsets.only(right: stdHorizontalOffset * 2),
                       child: Icon(
-                        Icons.drag_handle,
-                        color: thisTheme.onBackground,
+                        Icons.edit,
+                        color: context.theme.onBackground.withAlpha(128),
                         size: stdIconSize * 0.75,
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }

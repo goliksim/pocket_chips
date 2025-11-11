@@ -86,7 +86,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
   Future<void> addPlayer({
     required PlayerModel player,
     required bool makeDealer,
-    int bank = defaultLobbyBank,
+    int? bank,
   }) async {
     final currentLobby = activeLobby;
 
@@ -110,7 +110,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     final newPlayers = [...currentLobby.players, player];
 
     final newBanks = Map<String, int>.from(currentLobby.banks)
-      ..[player.uid] = bank;
+      ..[player.uid] = bank ?? currentLobby.defaultBank;
 
     final newDealerId =
         makeDealer ? player.uid : currentLobby.dealerId ?? newPlayers.first.uid;

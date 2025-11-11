@@ -26,7 +26,15 @@ class InitializationManager with ChangeNotifier {
     await checkFirstLaunch(config).then(
       (pushed) async {
         if (!pushed) {
-          await checkForUpdates(config);
+          await checkForUpdates(config).then(
+            (pushed) async {
+              if (pushed) {
+                await Future.delayed(Duration(milliseconds: 500));
+              }
+            },
+          );
+        } else {
+          await Future.delayed(Duration(milliseconds: 500));
         }
       },
     );
@@ -42,7 +50,7 @@ class InitializationManager with ChangeNotifier {
     if (currentVersion.compareTo(lastVersion) > 0) {
       _configModelHolder.updateVerion(currentVersion);
 
-      showUpdateInfo();
+      await showUpdateInfo();
       return true;
     }
 
@@ -53,7 +61,7 @@ class InitializationManager with ChangeNotifier {
     final firstLaunch = config.firstLaunch;
 
     if (firstLaunch) {
-      showAboutInfo();
+      await showAboutInfo();
 
       return true;
     }
@@ -61,9 +69,9 @@ class InitializationManager with ChangeNotifier {
     return false;
   }
 
-  void showUpdateInfo() => _navigationManager.showUpdateDialog();
+  Future<void> showUpdateInfo() => _navigationManager.showUpdateDialog();
 
-  void showAboutInfo() => _navigationManager.showAboutDialog(
+  Future<void> showAboutInfo() => _navigationManager.showAboutDialog(
         canPop: false,
       );
 }

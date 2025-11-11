@@ -1,5 +1,6 @@
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../utils/logs.dart';
 import '../utils/theme/ui_values.dart';
 
 /// Менеджер всплывающих уведомлений
@@ -10,16 +11,16 @@ class ToastManager {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 3,
-        backgroundColor: thisTheme.bgrColor,
-        textColor: thisTheme.onBackground,
+        //TODO: make container for ToastManager
+        //backgroundColor: context.theme.bgrColor,
+        //textColor: context.theme.onBackground,
       );
 
   void showToast(String text) async {
     try {
       await toastWarning(text);
     } catch (e) {
-      // ignore: avoid_print
-      print('TOAST ERROR of: $text');
+      logs.writeLog('TOAST ERROR of: $text');
     }
   }
 }

@@ -237,7 +237,7 @@ void runExecuteFoldAllPlayersPreFlopTest(
         players[0].uid,
         players[1].uid,
       },
-      currentPlayerUid: players[1].uid,
+      currentPlayerUid: null,
     ),
   );
 }
@@ -296,6 +296,7 @@ void runExecuteFoldPlayerWithInactiveTest(
       foldedPlayers: {
         players[0].uid,
       },
+      currentPlayerUid: null,
     ),
   );
 }

@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../di/domain_managers.dart';
 import '../l10n/app_localizations.dart';
-import '../utils/theme/ui_values.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -20,10 +19,7 @@ class MyApp extends StatelessWidget {
             locale: ref.watch(localeManagerProvider),
             title: _appTitle,
             //TODO: normal theme
-            theme: ThemeData(
-              primarySwatch: thisTheme.primaryColor,
-              fontFamily: 'Ubuntu',
-            ),
+
             routerDelegate: ref.watch(routeDelegateProvider),
             routeInformationParser: ref.watch(routeInformationParserProvider),
           ),

@@ -1,24 +1,32 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../di/model_holders.dart';
 import '../../domain/model_holders/config_model_holder.dart';
-import '../logs.dart';
-import 'ui_values.dart';
 
-class ThemeManager {
-  final ConfigModelHolder _configModelHolder;
+class ThemeManager extends Notifier<ThemeMode> {
+  ConfigModelHolder get _configModelHolder =>
+      ref.read(configModelHolderProvider.notifier);
 
-  ThemeManager({required ConfigModelHolder configModelHolder})
-      : _configModelHolder = configModelHolder;
-
-  void changeTheme() {
-    final currentConfig = _configModelHolder.state.requireValue;
-
-    final isDark = thisTheme == themeList[1];
-
-    thisTheme = themeList[isDark ? 0 : 1];
-
-    _configModelHolder.updateConfig(
-      currentConfig.copyWith(isDark: isDark),
+  @override
+  ThemeMode build() {
+    ref.listen(
+      configModelHolderProvider,
+      (_, value) {
+        value.whenOrNull(
+          data: (data) {
+            state = data.isDark ? ThemeMode.dark : ThemeMode.light;
+          },
+        );
+      },
     );
 
-    logs.writeLog('Turn to ${thisTheme.name} mode');
+    return ThemeMode.system;
+  }
+
+  Future<void> changeTheme() async {
+    final isDark = (state == ThemeMode.dark);
+
+    return _configModelHolder.updateTheme(isDark: !isDark);
   }
 }

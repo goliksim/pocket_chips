@@ -26,5 +26,5 @@ abstract class PlayerModel with _$PlayerModel {
 }
 
 extension PlayerModelX on Iterable<PlayerModel> {
-  PlayerModel? findByUid(String uid) => firstWhereOrNull((p) => p.uid == uid);
+  PlayerModel? findByUid(String? uid) => firstWhereOrNull((p) => p.uid == uid);
 }

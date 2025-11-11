@@ -148,6 +148,9 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       lobbyState: model.lobbyState.copyWith(
         gameState: GameStatusEnum.showdown,
       ),
+      sessionState: model.sessionState.copyWith(
+        currentPlayerUid: null,
+      ),
     );
 
     GameStateModel model2;
@@ -406,6 +409,9 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
         lobbyState: currentLobby.copyWith(
           gameState: GameStatusEnum.showdown,
         ),
+        sessionState: currentModel.sessionState.copyWith(
+          currentPlayerUid: null,
+        ),
       );
     }
 
@@ -484,6 +490,9 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       logs.writeLog('GameSM: new street is showdown, returning to UI');
       return currentModel.copyWith(
         lobbyState: newLobbyState,
+        sessionState: currentModel.sessionState.copyWith(
+          currentPlayerUid: null,
+        ),
       );
     }
 
@@ -640,6 +649,9 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       return editableModel.copyWith(
         lobbyState: currentLobby().copyWith(
           gameState: GameStatusEnum.showdown,
+        ),
+        sessionState: currentSession().copyWith(
+          currentPlayerUid: null,
         ),
       );
     }

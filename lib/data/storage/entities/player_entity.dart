@@ -25,12 +25,9 @@ class PlayerEntity {
   Map<String, dynamic> toJson() => _$PlayerEntityToJson(this);
 
   // Generate new id for old versions
-  static String idFromJson(String? uid) {
-    return uid ?? Uuid().v4();
-  }
+  static String idFromJson(String? uid) => uid ?? Uuid().v4();
 
   @override
-  String toString() {
-    return '[PlayerEntity] - id: $uid, name: $name, assetUrl: $assetUrl';
-  }
+  String toString() =>
+      '[PlayerEntity] - id: $uid, name: $name, assetUrl: $assetUrl';
 }

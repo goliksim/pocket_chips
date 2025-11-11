@@ -12,9 +12,7 @@ class StoreConfig {
 
   StoreConfig._internal(this.store, this.apiKey);
 
-  static StoreConfig get instance {
-    return _instance!;
-  }
+  static StoreConfig get instance => _instance!;
 
   static bool isForAppleStore() => _instance!.store == Stores.appleStore;
 

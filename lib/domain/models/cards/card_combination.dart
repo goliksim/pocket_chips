@@ -22,9 +22,7 @@ class Combination implements Comparable<Combination> {
     return strength.compareTo(other.strength);
   }
 
-  bool operator >(Combination other) {
-    return compareTo(other) > 0;
-  }
+  bool operator >(Combination other) => compareTo(other) > 0;
 
   @override
   bool operator ==(Object other) =>

@@ -42,95 +42,94 @@ class _BankWindowState extends State<BankEditorDialog> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      elevation: 0,
-      backgroundColor: thisTheme.bgrColor,
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: adaptiveOffset,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(stdBorderRadius),
+  Widget build(BuildContext context) => Dialog(
+        elevation: 0,
+        backgroundColor: context.theme.bgrColor,
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: adaptiveOffset,
         ),
-      ),
-      child: Container(
-        padding: EdgeInsets.all(
-          stdHorizontalOffset,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(stdBorderRadius),
+          ),
         ),
-        width: stdButtonWidth,
-        height: stdButtonHeight * 0.75 * 2.7 + stdHorizontalOffset * 3.5,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox(
-              height: stdButtonHeight * 0.5,
-              child: Center(
-                child: FittedBox(
-                  fit: BoxFit.fitWidth,
-                  child: Text(
-                    context.strings.playp_bank_title,
-                    style: TextStyle(
-                      color: thisTheme.onBackground,
-                      fontSize: stdFontSize,
-                      fontWeight: FontWeight.bold,
+        child: Container(
+          padding: EdgeInsets.all(
+            stdHorizontalOffset,
+          ),
+          width: stdButtonWidth,
+          height: stdButtonHeight * 0.75 * 2.7 + stdHorizontalOffset * 3.5,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                height: stdButtonHeight * 0.5,
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Text(
+                      context.strings.playp_bank_title,
+                      style: TextStyle(
+                        color: context.theme.onBackground,
+                        fontSize: stdFontSize,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(
-              height: stdHorizontalOffset / 2,
-            ),
-            Container(
-              height: stdButtonHeight * 0.75,
-              decoration: BoxDecoration(
-                color: thisTheme.bankColor,
-                borderRadius: BorderRadius.circular(stdBorderRadius),
+              SizedBox(
+                height: stdHorizontalOffset / 2,
               ),
-              child: TextFormField(
-                controller: _bankController,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: thisTheme.onBackground,
-                  fontSize: stdFontSize,
+              Container(
+                height: stdButtonHeight * 0.75,
+                decoration: BoxDecoration(
+                  color: context.theme.bankColor,
+                  borderRadius: BorderRadius.circular(stdBorderRadius),
                 ),
-                maxLength: 10,
-                textAlignVertical: TextAlignVertical.bottom,
-                decoration: InputDecoration(
-                  hintStyle: TextStyle(
+                child: TextFormField(
+                  controller: _bankController,
+                  keyboardType: TextInputType.number,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: context.theme.onBackground,
                     fontSize: stdFontSize,
-                    color: thisTheme.bgrColor,
                   ),
-                  hintText: '${widget.viewModel.currentDefaultBank}',
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(stdBorderRadius),
-                    borderSide: BorderSide(color: thisTheme.bankColor),
+                  maxLength: 8,
+                  textAlignVertical: TextAlignVertical.bottom,
+                  decoration: InputDecoration(
+                    hintStyle: TextStyle(
+                      fontSize: stdFontSize,
+                      color: context.theme.bgrColor,
+                    ),
+                    hintText: '${widget.viewModel.currentDefaultBank}',
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(stdBorderRadius),
+                      borderSide: BorderSide(color: context.theme.bankColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(stdBorderRadius),
+                      borderSide: BorderSide(color: context.theme.bankColor),
+                    ),
+                    counterText: '',
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(stdBorderRadius),
-                    borderSide: BorderSide(color: thisTheme.bankColor),
-                  ),
-                  counterText: '',
+                  onChanged: _onValueChanged,
                 ),
-                onChanged: _onValueChanged,
               ),
-            ),
-            SizedBox(
-              height: stdHorizontalOffset,
-            ),
-            MyButton(
-              height: stdButtonHeight * 0.75,
-              width: double.infinity,
-              buttonColor:
-                  (tmpBank >= 1) ? thisTheme.primaryColor : thisTheme.bankColor,
-              action: () => widget.viewModel.changeBank(tmpBank),
-              textString: context.strings.playp_bank_conf,
-            ),
-          ],
+              SizedBox(
+                height: stdHorizontalOffset,
+              ),
+              MyButton(
+                height: stdButtonHeight * 0.75,
+                width: double.infinity,
+                buttonColor: (tmpBank >= 1)
+                    ? context.theme.primaryColor
+                    : context.theme.bankColor,
+                action: () => widget.viewModel.changeBank(tmpBank),
+                textString: context.strings.playp_bank_conf,
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 }

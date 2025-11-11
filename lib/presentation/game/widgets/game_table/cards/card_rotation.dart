@@ -20,14 +20,12 @@ class RotationCard extends StatelessWidget {
   final EdgeInsets? padding;
 
   @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: count,
-      itemBuilder: (context, index) {
-        return AnimatedSwitcher(
+  Widget build(BuildContext context) => ListView.builder(
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: count,
+        itemBuilder: (context, index) => AnimatedSwitcher(
           switchInCurve: Curves.easeIn,
           switchOutCurve: Curves.easeOut,
           duration: Duration(milliseconds: durationByIndex(index)),
@@ -59,8 +57,6 @@ class RotationCard extends StatelessWidget {
             child:
                 conditionByIndex(index) ? firstSide(index) : secondSide(index),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
 }

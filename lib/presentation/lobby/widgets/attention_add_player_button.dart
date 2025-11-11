@@ -16,21 +16,21 @@ class AttentionAddPlayerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AttentionButton(
-        bgColor: thisTheme.playerColor,
-        textColor: thisTheme.primaryColor,
+        bgColor: context.theme.playerColor,
+        textColor: context.theme.primaryColor,
         onTap: () => onTap(),
         needToAnimate: needToAnimate,
         textWidget: needToAnimate()
             ? Text(
                 context.strings.playp_add,
                 style: TextStyle(
-                  color: thisTheme.primaryColor,
+                  color: context.theme.primaryColor,
                   fontSize: stdFontSize * 0.75,
                 ),
               )
             : Icon(
                 Icons.add_sharp,
-                color: thisTheme.primaryColor,
+                color: context.theme.primaryColor,
                 size: stdIconSize,
               ),
       );

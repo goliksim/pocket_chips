@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mailer/flutter_mailer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,8 +21,6 @@ class OnboardingViewModel extends AsyncNotifier<OnboardingViewState> {
   AppLocalizations get _strings => ref.watch(stringsProvider);
 
   AsyncValue<OnboardingViewState> get stateModel => state;
-
-  bool get canSendMail => !kIsWeb && Platform.isAndroid;
 
   @override
   FutureOr<OnboardingViewState> build() async {
@@ -61,13 +57,10 @@ class OnboardingViewModel extends AsyncNotifier<OnboardingViewState> {
       ],
     );
 
-    if (canSendMail) {
-      await FlutterMailer.send(mailOptions);
-    }
+    await FlutterMailer.send(mailOptions);
   }
 
-  //TODO: implement
-  void changeTheme() => throw UnimplementedError();
+  void changeTheme() => ref.read(themeManagerProvider.notifier).changeTheme();
 
   void setLocale(Locale locale) {
     {

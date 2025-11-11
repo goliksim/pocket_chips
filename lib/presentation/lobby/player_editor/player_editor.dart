@@ -1,7 +1,6 @@
 // Кнопка добавления игрока
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../../services/assets_provider.dart';
 import '../../../services/toast_manager.dart';
@@ -27,7 +26,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
   late FocusNode focusNodeStack = FocusNode();
 
   Future<void> _onLogoTap() async {
-    SystemChrome.restoreSystemUIOverlays();
+    //SystemChrome.restoreSystemUIOverlays();
     if (focusNodeName.hasFocus || focusNodeStack.hasFocus) {
       focusNodeStack.unfocus();
       focusNodeName.unfocus();
@@ -51,13 +50,12 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
       listenable: widget.viewModel,
       builder: (context, value) {
         final player = widget.viewModel.playerState;
-        final canEdit = widget.viewModel.canEdit;
 
         final validInput = widget.viewModel.validateInput;
 
         return Dialog(
           elevation: stdElevation,
-          backgroundColor: thisTheme.bgrColor,
+          backgroundColor: context.theme.bgrColor,
           insetPadding: EdgeInsets.symmetric(horizontal: adaptiveOffset),
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(20.0)),
@@ -96,8 +94,8 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                             width: 1.5,
                             color: (player.assetUrl !=
                                     AssetsProvider.emptyPlayerAsset)
-                                ? thisTheme.primaryColor
-                                : thisTheme.bgrColor,
+                                ? context.theme.primaryColor
+                                : context.theme.bgrColor,
                           ),
                           shape: BoxShape.circle,
                           image: DecorationImage(
@@ -126,7 +124,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                                   ? context.strings.playp_edit_title1
                                   : context.strings.playp_edit_title2,
                               style: TextStyle(
-                                color: thisTheme.onBackground,
+                                color: context.theme.onBackground,
                                 fontWeight: FontWeight.bold,
                                 fontSize: stdFontSize,
                               ),
@@ -141,7 +139,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                             focusNode: focusNodeName,
                             style: TextStyle(
                               fontStyle: FontStyle.italic,
-                              color: thisTheme.onBackground,
+                              color: context.theme.onBackground,
                               fontSize: stdFontSize * 0.85,
                             ),
                             maxLength: 10,
@@ -150,7 +148,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                               hintStyle: TextStyle(
                                 fontStyle: FontStyle.italic,
                                 fontSize: stdFontSize * 0.85,
-                                color: thisTheme.hintColor,
+                                color: context.theme.hintColor,
                               ),
                               hintText: context.strings.playp_edit_win1,
                               enabledBorder: UnderlineInputBorder(
@@ -158,15 +156,15 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                                     // цвет линнии в окне
                                     BorderSide(
                                   color: (player.nameInput?.isNotEmpty ?? false)
-                                      ? thisTheme.primaryColor
-                                      : thisTheme.hintColor,
+                                      ? context.theme.primaryColor
+                                      : context.theme.hintColor,
                                 ),
                               ),
                               focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
                                   color: (player.nameInput?.isNotEmpty ?? false)
-                                      ? thisTheme.primaryColor
-                                      : thisTheme.hintColor,
+                                      ? context.theme.primaryColor
+                                      : context.theme.hintColor,
                                 ),
                               ),
                               counterText: '',
@@ -175,91 +173,90 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                           ),
                         ),
                         // Bank field
-                        if (canEdit)
-                          SizedBox(
-                            height: stdButtonHeight * 0.6,
-                            child: TextFormField(
-                              keyboardType: TextInputType.number,
-                              focusNode: focusNodeStack,
-                              style: TextStyle(
-                                fontStyle: FontStyle.italic,
-                                color: thisTheme.onBackground,
-                                fontSize: stdFontSize * 0.85,
-                              ),
-                              maxLength: 5,
-                              textAlignVertical: TextAlignVertical.bottom,
-                              decoration: InputDecoration(
-                                hintStyle: TextStyle(
-                                  fontStyle: FontStyle.italic,
-                                  fontSize: stdFontSize * 0.85,
-                                  color: thisTheme.hintColor,
-                                ),
-                                hintText:
-                                    '${context.strings.playp_edit_win2} - ${player.bankInput}',
-                                enabledBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      // цвет линнии в окне
-                                      BorderSide(
-                                    color: (player.bankInput != null)
-                                        ? thisTheme.primaryColor
-                                        : thisTheme.hintColor,
-                                  ),
-                                ),
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: (player.bankInput != null)
-                                        ? thisTheme.primaryColor
-                                        : thisTheme.hintColor,
-                                  ),
-                                ),
-                                counterText: '',
-                              ),
-                              onChanged: _onBankChanged,
+                        SizedBox(
+                          height: stdButtonHeight * 0.6,
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            focusNode: focusNodeStack,
+                            style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              color: context.theme.onBackground,
+                              fontSize: stdFontSize * 0.85,
                             ),
+                            maxLength: 8,
+                            textAlignVertical: TextAlignVertical.bottom,
+                            decoration: InputDecoration(
+                              hintStyle: TextStyle(
+                                fontStyle: FontStyle.italic,
+                                fontSize: stdFontSize * 0.85,
+                                color: context.theme.hintColor,
+                              ),
+                              hintText:
+                                  '${context.strings.playp_edit_win2} - ${player.bankInput}',
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide:
+                                    // цвет линнии в окне
+                                    BorderSide(
+                                  color: (player.bankInput != null)
+                                      ? context.theme.primaryColor
+                                      : context.theme.hintColor,
+                                ),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: (player.bankInput != null)
+                                      ? context.theme.primaryColor
+                                      : context.theme.hintColor,
+                                ),
+                              ),
+                              counterText: '',
+                            ),
+                            onChanged: _onBankChanged,
                           ),
+                        ),
                         // Button field
-                        if (canEdit)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Flexible(
-                                flex: 7,
-                                child: Text(
-                                  context.strings.playp_edit_win3,
-                                  style: TextStyle(
-                                    color: player.forceDeadler
-                                        ? thisTheme.hintColor
-                                        : thisTheme.onBackground,
-                                    fontSize: stdFontSize * 0.85,
-                                    fontWeight: FontWeight.normal,
-                                  ),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              flex: 7,
+                              child: Text(
+                                context.strings.playp_edit_win3,
+                                style: TextStyle(
+                                  color: player.forceDeadler
+                                      ? context.theme.hintColor
+                                      : context.theme.onBackground,
+                                  fontSize: stdFontSize * 0.85,
+                                  fontWeight: FontWeight.normal,
                                 ),
                               ),
-                              Expanded(
-                                flex: 2,
-                                child: SizedBox(
-                                  height: stdButtonHeight * 0.6,
-                                  child: Checkbox(
-                                    checkColor: Colors.white,
-                                    fillColor: WidgetStateProperty.all<Color>(
-                                      player.makeDealer
-                                          ? thisTheme.primaryColor
-                                          : thisTheme.hintColor,
-                                    ),
-                                    value: player.makeDealer ||
-                                        player.forceDeadler,
-                                    onChanged: widget.viewModel.makeDealer,
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: SizedBox(
+                                height: stdButtonHeight * 0.6,
+                                child: Checkbox(
+                                  checkColor: Colors.white,
+                                  fillColor: WidgetStateProperty.all<Color>(
+                                    player.makeDealer
+                                        ? context.theme.primaryColor
+                                        : context.theme.bgrColor,
                                   ),
+                                  value:
+                                      player.makeDealer || player.forceDeadler,
+                                  onChanged: widget.viewModel.makeDealer,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
+                        ),
                         MyButton(
                           height: stdButtonHeight * 0.75,
                           width: double.infinity,
                           buttonColor: validInput
-                              ? thisTheme.primaryColor
-                              : thisTheme.bankColor,
+                              ? context.theme.primaryColor
+                              : context.theme.bankColor,
                           textString: widget.viewModel.newPlayerEditing
                               ? context.strings.playp_edit_add
                               : context.strings.playp_edit_conf,
