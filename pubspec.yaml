@@ -19,6 +19,7 @@ dependencies:
   #in_app_review: ^2.0.6
   
   # Monitization
+  in_app_purchase: ^3.2.3
   #unity_ads_plugin: ^0.3.7
   #purchases_flutter: ^5.7.0
   # my_target_flutter: ^0.1.0+3

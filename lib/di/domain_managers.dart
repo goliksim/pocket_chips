@@ -8,6 +8,7 @@ import '../data/storage/shared_preferences/shared_preferences_storage.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/localization.dart';
 import '../services/initialization_manager.dart';
+import '../services/monitization/purchases/purchases_manager.dart';
 import '../services/toast_manager.dart';
 import '../utils/theme/theme_manager.dart';
 import 'model_holders.dart';
@@ -62,4 +63,11 @@ final toastManagerProvider = Provider(
 
 final themeManagerProvider = NotifierProvider<ThemeManager, ThemeMode>(
   ThemeManager.new,
+);
+
+final purchasesManagerProvider = Provider(
+  (ref) => PurchasesManager(
+    toastManager: ref.watch(toastManagerProvider),
+    strings: ref.watch(stringsProvider),
+  ),
 );

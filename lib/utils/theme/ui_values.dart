@@ -1,8 +1,6 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // Глобальные переменные размеров
-double stdCutoutWidth = 0;
-double stdCutoutWidthDown = 0;
 
 double stdHeight = 48.h;
 final double stdButtonWidth = 400.h;

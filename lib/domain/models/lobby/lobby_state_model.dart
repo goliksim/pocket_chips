@@ -8,7 +8,7 @@ part 'lobby_state_model.freezed.dart';
 const int defaultSmallBlindValue = 25;
 const int defaultLobbyBank = 5000;
 
-int maxPlayerCount = 10;
+const int maxPlayerCount = 10;
 
 @freezed
 abstract class LobbyStateModel with _$LobbyStateModel {

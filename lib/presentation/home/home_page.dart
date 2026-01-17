@@ -149,13 +149,19 @@ class HomePage extends ConsumerWidget {
     );
 
     return PatternContainer(
-      padding: EdgeInsets.only(
-        top: stdCutoutWidth * 0.75,
-        bottom: stdCutoutWidthDown * 0.75,
-      ),
       child: Scaffold(
         appBar: AppBar(
-          leading: null,
+          leading: AspectRatio(
+            aspectRatio: 1,
+            child: IconButton(
+              icon: Icon(
+                Icons.help,
+                size: stdIconSize,
+              ),
+              tooltip: context.strings.home_abo,
+              onPressed: () => viewModel.showAboutInfo(),
+            ),
+          ),
           toolbarHeight: stdButtonHeight * 0.75,
           automaticallyImplyLeading: false,
           backgroundColor: const Color(0x00000000),
@@ -212,9 +218,8 @@ class HomePage extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               // Continue Button
-                              Opacity(
-                                opacity: shouldDrawContinue ? 1 : 0.25,
-                                child: MyButton(
+                              if (shouldDrawContinue)
+                                MyButton(
                                   height: stdButtonHeight,
                                   width: double.infinity,
                                   borderRadius:
@@ -227,7 +232,6 @@ class HomePage extends ConsumerWidget {
                                     }
                                   },
                                 ),
-                              ),
 
                               SizedBox(height: stdHorizontalOffset),
                               //New Game
@@ -257,8 +261,8 @@ class HomePage extends ConsumerWidget {
                                           stdBorderRadius),
                                       buttonColor:
                                           context.theme.additionButtonColor,
-                                      textString: context.strings.home_abo,
-                                      action: () => viewModel.showAboutInfo(),
+                                      textString: context.strings.home_sup,
+                                      action: () => viewModel.showDonation(),
                                     ),
                                   ),
                                   Expanded(

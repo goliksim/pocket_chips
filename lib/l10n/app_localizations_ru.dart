@@ -82,7 +82,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get home_win_check => 'Ассистент';
 
   @override
-  String get support_tittle => 'Вы можете поддержать меня:';
+  String get support_tittle => 'Способы поддержки:';
 
   @override
   String get support_video => 'Посмотреть рекламу';

@@ -15,6 +15,8 @@ import '../presentation/lobby/player_list/view_state/lobby_player_item.dart';
 import '../presentation/lobby/view_model/lobby_page_view_model.dart';
 import '../presentation/lobby/view_model/lobby_scroll_controller.dart';
 import '../presentation/lobby/view_state/lobby_page_state.dart';
+import '../presentation/monitization/view_model/donation_view_model.dart';
+import '../presentation/monitization/view_state/donation_view_state.dart';
 import '../presentation/onboading/onboarding_view_model.dart';
 import '../presentation/onboading/view_state/onboarding_view_state.dart';
 import '../presentation/settings/view_model/game_settings_view_model.dart';
@@ -120,4 +122,9 @@ final winnerChooseViewModelProvider =
     strings: ref.read(stringsProvider),
     args: args,
   ),
+);
+
+final donationViewModelProvider =
+    AsyncNotifierProvider.autoDispose<DonationViewModel, DonationViewState>(
+  DonationViewModel.new,
 );

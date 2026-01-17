@@ -32,16 +32,6 @@ class _InitPageState extends State<InitPage>
   void initState() {
     super.initState();
 
-    //TODO: Выпилить это говно
-    final data = MediaQueryData.fromView(
-      WidgetsBinding.instance.platformDispatcher.views.single,
-    ).systemGestureInsets;
-    stdCutoutWidth = data.top;
-    stdCutoutWidthDown = data.bottom;
-
-    stdCutoutWidth = stdCutoutWidth >= 48 ? stdCutoutWidth : 0;
-    stdCutoutWidthDown = stdCutoutWidthDown > 48 ? stdCutoutWidthDown / 2 : 0;
-
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -89,101 +79,90 @@ class _InitPageState extends State<InitPage>
   Widget build(BuildContext _) => ThemeProvider(
         theme: Themes.dark(),
         child: Builder(
-            builder: (context) => Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomCenter,
-                      stops: const [
-                        0.0,
-                        0.175,
-                        0.45,
-                        0.725,
-                        1.0,
-                      ],
-                      colors: [
-                        context.theme.onBackground,
-                        context.theme.onBackground,
-                        context.theme.primaryColor,
-                        context.theme.bgrColor,
-                        context.theme.bgrColor,
-                      ],
-                    ),
+          builder: (context) => Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomCenter,
+                stops: const [0.0, 0.175, 0.45, 0.725, 1.0],
+                colors: [
+                  context.theme.onBackground,
+                  context.theme.onBackground,
+                  context.theme.primaryColor,
+                  context.theme.bgrColor,
+                  context.theme.bgrColor,
+                ],
+              ),
+            ),
+            child: Scaffold(
+              appBar: AppBar(
+                leading: null,
+                toolbarHeight: stdButtonHeight * 0.75,
+                automaticallyImplyLeading: false,
+                backgroundColor: const Color(0x00000000),
+                iconTheme: IconThemeData(
+                  color: context.theme.onBackground,
+                ),
+                elevation: 0,
+              ),
+              backgroundColor: Colors.transparent,
+              body: Center(
+                child: AnimatedBuilder(
+                  animation: _opacity,
+                  builder: (context, child) => Opacity(
+                    opacity: _opacity.value,
+                    child: child,
                   ),
-                  padding: EdgeInsets.only(
-                    top: stdCutoutWidth * 0.75,
-                    bottom: stdCutoutWidthDown * 0.75,
-                  ),
-                  child: Scaffold(
-                    appBar: AppBar(
-                      leading: null,
-                      toolbarHeight: stdButtonHeight * 0.75,
-                      automaticallyImplyLeading: false,
-                      backgroundColor: const Color(0x00000000),
-                      iconTheme: IconThemeData(
-                        color: context.theme.onBackground,
-                      ),
-                      elevation: 0,
+                  child: Container(
+                    width: stdButtonWidth,
+                    margin: EdgeInsets.only(
+                      bottom: adaptiveOffset,
+                      left: adaptiveOffset,
+                      right: adaptiveOffset,
                     ),
-                    backgroundColor: Colors.transparent,
-                    body: Center(
-                      child: AnimatedBuilder(
-                        animation: _opacity,
-                        builder: (context, child) => Opacity(
-                          opacity: _opacity.value,
-                          child: child,
-                        ),
-                        child: Container(
-                          width: stdButtonWidth,
-                          margin: EdgeInsets.only(
-                            bottom: adaptiveOffset,
-                            left: adaptiveOffset,
-                            right: adaptiveOffset,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          AspectRatio(
+                            aspectRatio: 0.8,
+                            child: ChipsImage(),
                           ),
-                          child: Center(
+                          Expanded(
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                AspectRatio(
-                                  aspectRatio: 0.8,
-                                  child: ChipsImage(),
+                                FittedBox(
+                                  child: Text(
+                                    'POCKET CHIPS',
+                                    textAlign: TextAlign.center,
+                                    style: context.theme.appBarStyle.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: stdFontSize * 2.35,
+                                      color: context.theme.primaryColor,
+                                    ),
+                                  ),
                                 ),
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      FittedBox(
-                                        child: Text(
-                                          'POCKET CHIPS',
-                                          textAlign: TextAlign.center,
-                                          style: context.theme.appBarStyle
-                                              .copyWith(
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: stdFontSize * 2.35,
-                                            color: context.theme.primaryColor,
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        'created by goliksim',
-                                        style:
-                                            context.theme.appBarStyle.copyWith(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: stdFontSize,
-                                        ),
-                                      ),
-                                    ],
+                                Text(
+                                  'created by goliksim',
+                                  style: context.theme.appBarStyle.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: stdFontSize,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ),
-                )),
+                ),
+              ),
+            ),
+          ),
+        ),
       );
 }

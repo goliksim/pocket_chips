@@ -3,11 +3,7 @@
 
 [![Google Play](https://img.shields.io/badge/Google_Play-%23414141.svg?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.goliksim.pocketchips&hl=en&gl=US) [![RuStore](https://img.shields.io/badge/RuStore-%234e60af.svg?)](https://apps.rustore.ru/app/com.goliksim.pocketchips) [![RuStore](https://img.shields.io/badge/Web_Verson-%23968ad2.svg?)](https://apps.rustore.ru/app/com.goliksim.pocketchips) 
 
-**This is my first app on Flutter and in general!**</br>
 Pocket poker chips for your phone. Play poker with only cards.
-
-
-
 
 ## Content
 
@@ -39,11 +35,18 @@ The application stores players' chips, and also allows you to place bets and div
 Instructions on how to install your application. This may include cloning the repository, installing dependencies, and other necessary steps.
 
 ```bash
-git clone https://github.com/your-project-on-github.git
-cd your-project
+git clone https://github.com/goliksim/pocket_chips.git
+cd pocket_chips
 fvm flutter pub get
 fvm flutter gen-l10n
+fvm dart run build_runner build --delete-conflicting-outputs
 ```
+
+To build android release app you need to add:
+* google-services.json
+* key.properties
+* keystore.jks
+
 
 ## Usage
 ```bash
@@ -53,10 +56,10 @@ flutter run
 ## Stack
 
 - **Flutter/Dart**: My app is built with Flutter on Dart.
-- **State Management**: StateFul/Stateless widgets with rolling variables.
+- **State Management**: Riverpod + ChangeNotifier.
 - **API Integration**: Offline app.
 - **Database**: Shared preferences.
-- **Testing**: Manual trial and error.
+- **Testing**: Unit tests with flutter_test and mockito.
 
 
 ## Contributing

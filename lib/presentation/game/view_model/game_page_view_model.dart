@@ -64,10 +64,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         smallBlindValue: gameModel.lobbyState.smallBlindValue,
       ),
       gameStatus: gameState,
-      currentGameState: getGameStateName(
-        strings: _strings,
-        state: gameState,
-      ),
+      currentGameState: _strings.getGameStateName(gameState),
       currentPlayerName: gameModel.currentPlayer?.name,
       canEditPlayer: gameState.canEditPlayers,
     );
@@ -77,10 +74,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
   void changeGameStateText(GameStatusEnum enumValue) async {
     state = AsyncData(
       viewState.copyWith(
-        currentGameState: getGameStateName(
-          strings: _strings,
-          state: enumValue,
-        ),
+        currentGameState: _strings.getGameStateName(enumValue),
       ),
     );
   }

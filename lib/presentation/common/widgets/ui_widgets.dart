@@ -185,17 +185,15 @@ class MyButton extends StatelessWidget {
 class PatternContainer extends StatelessWidget {
   final Widget child;
   final double opacity;
-  final EdgeInsets? padding;
+
   const PatternContainer({
     required this.child,
     this.opacity = 1.0,
-    this.padding,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: padding,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: context.theme.bgrColor,

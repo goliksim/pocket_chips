@@ -30,6 +30,10 @@ class HomePageViewModel extends AsyncNotifier<bool> {
         canPop: true,
       );
 
+  Future<void> showDonation() => _navigationManager.showDonationDialog(
+        canPop: true,
+      );
+
   Future<void> changeTheme() async =>
       ref.read(themeManagerProvider.notifier).changeTheme();
 

@@ -14,9 +14,8 @@ Future<T?> transitionDialog<T>({
   required BuildContext context,
   bool barrierDismissible = true,
   required Widget child,
-  required WidgetBuilder builder,
   DialogTransitionType type = DialogTransitionType.scale,
-  Duration duration = const Duration(milliseconds: 500),
+  Duration duration = const Duration(milliseconds: 400),
   Color barrierColor = const Color(0x80000000),
 }) {
   final ThemeData theme = Theme.of(context);

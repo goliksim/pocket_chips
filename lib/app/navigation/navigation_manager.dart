@@ -13,6 +13,7 @@ import '../../presentation/lobby/lobby_bank_editor/bank_editor_dialog.dart';
 import '../../presentation/lobby/player_editor/player_editor.dart';
 import '../../presentation/lobby/player_editor/widgets/player_logo_picker.dart';
 import '../../presentation/lobby/player_list/saved_player_list_view.dart';
+import '../../presentation/monitization/donation_page.dart';
 import '../../presentation/onboading/dialogs/about.dart';
 import '../../presentation/onboading/dialogs/update.dart';
 import '../../presentation/settings/game_settings_dialog.dart';
@@ -58,14 +59,8 @@ class NavigationManager extends ChangeNotifier {
       );
 
   Future<void> showUpdateDialog() => transitionDialog(
-        duration: const Duration(milliseconds: 400),
         context: context,
         child: Consumer(
-          builder: (_, ref, __) => UpdateDialog(
-            viewModel: ref.watch(onboardingViewModelProvider.notifier),
-          ),
-        ),
-        builder: (BuildContext context) => Consumer(
           builder: (_, ref, __) => UpdateDialog(
             viewModel: ref.watch(onboardingViewModelProvider.notifier),
           ),
@@ -73,40 +68,33 @@ class NavigationManager extends ChangeNotifier {
       );
 
   Future<void> showAboutDialog({bool canPop = true}) => transitionDialog(
-        duration: const Duration(milliseconds: 400),
         context: context,
         child: PopScope(
           canPop: canPop,
           child: AboutDialog(),
         ),
-        builder: (BuildContext context) => AboutDialog(),
+      );
+
+  Future<void> showDonationDialog({bool canPop = true}) => transitionDialog(
+        context: context,
+        child: const DonateWindow(),
       );
 
   Future<void> showWinnerSolver() => transitionDialog(
-        duration: const Duration(milliseconds: 400),
         context: context,
         child: const WinnerChecker(),
-        builder: (BuildContext context) => const WinnerChecker(),
       );
 
   Future<void> showSavedPlayers() => transitionDialog(
-        duration: const Duration(milliseconds: 400),
         type: DialogTransitionType.slideUp,
         context: context,
         child: SavedPlayerList(),
-        builder: (BuildContext context) => SavedPlayerList(),
       );
 
   Future<void> showStartingStackEditor() => transitionDialog(
         type: DialogTransitionType.slideUp,
         context: context,
-        duration: const Duration(milliseconds: 400),
         child: Consumer(
-          builder: (_, ref, __) => BankEditorDialog(
-            viewModel: ref.watch(bankEditorViewModelProvider),
-          ),
-        ),
-        builder: (BuildContext context) => Consumer(
           builder: (_, ref, __) => BankEditorDialog(
             viewModel: ref.watch(bankEditorViewModelProvider),
           ),
@@ -114,7 +102,6 @@ class NavigationManager extends ChangeNotifier {
       );
 
   Future<void> showLobbySettings() => transitionDialog(
-        duration: const Duration(milliseconds: 400),
         type: DialogTransitionType.slideDown,
         context: context,
         child: Consumer(
@@ -122,24 +109,11 @@ class NavigationManager extends ChangeNotifier {
             viewModel: ref.watch(lobbySettingsViewModelProvider),
           ),
         ),
-        builder: (BuildContext context) => Consumer(
-          builder: (_, ref, __) => GameSettingsDialog(
-            viewModel: ref.watch(lobbySettingsViewModelProvider),
-          ),
-        ),
       );
 
   Future<void> showPlayerEditor(PlayerId? playerUid) => transitionDialog(
-        duration: const Duration(milliseconds: 400),
         context: context,
         child: Consumer(
-          builder: (_, ref, __) => PlayerEditorPage(
-            viewModel: ref.watch(
-              playerEditorViewModelProvider(playerUid),
-            ),
-          ),
-        ),
-        builder: (BuildContext context) => Consumer(
           builder: (_, ref, __) => PlayerEditorPage(
             viewModel: ref.watch(
               playerEditorViewModelProvider(playerUid),
@@ -163,10 +137,6 @@ class NavigationManager extends ChangeNotifier {
           winner: winner,
           pop: pop,
         ),
-        builder: (_) => WinnerWindow(
-          winner: winner,
-          pop: pop,
-        ),
       );
 
   Future<Set<String>?> showWinnerChooseDialog(
@@ -174,17 +144,8 @@ class NavigationManager extends ChangeNotifier {
   ) =>
       transitionDialog<Set<String>>(
         barrierDismissible: false,
-        duration: const Duration(milliseconds: 400),
         context: context,
         child: Consumer(
-          builder: (_, ref, __) => WinnerChoiceWindow(
-            title: args.title,
-            viewModel: ref.watch(
-              winnerChooseViewModelProvider(args),
-            ),
-          ),
-        ),
-        builder: (BuildContext context) => Consumer(
           builder: (_, ref, __) => WinnerChoiceWindow(
             title: args.title,
             viewModel: ref.watch(

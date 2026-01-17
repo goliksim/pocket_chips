@@ -29,10 +29,6 @@ class GamePage extends ConsumerWidget {
 
         return PatternContainer(
           opacity: 0.5,
-          padding: EdgeInsets.only(
-            top: stdCutoutWidth * 0.75,
-            bottom: stdCutoutWidthDown * 0.75,
-          ),
           child: Scaffold(
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
