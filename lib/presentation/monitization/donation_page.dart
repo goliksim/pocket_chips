@@ -39,6 +39,7 @@ class _DonateWindowState extends ConsumerState<DonateWindow> {
       orElse: () {
         storeProducts = placeholderProducts;
       },
+      skipLoadingOnReload: true,
     );
 
     return DialogWidget(
@@ -89,7 +90,7 @@ class _DonateWindowState extends ConsumerState<DonateWindow> {
               fontSize: stdFontSize * 0.8,
             ),
             buttonColor: context.theme.bgrColor,
-            textString: 'Restore Purchases',
+            textString: context.strings.purchases_restore_button,
             action: () => viewModel.restorePurchases(),
           ),
         ],

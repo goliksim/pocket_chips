@@ -905,6 +905,66 @@ abstract class AppLocalizations {
   /// **'Enter name and choose icon'**
   String get toast_incorrect_player;
 
+  /// No description provided for @toast_playp_edit_new_dealer.
+  ///
+  /// In en, this message translates to:
+  /// **'New dealer is -'**
+  String get toast_playp_edit_new_dealer;
+
+  /// No description provided for @toast_playp_edit_no_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter player name'**
+  String get toast_playp_edit_no_name;
+
+  /// No description provided for @toast_playp_edit_no_icon.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select icon for player'**
+  String get toast_playp_edit_no_icon;
+
+  /// No description provided for @toast_game_error_state_editing.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot edit player list on this state'**
+  String get toast_game_error_state_editing;
+
+  /// No description provided for @toast_purchases_updating_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error while updating purchases'**
+  String get toast_purchases_updating_error;
+
+  /// No description provided for @toast_purchase_success_named.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for your purchase:'**
+  String get toast_purchase_success_named;
+
+  /// No description provided for @toast_purchase_error_named.
+  ///
+  /// In en, this message translates to:
+  /// **'Found error with purchase:'**
+  String get toast_purchase_error_named;
+
+  /// No description provided for @toast_purchase_pending_state_named.
+  ///
+  /// In en, this message translates to:
+  /// **'Your purchase is pending:'**
+  String get toast_purchase_pending_state_named;
+
+  /// No description provided for @purchases_restore_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get purchases_restore_button;
+
+  /// No description provided for @purchase_done_text.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchased'**
+  String get purchase_done_text;
+
   /// No description provided for @check_table.
   ///
   /// In en, this message translates to:

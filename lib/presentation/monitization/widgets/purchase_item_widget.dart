@@ -48,17 +48,22 @@ class PurchaseItemWidget extends StatelessWidget {
                         ),
                         loading: (_) => SizedBox.shrink(),
                       ),
-                      ColoredBox(
-                        color: context.theme.primaryColor,
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: stdButtonHeight * 0.5,
-                          child: itemState.map(
-                            (item) => Column(
+                      // PRICE BOX
+                      itemState.map(
+                        (item) => ColoredBox(
+                          color: item.alreadyPurchased
+                              ? context.theme.successColor
+                              : context.theme.primaryColor,
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: stdButtonHeight * 0.5,
+                            child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  item.priceText,
+                                  item.alreadyPurchased
+                                      ? context.strings.purchase_done_text
+                                      : item.priceText,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: context.theme.onPrimary,
@@ -67,7 +72,14 @@ class PurchaseItemWidget extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            loading: (_) => Center(
+                          ),
+                        ),
+                        loading: (_) => ColoredBox(
+                          color: context.theme.primaryColor,
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: stdButtonHeight * 0.5,
+                            child: Center(
                               child: CircularProgressIndicator(
                                 strokeWidth: 3,
                                 color: context.theme.onPrimary,

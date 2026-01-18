@@ -75,7 +75,7 @@ class PlayerCard extends StatelessWidget {
                     ? ' ${context.strings.playp_playr_diss3}'
                     : ' ${context.strings.playp_playr_diss4}',
                 style: TextStyle(
-                  color: context.theme.subsubmainColor,
+                  color: context.theme.alertColor,
                   fontSize: stdFontSize * 0.75,
                 ),
               ),
@@ -83,7 +83,7 @@ class PlayerCard extends StatelessWidget {
                 aspectRatio: 1,
                 child: Icon(
                   Icons.delete,
-                  color: context.theme.subsubmainColor,
+                  color: context.theme.alertColor,
                   size: stdIconSize,
                 ),
               ),

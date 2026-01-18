@@ -74,7 +74,7 @@ class ConfirmationWindow extends StatelessWidget {
                       textString: actionTitle,
                       textStyle: TextStyle(
                         fontWeight: FontWeight.normal,
-                        color: context.theme.subsubmainColor,
+                        color: context.theme.alertColor,
                         fontSize: stdFontSize,
                       ),
                       action: () async {

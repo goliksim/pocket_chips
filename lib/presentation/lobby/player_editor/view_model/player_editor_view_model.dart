@@ -136,9 +136,7 @@ class PlayerEditorViewModel with ChangeNotifier {
 
     // Проверяем, что новый игрок с норм данными
     if (!validateInput) {
-      _toastManager.showToast(
-        _strings.toast_incorrect_player,
-      );
+      _toastManager.showToast(_strings.toast_incorrect_player);
 
       return;
     }

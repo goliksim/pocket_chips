@@ -18,14 +18,14 @@ class DonationLeadBuilder extends StatelessWidget {
         videoAd: (_) => FittedBox(
           child: Icon(
             Icons.smart_display,
-            color: context.theme.subsubmainColor,
+            color: context.theme.alertColor,
             size: stdIconSize * 3.25,
           ),
         ),
         pro: (_) => FittedBox(
           child: Icon(
             Icons.star,
-            color: context.theme.subsubmainColor,
+            color: context.theme.alertColor,
             size: stdIconSize * 3.25,
           ),
         ),

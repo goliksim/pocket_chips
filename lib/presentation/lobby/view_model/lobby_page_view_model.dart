@@ -57,7 +57,7 @@ class LobbyPageViewModel extends AsyncNotifier<LobbyPageState> {
     if (state.requireValue.canEditPlayers) {
       _navigationManager.showPlayerEditor(null);
     } else {
-      _toastManager.showToast('Cannot edit player list on this state');
+      _toastManager.showToast(_strings.toast_game_error_state_editing);
     }
   }
 
@@ -65,7 +65,7 @@ class LobbyPageViewModel extends AsyncNotifier<LobbyPageState> {
     if (state.requireValue.canEditPlayers) {
       _navigationManager.showPlayerEditor(playerUid);
     } else {
-      _toastManager.showToast('Cannot edit player list on this state');
+      _toastManager.showToast(_strings.toast_game_error_state_editing);
     }
   }
 
@@ -82,9 +82,7 @@ class LobbyPageViewModel extends AsyncNotifier<LobbyPageState> {
     try {
       await _savedPlayersModelHolder.addPlayer(playerModel.toDomain);
 
-      _toastManager.showToast(
-        '${playerModel.name} ${_strings.toast_saved}',
-      );
+      _toastManager.showToast('${playerModel.name} ${_strings.toast_saved}');
     } on Exception catch (e) {
       _toastManager.showToast(e.toString());
     }

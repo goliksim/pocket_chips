@@ -13,6 +13,7 @@ abstract class PurchaseItemState with _$PurchaseItemState {
     required String name,
     required String priceText,
     required DonationItemAction action,
+    @Default(false) bool alreadyPurchased,
   }) = _PurchaseItemState;
 
   const factory PurchaseItemState.loading({

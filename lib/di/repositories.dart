@@ -7,5 +7,6 @@ import 'domain_managers.dart';
 final appRepositoryProvider = Provider<AppRepository>(
   (ref) => AppRepositoryImpl(
     localStorage: ref.read(localStorageProvider),
+    secureStorage: ref.read(secureStorageProvider),
   ),
 );

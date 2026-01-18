@@ -10,13 +10,16 @@ import '../builders/config_builder.dart';
 import '../builders/game_session_builder.dart';
 import '../builders/lobby_state_builder.dart';
 import '../builders/player_builder.dart';
+import '../storage/secure_storage/secure_storage.dart';
 import '../storage/shared_preferences/shared_preferences_storage.dart';
 
 class AppRepositoryImpl implements AppRepository {
   final SharedPreferencesStorage localStorage;
+  final SecureStorage secureStorage;
 
   AppRepositoryImpl({
     required this.localStorage,
+    required this.secureStorage,
   });
 
   @override
@@ -39,6 +42,13 @@ class AppRepositoryImpl implements AppRepository {
 
     await localStorage.configDao.write(entity);
   }
+
+  @override
+  Future<bool> isProVersion() async => secureStorage.proVersionDao.read();
+
+  @override
+  Future<void> changeProVersion(bool isPro) async =>
+      secureStorage.proVersionDao.write(isPro);
 
   @override
   Future<LobbyStateModel?> getLobbyState() async {

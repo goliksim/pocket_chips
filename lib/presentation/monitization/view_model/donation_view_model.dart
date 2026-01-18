@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/navigation/navigation_manager.dart';
 import '../../../di/domain_managers.dart';
+import '../../../di/model_holders.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../l10n/localization_extension.dart';
+import '../../../services/monitization/purchases/models/purchasable_product.dart';
 import '../../../services/monitization/purchases/purchases_manager.dart';
 import '../../../services/toast_manager.dart';
 import '../../../utils/constants.dart';
@@ -21,51 +23,52 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
   ToastManager get _toastManager => ref.read(toastManagerProvider);
   AppLocalizations get _strings => ref.read(stringsProvider);
 
-  PurchasesManager get _purchasesManager => ref.read(purchasesManagerProvider);
+  PurchasesManager get _purchasesManager =>
+      ref.read(purchasesManagerProvider.notifier);
 
   @override
   FutureOr<DonationViewState> build() async {
-    void listener() {
-      ref.invalidateSelf();
+    logs.writeLog('DonationVM: build');
+
+    final videoMock = PurchaseItemState(
+      id: Constants.videoAdItemKey,
+      lead: DonationLeadItem.videoAd(),
+      name: _strings.support_video,
+      priceText: _strings.support_free,
+      action: DonationItemAction.watchAd,
+    );
+
+    final manager = ref.read(purchasesManagerProvider);
+
+    if (manager.value != null) {
+      ref.read(purchasesManagerProvider.notifier).build();
     }
 
-    final manager = _purchasesManager;
-
-    manager.addListener(listener);
-
-    ref.onDispose(() {
-      manager.removeListener(listener);
-    });
-
-    final availableItems = <PurchaseItemState>[];
-
-    // TODO remove mock for video ad
-    availableItems.add(
-      PurchaseItemState(
-        id: Constants.videoAdItemKey,
-        lead: DonationLeadItem.videoAd(),
-        name: _strings.support_video,
-        priceText: _strings.support_free,
-        action: DonationItemAction.watchAd,
-      ),
+    ref.listen(
+      purchasesManagerProvider,
+      (prev, next) {
+        next.maybeWhen(
+          data: (products) {
+            state = AsyncValue.data(
+              DonationViewState(
+                availableItems: [
+                  ...state.value?.availableItems ?? [],
+                  ...products.map(_buildItem).toSet(),
+                ],
+              ),
+            );
+          },
+          orElse: () {},
+        );
+      },
     );
 
-    availableItems.addAll(
-      manager.products
-          .map(
-            (p) => PurchaseItemState(
-              id: p.id,
-              lead: _getLeadById(p.id),
-              name: _strings.getProductNameById(p.id),
-              priceText: p.price,
-              action: DonationItemAction.purchase,
-            ),
-          )
-          .toSet()
-          .toList(),
+    return DonationViewState(
+      availableItems: [
+        videoMock,
+        ...?manager.value?.map(_buildItem).toSet(),
+      ],
     );
-
-    return DonationViewState(availableItems: availableItems);
   }
 
   Future<void> onItemAction(PurchaseItemState product) => product.map(
@@ -122,4 +125,22 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
         return DonationLeadItem.loading();
     }
   }
+
+  bool _checkPurchased(String id) {
+    switch (id) {
+      case Constants.pocketChipsPROItemKey:
+        return ref.watch(proVersionModelHolderProvider).value ?? false;
+      default:
+        return false;
+    }
+  }
+
+  PurchaseItemState _buildItem(PurchasableProduct product) => PurchaseItemState(
+        id: product.id,
+        lead: _getLeadById(product.id),
+        name: _strings.getProductNameById(product.id),
+        priceText: product.price,
+        action: DonationItemAction.purchase,
+        alreadyPurchased: _checkPurchased(product.id),
+      );
 }

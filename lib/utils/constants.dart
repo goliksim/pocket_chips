@@ -1,6 +1,6 @@
 class Constants {
   static const List<String> inAppProductsKeys = [
-    'pocket_chips_pro',
+    pocketChipsPROItemKey,
     'huge_donat',
     'nice_donat',
     'modest_donat',

@@ -414,6 +414,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toast_incorrect_player => 'Enter name and choose icon';
 
   @override
+  String get toast_playp_edit_new_dealer => 'New dealer is -';
+
+  @override
+  String get toast_playp_edit_no_name => 'Please enter player name';
+
+  @override
+  String get toast_playp_edit_no_icon => 'Please select icon for player';
+
+  @override
+  String get toast_game_error_state_editing => 'Cannot edit player list on this state';
+
+  @override
+  String get toast_purchases_updating_error => 'Error while updating purchases';
+
+  @override
+  String get toast_purchase_success_named => 'Thanks for your purchase:';
+
+  @override
+  String get toast_purchase_error_named => 'Found error with purchase:';
+
+  @override
+  String get toast_purchase_pending_state_named => 'Your purchase is pending:';
+
+  @override
+  String get purchases_restore_button => 'Restore Purchases';
+
+  @override
+  String get purchase_done_text => 'Purchased';
+
+  @override
   String get check_table => 'Table';
 
   @override

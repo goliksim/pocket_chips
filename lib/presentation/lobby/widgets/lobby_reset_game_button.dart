@@ -15,7 +15,10 @@ class LobbyResetButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MyButton(
-        side: BorderSide(width: 2.5, color: context.theme.subsubmainColor),
+        side: BorderSide(
+          width: 2.5,
+          color: context.theme.alertColor,
+        ),
         height: stdButtonHeight,
         buttonColor: context.theme.playerColor,
         action: () => onTap(),
@@ -42,7 +45,7 @@ class LobbyResetButton extends StatelessWidget {
               aspectRatio: 1,
               child: Icon(
                 Icons.sync_sharp,
-                color: context.theme.subsubmainColor,
+                color: context.theme.alertColor,
                 size: stdIconSize,
               ),
             ),

@@ -8,6 +8,10 @@ abstract class AppRepository {
 
   Future<void> updateConfig(ConfigModel newConfig);
 
+  Future<bool> isProVersion();
+
+  Future<void> changeProVersion(bool isPro);
+
   Future<LobbyStateModel?> getLobbyState();
 
   Future<GameSessionState?> getGameSessionState();

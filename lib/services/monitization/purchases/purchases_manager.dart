@@ -1,46 +1,36 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
+import '../../../di/domain_managers.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../l10n/localization_extension.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/logs.dart';
 import '../../toast_manager.dart';
 import 'models/purchasable_product.dart';
-import 'models/store_status.dart';
 
-class PurchasesManager with ChangeNotifier {
-  final ToastManager _toastManager;
-  final AppLocalizations _strings;
+class PurchasesManager extends AsyncNotifier<List<PurchasableProduct>> {
+  ToastManager get _toastManager => ref.read(toastManagerProvider);
+  AppLocalizations get _strings => ref.read(stringsProvider);
 
-  StoreState storeState = StoreState.loading;
   late StreamSubscription<List<PurchaseDetails>> _subscription;
-  List<PurchasableProduct> products = [];
-
-  PurchasesManager({
-    required ToastManager toastManager,
-    required AppLocalizations strings,
-  })  : _toastManager = toastManager,
-        _strings = strings {
-    _purchaseListening();
-
-    _loadPurchases();
-  }
 
   @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
+  FutureOr<List<PurchasableProduct>> build() {
+    _purchaseListening();
+    ref.onDispose(() => _subscription.cancel());
+
+    return _loadPurchases();
   }
 
   /// Публичный метод покупки товара
   Future<void> buyProduct(String productId) async {
-    final product =
-        products.firstWhereOrNull((element) => element.id == productId);
+    final product = state.requireValue
+        .firstWhereOrNull((element) => element.id == productId);
 
     if (product == null) {
       throw Exception('Product not found');
@@ -116,18 +106,16 @@ class PurchasesManager with ChangeNotifier {
       logs.writeLog('PurcasesManager: check store access');
       final bool available = await InAppPurchase.instance.isAvailable();
       if (!available) {
-        storeState = StoreState.notAvailable;
         throw Exception('Store not available');
       }
 
       logs.writeLog('PurcasesManager: store is available');
     } on PlatformException catch (_) {
-      storeState = StoreState.notAvailable;
       throw Exception('Store not available');
     }
   }
 
-  Future<void> _loadPurchases() async {
+  Future<List<PurchasableProduct>> _loadPurchases() async {
     try {
       await _checkStoreAccess();
 
@@ -139,17 +127,18 @@ class PurchasesManager with ChangeNotifier {
         // Handle the error.
       }
 
-      products = response.productDetails
+      final products = response.productDetails
           .map((e) => PurchasableProduct(e))
           .toList()
         ..sortBy<num>((e) => kIds.indexOf(e.id));
       logs.writeLog('PurcasesManager: fetched ${products.length} products');
-      storeState = StoreState.available;
 
-      notifyListeners();
+      return products;
     } on Exception catch (e) {
       logs.writeLog(e.toString());
       _toastManager.showToast(e.toString());
+
+      return [];
     }
   }
 
@@ -171,7 +160,6 @@ class PurchasesManager with ChangeNotifier {
     for (var purchaseDetails in purchaseDetailsList) {
       await _handlePurchase(purchaseDetails);
     }
-    notifyListeners();
   }
 
   //Получаем обновление о покупке, применяет покупку к логике приложения.
@@ -186,10 +174,10 @@ class PurchasesManager with ChangeNotifier {
         //TODO сделать модалку и повесить тесты
         logs.writeLog('Purchase valid: ${purchaseDetails.productID}');
         _toastManager.showToast(
-          'Thanks for your purchase: ${_strings.getProductNameById(purchaseDetails.productID)}!',
+          '${_strings.toast_purchase_success_named} ${_strings.getProductNameById(purchaseDetails.productID)}!',
         );
       } else {
-        //TODO Handle invalide purchase
+        //TODO Handle invalid purchase
       }
     }
 
@@ -197,15 +185,19 @@ class PurchasesManager with ChangeNotifier {
       //TODO сделать модалку и повесить тесты
       logs.writeLog('Purchase pending: ${purchaseDetails.productID}');
       _toastManager.showToast(
-        'Your purchase is pending: ${_strings.getProductNameById(purchaseDetails.productID)}...',
+        '${_strings.toast_purchase_pending_state_named} ${_strings.getProductNameById(purchaseDetails.productID)}...',
       );
     }
 
     if (purchaseDetails.status == PurchaseStatus.error) {
       logs.writeLog('Error purchase: ${purchaseDetails.error?.message}');
       _toastManager.showToast(
-        'Found error with purchase: ${_strings.getProductNameById(purchaseDetails.productID)}.',
+        '${_strings.toast_purchase_error_named} ${_strings.getProductNameById(purchaseDetails.productID)}.',
       );
+    }
+
+    if (purchaseDetails.productID == Constants.pocketChipsPROItemKey) {
+      return;
     }
 
     // Подтверждаем, что покупка обработана правильно.
@@ -224,6 +216,6 @@ class PurchasesManager with ChangeNotifier {
 
   void _updateStreamOnError(dynamic error) {
     logs.writeLog('Purchase stream error: $error');
-    _toastManager.showToast('Error in updating purchases.');
+    _toastManager.showToast(_strings.toast_purchases_updating_error);
   }
 }

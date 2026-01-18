@@ -161,7 +161,9 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     } else if (newDealerId == player.uid) {
       // Make first player the dealer
       newDealerId = newPlayers.first.uid;
-      _toastManager.showToast('Dealer changed to ${newPlayers.first.name}');
+      _toastManager.showToast(
+        '${_strings.toast_playp_edit_new_dealer} ${newPlayers.first.name}',
+      );
     }
 
     final newLobby = currentLobby.copyWith(

@@ -181,7 +181,7 @@ class OnboardingLinksPage extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: Text(
-                ' ${context.strings.about_link_7}',
+                context.strings.about_link_7,
                 style: TextStyle(
                   color: context.theme.secondaryColor,
                   fontSize: stdFontSize * 0.7,

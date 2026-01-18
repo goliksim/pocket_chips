@@ -12,9 +12,10 @@ class Themes {
   Color additionButtonColor;
   MaterialColor primaryColor;
   Color secondaryColor;
-  Color subsubmainColor;
+  Color alertColor;
   Color onBackground;
-  Color onPrimary;
+  Color onPrimary = Colors.white;
+  Color successColor = Color.fromARGB(255, 94, 169, 117);
 
   Themes.light()
       : name = 'light',
@@ -25,9 +26,8 @@ class Themes {
         additionButtonColor = const Color.fromARGB(255, 54, 60, 87),
         primaryColor = MaterialColor(0xff7064df, colorLight),
         secondaryColor = const Color.fromARGB(255, 91, 112, 200),
-        subsubmainColor = const Color.fromARGB(255, 229, 115, 115),
-        onBackground = const Color.fromARGB(255, 54, 60, 87),
-        onPrimary = Colors.white;
+        alertColor = const Color.fromARGB(255, 229, 115, 115),
+        onBackground = const Color.fromARGB(255, 54, 60, 87);
 
   Themes.dark()
       : name = 'dark',
@@ -38,9 +38,8 @@ class Themes {
         additionButtonColor = const Color.fromARGB(255, 70, 78, 109),
         primaryColor = MaterialColor(0xff8882e6, colorLight),
         secondaryColor = const Color.fromARGB(255, 111, 130, 213),
-        subsubmainColor = const Color.fromARGB(255, 230, 130, 130),
-        onBackground = const Color.fromARGB(255, 241, 241, 251),
-        onPrimary = Colors.white;
+        alertColor = const Color.fromARGB(255, 230, 130, 130),
+        onBackground = const Color.fromARGB(255, 241, 241, 251);
 
   static const Map<int, Color> colorLight = {
     50: Color.fromRGBO(76, 175, 80, .1),

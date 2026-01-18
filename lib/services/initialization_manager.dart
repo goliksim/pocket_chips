@@ -4,24 +4,29 @@ import 'package:flutter/material.dart';
 
 import '../app/navigation/navigation_manager.dart';
 import '../domain/model_holders/config_model_holder.dart';
+import '../domain/model_holders/pro_version_model_holder.dart';
 import '../domain/models/config_model.dart';
 
 class InitializationManager with ChangeNotifier {
   final ConfigModelHolder _configModelHolder;
   final NavigationManager _navigationManager;
+  final ProVersionModelHolder _proVersionModelHolder;
 
   bool isInitialized = false;
 
   InitializationManager({
     required ConfigModelHolder configModelHolder,
     required NavigationManager navigationManager,
+    required ProVersionModelHolder proVersionModelHolder,
   })  : _configModelHolder = configModelHolder,
-        _navigationManager = navigationManager {
+        _navigationManager = navigationManager,
+        _proVersionModelHolder = proVersionModelHolder {
     init();
   }
 
   Future<void> init() async {
     final config = await _configModelHolder.build();
+    _proVersionModelHolder;
 
     await checkFirstLaunch(config).then(
       (pushed) async {

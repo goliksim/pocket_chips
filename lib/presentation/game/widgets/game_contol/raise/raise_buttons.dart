@@ -50,7 +50,7 @@ class _RaiseButtonsState extends State<RaiseButtons> {
           fit: FlexFit.tight,
           child: ControlButtonWrapper(
             title: context.strings.game_raise_canc,
-            color: context.theme.subsubmainColor,
+            color: context.theme.alertColor,
             action: () => widget.onClose(),
           ),
         ),
