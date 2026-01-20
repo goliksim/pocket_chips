@@ -26,6 +26,9 @@ class ProVersionModelHolder extends AsyncNotifier<ProVersionModel> {
             availableProduct: data.availableProduct,
           );
         }
+        if (!isProCached && data.isPurchased) {
+          changePro(true);
+        }
 
         return ProVersionModel(
           isPurchased: isProCached || data.isPurchased,

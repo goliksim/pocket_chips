@@ -100,23 +100,22 @@ void runUpdatePlayerToExistNameTest(
 
   final newAssetName = AssetsProvider.playerAssetByIndex(2);
   final newPlayer = PlayerModel(
-      uid: players[1].uid, name: players.first.name, assetUrl: newAssetName);
-
-  await lobbyStateHolder.future;
-  await lobbyStateHolder.updatePlayer(
-    player: newPlayer,
-    makeDealer: true,
-    bank: 333,
+    uid: players[1].uid,
+    name: players.first.name,
+    assetUrl: newAssetName,
   );
 
-  final newLobbyState = lobbyStateHolder.state.requireValue;
+  await lobbyStateHolder.future;
+  void updatePlayer() => lobbyStateHolder.updatePlayer(
+        player: newPlayer,
+        makeDealer: true,
+        bank: 333,
+      );
 
-  expect(newLobbyState.banks.containsKey(newPlayer.uid), true);
-  expect(newLobbyState.banks[newPlayer.uid], 333);
-  expect(newLobbyState.players.length, 3);
-  expect(newLobbyState.players[1], newPlayer);
-  expect(newLobbyState.players[1].assetUrl, newAssetName);
-  expect(newLobbyState.dealerId, newPlayer.uid);
+  expect(
+    () => updatePlayer(),
+    throwsA(isA<Exception>()),
+  );
 }
 
 void runUpdatePlayerDisableDealerTest(

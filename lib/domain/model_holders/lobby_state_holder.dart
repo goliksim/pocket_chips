@@ -96,8 +96,8 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     }
 
     // Проверка на дубли
-    final samePlayer = currentLobby.players.firstWhereOrNull(
-        (p) => (p.name == player.name) && (p.assetUrl == player.assetUrl));
+    final samePlayer =
+        currentLobby.players.firstWhereOrNull((p) => (p.name == player.name));
     if (currentLobby.players.contains(player) || samePlayer != null) {
       throw Exception('${player.name} ${_strings.toast_alred}');
     }
@@ -138,10 +138,8 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     }
 
     // Проверка на дубли
-    final samePlayer = currentLobby.players.firstWhereOrNull((p) =>
-        (p.name == player.name) &&
-        (p.assetUrl == player.assetUrl) &&
-        (p.uid != player.uid));
+    final samePlayer = currentLobby.players.firstWhereOrNull(
+        (p) => (p.name == player.name) && (p.uid != player.uid));
     if (samePlayer != null) {
       throw Exception('${player.name} ${_strings.toast_alred}');
     }

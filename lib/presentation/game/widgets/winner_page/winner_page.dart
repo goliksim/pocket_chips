@@ -3,8 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../../../domain/models/player/player_model.dart';
+import '../../../../services/assets_provider.dart';
 import '../../../../utils/extensions.dart';
+import '../../../../utils/theme/empty_asset_filter.dart';
 import '../../../../utils/theme/ui_values.dart';
+import '../../../common/player_avatar.dart';
 
 class WinnerWindow extends StatefulWidget {
   final PlayerModel winner;
@@ -74,19 +77,13 @@ class _WinnerWindowState extends State<WinnerWindow> {
                   ),
                   Positioned(
                     top: stdButtonHeight / 8,
-                    child: Container(
-                      height: stdButtonHeight * 3,
-                      width: stdButtonHeight * 3,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          filterQuality: FilterQuality.high,
-                          image: AssetImage(
-                            widget.winner.assetUrl,
-                          ),
-                          fit: BoxFit.fitHeight,
-                        ),
-                      ),
+                    child: PlayerAvatar(
+                      assetUrl: widget.winner.assetUrl,
+                      radius: (stdButtonHeight * 3) / 2,
+                      colorFilter: (widget.winner.assetUrl ==
+                              AssetsProvider.emptyPlayerAsset)
+                          ? EmptyAssetFilter(widget.winner.uid)
+                          : null,
                     ),
                   ),
                   Positioned(

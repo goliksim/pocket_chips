@@ -110,8 +110,7 @@ class PlayerEditorViewModel with ChangeNotifier {
     return kDebugMode || (bankInput != null && bankInput > 0);
   }
 
-  bool get _validIcon =>
-      playerState.assetUrl != AssetsProvider.emptyPlayerAsset;
+  bool get _validIcon => true;
   bool get _validName => playerState.nameInput?.isNotEmpty ?? false;
 
   bool get validateInput => _validIcon && _validName && _validBank;

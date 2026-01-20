@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../../../services/assets_provider.dart';
 import '../../../../utils/extensions.dart';
+import '../../../../utils/theme/empty_asset_filter.dart';
 import '../../../../utils/theme/ui_values.dart';
+import '../../../common/player_avatar.dart';
 import '../../../common/widgets/ui_widgets.dart';
 import '../../view_state/game_player_item.dart';
 
@@ -22,19 +24,22 @@ class PlayerField extends StatelessWidget {
         duration: const Duration(milliseconds: 300),
         height: stdHeight,
         width: stdHeight * 2.2,
-        child: MyButton(
-          borderRadius: BorderRadius.circular(stdBorderRadius * 2),
-          height: stdHeight,
-          buttonColor: player.isCurrent
-              ? context.theme.primaryColor
-              : context.theme.bankColor.withAlpha(player.isFolded ? 128 : 255),
-          //longAction: () async {},
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: shouldReverse
-                ? List.from(
-                    _reversablePlayerWidgetList(player, context).reversed)
-                : _reversablePlayerWidgetList(player, context),
+        child: Opacity(
+          opacity: player.isFolded ? 0.4 : 1.0,
+          child: MyButton(
+            borderRadius: BorderRadius.circular(stdBorderRadius * 2),
+            height: stdHeight,
+            buttonColor: player.isCurrent
+                ? context.theme.primaryColor
+                : context.theme.bankColor,
+            //longAction: () async {},
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: shouldReverse
+                  ? List.from(
+                      _reversablePlayerWidgetList(player, context).reversed)
+                  : _reversablePlayerWidgetList(player, context),
+            ),
           ),
         ),
       );
@@ -47,24 +52,14 @@ List<Widget> _reversablePlayerWidgetList(
     [
       Stack(
         children: [
-          Container(
+          SizedBox(
             width: stdHeight,
             height: stdHeight,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                filterQuality: FilterQuality.medium,
-                image: AssetImage(
-                  player.assetUrl,
-                ),
-                colorFilter: ColorFilter.mode(
-                  Colors.white.withAlpha(
-                    player.isFolded ? 50 : 255,
-                  ),
-                  BlendMode.modulate,
-                ),
-                fit: BoxFit.fill,
-              ),
+            child: PlayerAvatar(
+              assetUrl: player.assetUrl,
+              colorFilter: (player.assetUrl == AssetsProvider.emptyPlayerAsset)
+                  ? EmptyAssetFilter(player.uid)
+                  : null,
             ),
           ),
           player.isDealer
@@ -76,12 +71,6 @@ List<Widget> _reversablePlayerWidgetList(
                     image: DecorationImage(
                       filterQuality: FilterQuality.medium,
                       image: AssetsProvider.dealerAsset,
-                      colorFilter: ColorFilter.mode(
-                        Colors.white.withAlpha(
-                          player.isFolded ? 50 : 255,
-                        ),
-                        BlendMode.modulate,
-                      ),
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -102,9 +91,7 @@ List<Widget> _reversablePlayerWidgetList(
                   style: TextStyle(
                     color: player.isCurrent
                         ? context.theme.onPrimary
-                        : context.theme.onBackground.withAlpha(
-                            player.isFolded ? 50 : 255,
-                          ),
+                        : context.theme.onBackground,
                     fontWeight: FontWeight.bold,
                     fontSize: stdFontSize,
                   ),
@@ -119,9 +106,7 @@ List<Widget> _reversablePlayerWidgetList(
                       fontSize: stdFontSize * 0.75,
                       color: player.isCurrent
                           ? context.theme.onPrimary
-                          : context.theme.onBackground.withAlpha(
-                              player.isFolded ? 50 : 255,
-                            ),
+                          : context.theme.onBackground,
                     ),
                   ),
                 ),

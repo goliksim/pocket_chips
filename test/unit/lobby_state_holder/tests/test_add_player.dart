@@ -142,19 +142,16 @@ void runAddExistNamePlayerTest(
   );
 
   await lobbyStateHolder.future;
-  await lobbyStateHolder.addPlayer(
-    player: newPlayer,
-    makeDealer: true,
-    bank: 333,
+  void addPlayer() => lobbyStateHolder.addPlayer(
+        player: newPlayer,
+        makeDealer: true,
+        bank: 333,
+      );
+
+  expect(
+    () => addPlayer(),
+    throwsA(isA<Exception>()),
   );
-
-  final newLobbyState = lobbyStateHolder.state.requireValue;
-
-  expect(newLobbyState.banks.containsKey('new_uid'), true);
-  expect(newLobbyState.banks['new_uid'], 333);
-  expect(newLobbyState.players.length, 4);
-  expect(newLobbyState.players.last, newPlayer);
-  expect(newLobbyState.dealerId, newPlayer.uid);
 }
 
 void runAddPlayerWhileMaxTest(

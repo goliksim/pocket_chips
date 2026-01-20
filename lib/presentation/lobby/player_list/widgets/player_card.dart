@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+import '../../../../services/assets_provider.dart';
 import '../../../../utils/extensions.dart';
+import '../../../../utils/theme/empty_asset_filter.dart';
 import '../../../../utils/theme/ui_values.dart';
+import '../../../common/player_avatar.dart';
+import '../../../monitization/pro_version/widgets/pro_version_wrapper.dart';
 import '../view_state/lobby_player_item.dart';
 
 class PlayerCard extends StatelessWidget {
@@ -45,12 +49,15 @@ class PlayerCard extends StatelessWidget {
           color: context.theme.bgrColor,
           child: Row(
             children: [
-              AspectRatio(
-                aspectRatio: 1,
-                child: Icon(
-                  isSaved ? Icons.add : Icons.save,
-                  color: context.theme.onBackground,
-                  size: stdIconSize,
+              ProVersionWrapper(
+                offset: 10,
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Icon(
+                    isSaved ? Icons.add : Icons.save,
+                    color: context.theme.onBackground,
+                    size: stdIconSize,
+                  ),
                 ),
               ),
               Text(
@@ -122,17 +129,12 @@ class PlayerCard extends StatelessWidget {
                           child: Padding(
                             padding:
                                 EdgeInsets.all(0.20 * stdButtonHeight * 0.75),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  filterQuality: FilterQuality.medium,
-                                  image: AssetImage(
-                                    player.assetUrl,
-                                  ),
-                                  fit: BoxFit.fill,
-                                ),
-                              ),
+                            child: PlayerAvatar(
+                              assetUrl: player.assetUrl,
+                              colorFilter: (player.assetUrl ==
+                                      AssetsProvider.emptyPlayerAsset)
+                                  ? EmptyAssetFilter(player.uid)
+                                  : null,
                             ),
                           ),
                         ),

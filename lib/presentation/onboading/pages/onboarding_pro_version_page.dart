@@ -10,7 +10,10 @@ import '../../monitization/pro_version/view_state/pro_version_offer_view_state.d
 import '../onboarding_dialog.dart';
 
 class OnboardingProVersionPage extends ConsumerWidget {
+  final bool isDialog;
+
   const OnboardingProVersionPage({
+    this.isDialog = false,
     super.key,
   });
 
@@ -115,7 +118,7 @@ class OnboardingProVersionPage extends ConsumerWidget {
                   child: SizedBox(
                     width: double.infinity,
                     child: Text(
-                      "- " + text,
+                      "- $text",
                       style: TextStyle(
                         height: 1.5,
                         color: context.theme.onBackground,
@@ -169,6 +172,18 @@ class OnboardingProVersionPage extends ConsumerWidget {
             ),
           ),
         ),
+        if (isDialog) ...[
+          SizedBox(height: stdHorizontalOffset),
+          MyButton(
+            side: BorderSide(
+              width: 2.5,
+              color: context.theme.hintColor,
+            ),
+            height: stdHeight,
+            buttonColor: Colors.transparent,
+            textString: context.strings.support_close,
+          )
+        ]
       ],
     );
   }

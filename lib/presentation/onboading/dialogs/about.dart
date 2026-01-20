@@ -7,7 +7,6 @@ import '../../../di/view_models.dart';
 import '../../../utils/extensions.dart';
 import '../onboarding_dialog.dart';
 import '../pages/onboarding_game_page.dart';
-import '../pages/onboarding_home_page.dart';
 import '../pages/onboarding_links_page.dart';
 import '../pages/onboarding_lobby_page.dart';
 import '../pages/onboarding_pro_version_page.dart';
@@ -61,11 +60,7 @@ class AboutDialog extends StatelessWidget {
               PageModel(
                 widget: OnboardingProVersionPage(),
               ),
-              PageModel(
-                widget: OnboardingHomePage(
-                  changeTheme: viewModel.changeTheme,
-                ),
-              ),
+
               PageModel(
                 widget: OnboardingLobbyPage(),
               ),

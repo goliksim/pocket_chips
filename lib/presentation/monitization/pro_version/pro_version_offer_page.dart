@@ -14,7 +14,9 @@ class ProVersionOfferPage extends StatelessWidget {
         child: Onboarding(
           pages: [
             PageModel(
-              widget: OnboardingProVersionPage(),
+              widget: OnboardingProVersionPage(
+                isDialog: true,
+              ),
             ),
           ],
         ),

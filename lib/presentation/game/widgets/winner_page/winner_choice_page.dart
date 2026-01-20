@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../services/assets_provider.dart';
 import '../../../../utils/extensions.dart';
+import '../../../../utils/theme/empty_asset_filter.dart';
 import '../../../../utils/theme/ui_values.dart';
 import '../../../common/widgets/ui_widgets.dart';
 import 'view_state/possible_winner_item.dart';
@@ -90,6 +92,11 @@ class WinnerChoiceWindow extends StatelessWidget {
                                             shape: BoxShape.circle,
                                             image: DecorationImage(
                                               filterQuality: FilterQuality.high,
+                                              colorFilter: (winner.assetUrl ==
+                                                      AssetsProvider
+                                                          .emptyPlayerAsset)
+                                                  ? EmptyAssetFilter(winner.uid)
+                                                  : null,
                                               image: AssetImage(
                                                 winner.assetUrl,
                                               ),

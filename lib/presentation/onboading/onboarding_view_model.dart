@@ -60,8 +60,6 @@ class OnboardingViewModel extends AsyncNotifier<OnboardingViewState> {
     await FlutterMailer.send(mailOptions);
   }
 
-  void changeTheme() => ref.read(themeManagerProvider.notifier).changeTheme();
-
   void setLocale(Locale locale) {
     {
       _configModelHolder.changeLocale(

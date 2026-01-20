@@ -6,7 +6,9 @@ import '../../../services/assets_provider.dart';
 import '../../../services/toast_manager.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
+import '../../common/player_avatar.dart';
 import '../../common/widgets/ui_widgets.dart';
+import '../../monitization/pro_version/widgets/pro_version_wrapper.dart';
 import 'view_model/player_editor_view_model.dart';
 
 class PlayerEditorPage extends StatefulWidget {
@@ -70,42 +72,36 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 // Аватарка
-                GestureDetector(
-                  onTap: () => _onLogoTap(),
-                  child: Stack(
-                    children: [
-                      Container(
-                        width: stdDialogHeight / 2,
-                        height: stdDialogHeight / 2,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            filterQuality: FilterQuality.medium,
-                            image: AssetImage(player.assetUrl),
-                            fit: BoxFit.fill,
+                ProVersionWrapper(
+                  child: GestureDetector(
+                    onTap: () => _onLogoTap(),
+                    child: Stack(
+                      children: [
+                        PlayerAvatar(
+                          assetUrl: player.assetUrl,
+                          radius: (stdDialogHeight / 2) / 2,
+                        ),
+                        Container(
+                          width: stdDialogHeight / 2,
+                          height: stdDialogHeight / 2,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1.5,
+                              color: (player.assetUrl !=
+                                      AssetsProvider.emptyPlayerAsset)
+                                  ? context.theme.primaryColor
+                                  : context.theme.bgrColor,
+                            ),
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              filterQuality: FilterQuality.medium,
+                              image: AssetsProvider.playerIconEditFrame,
+                              fit: BoxFit.fill,
+                            ),
                           ),
                         ),
-                      ),
-                      Container(
-                        width: stdDialogHeight / 2,
-                        height: stdDialogHeight / 2,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1.5,
-                            color: (player.assetUrl !=
-                                    AssetsProvider.emptyPlayerAsset)
-                                ? context.theme.primaryColor
-                                : context.theme.bgrColor,
-                          ),
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            filterQuality: FilterQuality.medium,
-                            image: AssetsProvider.playerIconEditFrame,
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(

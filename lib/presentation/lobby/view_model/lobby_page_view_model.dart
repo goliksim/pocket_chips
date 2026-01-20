@@ -72,6 +72,15 @@ class LobbyPageViewModel extends AsyncNotifier<LobbyPageState> {
   void pop() => _navigationManager.popPage();
 
   Future<bool> savePlayer(String playerUid) async {
+    final isPro =
+        ref.read(proVersionManagerProvider).value?.isPurchased ?? false;
+
+    if (!isPro) {
+      _navigationManager.showProVersionOfferDialog();
+
+      return false;
+    }
+
     final playerModel =
         state.requireValue.players.firstWhereOrNull((p) => p.uid == playerUid);
 

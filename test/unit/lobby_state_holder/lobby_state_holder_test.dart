@@ -66,7 +66,7 @@ void main() {
         () => runAddExistPlayerTest(container, mockAppRepository),
       );
       test(
-        'Add Exist Player test',
+        'Add Exist Name Player test',
         () => runAddExistNamePlayerTest(container, mockAppRepository),
       );
       test(
