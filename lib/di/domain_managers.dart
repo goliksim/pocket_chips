@@ -9,6 +9,7 @@ import '../data/storage/shared_preferences/shared_preferences_storage.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/localization.dart';
 import '../services/initialization_manager.dart';
+import '../services/monitization/purchases/models/pro_version_model.dart';
 import '../services/monitization/purchases/models/purchasable_product.dart';
 import '../services/monitization/purchases/pro_version_manager.dart';
 import '../services/monitization/purchases/purchases_manager.dart';
@@ -76,11 +77,10 @@ final themeManagerProvider = NotifierProvider<ThemeManager, ThemeMode>(
 final purchasesManagerProvider =
     AsyncNotifierProvider<PurchasesManager, List<PurchasableProduct>>(
   PurchasesManager.new,
+  isAutoDispose: true,
 );
 
-final proVersionManagerProvider = Provider(
-  (ref) => ProVersionManager(
-    toastManager: ref.watch(toastManagerProvider),
-    strings: ref.watch(stringsProvider),
-  ),
+final proVersionManagerProvider =
+    AsyncNotifierProvider<ProVersionManager, ProVersionModel>(
+  ProVersionManager.new,
 );

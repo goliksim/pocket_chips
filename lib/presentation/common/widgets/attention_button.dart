@@ -51,7 +51,9 @@ class AttentionAddPlayerButtonState extends State<AttentionButton>
   void _startAnimation() async {
     if (needToAnimate) {
       await Future.delayed(const Duration(seconds: 2));
-      controller.forward();
+      if (mounted) {
+        controller.forward();
+      }
     }
 
     controller.addStatusListener(_statusHandler);

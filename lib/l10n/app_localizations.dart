@@ -350,19 +350,19 @@ abstract class AppLocalizations {
   /// No description provided for @about_hom_2.
   ///
   /// In en, this message translates to:
-  /// **'On the home screen you can choose a light or dark interface theme.'**
+  /// **'[PRO-feature] On the home screen you can choose a light or dark interface theme'**
   String get about_hom_2;
 
   /// No description provided for @about_hom_3.
   ///
   /// In en, this message translates to:
-  /// **'The app stores information about your last game. You can exit at any time, most likely, everything will be saved.'**
+  /// **'[PRO-feature] In PRO version the app stores information about your last game. You can exit at any time, everything will be saved.'**
   String get about_hom_3;
 
   /// No description provided for @about_hom_4.
   ///
   /// In en, this message translates to:
-  /// **'The NEW GAME button deletes all information about the last game, so be careful and save the players to the storage just in case.'**
+  /// **'The NEW GAME button deletes all information about the last game!'**
   String get about_hom_4;
 
   /// No description provided for @about_plme_1.
@@ -386,7 +386,7 @@ abstract class AppLocalizations {
   /// No description provided for @about_plme_4.
   ///
   /// In en, this message translates to:
-  /// **'Swipe the player right to add players to the storage.'**
+  /// **'[PRO-feature] Swipe the player right to add players to the storage.'**
   String get about_plme_4;
 
   /// No description provided for @about_plme_5.
@@ -442,12 +442,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'you can change the dealer, etc'**
   String get about_set_6;
-
-  /// No description provided for @about_set_7.
-  ///
-  /// In en, this message translates to:
-  /// **'During the betting:'**
-  String get about_set_7;
 
   /// No description provided for @about_set_8.
   ///
@@ -1096,6 +1090,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Controls and UI have been changed.'**
   String get update_7;
+
+  /// No description provided for @pro_version_offer_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum features in the PRO version'**
+  String get pro_version_offer_title;
+
+  /// No description provided for @pro_version_offer_options_available.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have:'**
+  String get pro_version_offer_options_available;
+
+  /// No description provided for @pro_version_offer_price_duration.
+  ///
+  /// In en, this message translates to:
+  /// **'forever'**
+  String get pro_version_offer_price_duration;
+
+  /// No description provided for @pro_version_offer_option_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark theme'**
+  String get pro_version_offer_option_1;
+
+  /// No description provided for @pro_version_offer_option_2.
+  ///
+  /// In en, this message translates to:
+  /// **'No ads'**
+  String get pro_version_offer_option_2;
+
+  /// No description provided for @pro_version_offer_option_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Winner solver'**
+  String get pro_version_offer_option_3;
+
+  /// No description provided for @pro_version_offer_option_4.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to 10 players in the lobby'**
+  String get pro_version_offer_option_4;
+
+  /// No description provided for @pro_version_offer_option_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving game progress and frequent players'**
+  String get pro_version_offer_option_5;
+
+  /// No description provided for @pro_version_offer_option_6.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom player avatars'**
+  String get pro_version_offer_option_6;
+
+  /// No description provided for @pro_version_offer_button_purchased.
+  ///
+  /// In en, this message translates to:
+  /// **'PRO active'**
+  String get pro_version_offer_button_purchased;
+
+  /// No description provided for @pro_version_offer_button_not_purchased.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy PRO'**
+  String get pro_version_offer_button_not_purchased;
+
+  /// No description provided for @pro_version_offer_button_not_available.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently unavailable'**
+  String get pro_version_offer_button_not_available;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

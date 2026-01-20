@@ -8,6 +8,7 @@ import '../domain/model_holders/saved_players_model_holder.dart';
 import '../domain/models/config_model.dart';
 import '../domain/models/game/game_state_model.dart';
 import '../domain/models/lobby/lobby_state_model.dart';
+import '../services/monitization/purchases/models/pro_version_model.dart';
 
 final configModelHolderProvider =
     AsyncNotifierProvider<ConfigModelHolder, ConfigModel>(
@@ -30,6 +31,6 @@ final gameStateMachineProvider =
 );
 
 final proVersionModelHolderProvider =
-    AsyncNotifierProvider<ProVersionModelHolder, bool>(
+    AsyncNotifierProvider<ProVersionModelHolder, ProVersionModel>(
   ProVersionModelHolder.new,
 );

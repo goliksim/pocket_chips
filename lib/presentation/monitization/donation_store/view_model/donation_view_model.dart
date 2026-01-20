@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/navigation/navigation_manager.dart';
-import '../../../di/domain_managers.dart';
-import '../../../di/model_holders.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../l10n/localization_extension.dart';
-import '../../../services/monitization/purchases/models/purchasable_product.dart';
-import '../../../services/monitization/purchases/purchases_manager.dart';
-import '../../../services/toast_manager.dart';
-import '../../../utils/constants.dart';
-import '../../../utils/logs.dart';
+import '../../../../app/navigation/navigation_manager.dart';
+import '../../../../di/domain_managers.dart';
+import '../../../../di/model_holders.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../l10n/localization_extension.dart';
+import '../../../../services/monitization/purchases/models/purchasable_product.dart';
+import '../../../../services/monitization/purchases/purchases_manager.dart';
+import '../../../../services/toast_manager.dart';
+import '../../../../utils/constants.dart';
+import '../../../../utils/logs.dart';
 import '../view_state/donation_item_action.dart';
 import '../view_state/donation_lead_item.dart';
 import '../view_state/donation_view_state.dart';
@@ -85,7 +85,7 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
 
   Future<void> purchaseItem(String itemKey) async {
     try {
-      await _purchasesManager.buyProduct(itemKey);
+      await _purchasesManager.buyItem(itemKey);
     } on Exception catch (e) {
       // TODO настроить репорт ошибок
       _toastManager.showToast(_strings.toast_unav);
@@ -129,7 +129,8 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
   bool _checkPurchased(String id) {
     switch (id) {
       case Constants.pocketChipsPROItemKey:
-        return ref.watch(proVersionModelHolderProvider).value ?? false;
+        return ref.watch(proVersionModelHolderProvider).value?.isPurchased ??
+            false;
       default:
         return false;
     }

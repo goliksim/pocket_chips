@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
+import '../../monitization/pro_version/widgets/pro_version_wrapper.dart';
 import '../onboarding_dialog.dart';
 
 class OnboardingHomePage extends StatelessWidget {
@@ -31,19 +32,22 @@ class OnboardingHomePage extends StatelessWidget {
                   textAlign: TextAlign.start,
                 ),
               ),
-              SizedBox(
-                width: stdButtonHeight,
-                height: stdButtonHeight,
-                child: IconButton(
-                  icon: Icon(
-                    (context.theme.isDark)
-                        ? Icons.nightlight_round
-                        : Icons.mode_night_outlined,
-                    size: stdIconSize,
-                    color: context.theme.onBackground,
+              ProVersionWrapper(
+                offset: 3,
+                child: SizedBox(
+                  width: stdButtonHeight,
+                  height: stdButtonHeight,
+                  child: IconButton(
+                    icon: Icon(
+                      (context.theme.isDark)
+                          ? Icons.nightlight_round
+                          : Icons.mode_night_outlined,
+                      size: stdIconSize,
+                      color: context.theme.onBackground,
+                    ),
+                    tooltip: context.strings.tooltip_theme,
+                    onPressed: () => changeTheme(),
                   ),
-                  tooltip: context.strings.tooltip_theme,
-                  onPressed: () => changeTheme(),
                 ),
               ),
             ],

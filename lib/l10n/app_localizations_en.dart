@@ -135,13 +135,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about_hom_1 => 'Home screen';
 
   @override
-  String get about_hom_2 => 'On the home screen you can choose a light or dark interface theme.';
+  String get about_hom_2 => '[PRO-feature] On the home screen you can choose a light or dark interface theme';
 
   @override
-  String get about_hom_3 => 'The app stores information about your last game. You can exit at any time, most likely, everything will be saved.';
+  String get about_hom_3 => '[PRO-feature] In PRO version the app stores information about your last game. You can exit at any time, everything will be saved.';
 
   @override
-  String get about_hom_4 => 'The NEW GAME button deletes all information about the last game, so be careful and save the players to the storage just in case.';
+  String get about_hom_4 => 'The NEW GAME button deletes all information about the last game!';
 
   @override
   String get about_plme_1 => 'Player Menu';
@@ -153,7 +153,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about_plme_3 => 'Swipe the player left to remove it.';
 
   @override
-  String get about_plme_4 => 'Swipe the player right to add players to the storage.';
+  String get about_plme_4 => '[PRO-feature] Swipe the player right to add players to the storage.';
 
   @override
   String get about_plme_5 => 'They will be stored there forever.';
@@ -181,9 +181,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get about_set_6 => 'you can change the dealer, etc';
-
-  @override
-  String get about_set_7 => 'During the betting:';
 
   @override
   String get about_set_8 => 'change the initial smallblind';
@@ -508,4 +505,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get update_7 => 'Controls and UI have been changed.';
+
+  @override
+  String get pro_version_offer_title => 'Maximum features in the PRO version';
+
+  @override
+  String get pro_version_offer_options_available => 'You already have:';
+
+  @override
+  String get pro_version_offer_price_duration => 'forever';
+
+  @override
+  String get pro_version_offer_option_1 => 'Dark theme';
+
+  @override
+  String get pro_version_offer_option_2 => 'No ads';
+
+  @override
+  String get pro_version_offer_option_3 => 'Winner solver';
+
+  @override
+  String get pro_version_offer_option_4 => 'Up to 10 players in the lobby';
+
+  @override
+  String get pro_version_offer_option_5 => 'Saving game progress and frequent players';
+
+  @override
+  String get pro_version_offer_option_6 => 'Custom player avatars';
+
+  @override
+  String get pro_version_offer_button_purchased => 'PRO active';
+
+  @override
+  String get pro_version_offer_button_not_purchased => 'Buy PRO';
+
+  @override
+  String get pro_version_offer_button_not_available => 'Currently unavailable';
 }

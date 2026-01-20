@@ -2,31 +2,40 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../di/domain_managers.dart';
 import '../../di/repositories.dart';
+import '../../services/monitization/purchases/models/pro_version_model.dart';
 import '../../utils/logs.dart';
 
-class ProVersionModelHolder extends AsyncNotifier<bool> {
+//TODO Сделать новую доменную модельку (без forceDisable)
+class ProVersionModelHolder extends AsyncNotifier<ProVersionModel> {
   @override
-  Future<bool> build() async {
+  Future<ProVersionModel> build() async {
     final repository = ref.read(appRepositoryProvider);
-    final isPro = await repository.isProVersion();
+    final isProCached = await repository.isProVersion();
 
-    ref.read(proVersionManagerProvider).addListener(
-      () {
-        logs.writeLog('ProVersionModelHolder: listen to isProEnabled change');
-        final next = ref.read(proVersionManagerProvider).isProEnabled;
+    final isProRemote = ref.watch(proVersionManagerProvider);
 
-        if (next != null && next != state.value) {
-          changePro(next);
+    return isProRemote.maybeWhen(
+      data: (data) {
+        logs.writeLog(
+            'ProVersionModelHolder: build remotely with ${data.isPurchased}');
+        if (isProCached && data.forceDisable) {
+          changePro(false);
+
+          return ProVersionModel(
+            isPurchased: false,
+            availableProduct: data.availableProduct,
+          );
         }
+
+        return ProVersionModel(
+          isPurchased: isProCached || data.isPurchased,
+          availableProduct: data.availableProduct,
+        );
       },
+      orElse: () => ProVersionModel(
+        isPurchased: isProCached,
+      ),
     );
-
-    if (!isPro) {
-      ref.read(proVersionManagerProvider).restorePurchases();
-    }
-
-    logs.writeLog('ProVersionModelHolder: build with $isPro');
-    return isPro;
   }
 
   Future<void> changePro(bool isPro) async {
@@ -34,13 +43,6 @@ class ProVersionModelHolder extends AsyncNotifier<bool> {
 
     final repository = ref.read(appRepositoryProvider);
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () async {
-        await repository.changeProVersion(isPro);
-
-        return isPro;
-      },
-    );
+    return repository.changeProVersion(isPro);
   }
 }

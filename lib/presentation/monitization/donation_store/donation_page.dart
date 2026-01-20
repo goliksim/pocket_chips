@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../di/view_models.dart';
-import '../../utils/extensions.dart';
-import '../../utils/theme/ui_values.dart';
-import '../common/widgets/dialog_widget.dart';
-import '../common/widgets/ui_widgets.dart';
+import '../../../di/view_models.dart';
+import '../../../utils/extensions.dart';
+import '../../../utils/theme/ui_values.dart';
+import '../../common/widgets/dialog_widget.dart';
+import '../../common/widgets/ui_widgets.dart';
 import 'view_state/purchase_item_state.dart';
 import 'widgets/purchase_item_widget.dart';
 

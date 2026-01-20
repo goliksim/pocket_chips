@@ -13,7 +13,8 @@ import '../../presentation/lobby/lobby_bank_editor/bank_editor_dialog.dart';
 import '../../presentation/lobby/player_editor/player_editor.dart';
 import '../../presentation/lobby/player_editor/widgets/player_logo_picker.dart';
 import '../../presentation/lobby/player_list/saved_player_list_view.dart';
-import '../../presentation/monitization/donation_page.dart';
+import '../../presentation/monitization/donation_store/donation_page.dart';
+import '../../presentation/monitization/pro_version/pro_version_offer_page.dart';
 import '../../presentation/onboading/dialogs/about.dart';
 import '../../presentation/onboading/dialogs/update.dart';
 import '../../presentation/settings/game_settings_dialog.dart';
@@ -78,6 +79,11 @@ class NavigationManager extends ChangeNotifier {
   Future<void> showDonationDialog({bool canPop = true}) => transitionDialog(
         context: context,
         child: const DonateWindow(),
+      );
+
+  Future<void> showProVersionOfferDialog() => transitionDialog(
+        context: context,
+        child: const ProVersionOfferPage(),
       );
 
   Future<void> showWinnerSolver() => transitionDialog(

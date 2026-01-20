@@ -9,6 +9,7 @@ const int defaultSmallBlindValue = 25;
 const int defaultLobbyBank = 5000;
 
 const int maxPlayerCount = 10;
+const int noProPlayerCount = 5;
 
 @freezed
 abstract class LobbyStateModel with _$LobbyStateModel {

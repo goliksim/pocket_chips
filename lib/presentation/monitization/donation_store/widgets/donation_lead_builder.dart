@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../services/assets_provider.dart';
-import '../../../utils/extensions.dart';
-import '../../../utils/theme/ui_values.dart';
+import '../../../../services/assets_provider.dart';
+import '../../../../utils/extensions.dart';
+import '../../../../utils/theme/ui_values.dart';
 import '../view_state/donation_lead_item.dart';
 
 class DonationLeadBuilder extends StatelessWidget {
@@ -24,8 +24,8 @@ class DonationLeadBuilder extends StatelessWidget {
         ),
         pro: (_) => FittedBox(
           child: Icon(
-            Icons.star,
-            color: context.theme.alertColor,
+            Icons.rocket_launch_rounded,
+            color: context.theme.primaryColor,
             size: stdIconSize * 3.25,
           ),
         ),

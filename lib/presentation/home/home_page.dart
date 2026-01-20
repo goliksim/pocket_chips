@@ -11,6 +11,7 @@ import '../../utils/theme/ui_values.dart';
 import '../common/widgets/attention_button.dart';
 import '../common/widgets/chips_image.dart';
 import '../common/widgets/ui_widgets.dart';
+import '../monitization/pro_version/widgets/pro_version_wrapper.dart';
 
 class AnimatedHomePage extends ConsumerStatefulWidget {
   const AnimatedHomePage({
@@ -86,7 +87,7 @@ class _AnimatedHomePageState extends ConsumerState<AnimatedHomePage>
           // old theme (underneath)
           ThemeProvider(
             theme: old,
-            child: HomePage(),
+            child: _HomePage(),
           ),
 
           // new theme revealed with radial mask
@@ -113,7 +114,7 @@ class _AnimatedHomePageState extends ConsumerState<AnimatedHomePage>
                 ).createShader(rect),
                 child: child,
               ),
-              child: HomePage(),
+              child: _HomePage(),
             ),
           ),
         ],
@@ -123,15 +124,13 @@ class _AnimatedHomePageState extends ConsumerState<AnimatedHomePage>
     // default: no animation, just current theme
     return ThemeProvider(
       theme: currentTheme,
-      child: HomePage(),
+      child: _HomePage(),
     );
   }
 }
 
-class HomePage extends ConsumerWidget {
+class _HomePage extends ConsumerWidget {
   final title = 'POCKET CHIPS';
-
-  const HomePage({super.key});
 
   @override
   Widget build(
@@ -179,17 +178,19 @@ class HomePage extends ConsumerWidget {
             ),
           ),
           actions: <Widget>[
-            AspectRatio(
-              aspectRatio: 1,
-              child: IconButton(
-                icon: Icon(
-                  (context.theme.isDark)
-                      ? Icons.nightlight_round
-                      : Icons.mode_night_outlined,
-                  size: stdIconSize,
+            ProVersionWrapper(
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: IconButton(
+                  icon: Icon(
+                    (context.theme.isDark)
+                        ? Icons.nightlight_round
+                        : Icons.mode_night_outlined,
+                    size: stdIconSize,
+                  ),
+                  tooltip: context.strings.tooltip_theme,
+                  onPressed: () => viewModel.changeTheme(),
                 ),
-                tooltip: context.strings.tooltip_theme,
-                onPressed: () => viewModel.changeTheme(),
               ),
             ),
           ],
@@ -217,23 +218,6 @@ class HomePage extends ConsumerWidget {
                         : Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              // Continue Button
-                              if (shouldDrawContinue)
-                                MyButton(
-                                  height: stdButtonHeight,
-                                  width: double.infinity,
-                                  borderRadius:
-                                      BorderRadius.circular(stdBorderRadius),
-                                  buttonColor: context.theme.primaryColor,
-                                  textString: context.strings.home_cont,
-                                  action: () {
-                                    if (shouldDrawContinue) {
-                                      viewModel.continueGame();
-                                    }
-                                  },
-                                ),
-
-                              SizedBox(height: stdHorizontalOffset),
                               //New Game
                               AttentionButton(
                                 onTap: () => viewModel.createNewGame(),
@@ -249,9 +233,27 @@ class HomePage extends ConsumerWidget {
                                   ),
                                 ),
                               ),
-                              SizedBox(
-                                height: stdHorizontalOffset,
-                              ),
+                              // Continue Button
+                              if (shouldDrawContinue) ...[
+                                SizedBox(height: stdHorizontalOffset),
+                                ProVersionWrapper(
+                                  offset: -5,
+                                  child: MyButton(
+                                    height: stdButtonHeight,
+                                    width: double.infinity,
+                                    borderRadius:
+                                        BorderRadius.circular(stdBorderRadius),
+                                    buttonColor: context.theme.primaryColor,
+                                    textString: context.strings.home_cont,
+                                    action: () {
+                                      if (shouldDrawContinue) {
+                                        viewModel.continueGame();
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
+                              SizedBox(height: stdHorizontalOffset),
                               Row(
                                 children: [
                                   Expanded(
@@ -270,16 +272,20 @@ class HomePage extends ConsumerWidget {
                                       padding: EdgeInsets.only(
                                         left: stdHorizontalOffset,
                                       ),
-                                      child: MyButton(
-                                        height: stdButtonHeight,
-                                        borderRadius: BorderRadius.circular(
-                                            stdBorderRadius),
-                                        buttonColor:
-                                            context.theme.additionButtonColor,
-                                        textString:
-                                            context.strings.home_win_check,
-                                        action: () =>
-                                            viewModel.showWinnerSolver(),
+                                      child: ProVersionWrapper(
+                                        offset: -5,
+                                        child: MyButton(
+                                          height: stdButtonHeight,
+                                          borderRadius: BorderRadius.circular(
+                                            stdBorderRadius,
+                                          ),
+                                          buttonColor:
+                                              context.theme.additionButtonColor,
+                                          textString:
+                                              context.strings.home_win_check,
+                                          action: () =>
+                                              viewModel.showWinnerSolver(),
+                                        ),
                                       ),
                                     ),
                                   ),

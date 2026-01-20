@@ -135,13 +135,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get about_hom_1 => 'Начальный экран';
 
   @override
-  String get about_hom_2 => 'На главном экране вы можете выбрать светлую или темную тему интерфейса.';
+  String get about_hom_2 => '[ПРО-функция] На главном экране вы можете выбрать светлую или темную тему интерфейса.';
 
   @override
-  String get about_hom_3 => 'Приложение хранит информацию о вашей последней игре. Вы можете выйти в любой момент, скорее всего, все будет сохранено.';
+  String get about_hom_3 => '[ПРО-функция] Приложение хранит информацию о вашей последней игре. Вы можете выйти в любой момент, все будет сохранено.';
 
   @override
-  String get about_hom_4 => 'Кнопка НОВАЯ ИГРА удаляет всю информацию о последней игре, поэтому будьте осторожны и сохраните игроков в хранилище на всякий случай.';
+  String get about_hom_4 => 'Кнопка НОВАЯ ИГРА удаляет всю информацию о последней игре!';
 
   @override
   String get about_plme_1 => 'Меню игрока';
@@ -153,7 +153,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get about_plme_3 => 'Проведите пальцем по игроку влево, чтобы удалить его.';
 
   @override
-  String get about_plme_4 => 'Проведите пальцем по игроку вправо, чтобы добавить его в хранилище.';
+  String get about_plme_4 => '[ПРО-функция] Проведите пальцем по игроку вправо, чтобы добавить его в хранилище.';
 
   @override
   String get about_plme_5 => 'Они будут храниться там вечно.';
@@ -181,9 +181,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get about_set_6 => 'вы можете сменить дилера и т.д';
-
-  @override
-  String get about_set_7 => 'Во время ставок:';
 
   @override
   String get about_set_8 => 'изменить начальный малый блайнд';
@@ -508,4 +505,40 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get update_7 => 'Изменены элементы управления и UI';
+
+  @override
+  String get pro_version_offer_title => 'Максимум возможностей в PRO версии';
+
+  @override
+  String get pro_version_offer_options_available => 'Вам уже доступны:';
+
+  @override
+  String get pro_version_offer_price_duration => 'навсегда';
+
+  @override
+  String get pro_version_offer_option_1 => 'Темная тема';
+
+  @override
+  String get pro_version_offer_option_2 => 'Отсутствие рекламы';
+
+  @override
+  String get pro_version_offer_option_3 => 'Ассистент для определения победителя';
+
+  @override
+  String get pro_version_offer_option_4 => 'До 10 игроков в лобби';
+
+  @override
+  String get pro_version_offer_option_5 => 'Сохранение прогресса игры и частых игроков';
+
+  @override
+  String get pro_version_offer_option_6 => 'Кастомные аватары игроков';
+
+  @override
+  String get pro_version_offer_button_purchased => 'PRO активен';
+
+  @override
+  String get pro_version_offer_button_not_purchased => 'Стать PRO';
+
+  @override
+  String get pro_version_offer_button_not_available => 'Cейчас не доступно';
 }

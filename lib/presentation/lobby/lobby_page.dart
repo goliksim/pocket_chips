@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../di/view_models.dart';
+import '../../domain/models/lobby/lobby_state_model.dart';
 import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
 import '../common/widgets/loading_page.dart';
 import '../common/widgets/ui_widgets.dart';
+import '../monitization/pro_version/widgets/pro_version_wrapper.dart';
 import 'player_list/player_list_view.dart';
 import 'widgets/attention_add_player_button.dart';
 import 'widgets/lobby_page_bottom_buttons.dart';
@@ -49,17 +51,19 @@ class LobbyPage extends ConsumerWidget {
             title: Text(context.strings.playp_tittle),
             centerTitle: true,
             actions: <Widget>[
-              AspectRatio(
-                aspectRatio: 1,
-                child: IconButton(
-                  splashColor: context.theme.bankColor,
-                  highlightColor: Colors.transparent,
-                  icon: Icon(
-                    Icons.folder_shared,
-                    size: stdIconSize,
+              ProVersionWrapper(
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: IconButton(
+                    splashColor: context.theme.bankColor,
+                    highlightColor: Colors.transparent,
+                    icon: Icon(
+                      Icons.folder_shared,
+                      size: stdIconSize,
+                    ),
+                    tooltip: context.strings.tooltip_stor,
+                    onPressed: () => viewModel.openSavedPlayersList(),
                   ),
-                  tooltip: context.strings.tooltip_stor,
-                  onPressed: () => viewModel.openSavedPlayersList(),
                 ),
               ),
             ],
@@ -121,9 +125,14 @@ class LobbyPage extends ConsumerWidget {
                             padding: EdgeInsets.symmetric(
                               vertical: stdHorizontalOffset / 2,
                             ),
-                            child: AttentionAddPlayerButton(
-                              onTap: () => viewModel.openNewPlayerEditor(),
-                              needToAnimate: () => state.players.isEmpty,
+                            child: ProVersionWrapper(
+                              offset: -5,
+                              conditionToEnable:
+                                  state.players.length < noProPlayerCount,
+                              child: AttentionAddPlayerButton(
+                                onTap: () => viewModel.openNewPlayerEditor(),
+                                needToAnimate: () => state.players.isEmpty,
+                              ),
                             ),
                           ),
                         //FreeSpace

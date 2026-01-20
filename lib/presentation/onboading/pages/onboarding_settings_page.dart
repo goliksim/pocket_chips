@@ -41,7 +41,7 @@ class OnboardingSettingsPage extends StatelessWidget {
           ),
           SizedBox(height: stdHorizontalOffset * 2),
           Text(
-            '${context.strings.about_set_3}\n- ${context.strings.about_set_4}\n- ${context.strings.about_set_5}\n- ${context.strings.about_set_6}\n\n${context.strings.about_set_7}\n- ${context.strings.about_set_8}\n- ${context.strings.about_set_9}',
+            '${context.strings.about_set_3}\n- ${context.strings.about_set_4}\n- ${context.strings.about_set_5}\n- ${context.strings.about_set_6}\n- ${context.strings.about_set_8}\n- ${context.strings.about_set_9}',
             style: TextStyle(
               height: 1.5,
               color: context.theme.onBackground,

@@ -1,93 +1,109 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
+import '../../../di/domain_managers.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/logs.dart';
 import '../../toast_manager.dart';
-import 'models/purchasable_product.dart';
-import 'models/store_status.dart';
+import 'models/pro_version_model.dart';
+import 'purchases_mixin.dart';
 
-class ProVersionManager with ChangeNotifier {
-  final ToastManager _toastManager;
-  final AppLocalizations _strings;
+class ProVersionManager extends AsyncNotifier<ProVersionModel>
+    with PurchasesMixin {
+  @override
+  String get logName => 'ProVersionManager';
 
-  StoreState storeState = StoreState.loading;
-  late StreamSubscription<List<PurchaseDetails>> _subscription;
-  List<PurchasableProduct> products = [];
+  @override
+  ToastManager get toastManager => ref.read(toastManagerProvider);
+  @override
+  AppLocalizations get strings => ref.read(stringsProvider);
+
+  @override
+  List<String> get kIds => [Constants.pocketChipsPROItemKey];
+
+  @override
+  bool isConsumable(String productId) => true;
 
   bool proConfirmedByRestore = false;
-  bool? isProEnabled;
 
+  @override
+  FutureOr<ProVersionModel> build() async {
+    init();
+    ref.onDispose(dispose);
+
+    final product = (await loadPurchases())
+        .firstWhere((p) => p.id == Constants.pocketChipsPROItemKey);
+
+    return ProVersionModel(
+      availableProduct: product,
+    );
+  }
+
+  @override
   Future<void> restorePurchases() async {
     logs.writeLog('ProVersionManager: restore purchases');
 
-    await InAppPurchase.instance.restorePurchases();
+    super.restorePurchases();
 
     // Ждем восстановления покупок и отрубаем ПРО, если не подтвердили
     await Future.delayed(const Duration(seconds: 5)).then(
       (_) {
         if (!proConfirmedByRestore) {
           //Disable PRO
-          isProEnabled = false;
-          notifyListeners();
+          state = AsyncData(
+            ProVersionModel(
+              forceDisable: true,
+              isPurchased: false,
+              availableProduct: state.value?.availableProduct,
+            ),
+          );
         }
       },
     );
   }
 
-  ProVersionManager({
-    required ToastManager toastManager,
-    required AppLocalizations strings,
-  })  : _toastManager = toastManager,
-        _strings = strings {
-    _purchaseListening();
-  }
+  Future<void> buyPro() async {
+    restorePurchases();
 
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
-  }
+    await Future.delayed(const Duration(seconds: 2));
 
-  //Listening to purchase updates
-  void _purchaseListening() {
-    final purchaseUpdated = InAppPurchase.instance.purchaseStream;
-    _subscription = purchaseUpdated.listen(
-      _onPurchaseUpdate,
-      onDone: _updateStreamOnDone,
-      onError: _updateStreamOnError,
-    );
-    //iapRepo.addListener(purchasesUpdate);
-  }
-
-  //Получаем обновления о покупках
-  Future<void> _onPurchaseUpdate(
-    List<PurchaseDetails> purchaseDetailsList,
-  ) async {
-    for (var purchaseDetails in purchaseDetailsList) {
-      if (purchaseDetails.productID == Constants.pocketChipsPROItemKey) {
-        await _handlePurchase(purchaseDetails);
-      }
+    if (state.value?.isPurchased == true) {
+      return;
     }
-    notifyListeners();
+
+    final product = state.value?.availableProduct;
+
+    if (product == null) {
+      throw Exception('Product not found to buy');
+    }
+
+    return buyProduct(product.productDetails);
   }
 
   //Получаем обновление о покупке, применяет покупку к логике приложения.
-  Future<void> _handlePurchase(PurchaseDetails purchaseDetails) async {
+  @override
+  Future<void> handlePurchase(PurchaseDetails purchaseDetails) async {
     if (purchaseDetails.status == PurchaseStatus.purchased ||
         purchaseDetails.status == PurchaseStatus.restored) {
       // Валидируем покупку
-      var validPurchase = await _verifyPurchase(purchaseDetails);
+      var validPurchase = await verifyPurchase(purchaseDetails);
 
       if (validPurchase) {
         // Применяем покупку
         //TODO сделать модалку и повесить тесты
         proConfirmedByRestore = true;
         //Enable PRO
-        isProEnabled = true;
+        state = AsyncData(
+          ProVersionModel(
+            isPurchased: true,
+            forceDisable: false,
+            availableProduct: state.value?.availableProduct,
+          ),
+        );
 
         logs.writeLog('Pro version purchased/restored');
       } else {
@@ -101,16 +117,15 @@ class ProVersionManager with ChangeNotifier {
     }
   }
 
-  // TODO verify with backend
-  // https://github.com/flutter/codelabs/blob/main/in_app_purchases/complete/app/lib/logic/dash_purchases.dart#L116
-  Future<bool> _verifyPurchase(PurchaseDetails purchaseDetails) async => true;
-
-  void _updateStreamOnDone() {
-    _subscription.cancel();
-  }
-
-  void _updateStreamOnError(dynamic error) {
-    logs.writeLog('Purchase stream error: $error');
-    _toastManager.showToast(_strings.toast_purchases_updating_error);
+  void debugDisablePro() {
+    if (kDebugMode) {
+      state = AsyncData(
+        ProVersionModel(
+          isPurchased: false,
+          forceDisable: true,
+          availableProduct: state.value?.availableProduct,
+        ),
+      );
+    }
   }
 }
