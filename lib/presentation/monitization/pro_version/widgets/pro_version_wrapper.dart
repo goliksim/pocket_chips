@@ -40,9 +40,6 @@ class ProVersionWrapper extends ConsumerWidget {
             onTap: () {
               ref.read(navigationManagerProvider).showProVersionOfferDialog();
             },
-            child: const ColoredBox(
-              color: Colors.transparent,
-            ),
           ),
         ),
         Positioned(

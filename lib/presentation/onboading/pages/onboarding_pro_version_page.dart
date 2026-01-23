@@ -180,8 +180,13 @@ class OnboardingProVersionPage extends ConsumerWidget {
               color: context.theme.hintColor,
             ),
             height: stdHeight,
-            buttonColor: Colors.transparent,
+            buttonColor: context.theme.bgrColor,
             textString: context.strings.support_close,
+            textStyle: context.theme.stdTextStyle.copyWith(
+              color: context.theme.hintColor,
+              fontSize: stdFontSize,
+            ),
+            action: () => viewModel.pop(),
           )
         ]
       ],

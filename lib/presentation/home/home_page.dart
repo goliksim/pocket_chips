@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../app/theme_provider.dart';
 import '../../di/domain_managers.dart';
@@ -11,6 +12,7 @@ import '../../utils/theme/ui_values.dart';
 import '../common/widgets/attention_button.dart';
 import '../common/widgets/chips_image.dart';
 import '../common/widgets/ui_widgets.dart';
+import '../monitization/ads/app_bar_banner.dart';
 import '../monitization/pro_version/widgets/pro_version_wrapper.dart';
 
 class AnimatedHomePage extends ConsumerStatefulWidget {
@@ -29,6 +31,8 @@ class _AnimatedHomePageState extends ConsumerState<AnimatedHomePage>
   Themes? _oldTheme;
 
   bool _isAnimating = false;
+
+  BannerAd? banner;
 
   @override
   void initState() {
@@ -87,7 +91,7 @@ class _AnimatedHomePageState extends ConsumerState<AnimatedHomePage>
           // old theme (underneath)
           ThemeProvider(
             theme: old,
-            child: _HomePage(),
+            child: _HomePage(showBanner: false),
           ),
 
           // new theme revealed with radial mask
@@ -114,7 +118,7 @@ class _AnimatedHomePageState extends ConsumerState<AnimatedHomePage>
                 ).createShader(rect),
                 child: child,
               ),
-              child: _HomePage(),
+              child: _HomePage(showBanner: false),
             ),
           ),
         ],
@@ -131,6 +135,11 @@ class _AnimatedHomePageState extends ConsumerState<AnimatedHomePage>
 
 class _HomePage extends ConsumerWidget {
   final title = 'POCKET CHIPS';
+  final bool showBanner;
+
+  const _HomePage({
+    this.showBanner = true,
+  });
 
   @override
   Widget build(
@@ -150,6 +159,7 @@ class _HomePage extends ConsumerWidget {
     return PatternContainer(
       child: Scaffold(
         appBar: AppBar(
+          flexibleSpace: showBanner ? AppBarBanner() : null,
           leading: AspectRatio(
             aspectRatio: 1,
             child: IconButton(

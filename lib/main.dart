@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'app/application.dart';
 
@@ -17,6 +18,7 @@ void _runApp() async {
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
 
   if (kIsWeb) {
     // Для веб-приложений может потребоваться своя логика инициализации.

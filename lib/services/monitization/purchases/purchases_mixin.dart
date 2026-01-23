@@ -104,7 +104,9 @@ mixin PurchasesMixin<T> {
   Future<void> restorePurchases() async {
     logs.writeLog('$logName: restore purchases');
 
-    return InAppPurchase.instance.restorePurchases();
+    await _checkStoreAccess();
+
+    await InAppPurchase.instance.restorePurchases();
   }
 
   // TODO verify with backend

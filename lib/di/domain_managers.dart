@@ -13,6 +13,7 @@ import '../services/monitization/purchases/models/pro_version_model.dart';
 import '../services/monitization/purchases/models/purchasable_product.dart';
 import '../services/monitization/purchases/pro_version_manager.dart';
 import '../services/monitization/purchases/purchases_manager.dart';
+import '../services/monitization/video_ads/google_ads_manager.dart';
 import '../services/toast_manager.dart';
 import '../utils/theme/theme_manager.dart';
 import 'model_holders.dart';
@@ -21,7 +22,7 @@ final initializationManagerProvider = Provider<InitializationManager>(
   (ref) => InitializationManager(
     configModelHolder: ref.read(configModelHolderProvider.notifier),
     navigationManager: ref.read(navigationManagerProvider),
-    proVersionModelHolder: ref.read(proVersionModelHolderProvider.notifier),
+    proVersionManager: ref.read(proVersionManagerProvider.notifier),
   ),
 );
 
@@ -83,4 +84,12 @@ final purchasesManagerProvider =
 final proVersionManagerProvider =
     AsyncNotifierProvider<ProVersionManager, ProVersionModel>(
   ProVersionManager.new,
+);
+
+final proVersionProvider = Provider<bool>(
+  (ref) => ref.watch(proVersionModelHolderProvider).value?.isPurchased ?? false,
+);
+
+final googleAdsManagerProvider = Provider<GoogleAdsManager>(
+  (ref) => GoogleAdsManager(),
 );

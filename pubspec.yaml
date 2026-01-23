@@ -20,10 +20,9 @@ dependencies:
   
   # Monitization
   in_app_purchase: ^3.2.3
+  google_mobile_ads: ^7.0.0
   #unity_ads_plugin: ^0.3.7
-  #purchases_flutter: ^5.7.0
   # my_target_flutter: ^0.1.0+3
-  # in_app_purchase: ^3.0.8
   
 
   # UI

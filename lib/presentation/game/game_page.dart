@@ -6,6 +6,7 @@ import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
 import '../common/widgets/loading_page.dart';
 import '../common/widgets/ui_widgets.dart';
+import '../monitization/ads/app_bar_banner.dart';
 import 'widgets/game_contol/game_control.dart';
 import 'widgets/game_table/game_table.dart';
 import 'widgets/game_title_widget.dart';
@@ -32,6 +33,7 @@ class GamePage extends ConsumerWidget {
           child: Scaffold(
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
+              flexibleSpace: AppBarBanner(),
               toolbarHeight: stdButtonHeight * 0.75,
               leading: IconButton(
                 onPressed: () => viewModel.pop(),

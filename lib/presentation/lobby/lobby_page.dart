@@ -7,6 +7,7 @@ import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
 import '../common/widgets/loading_page.dart';
 import '../common/widgets/ui_widgets.dart';
+import '../monitization/ads/app_bar_banner.dart';
 import '../monitization/pro_version/widgets/pro_version_wrapper.dart';
 import 'player_list/player_list_view.dart';
 import 'widgets/attention_add_player_button.dart';
@@ -30,6 +31,7 @@ class LobbyPage extends ConsumerWidget {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
+            flexibleSpace: AppBarBanner(),
             scrolledUnderElevation: 0,
             toolbarHeight: stdButtonHeight * 0.75,
             leading: IconButton(

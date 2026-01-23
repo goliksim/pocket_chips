@@ -12,33 +12,31 @@ class ProVersionModelHolder extends AsyncNotifier<ProVersionModel> {
     final repository = ref.read(appRepositoryProvider);
     final isProCached = await repository.isProVersion();
 
-    final isProRemote = ref.watch(proVersionManagerProvider);
+    return ref.watch(proVersionManagerProvider).maybeWhen(
+          data: (data) {
+            logs.writeLog(
+                'ProVersionModelHolder: build remotely with ${data.isPurchased}');
+            if (isProCached && data.forceDisable) {
+              changePro(false);
 
-    return isProRemote.maybeWhen(
-      data: (data) {
-        logs.writeLog(
-            'ProVersionModelHolder: build remotely with ${data.isPurchased}');
-        if (isProCached && data.forceDisable) {
-          changePro(false);
+              return ProVersionModel(
+                isPurchased: false,
+                availableProduct: data.availableProduct,
+              );
+            }
+            if (!isProCached && data.isPurchased) {
+              changePro(true);
+            }
 
-          return ProVersionModel(
-            isPurchased: false,
-            availableProduct: data.availableProduct,
-          );
-        }
-        if (!isProCached && data.isPurchased) {
-          changePro(true);
-        }
-
-        return ProVersionModel(
-          isPurchased: isProCached || data.isPurchased,
-          availableProduct: data.availableProduct,
+            return ProVersionModel(
+              isPurchased: isProCached || data.isPurchased,
+              availableProduct: data.availableProduct,
+            );
+          },
+          orElse: () => ProVersionModel(
+            isPurchased: isProCached,
+          ),
         );
-      },
-      orElse: () => ProVersionModel(
-        isPurchased: isProCached,
-      ),
-    );
   }
 
   Future<void> changePro(bool isPro) async {

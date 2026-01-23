@@ -40,19 +40,26 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
 
     return ProVersionModel(
       availableProduct: product,
+      isPurchased: state.value?.isPurchased ?? false,
+      forceDisable: state.value?.forceDisable ?? false,
     );
   }
 
   @override
   Future<void> restorePurchases() async {
-    logs.writeLog('ProVersionManager: restore purchases');
+    try {
+      await super.restorePurchases();
+    } on Exception catch (e) {
+      toastManager.showToast(e.toString());
 
-    super.restorePurchases();
+      return;
+    }
 
     // Ждем восстановления покупок и отрубаем ПРО, если не подтвердили
     await Future.delayed(const Duration(seconds: 5)).then(
       (_) {
         if (!proConfirmedByRestore) {
+          logs.writeLog('ProVersionManager: force disable');
           //Disable PRO
           state = AsyncData(
             ProVersionModel(
