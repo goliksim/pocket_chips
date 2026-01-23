@@ -14,7 +14,7 @@ abstract class PurchaseItemState with _$PurchaseItemState {
     required String priceText,
     required DonationItemAction action,
     @Default(false) bool alreadyPurchased,
-  }) = _PurchaseItemState;
+  }) = LoadedPurchaseItemState;
 
   const factory PurchaseItemState.loading({
     @Default(DonationLeadItem.loading()) DonationLeadItem lead,

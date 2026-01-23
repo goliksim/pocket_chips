@@ -6,15 +6,10 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../../utils/logs.dart';
 
 class GoogleBannersManager with ChangeNotifier {
-  static String get bannerAdUnitId {
-    if (Platform.isAndroid) {
-      return 'ca-app-pub-2217402774042534/4056700357';
-    } else if (Platform.isIOS) {
-      return '<Your_IOS_BANNER_AD_ID>';
-    } else {
-      throw UnsupportedError('Unsupported platform');
-    }
-  }
+  static const int _maxFailedLoadAttempts = 3;
+  int _numBannerLoadAttempts = 0;
+
+  BannerAd? _bannerAd;
 
   GoogleBannersManager({
     required bool isPro,
@@ -26,14 +21,25 @@ class GoogleBannersManager with ChangeNotifier {
 
   BannerAd? get bannerAd => _bannerAd;
 
-  BannerAd? _bannerAd;
-  int _numBannerLoadAttempts = 0;
+  static String get _bannerAdUnitId {
+    if (Platform.isAndroid) {
+      return 'ca-app-pub-2217402774042534/4056700357';
+    } else if (Platform.isIOS) {
+      return '<Your_IOS_BANNER_AD_ID>';
+    } else {
+      throw UnsupportedError('Unsupported platform');
+    }
+  }
 
-  static const int maxFailedLoadAttempts = 3;
+  @override
+  void dispose() {
+    super.dispose();
+    _bannerAd?.dispose();
+  }
 
   void _createBannerAd() {
     BannerAd(
-      adUnitId: bannerAdUnitId,
+      adUnitId: _bannerAdUnitId,
       request: AdRequest(),
       size: AdSize.banner,
       listener: BannerAdListener(
@@ -48,7 +54,7 @@ class GoogleBannersManager with ChangeNotifier {
           logs.writeLog('BannerAd failed to load: $error.');
           _numBannerLoadAttempts += 1;
           _bannerAd = null;
-          if (_numBannerLoadAttempts < maxFailedLoadAttempts) {
+          if (_numBannerLoadAttempts < _maxFailedLoadAttempts) {
             _createBannerAd();
           }
         },
@@ -60,11 +66,5 @@ class GoogleBannersManager with ChangeNotifier {
         onPaidEvent: (ad, valueMicros, precision, currencyCode) {},
       ),
     ).load();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _bannerAd?.dispose();
   }
 }

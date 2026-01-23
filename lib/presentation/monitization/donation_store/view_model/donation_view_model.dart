@@ -9,6 +9,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../l10n/localization_extension.dart';
 import '../../../../services/monitization/purchases/models/purchasable_product.dart';
 import '../../../../services/monitization/purchases/purchases_manager.dart';
+import '../../../../services/monitization/video_ads/google_ads_manager.dart';
 import '../../../../services/toast_manager.dart';
 import '../../../../utils/constants.dart';
 import '../../../../utils/logs.dart';
@@ -26,17 +27,27 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
   PurchasesManager get _purchasesManager =>
       ref.read(purchasesManagerProvider.notifier);
 
+  GoogleAdsManager get _googleAdsManager => ref.read(googleAdsManagerProvider);
+
   @override
   FutureOr<DonationViewState> build() async {
     logs.writeLog('DonationVM: build');
 
-    final videoMock = PurchaseItemState(
-      id: Constants.videoAdItemKey,
-      lead: DonationLeadItem.videoAd(),
-      name: _strings.support_video,
-      priceText: _strings.support_free,
-      action: DonationItemAction.watchAd,
-    );
+    _googleAdsManager
+      ..removeListener(_updateVideoAd)
+      ..addListener(_updateVideoAd);
+
+    final adIsLoaded = _googleAdsManager.loaded;
+
+    final videoAd = adIsLoaded
+        ? LoadedPurchaseItemState(
+            id: Constants.videoAdItemKey,
+            lead: DonationLeadItem.videoAd(),
+            name: _strings.support_video,
+            priceText: _strings.support_free,
+            action: DonationItemAction.watchAd,
+          )
+        : PurchaseItemState.loading();
 
     final manager = ref.read(purchasesManagerProvider);
 
@@ -49,12 +60,19 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
       (prev, next) {
         next.maybeWhen(
           data: (products) {
+            final oldProducts = state.value?.availableItems ?? [];
+            final oldProductsSet = oldProducts.map((e) => e.id).toSet();
+
             state = AsyncValue.data(
               DonationViewState(
                 availableItems: [
-                  ...state.value?.availableItems ?? [],
-                  ...products.map(_buildItem).toSet(),
+                  ...oldProducts,
+                  ...products
+                      .where((e) => !oldProductsSet.contains(e.id))
+                      .map(_buildItem)
+                      .toSet(),
                 ],
+                videoAdItem: state.value?.videoAdItem,
               ),
             );
           },
@@ -64,10 +82,31 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
     );
 
     return DonationViewState(
+      videoAdItem: videoAd,
       availableItems: [
-        videoMock,
         ...?manager.value?.map(_buildItem).toSet(),
       ],
+    );
+  }
+
+  void _updateVideoAd() {
+    final loaded = _googleAdsManager.loaded;
+
+    final newVideoItem = loaded
+        ? LoadedPurchaseItemState(
+            id: Constants.videoAdItemKey,
+            lead: DonationLeadItem.videoAd(),
+            name: _strings.support_video,
+            priceText: _strings.support_free,
+            action: DonationItemAction.watchAd,
+          )
+        : PurchaseItemState.loading();
+
+    state = AsyncValue.data(
+      DonationViewState(
+        availableItems: state.value?.availableItems ?? [],
+        videoAdItem: newVideoItem,
+      ),
     );
   }
 
@@ -93,10 +132,11 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
     }
   }
 
-  void watchVideoAd() {
-    // TODO implement watch ad logic
-    _toastManager.showToast(_strings.toast_unav);
-  }
+  Future<void> watchVideoAd() => _googleAdsManager.showInterstitialAd(
+        onAdDismissed: () {
+          _toastManager.showToast('Thank you for watching video ad!');
+        },
+      );
 
   Future<void> restorePurchases() async {
     try {
@@ -136,7 +176,8 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
     }
   }
 
-  PurchaseItemState _buildItem(PurchasableProduct product) => PurchaseItemState(
+  LoadedPurchaseItemState _buildItem(PurchasableProduct product) =>
+      LoadedPurchaseItemState(
         id: product.id,
         lead: _getLeadById(product.id),
         name: _strings.getProductNameById(product.id),

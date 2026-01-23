@@ -34,7 +34,10 @@ class _DonateWindowState extends ConsumerState<DonateWindow> {
 
     viewState.maybeWhen(
       data: (data) {
-        storeProducts = data.availableItems;
+        storeProducts = [
+          if (data.videoAdItem != null) data.videoAdItem!,
+          ...data.availableItems
+        ];
       },
       orElse: () {
         storeProducts = placeholderProducts;
