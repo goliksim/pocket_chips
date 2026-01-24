@@ -390,6 +390,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toast_alred => 'already in lobby!';
 
   @override
+  String get toast_alred2 => 'Player with same name and icon already exist';
+
+  @override
   String get toast_moreplay2 => 'You cant play without players';
 
   @override
@@ -399,13 +402,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toast_bank2 => 'In your case';
 
   @override
-  String get toast_alred2 => 'Player with same name and icon already exist';
-
-  @override
   String get toast_bank3 => 'The stack cannot be zero';
 
   @override
   String get toast_bank4 => 'We recommend a Big Blind value less than Stack';
+
+  @override
+  String get toast_bank5 => 'The Small Blind cannot be zero';
 
   @override
   String get toast_unav => 'Unavailible now';

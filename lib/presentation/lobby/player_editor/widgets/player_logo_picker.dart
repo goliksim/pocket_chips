@@ -55,7 +55,7 @@ class _PickIconState extends State<PlayerLogoPicker> {
         if (image != null) {
           final resizedImage = img.copyResize(
             image,
-            height: 256,
+            height: 512,
             maintainAspect: true,
           );
 

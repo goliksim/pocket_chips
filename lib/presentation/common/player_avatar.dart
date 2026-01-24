@@ -5,16 +5,18 @@ import 'package:flutter/material.dart';
 import '../../services/assets_provider.dart';
 
 class PlayerAvatar extends StatelessWidget {
-  const PlayerAvatar({
-    super.key,
-    required this.assetUrl,
-    this.radius,
-    this.colorFilter,
-  });
-
   final String assetUrl;
   final double? radius;
   final ColorFilter? colorFilter;
+  final FilterQuality? filterQuality;
+
+  const PlayerAvatar({
+    required this.assetUrl,
+    this.radius,
+    this.colorFilter,
+    this.filterQuality,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +39,7 @@ class PlayerAvatar extends StatelessWidget {
           image: imageProvider.image,
           fit: BoxFit.cover,
           colorFilter: colorFilter,
+          filterQuality: filterQuality ?? FilterQuality.medium,
           onError: (exception, stackTrace) =>
               AssetImage(AssetsProvider.emptyPlayerAsset),
         ),

@@ -390,6 +390,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get toast_alred => 'уже в лобби!';
 
   @override
+  String get toast_alred2 => 'Игрок с таким же именем и аватаром уже существует';
+
+  @override
   String get toast_moreplay2 => 'Вы не можете начать игру без игроков';
 
   @override
@@ -399,13 +402,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get toast_bank2 => 'В вашем случае';
 
   @override
-  String get toast_alred2 => 'Игрок с таким же именем и аватаром уже существует';
-
-  @override
   String get toast_bank3 => 'Стек не может быть равен нулю';
 
   @override
   String get toast_bank4 => 'Рекомендуем использовать значение большого блайнда меньше стека';
+
+  @override
+  String get toast_bank5 => 'Нелья играть без блайндов';
 
   @override
   String get toast_unav => 'Недоступно';

@@ -117,10 +117,10 @@ class PlayerEditorViewModel with ChangeNotifier {
 
   void notifyWrongInput() {
     if (!_validName) {
-      return _toastManager.showToast('Please enter player name');
+      return _toastManager.showToast(_strings.toast_playp_edit_no_name);
     }
     if (!_validIcon) {
-      return _toastManager.showToast('Please select icon for player');
+      return _toastManager.showToast(_strings.toast_playp_edit_no_icon);
     }
     if (!_validBank) {
       return _toastManager.showToast(_strings.toast_bank3);

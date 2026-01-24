@@ -80,6 +80,7 @@ class _WinnerWindowState extends State<WinnerWindow> {
                     child: PlayerAvatar(
                       assetUrl: widget.winner.assetUrl,
                       radius: (stdButtonHeight * 3) / 2,
+                      filterQuality: FilterQuality.high,
                       colorFilter: (widget.winner.assetUrl ==
                               AssetsProvider.emptyPlayerAsset)
                           ? EmptyAssetFilter(widget.winner.uid)

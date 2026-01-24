@@ -4,6 +4,7 @@ import '../../../../services/assets_provider.dart';
 import '../../../../utils/extensions.dart';
 import '../../../../utils/theme/empty_asset_filter.dart';
 import '../../../../utils/theme/ui_values.dart';
+import '../../../common/player_avatar.dart';
 import '../../../common/widgets/ui_widgets.dart';
 import 'view_state/possible_winner_item.dart';
 import 'winner_choice_view_model.dart';
@@ -85,24 +86,14 @@ class WinnerChoiceWindow extends StatelessWidget {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Container(
-                                          width: stdButtonHeight * 0.75 * 0.8,
-                                          height: stdButtonHeight * 0.75 * 0.8,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                              filterQuality: FilterQuality.high,
-                                              colorFilter: (winner.assetUrl ==
-                                                      AssetsProvider
-                                                          .emptyPlayerAsset)
-                                                  ? EmptyAssetFilter(winner.uid)
-                                                  : null,
-                                              image: AssetImage(
-                                                winner.assetUrl,
-                                              ),
-                                              fit: BoxFit.fitHeight,
-                                            ),
-                                          ),
+                                        PlayerAvatar(
+                                          assetUrl: winner.assetUrl,
+                                          radius: stdButtonHeight * 0.3,
+                                          colorFilter: (winner.assetUrl ==
+                                                  AssetsProvider
+                                                      .emptyPlayerAsset)
+                                              ? EmptyAssetFilter(winner.uid)
+                                              : null,
                                         ),
                                         Expanded(
                                           child: Padding(

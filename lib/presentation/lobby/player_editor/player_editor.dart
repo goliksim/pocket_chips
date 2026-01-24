@@ -80,6 +80,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                         PlayerAvatar(
                           assetUrl: player.assetUrl,
                           radius: (stdDialogHeight / 2) / 2,
+                          filterQuality: FilterQuality.high,
                         ),
                         Container(
                           width: stdDialogHeight / 2,

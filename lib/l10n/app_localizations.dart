@@ -857,6 +857,12 @@ abstract class AppLocalizations {
   /// **'already in lobby!'**
   String get toast_alred;
 
+  /// No description provided for @toast_alred2.
+  ///
+  /// In en, this message translates to:
+  /// **'Player with same name and icon already exist'**
+  String get toast_alred2;
+
   /// No description provided for @toast_moreplay2.
   ///
   /// In en, this message translates to:
@@ -875,12 +881,6 @@ abstract class AppLocalizations {
   /// **'In your case'**
   String get toast_bank2;
 
-  /// No description provided for @toast_alred2.
-  ///
-  /// In en, this message translates to:
-  /// **'Player with same name and icon already exist'**
-  String get toast_alred2;
-
   /// No description provided for @toast_bank3.
   ///
   /// In en, this message translates to:
@@ -892,6 +892,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We recommend a Big Blind value less than Stack'**
   String get toast_bank4;
+
+  /// No description provided for @toast_bank5.
+  ///
+  /// In en, this message translates to:
+  /// **'The Small Blind cannot be zero'**
+  String get toast_bank5;
 
   /// No description provided for @toast_unav.
   ///

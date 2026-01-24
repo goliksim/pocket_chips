@@ -94,7 +94,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
       if (parsedValue < 1) {
         _sbController.value = _sbController.value.copyWith(text: '1');
         smallBlind = 1;
-        showToast('The Small Blind cannot be zero');
+        showToast(context.strings.toast_bank5);
       } else {
         smallBlind = parsedValue;
       }
