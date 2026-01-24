@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:onboarding/onboarding.dart';
 
 import '../../../utils/extensions.dart';
@@ -34,8 +33,51 @@ class UpdateDialog extends StatelessWidget {
             title: '${context.strings.update_title} $version',
             children: [
               SizedBox(height: stdHorizontalOffset),
-              Text(
-                '- ${context.strings.update_1}\n',
+              _PatchNoteItem(
+                text: context.strings.update_1,
+                icon: Icons.build,
+              ),
+              _PatchNoteItem(
+                text: context.strings.update_2,
+                icon: Icons.monetization_on,
+              ),
+              _PatchNoteItem(
+                text: context.strings.update_3,
+                icon: Icons.photo,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PatchNoteItem extends StatelessWidget {
+  final String text;
+  final IconData icon;
+
+  const _PatchNoteItem({
+    required this.text,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: EdgeInsets.only(bottom: stdHorizontalOffset),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: context.theme.primaryColor,
+              size: stdIconSize,
+            ),
+            SizedBox(width: stdHorizontalOffset * 1.5),
+            Flexible(
+              child: Text(
+                text,
+                maxLines: null,
                 style: TextStyle(
                   height: 1.5,
                   color: context.theme.onBackground,
@@ -44,106 +86,8 @@ class UpdateDialog extends StatelessWidget {
                 ),
                 textAlign: TextAlign.start,
               ),
-              SizedBox(
-                width: double.infinity,
-                height: stdIconSize,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '- ${context.strings.update_2}',
-                      style: TextStyle(
-                        height: 1.5,
-                        color: context.theme.primaryColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: stdFontSize * 0.7,
-                      ),
-                      textAlign: TextAlign.start,
-                    ),
-                    SizedBox(width: stdHorizontalOffset / 2),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            MdiIcons.cardsPlayingDiamondMultiple,
-                            color: context.theme.onBackground,
-                            size: stdIconSize * 0.75,
-                          ),
-                          Icon(
-                            MdiIcons.cardsPlayingClubMultiple,
-                            color: context.theme.onBackground,
-                            size: stdIconSize * 0.75,
-                          ),
-                          Icon(
-                            MdiIcons.arrowRight,
-                            color: context.theme.onBackground,
-                            size: stdIconSize * 0.75,
-                          ),
-                          Icon(
-                            MdiIcons.crown,
-                            color: context.theme.onBackground,
-                            size: stdIconSize * 0.75,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                '${context.strings.update_3}:\n',
-                style: TextStyle(
-                  height: 1.5,
-                  color: context.theme.onBackground,
-                  fontWeight: FontWeight.w500,
-                  fontSize: stdFontSize * 0.65,
-                ),
-                textAlign: TextAlign.start,
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: stdHorizontalOffset),
-                child: Text(
-                  '${context.strings.update_4}\n${context.strings.update_5}',
-                  style: TextStyle(
-                    height: 1.5,
-                    color: context.theme.onBackground,
-                    fontWeight: FontWeight.w500,
-                    fontSize: stdFontSize * 0.65,
-                  ),
-                  textAlign: TextAlign.start,
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '\n- ${context.strings.update_6}',
-                  style: TextStyle(
-                    height: 1.5,
-                    color: context.theme.onBackground,
-                    fontWeight: FontWeight.w500,
-                    fontSize: stdFontSize * 0.65,
-                  ),
-                  textAlign: TextAlign.start,
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '\n- ${context.strings.update_7}',
-                  style: TextStyle(
-                    height: 1.5,
-                    color: context.theme.onBackground,
-                    fontWeight: FontWeight.w500,
-                    fontSize: stdFontSize * 0.65,
-                  ),
-                  textAlign: TextAlign.start,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
-    );
-  }
+      );
 }

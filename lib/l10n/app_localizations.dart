@@ -941,6 +941,12 @@ abstract class AppLocalizations {
   /// **'Thanks for your purchase:'**
   String get toast_purchase_success_named;
 
+  /// No description provided for @toast_video_ad_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for watching video ad!'**
+  String get toast_video_ad_success;
+
   /// No description provided for @toast_purchase_error_named.
   ///
   /// In en, this message translates to:
@@ -1058,44 +1064,20 @@ abstract class AppLocalizations {
   /// No description provided for @update_1.
   ///
   /// In en, this message translates to:
-  /// **'You can now change the order of players using Drag&Drop.'**
+  /// **'Fixed many application issues, improved user experience'**
   String get update_1;
 
   /// No description provided for @update_2.
   ///
   /// In en, this message translates to:
-  /// **'Winner Solver.'**
+  /// **'A page has been added to support the author, I will be glad of any help'**
   String get update_2;
 
   /// No description provided for @update_3.
   ///
   /// In en, this message translates to:
-  /// **'New service to help determine the winner at the showndown'**
+  /// **'PRO users can now put their photos from the gallery to players'**
   String get update_3;
-
-  /// No description provided for @update_4.
-  ///
-  /// In en, this message translates to:
-  /// **'If the game goes to a showdown but the players are in dispute, let the game determine the pot winner.'**
-  String get update_4;
-
-  /// No description provided for @update_5.
-  ///
-  /// In en, this message translates to:
-  /// **'The service will correctly determine a win or a draw according to the rules of Texas Hold\'em.'**
-  String get update_5;
-
-  /// No description provided for @update_6.
-  ///
-  /// In en, this message translates to:
-  /// **'Fixed some game logic errors.'**
-  String get update_6;
-
-  /// No description provided for @update_7.
-  ///
-  /// In en, this message translates to:
-  /// **'Controls and UI have been changed.'**
-  String get update_7;
 
   /// No description provided for @pro_version_offer_title.
   ///

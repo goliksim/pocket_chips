@@ -432,6 +432,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get toast_purchase_success_named => 'Спасибо за покупку:';
 
   @override
+  String get toast_video_ad_success => 'Спасибо за просмотр рекламы!';
+
+  @override
   String get toast_purchase_error_named => 'Произошла ошибка с покупкой:';
 
   @override
@@ -489,25 +492,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get update_title => 'Обзор версии';
 
   @override
-  String get update_1 => 'Возможность изменять порядок игроков путем Drag&Drop';
+  String get update_1 => 'Исправлены многие проблемы приложения, улучшен пользовательский опыт';
 
   @override
-  String get update_2 => 'Поиск победителя';
+  String get update_2 => 'Добавлена страница для поддержки автора, буду рад любой помощи!';
 
   @override
-  String get update_3 => 'Новый сервис помощи в определении победителя розыгрыша';
-
-  @override
-  String get update_4 => 'Если игра дошла до вскрытия карт, но у игроков возникли споры, позвольте игре определить победителя.';
-
-  @override
-  String get update_5 => 'Сервис правильно определит победитя или ничью по правилам Техасского холдема.';
-
-  @override
-  String get update_6 => 'Исправлены некоторые ошибки игровой логики.';
-
-  @override
-  String get update_7 => 'Изменены элементы управления и UI';
+  String get update_3 => 'ПРО пользователи теперь могут ставить игрокам свои фото из галереи';
 
   @override
   String get pro_version_offer_title => 'Максимум возможностей в PRO версии';

@@ -432,6 +432,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toast_purchase_success_named => 'Thanks for your purchase:';
 
   @override
+  String get toast_video_ad_success => 'Thank you for watching video ad!';
+
+  @override
   String get toast_purchase_error_named => 'Found error with purchase:';
 
   @override
@@ -489,25 +492,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get update_title => 'What\'s new in';
 
   @override
-  String get update_1 => 'You can now change the order of players using Drag&Drop.';
+  String get update_1 => 'Fixed many application issues, improved user experience';
 
   @override
-  String get update_2 => 'Winner Solver.';
+  String get update_2 => 'A page has been added to support the author, I will be glad of any help';
 
   @override
-  String get update_3 => 'New service to help determine the winner at the showndown';
-
-  @override
-  String get update_4 => 'If the game goes to a showdown but the players are in dispute, let the game determine the pot winner.';
-
-  @override
-  String get update_5 => 'The service will correctly determine a win or a draw according to the rules of Texas Hold\'em.';
-
-  @override
-  String get update_6 => 'Fixed some game logic errors.';
-
-  @override
-  String get update_7 => 'Controls and UI have been changed.';
+  String get update_3 => 'PRO users can now put their photos from the gallery to players';
 
   @override
   String get pro_version_offer_title => 'Maximum features in the PRO version';

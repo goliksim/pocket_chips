@@ -134,7 +134,7 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
 
   Future<void> watchVideoAd() => _googleAdsManager.showInterstitialAd(
         onAdDismissed: () {
-          _toastManager.showToast('Thank you for watching video ad!');
+          _toastManager.showToast(_strings.toast_video_ad_success);
         },
       );
 
