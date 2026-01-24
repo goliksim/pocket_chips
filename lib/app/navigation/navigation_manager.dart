@@ -76,9 +76,12 @@ class NavigationManager extends ChangeNotifier {
         ),
       );
 
-  Future<void> showDonationDialog({bool canPop = true}) => transitionDialog(
+  Future<void> showDonationDialog({bool isTriggered = false}) =>
+      transitionDialog(
         context: context,
-        child: const DonateWindow(),
+        child: DonateWindow(
+          isTriggered: isTriggered,
+        ),
       );
 
   Future<void> showProVersionOfferDialog() => transitionDialog(

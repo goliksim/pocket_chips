@@ -159,7 +159,7 @@ class _HomePage extends ConsumerWidget {
     return PatternContainer(
       child: Scaffold(
         appBar: AppBar(
-          flexibleSpace: showBanner ? AppBarBanner() : null,
+          flexibleSpace: showBanner ? const AppBarBanner() : null,
           leading: AspectRatio(
             aspectRatio: 1,
             child: IconButton(

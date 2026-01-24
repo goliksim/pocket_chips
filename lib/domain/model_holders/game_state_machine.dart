@@ -10,6 +10,8 @@ import '../../di/model_holders.dart';
 import '../../di/repositories.dart';
 import '../../l10n/app_localizations.dart';
 import '../../presentation/game/widgets/winner_page/view_state/winner_choice_args.dart';
+import '../../services/event_push_service/handlers/event_handler.dart';
+import '../../services/event_push_service/promotion_service.dart';
 import '../../services/game_logic_service.dart';
 import '../../services/toast_manager.dart';
 import '../../utils/logs.dart';
@@ -28,6 +30,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       ref.read(navigationManagerProvider);
   AppLocalizations get _strings => ref.read(stringsProvider);
   ToastManager get _toastManager => ref.read(toastManagerProvider);
+  PromotionManager get _promotionManager => ref.read(promotionManagerProvider);
 
   @override
   FutureOr<GameStateModel> build() async {
@@ -200,6 +203,14 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     final model3 = _toBreakdown(model: model2);
 
     await _updateGame(model3);
+
+    _promotionManager.maybeShowPromotion(
+      types: [
+        EventType.donation,
+        EventType.advertisement,
+      ],
+      delay: Duration(milliseconds: 1750),
+    );
   }
 
   String _getCurrentPlayerUid(GameStateModel model) {

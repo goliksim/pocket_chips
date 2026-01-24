@@ -41,11 +41,12 @@ class _AppBarBannerState extends State<_AppBarBanner> {
   late GoogleBannersManager manager;
 
   @override
-  void didUpdateWidget(state) {
-    _dispose();
-    _init();
-
-    super.didUpdateWidget(state);
+  void didUpdateWidget(covariant _AppBarBanner oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.manager != oldWidget.manager) {
+      _dispose();
+      _init();
+    }
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
+import '../../monitization/pro_version/widgets/pro_version_wrapper.dart';
 
 class AddPlayerButton extends StatefulWidget {
   final bool canEditPlayers;
@@ -116,17 +117,20 @@ class _AddPlayerButtonState extends State<AddPlayerButton> {
                               topRight: Radius.circular(stdBorderRadius),
                             ),
                           ),
-                          child: FittedBox(
-                            child: IconButton(
-                              splashRadius: stdButtonHeight * 0.75 * 0.45,
-                              icon: const Icon(
-                                Icons.folder_shared,
-                                color: Colors.white,
-                                //size: stdIconSize,
+                          child: ProVersionWrapper(
+                            offset: -5,
+                            child: FittedBox(
+                              child: IconButton(
+                                splashRadius: stdButtonHeight * 0.75 * 0.45,
+                                icon: const Icon(
+                                  Icons.folder_shared,
+                                  color: Colors.white,
+                                  //size: stdIconSize,
+                                ),
+                                tooltip: context.strings.tooltip_add_stor,
+                                onPressed: () =>
+                                    widget.openPlayersListCallback?.call(),
                               ),
-                              tooltip: context.strings.tooltip_add_stor,
-                              onPressed: () =>
-                                  widget.openPlayersListCallback?.call(),
                             ),
                           ),
                         ),

@@ -8,6 +8,9 @@ import '../data/storage/secure_storage/secure_storage.dart';
 import '../data/storage/shared_preferences/shared_preferences_storage.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/localization.dart';
+import '../services/event_push_service/handlers/ads_handler.dart';
+import '../services/event_push_service/handlers/donation_handler.dart';
+import '../services/event_push_service/promotion_service.dart';
 import '../services/initialization_manager.dart';
 import '../services/monitization/purchases/models/pro_version_model.dart';
 import '../services/monitization/purchases/models/purchasable_product.dart';
@@ -92,4 +95,26 @@ final proVersionProvider = Provider<bool>(
 
 final googleAdsManagerProvider = Provider<GoogleAdsManager>(
   (ref) => GoogleAdsManager(),
+);
+
+final promotionManagerProvider = Provider<PromotionManager>(
+  (ref) => PromotionManager(
+    handlers: [
+      ref.read(donationHandlerProvider),
+      ref.watch(adsHandler),
+    ],
+  ),
+);
+
+final donationHandlerProvider = Provider<DonationHandler>(
+  (ref) => DonationHandler(
+    navigationManager: ref.read(navigationManagerProvider),
+  ),
+);
+
+final adsHandler = Provider<AdvertisementHandler>(
+  (ref) => AdvertisementHandler(
+    googleAdsManager: ref.read(googleAdsManagerProvider),
+    isPro: ref.watch(proVersionProvider),
+  ),
 );

@@ -84,6 +84,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get support_tittle => 'Способы поддержки:';
 
   @override
+  String get support_tittle_triggered => 'Нравится приложение? Поддержи меня!';
+
+  @override
   String get support_video => 'Посмотреть рекламу';
 
   @override

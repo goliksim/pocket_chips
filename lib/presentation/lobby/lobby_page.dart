@@ -31,7 +31,7 @@ class LobbyPage extends ConsumerWidget {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
-            flexibleSpace: AppBarBanner(),
+            flexibleSpace: const AppBarBanner(),
             scrolledUnderElevation: 0,
             toolbarHeight: stdButtonHeight * 0.75,
             leading: IconButton(

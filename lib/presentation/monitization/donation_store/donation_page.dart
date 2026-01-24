@@ -10,10 +10,10 @@ import 'view_state/purchase_item_state.dart';
 import 'widgets/purchase_item_widget.dart';
 
 class DonateWindow extends ConsumerStatefulWidget {
-  final bool onWillPop;
+  final bool isTriggered;
 
   const DonateWindow({
-    this.onWillPop = false,
+    this.isTriggered = false,
     super.key,
   });
 
@@ -52,7 +52,9 @@ class _DonateWindowState extends ConsumerState<DonateWindow> {
           Column(
             children: [
               Text(
-                context.strings.support_tittle,
+                widget.isTriggered
+                    ? context.strings.support_tittle_triggered
+                    : context.strings.support_tittle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: context.theme.onBackground,
@@ -93,8 +95,12 @@ class _DonateWindowState extends ConsumerState<DonateWindow> {
               fontSize: stdFontSize * 0.8,
             ),
             buttonColor: context.theme.bgrColor,
-            textString: context.strings.purchases_restore_button,
-            action: () => viewModel.restorePurchases(),
+            textString: widget.isTriggered
+                ? context.strings.support_close
+                : context.strings.purchases_restore_button,
+            action: widget.isTriggered
+                ? () => viewModel.pop()
+                : () => viewModel.restorePurchases(),
           ),
         ],
       ),

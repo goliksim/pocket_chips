@@ -33,7 +33,7 @@ class GamePage extends ConsumerWidget {
           child: Scaffold(
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
-              flexibleSpace: AppBarBanner(),
+              flexibleSpace: const AppBarBanner(),
               toolbarHeight: stdButtonHeight * 0.75,
               leading: IconButton(
                 onPressed: () => viewModel.pop(),
