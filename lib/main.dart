@@ -21,11 +21,10 @@ Future main() async {
   MobileAds.instance.initialize();
 
   if (kIsWeb) {
-    // Для веб-приложений может потребоваться своя логика инициализации.
-    // Пока оставим как есть, но с возможностью расширения.
+    // Web applications may require their own initialization logic.
+    // Now it as it is, but with the possibility of expansion.
     _runApp();
   } else if (Platform.isAndroid || Platform.isIOS) {
-    //await Purchases.configure(PurchasesConfiguration('goog_oLBnINIENkDvkGoquoIjyBHPcoy'));
     if (Platform.isAndroid) {
       SystemChrome.setEnabledSystemUIMode(
         SystemUiMode.immersiveSticky,
@@ -37,7 +36,6 @@ Future main() async {
       DeviceOrientation.portraitDown,
     ]).then((_) async {
       await Future.delayed(const Duration(milliseconds: 100));
-      //print('Orientation set to portrait');
 
       _runApp();
     });

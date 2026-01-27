@@ -90,19 +90,19 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
   }) async {
     final currentLobby = activeLobby;
 
-    // Проверка на статус лобби
+    // Lobby status check
     if (!currentLobby.gameState.canEditPlayers) {
       throw Exception('Cannot edit player list on this state');
     }
 
-    // Проверка на дубли
+    // Checking for duplicates
     final samePlayer =
         currentLobby.players.firstWhereOrNull((p) => (p.name == player.name));
     if (currentLobby.players.contains(player) || samePlayer != null) {
       throw Exception('${player.name} ${_strings.toast_alred}');
     }
 
-    // Проверка на максимальное количество
+    // Checking for max limits
     if (currentLobby.players.length >= maxPlayerCount) {
       throw Exception(_strings.toast_maxpl);
     }
@@ -132,12 +132,12 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
   }) async {
     final currentLobby = activeLobby;
 
-    // Проверка на статус лобби
+    // Lobby status check
     if (!currentLobby.gameState.canEditPlayers) {
       throw Exception('Cannot edit player list on this state');
     }
 
-    // Проверка на дубли
+    // Checking for duplicates
     final samePlayer = currentLobby.players.firstWhereOrNull(
         (p) => (p.name == player.name) && (p.uid != player.uid));
     if (samePlayer != null) {
@@ -177,12 +177,12 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
   Future<void> removePlayer(String playerUid) async {
     final currentLobby = activeLobby;
 
-    // Проверка на статус лобби
+    // Lobby status check
     if (!currentLobby.gameState.canEditPlayers) {
       throw Exception('Cannot edit player list on this state');
     }
 
-    // Проверка на существование
+    // Check for existace
     if (!currentLobby.players.any((p) => p.uid == playerUid)) {
       throw Exception('Player $playerUid not found');
     }
@@ -203,8 +203,8 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
           : null;
     }
 
-    // Не изменяем currentPlayerId, так как удаление возможно только в перерывах,
-    // когда currentPlayerId == null
+    // We dont need to change currentPlayerId, because it can be changed only in pause state
+    // In these cases currentPlayerId is already null
 
     final newLobby = currentLobby.copyWith(
       players: newPlayers,

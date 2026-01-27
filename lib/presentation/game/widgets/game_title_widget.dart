@@ -23,6 +23,14 @@ class GameTitleWidgetState extends State<GameTitleWidget> {
   Timer? _timer;
 
   @override
+  void initState() {
+    super.initState();
+    _temporaryStateText = widget.gameState;
+
+    _startTimer();
+  }
+
+  @override
   void didUpdateWidget(GameTitleWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.gameState != oldWidget.gameState) {

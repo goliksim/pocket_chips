@@ -39,9 +39,7 @@ class _CheckTableState extends State<CheckTable> with ToastsMixin {
         decoration: BoxDecoration(
           border: Border.all(width: 2.0, color: context.theme.bankColor),
           borderRadius: BorderRadius.all(
-            Radius.circular(
-              stdBorderRadius,
-            ), //                 <--- border radius here
+            Radius.circular(stdBorderRadius), // <--- border radius here
           ),
         ),
         height: 300.h,

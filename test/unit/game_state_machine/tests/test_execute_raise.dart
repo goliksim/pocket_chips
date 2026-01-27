@@ -8,8 +8,8 @@ import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import '../../test_utils.dart';
 
-/// Тест ре-рейза на втором круге ставок, если кто-то рейзанул, а мы его ре-рейзнули
-/// Идем дальше до выравнивания
+/// [ReRaiseTest] on second lap, after raise, we are re-raising
+/// Waiting for bets equal
 void runExecuteReRaiseLastTest(
   ProviderContainer container,
   AppRepository repository,
@@ -61,6 +61,7 @@ void runExecuteReRaiseLastTest(
       },
     ),
   );
+
   expect(
     finalState.sessionState,
     gameSessionState.copyWith(

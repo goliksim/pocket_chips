@@ -3,7 +3,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../utils/logs.dart';
 import '../utils/theme/ui_values.dart';
 
-/// Менеджер всплывающих уведомлений
 class ToastManager {
   Future<bool?> toastWarning(String text) => Fluttertoast.showToast(
         msg: text,

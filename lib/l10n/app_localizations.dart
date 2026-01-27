@@ -122,7 +122,7 @@ abstract class AppLocalizations {
   /// No description provided for @tooltip_rot.
   ///
   /// In en, this message translates to:
-  /// **'Rotate'**
+  /// **'Rotate players'**
   String get tooltip_rot;
 
   /// No description provided for @tooltip_add_new.
@@ -142,6 +142,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add Player'**
   String get tooltip_add_main;
+
+  /// No description provided for @tooltip_undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo action'**
+  String get tooltip_undo;
 
   /// No description provided for @conf_canc.
   ///
@@ -773,11 +779,23 @@ abstract class AppLocalizations {
   /// **'Bet'**
   String get game_bet;
 
+  /// No description provided for @game_bet_to.
+  ///
+  /// In en, this message translates to:
+  /// **'Bet to'**
+  String get game_bet_to;
+
   /// No description provided for @game_raise.
   ///
   /// In en, this message translates to:
   /// **'Raise'**
   String get game_raise;
+
+  /// No description provided for @game_raise_to.
+  ///
+  /// In en, this message translates to:
+  /// **'Raise to'**
+  String get game_raise_to;
 
   /// No description provided for @game_raise_canc.
   ///
@@ -860,7 +878,7 @@ abstract class AppLocalizations {
   /// No description provided for @toast_alred2.
   ///
   /// In en, this message translates to:
-  /// **'Player with same name and icon already exist'**
+  /// **'Player with same name already exist'**
   String get toast_alred2;
 
   /// No description provided for @toast_moreplay2.
@@ -908,7 +926,7 @@ abstract class AppLocalizations {
   /// No description provided for @toast_incorrect_player.
   ///
   /// In en, this message translates to:
-  /// **'Enter name and choose icon'**
+  /// **'Check for name and initial stack'**
   String get toast_incorrect_player;
 
   /// No description provided for @toast_playp_edit_new_dealer.
@@ -1106,7 +1124,7 @@ abstract class AppLocalizations {
   /// No description provided for @pro_version_offer_option_1.
   ///
   /// In en, this message translates to:
-  /// **'Dark theme'**
+  /// **'Сhanging app theme'**
   String get pro_version_offer_option_1;
 
   /// No description provided for @pro_version_offer_option_2.
@@ -1138,6 +1156,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom player avatars'**
   String get pro_version_offer_option_6;
+
+  /// No description provided for @pro_version_offer_option_7.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo last action'**
+  String get pro_version_offer_option_7;
 
   /// No description provided for @pro_version_offer_button_purchased.
   ///

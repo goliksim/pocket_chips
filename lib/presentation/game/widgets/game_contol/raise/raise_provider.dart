@@ -4,11 +4,11 @@ class RaiseProviderScope extends StatefulWidget {
   const RaiseProviderScope({
     super.key,
     required this.child,
-    required this.currentBet,
+    required this.additionalBet,
   });
 
   final Widget child;
-  final int currentBet;
+  final int additionalBet;
 
   @override
   State<RaiseProviderScope> createState() => RaiseProviderScopeState();
@@ -21,52 +21,52 @@ class RaiseProviderScope extends StatefulWidget {
 }
 
 class RaiseProviderScopeState extends State<RaiseProviderScope> {
-  late int _currentBet;
-  int get currentBet => _currentBet;
+  late int _additionalBet;
+  int get additionalBet => _additionalBet;
 
   void changeBet(int value) {
     setState(() {
-      _currentBet = value;
+      _additionalBet = value;
     });
   }
 
   @override
   void initState() {
-    _currentBet = widget.currentBet;
+    _additionalBet = widget.additionalBet;
     super.initState();
   }
 
   @override
   void didUpdateWidget(covariant RaiseProviderScope oldWidget) {
-    _currentBet = widget.currentBet;
+    _additionalBet = widget.additionalBet;
 
     super.didUpdateWidget(oldWidget);
   }
 
   @override
-  Widget build(BuildContext context) => CurrentBetValueProvider(
-        currentBet: _currentBet,
+  Widget build(BuildContext context) => NewBetValueProvider(
+        additionalBet: _additionalBet,
         child: widget.child,
       );
 }
 
-class CurrentBetValueProvider extends InheritedWidget {
-  final int currentBet;
+class NewBetValueProvider extends InheritedWidget {
+  final int additionalBet;
 
-  const CurrentBetValueProvider({
-    required this.currentBet,
+  const NewBetValueProvider({
+    required this.additionalBet,
     required super.child,
     super.key,
   });
 
-  static CurrentBetValueProvider of(BuildContext context) {
+  static NewBetValueProvider of(BuildContext context) {
     final provider =
-        context.dependOnInheritedWidgetOfExactType<CurrentBetValueProvider>();
+        context.dependOnInheritedWidgetOfExactType<NewBetValueProvider>();
     assert(provider != null, 'No RaiseProvider found in context');
     return provider!;
   }
 
   @override
-  bool updateShouldNotify(CurrentBetValueProvider oldWidget) =>
-      currentBet != oldWidget.currentBet;
+  bool updateShouldNotify(NewBetValueProvider oldWidget) =>
+      additionalBet != oldWidget.additionalBet;
 }

@@ -8,9 +8,9 @@ import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import '../../test_utils.dart';
 
-/// Тест кола на втором круге ставок, если кто-то рейзанул, а мы его проколили
-/// Все ставки выровнены
-/// Сразу прыгаем на след улицу, не ждем окончания хода
+/// [CallTest] on second lap, we are calling the raise
+/// All bets are equal
+/// Jump to the next street without waiting for the turn to finish.
 void runExecuteCallFinalAfterRaiseTest(
   ProviderContainer container,
   AppRepository repository,
@@ -79,8 +79,8 @@ void runExecuteCallFinalAfterRaiseTest(
   );
 }
 
-/// Тест кола игрока после олина бигблайнда
-/// Ожидаем велечину кола размеров с бигблайнд
+/// [CallTest] after AllIn by Big Blind Player
+/// Expect call value equal to big blind
 void runExecuteCallAfterBBAITest(
   ProviderContainer container,
   AppRepository repository,
@@ -147,9 +147,9 @@ void runExecuteCallAfterBBAITest(
   );
 }
 
-/// Тест кола на третьем круге ставок, если кто-то рейзанул, его ре-рейзнули
-/// Все ставки выровнены
-/// Сразу прыгаем на след улицу, не ждем окончания хода
+/// [CallTest] on third lap after raise and re-raise
+/// All bets are equal
+/// Jump to the next street without waiting for the turn to finish.
 void runExecuteCallFinalAfterReRaiseTest(
   ProviderContainer container,
   AppRepository repository,

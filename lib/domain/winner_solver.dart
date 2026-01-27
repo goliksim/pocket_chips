@@ -24,30 +24,31 @@ class WinnerSolver {
       );
     }
 
-    // Сравните комбинации игроков
     if (combinations.contains(null)) return (0, combinations);
     final winnerIndex = _findIndexOfMax(combinations.map((e) => e!).toList());
     return (winnerIndex + 1, combinations);
   }
 
-  // Функция для определения комбинации карт на столе
   static Combination _detectCombination(
       List<Card> playerCards, List<Card> table) {
+    // Combining all cards together
     List<Card> allCards = [
       ...playerCards,
       ...table,
-    ]; // Сначала объединяем карты игрока и карты на столе
+    ];
+
+    // Sorting by value in descending order
     allCards.sort(
       (b, a) => a.key.compareTo(b.key),
-    ); // !!! Сортируйте карты по их значению по УБЫВАНИЮ
+    );
 
-    // Подсчитываем количество карт каждого значения
+    // Creating a dictionary of card frequency
     Map<int, int> valueCounts = {};
     for (var card in allCards) {
       valueCounts[card.key] = (valueCounts[card.key] ?? 0) + 1;
     }
 
-    // Группировка карт по масти
+    // Grouping of cards by suit
     Map<CardSuit, List<Card>> cardsBySuit = {};
     for (var card in allCards) {
       if (!cardsBySuit.containsKey(card.suit)) {
@@ -69,7 +70,7 @@ class WinnerSolver {
       () => _highCard(playerCards),
     ];
 
-    // Проверьте наличие комбинаций, начиная с наивысшей
+    // Checking for combinations, starting from the highest
     for (var check in checks) {
       var result = check();
       if (result.hand != PokerHand.none) {

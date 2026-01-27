@@ -1,21 +1,14 @@
-//ОСНОВНАЯ ИГРОВАЯ ЛОГИКА
 import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../app/navigation/navigation_manager.dart';
-import '../../di/domain_managers.dart';
 import '../../di/model_holders.dart';
 import '../../di/repositories.dart';
-import '../../l10n/app_localizations.dart';
-import '../../presentation/game/widgets/winner_page/view_state/winner_choice_args.dart';
-import '../../services/event_push_service/handlers/event_handler.dart';
-import '../../services/event_push_service/promotion_service.dart';
 import '../../services/game_logic_service.dart';
-import '../../services/toast_manager.dart';
 import '../../utils/logs.dart';
 import '../models/game/game_session_state.dart';
+import '../models/game/game_state_effect.dart';
 import '../models/game/game_state_enum.dart';
 import '../models/game/game_state_model.dart';
 import '../models/lobby/lobby_state_model.dart';
@@ -23,14 +16,10 @@ import '../models/player/player_id.dart';
 import '../models/player/player_model.dart';
 import 'lobby_state_holder.dart';
 
+/// Main class with game logic
 class GameStateMachine extends AsyncNotifier<GameStateModel> {
   LobbyStateHolder get _lobbyStateHolder =>
       ref.read(lobbyStateHolderProvider.notifier);
-  NavigationManager get _navigationManager =>
-      ref.read(navigationManagerProvider);
-  AppLocalizations get _strings => ref.read(stringsProvider);
-  ToastManager get _toastManager => ref.read(toastManagerProvider);
-  PromotionManager get _promotionManager => ref.read(promotionManagerProvider);
 
   @override
   FutureOr<GameStateModel> build() async {
@@ -39,8 +28,12 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     final lobbyState = await ref.watch(lobbyStateHolderProvider.future);
 
     final sessionState = lobbyState.gameState.isStarted
-        ? await ref.read(appRepositoryProvider).getGameSessionState()
+        ? state.value?.sessionState ??
+            await ref.read(appRepositoryProvider).getGameSessionState()
         : null;
+
+    final effects =
+        lobbyState.gameState.isStarted ? state.value?.effects : null;
 
     final finalSessionState = sessionState ?? GameSessionState.initial();
 
@@ -57,23 +50,45 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     final finalFoldedPlayers = finalSessionState.foldedPlayers
       ..addAll(foldedByBank);
 
-    return GameStateModel(
+    final result = GameStateModel(
       lobbyState: lobbyState,
       sessionState: finalSessionState.copyWith(
         foldedPlayers: finalFoldedPlayers,
       ),
+      effects: effects ?? [],
     );
+
+    if (result.lobbyState.gameState == GameStatusEnum.showdown) {
+      return _resetShowdownEffects(result);
+    }
+
+    return result;
   }
 
-  //Player controls
+  GameStateModel _resetShowdownEffects(GameStateModel model) {
+    if (model.effects.isEmpty && model.activePlayers.length > 1) {
+      return model.copyWith(
+        effects: [
+          GameStateEffect.needWinnerSelection(
+            possibleWinnersUid: model.possibleWinnersUids,
+            isSideSpot: false,
+          ),
+        ],
+      );
+    }
+
+    return model;
+  }
+
+  /// The first method in game, is contolling by client (current player)
+  /// Places the initial bets and determines the first player to bet
   Future<void> startBetting() async {
     final currentModel = state.requireValue;
 
     if (!currentModel.canStartOrContinueGame) {
-      //TODO: remove navigation from StateHolder
       logs.writeLog('GameSM: cannot start betting');
-      _toastManager.showToast(_strings.toast_moreplay);
-      return;
+
+      return _returnErrorEffect(GameStateErrorType.fewPlayers);
     }
 
     logs.writeLog('GameSM: starting betting');
@@ -89,12 +104,14 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     // 2. Calculate the state after posting blinds
     final stateAfterBlinds = _processFirstBlinds(initialHandState);
 
-    // 3. Update the game
+    // 3. Update the game state
     await _updateGame(stateAfterBlinds);
   }
 
+  ///  Raise execution, is calling by client (current player)
   Future<void> executeRaise(int raiseValue) => _executeBet(raiseValue);
 
+  ///  AllIn execution, is calling by client (current player)
   Future<void> executeAllIn() {
     final currentModel = state.requireValue;
     final currentPlayerUid = _getCurrentPlayerUid(currentModel);
@@ -105,6 +122,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     return _executeBet(bank);
   }
 
+  ///  Call execution, is calling by client (current player)
   Future<void> executeCall() {
     final model = state.requireValue;
     final currentPlayerUid = model.sessionState.currentPlayerUid;
@@ -119,6 +137,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     return _executeBet(callValue);
   }
 
+  ///  Check execution, is calling by client (current player)
   Future<void> executeCheck() async {
     logs.writeLog('GameSM: executeCheck');
 
@@ -126,6 +145,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     await _updateGame(nextState);
   }
 
+  ///  Fold execution, is calling by client (current player)
   Future<void> executeFold() async {
     final currentModel = state.requireValue;
     final sessionState = currentModel.sessionState;
@@ -142,77 +162,78 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     await _updateGame(nextState);
   }
 
-  // Новый круг
-  Future<void> showWinnersAndEndLap({
-    required GameStateModel model,
+  /// Winner selection execution, is calling by client
+  Future<void> executeWinnerSelection({
+    required Set<String> selectedWinners,
   }) async {
-    // 1. Set state to showdown
-    final model1 = model.copyWith(
-      lobbyState: model.lobbyState.copyWith(
-        gameState: GameStatusEnum.showdown,
-      ),
-      sessionState: model.sessionState.copyWith(
-        currentPlayerUid: null,
-      ),
+    final model1 = state.requireValue;
+
+    final model2 = await _moneyDistribution(
+      model: model1,
+      winners: selectedWinners,
     );
 
+    //If have side spot event - not saving game
+    if (model2.effects.isNotEmpty) {
+      state = AsyncData(model2);
+
+      return;
+    }
+
+    final model3 = _toBreakdown(model: model2);
+
+    await _updateGame(model3);
+  }
+
+  // Notifing the client of winner or requirement of winners selection
+  GameStateModel _selectWinnersOnShowdown({
+    required GameStateModel model,
+  }) {
     GameStateModel model2;
 
-    // 2.1 If win from folds, show 1 winner
-    final winFromFold = model1.activePlayers.length == 1;
+    // 1.1 If win from folds, show 1 winner
+    final winFromFold = model.activePlayers.length == 1;
 
     if (winFromFold) {
-      final winner = model1.activePlayers.first;
-      final totalBets = model1.sessionState.bets.values.sum;
-      final newBanks = Map.of(model1.lobbyState.banks)
+      final winner = model.activePlayers.first;
+      final totalBets = model.sessionState.bets.values.sum;
+      final newBanks = Map.of(model.lobbyState.banks)
         ..update(winner.uid, (value) => value + totalBets);
 
-      model2 = model1.copyWith(
-        lobbyState: model1.lobbyState.copyWith(
+      model2 = model.copyWith(
+        lobbyState: model.lobbyState.copyWith(
+          gameState: GameStatusEnum.showdown,
           banks: newBanks,
         ),
+        effects: [
+          GameStateEffect.hasWinner(winnerUid: winner.uid),
+        ],
       );
 
-      //TODO: remove navigation from StateHolder
-      unawaited(
-        _navigationManager.showWinner(winner),
-      );
+      // Updating state to breakdown and return winner
+      return _toBreakdown(model: model2);
     } else {
       // 2.2. Else need to select winner
       logs.writeLog('Call WinnerChooseWindow');
 
-      //TODO: remove navigation from StateHolder
-      final markedWinners = await _navigationManager.showWinnerChooseDialog(
-        WinnerChoiceArgs(
-          title: _strings.game_win3,
-          possibleWinners: model1.possibleWinners,
+      // Returning possible winners uids to client
+      model2 = model.copyWith(
+        lobbyState: model.lobbyState.copyWith(
+          gameState: GameStatusEnum.showdown,
         ),
+        effects: [
+          GameStateEffect.needWinnerSelection(
+            possibleWinnersUid: model.possibleWinnersUids,
+            isSideSpot: false,
+          ),
+        ],
       );
 
-      if (markedWinners == null) {
-        throw Exception('needToSelectWinners');
-      }
-
-      model2 = await _moneyDistribution(
-        model: model1,
-        winners: markedWinners,
-      );
+      return model2;
     }
-
-    // 3. Reset folded states and bets
-    final model3 = _toBreakdown(model: model2);
-
-    await _updateGame(model3);
-
-    _promotionManager.maybeShowPromotion(
-      types: [
-        EventType.donation,
-        EventType.advertisement,
-      ],
-      delay: Duration(milliseconds: 1750),
-    );
   }
 
+  // Calculate current player uid
   String _getCurrentPlayerUid(GameStateModel model) {
     final currentPlayerUid = model.sessionState.currentPlayerUid;
 
@@ -223,6 +244,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     return currentPlayerUid;
   }
 
+  // Update player bank and bet
   GameStateModel _processBet({
     required GameStateModel model,
     required PlayerId playerId,
@@ -248,6 +270,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     );
   }
 
+  // Update current players bank/bet and find next player
   Future<void> _executeBet(int bid) async {
     logs.writeLog('GameSM: executeBet $bid');
     final currentModel = state.requireValue;
@@ -267,63 +290,58 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     await _updateGame(finalState);
   }
 
+  // Method calls by server after winner selection, change players banks according of their bets
   Future<GameStateModel> _moneyDistribution({
     required GameStateModel model,
     required Set<String> winners,
   }) async {
-    // Упорядоченное множество ставок
     logs.writeLog('GameSM: distrubuteMoney $winners');
 
     var lobbyState = model.lobbyState;
     var sessionState = model.sessionState;
 
-    List<int> bets = sessionState.bets.values.toSet().toList()..sort();
+    // Sorted bets set
+    List<int> bets =
+        sessionState.bets.values.toSet().where((b) => b > 0).toList()..sort();
 
-    if (bets[0] == 0) {
-      bets.removeAt(0);
-    }
-
-    // Проходимся по каждому разному значению ставок
+    // Iterate over each bet value
     logs.writeLog('GameSM: distrubution bets $bets');
-    for (int bid in bets) {
+    for (var i = 0; i < bets.length; i++) {
+      final bid = bets[i];
+
       logs.writeLog('GameSM: distrubution $bid');
       if (bid <= 0) continue;
 
-      // Проверка на сайд-спот
-      if (winners.isEmpty && model.possibleWinners.length > 1) {
-        logs.writeLog('GameSM: call winnerChooseDialog');
-        final newWinners = await _navigationManager.showWinnerChooseDialog(
-          WinnerChoiceArgs(
-            title: _strings.game_win4,
-            possibleWinners: model.possibleWinners,
-          ),
-        );
+      // Side-spot check
+      final possibleWinnersUids = model.possibleWinnersUids;
+      if (winners.isEmpty && possibleWinnersUids.length > 1) {
+        logs.writeLog('GameSM: need to call winnerChooseDialog');
 
-        if (newWinners == null) {
-          throw Exception('needToSelectWinner');
-        }
-
-        return _moneyDistribution(
-          model: model,
-          winners: newWinners,
+        return model.copyWith(
+          effects: [
+            GameStateEffect.needWinnerSelection(
+              possibleWinnersUid: possibleWinnersUids,
+              isSideSpot: true,
+            )
+          ],
         );
       }
 
-      // Та сумма которая будет распределяться по победителям для данной ставки
+      // The amount that will be distributed among the winners for this bet
       int sumToDivide = 0;
 
-      // Проходимся по ставкам и проверяем, ставил ли кто-то данную ставку
+      // We go through the bets and check if anyone has placed a given bet.
       for (final entry in sessionState.bets.entries) {
-        // Если челик такую ставку поставил
+        // If a guy placed such a bet
         if (entry.value >= bid) {
-          // Если не победитель, то вносим ее в общий банк
+          // If not a winner, then we contribute it to the general bank.
           if (!winners.contains(entry.key)) {
             logs.writeLog(
                 'GameSM: ${entry.key} not winner, increase dividingSum');
             sumToDivide += bid;
           } else {
             logs.writeLog('GameSM: ${entry.value} is winner bet, returning');
-            // Если это победитель, то он свое вернул
+            // If this is a winner, then he got his money back.
             final newBanks = Map.of(lobbyState.banks)
               ..update(entry.key, (value) => value + bid);
 
@@ -333,23 +351,26 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       }
       logs.writeLog('GameSM: sumToDivide $sumToDivide');
 
-      // Заканчиваем цикл если остаток остался, а челиксы закончились
-      // Возвращаем деньги тому, кто поставил больше всех бабок
+      // End the loop if there's a remainder and there are no more players
+      // Return the money to the player who bet the most
       if (winners.isEmpty) {
-        //_pop();
         final newBanks = Map.of(lobbyState.banks);
+
         for (final player in model.activePlayers) {
           newBanks.update(player.uid,
               (value) => value + (sessionState.bets[player.uid] ?? 0));
         }
         lobbyState = lobbyState.copyWith(banks: newBanks);
 
-        return model.copyWith(lobbyState: lobbyState);
+        return model.copyWith(
+          lobbyState: lobbyState,
+          effects: [],
+        );
       }
 
       final winnersCount = winners.length;
 
-      // Разделенная добыча делится на победителей, причем тока тех, кто еще в игре
+      // The divided spoils are divided among the winners, and only those who are still in the game
       for (final winnerUid in winners) {
         final bet = sessionState.bets[winnerUid] ?? 0;
 
@@ -365,13 +386,13 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
         }
       }
 
-      // Вычитаем отработанную ставку из списка
+      // Subtract the processed rate from the list of bets
       for (int m = 0; m < bets.length; m++) {
         bets[m] -= bid;
       }
       logs.writeLog('GameSM: distrubution new bets $bets');
 
-      // Выключаем из посчета игроков, чья ставка была равно отработанной
+      // We exclude from the count the players whose bet was equal to the wagered one
 
       final newBets = Map.of(sessionState.bets);
 
@@ -380,10 +401,13 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
           winners.remove(player.uid);
         }
 
-        // Уменьшаем ставки игроков, так как сумма равная [bid] уже отыграла
+        // We reduce the players' bets, since the amount equal to [bid] has already been played
         newBets.update(
           player.uid,
-          (value) => value - bid,
+          (value) {
+            final newBet = value - bid;
+            return newBet > 0 ? newBet : 0;
+          },
           ifAbsent: () => 0,
         );
       }
@@ -392,38 +416,33 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
         bets: newBets,
       );
 
-      model = model.copyWith(
+      model = GameStateModel(
         sessionState: sessionState,
         lobbyState: lobbyState,
+        effects: [],
       );
     }
 
-    return model.copyWith(
+    return GameStateModel(
       lobbyState: lobbyState,
       sessionState: sessionState,
+      effects: [],
     );
   }
 
-  // Переходы между игроками
-
+  // Next player determination
   GameStateModel _calculateNextPlayerState(GameStateModel currentModel) {
     logs.writeLog('GameSM: finding next player state');
     var currentSession = currentModel.sessionState;
     final currentLobby = currentModel.lobbyState;
 
-    final bidsEqual = _checkBidsEqual(currentModel);
+    final bidsEqual = currentModel.checkBidsEqual();
+    logs.writeLog('GameSM: bidsEqual $bidsEqual');
 
     // 1. FORCE SHOWDOWN IF BETS EQUAL AND ONLY ONE LAST WITH MONEY
     if (bidsEqual && currentModel.activePlayersWithMoneyCount <= 1) {
       logs.writeLog('GameSM: [CNPS] force to showdown');
-      return currentModel.copyWith(
-        lobbyState: currentLobby.copyWith(
-          gameState: GameStatusEnum.showdown,
-        ),
-        sessionState: currentModel.sessionState.copyWith(
-          currentPlayerUid: null,
-        ),
-      );
+      return _selectWinnersOnShowdown(model: currentModel);
     }
 
     // 2. Calculate New Player
@@ -459,8 +478,8 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     return currentModel.copyWith(sessionState: currentSession);
   }
 
-  // Ищем следующего игрока, скипаем фолд и олинщиков.
-  // Повышаем круг, если нужно
+  // Finding next player uid, skip folded players and with allin case
+  // Increasing lap counter if needed
   (PlayerId?, bool) _nextPlayerUid({
     required GameStateModel model,
     required PlayerId fromUid,
@@ -486,7 +505,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     return (null, false);
   }
 
-  // Новая улица
+  // New street calculation
   GameStateModel _calculateNewStreet(GameStateModel currentModel) {
     final nextStreet = currentModel.lobbyState.gameState.next;
 
@@ -499,12 +518,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     // 1. RETURN CURRENT STATE IN SHOWDOWN
     if (nextStreet == GameStatusEnum.showdown) {
       logs.writeLog('GameSM: new street is showdown, returning to UI');
-      return currentModel.copyWith(
-        lobbyState: newLobbyState,
-        sessionState: currentModel.sessionState.copyWith(
-          currentPlayerUid: null,
-        ),
-      );
+      return _selectWinnersOnShowdown(model: currentModel);
     }
 
     // 2. Reset lap counter for new street
@@ -577,7 +591,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     return lobby.dealerId;
   }
 
-  // Первые ставки
+  // Performing the first blinds
   GameStateModel _processFirstBlinds(GameStateModel model) {
     logs.writeLog('GameSM: processing first blinds');
 
@@ -597,7 +611,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       return _processBet(
         model: modelToProcess,
         playerId: player.uid,
-        // Ставка тех денег, что есть
+        // Bet only real amount of money
         bid: bank < value ? bank : value,
       );
     }
@@ -635,10 +649,10 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       return (model, bigBlindPosition);
     }
 
-    //Head up случай
+    //HEAD UP case
     final isHandsUp = editableModel.activePlayersWithMoney.length == 2;
 
-    // Ставим смолблайнд
+    // Small blind bet
     (editableModel, _) = makeBetByCondition(
       model: model,
       condition: (uid) => editableModel.isPlayerActive(uid),
@@ -646,7 +660,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       initialOffset: isHandsUp ? 0 : 1,
     );
 
-    // Ставим бигблайнд
+    // Big blind bet
     (editableModel, bigBlindPosition) = makeBetByCondition(
       model: model,
       condition: (uid) => (editableModel.isPlayerActive(uid) &&
@@ -654,20 +668,18 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       value: currentLobby().bigBlindValue,
     );
 
-    if (_checkBidsEqual(editableModel) &&
+    if (editableModel.checkBidsEqual() &&
         editableModel.activePlayersWithMoneyCount <= 1) {
       logs.writeLog('GameSM: head-up showdown forcing');
-      return editableModel.copyWith(
-        lobbyState: currentLobby().copyWith(
-          gameState: GameStatusEnum.showdown,
-        ),
-        sessionState: currentSession().copyWith(
-          currentPlayerUid: null,
+      return _selectWinnersOnShowdown(
+        model: GameStateModel(
+          lobbyState: currentLobby(),
+          sessionState: currentSession(),
         ),
       );
     }
 
-    // Ищем первого игрока
+    // Searching for first player
     for (int i = 1; i < currentLobby().players.length; i++) {
       int localIndex = (i + bigBlindPosition) % currentLobby().players.length;
 
@@ -688,31 +700,6 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     return editableModel;
   }
 
-  bool _checkBidsEqual(GameStateModel model) {
-    final activePlayers = model.activePlayers;
-
-    final bets = activePlayers.map((p) => model.sessionState.bets[p.uid] ?? 0);
-    if (bets.isEmpty) return true;
-
-    final maxBet = bets.max;
-
-    for (final player in activePlayers) {
-      final bid = model.sessionState.bets[player.uid] ?? 0;
-      final bank = model.lobbyState.banks[player.uid] ?? 0;
-
-      bool isEqual = (bid == maxBet);
-      bool isAllIn = ((bid > 0) && (bank <= 0));
-
-      if (!(isEqual || isAllIn)) {
-        logs.writeLog('GameSM: bets are not equal');
-        return false;
-      }
-    }
-
-    logs.writeLog('GameSM: bets are equal');
-    return true;
-  }
-
   Future<void> _updateGame(GameStateModel newModel) async {
     logs.writeLog('GameSM: UPDATE GAME');
     state = AsyncData(newModel);
@@ -726,5 +713,15 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     } catch (e) {
       logs.writeLog('Ошибка при сохранении сессии: $e');
     }
+  }
+
+  void _returnErrorEffect(GameStateErrorType type) {
+    state = AsyncData(
+      state.requireValue.copyWith(
+        effects: [
+          GameStateEffect.error(type: type),
+        ],
+      ),
+    );
   }
 }

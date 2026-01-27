@@ -8,8 +8,8 @@ import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import '../../test_utils.dart';
 
-/// Тест кола бигблайнда на префлопе при хендс-апе
-/// Ожидаем переход на флоп, бигблайнд ходит первым
+/// [CheckTest] on Pre-flop in Hand-Up case
+/// Expect transition to Flop, Big Blind Player goes first
 void runExecuteCheckHandUpBigBlindTest(
   ProviderContainer container,
   AppRepository repository,
@@ -59,9 +59,9 @@ void runExecuteCheckHandUpBigBlindTest(
   );
 }
 
-/// Тест кола бигблайнда на префлопе при хендс-апе
-/// 2 игрока в олине
-/// Ожидаем переход на флоп, бигблайнд ходит первым
+/// [CheckTest] performing by Big Blind Player in Hand-Up case
+/// 2 Players is in AllIn
+/// Expect transition to Flop, Big Blind Player goes first
 void runExecuteCheckHandUpBigBlind2Test(
   ProviderContainer container,
   AppRepository repository,

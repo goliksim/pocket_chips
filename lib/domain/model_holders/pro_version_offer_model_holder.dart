@@ -2,13 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../di/domain_managers.dart';
 import '../../di/repositories.dart';
-import '../../services/monitization/purchases/models/pro_version_model.dart';
+import '../../services/monitization/purchases/models/pro_version_offer_model.dart';
 import '../../utils/logs.dart';
 
-//TODO Сделать новую доменную модельку (без forceDisable)
-class ProVersionModelHolder extends AsyncNotifier<ProVersionModel> {
+class ProVersionOfferModelHolder extends AsyncNotifier<ProVersionOfferModel> {
   @override
-  Future<ProVersionModel> build() async {
+  Future<ProVersionOfferModel> build() async {
     final repository = ref.read(appRepositoryProvider);
     final isProCached = await repository.isProVersion();
 
@@ -19,7 +18,7 @@ class ProVersionModelHolder extends AsyncNotifier<ProVersionModel> {
             if (isProCached && data.forceDisable) {
               changePro(false);
 
-              return ProVersionModel(
+              return ProVersionOfferModel(
                 isPurchased: false,
                 availableProduct: data.availableProduct,
               );
@@ -28,12 +27,12 @@ class ProVersionModelHolder extends AsyncNotifier<ProVersionModel> {
               changePro(true);
             }
 
-            return ProVersionModel(
+            return ProVersionOfferModel(
               isPurchased: isProCached || data.isPurchased,
               availableProduct: data.availableProduct,
             );
           },
-          orElse: () => ProVersionModel(
+          orElse: () => ProVersionOfferModel(
             isPurchased: isProCached,
           ),
         );

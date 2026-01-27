@@ -4,7 +4,6 @@ import '../../../services/assets_provider.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 
-//Подтверждение действия
 class ConfirmationWindow extends StatelessWidget {
   const ConfirmationWindow({
     super.key,
@@ -25,7 +24,7 @@ class ConfirmationWindow extends StatelessWidget {
         backgroundColor: context.theme.bgrColor,
         insetPadding: EdgeInsets.symmetric(
           horizontal: adaptiveOffset,
-        ), //windowInitialization(MediaQuery.of(context).size.height,MediaQuery.of(context).size.width)),
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(stdBorderRadius)),
         ),
@@ -105,7 +104,6 @@ class ConfirmationWindow extends StatelessWidget {
       );
 }
 
-//Класс Большинства кнопочек
 class MyButton extends StatelessWidget {
   const MyButton({
     super.key,
@@ -160,7 +158,6 @@ class MyButton extends StatelessWidget {
             padding: padding,
             foregroundColor: context.theme.bgrColor,
             backgroundColor: buttonColor,
-            //textStyle: (textStyle!=null)?textStyle:TextStyle(color: context.theme.onPrimary, fontFamily: 'Ubuntu' ,fontSize: stdFontSize, fontWeight: FontWeight.w500),
           ),
           onPressed: () => action?.call(),
           onLongPress: longAction == null ? null : () => longAction?.call(),
@@ -181,12 +178,11 @@ class MyButton extends StatelessWidget {
       );
 }
 
-//Фон с патерном
-class PatternContainer extends StatelessWidget {
+class PatternBackground extends StatelessWidget {
   final Widget child;
   final double opacity;
 
-  const PatternContainer({
+  const PatternBackground({
     required this.child,
     this.opacity = 1.0,
     super.key,
@@ -200,7 +196,6 @@ class PatternContainer extends StatelessWidget {
           image: DecorationImage(
             filterQuality: FilterQuality.high,
             opacity: 0.3 * opacity,
-            //colorFilter: ColorFilter.mode(context.theme.primaryColor, BlendMode.srcATop),
             image: AssetsProvider.backgroundPattern,
             fit: BoxFit.cover,
           ),

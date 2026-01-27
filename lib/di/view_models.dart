@@ -50,12 +50,11 @@ final lobbyPageViewModelProvider =
 final lobbyScrollControllerProvider =
     Provider.autoDispose<LobbyScrollController>(
   (ref) {
-    // Создаем контроллер
     final controller = LobbyScrollController();
 
-    // Указываем, что его не нужно уничтожать, пока есть активные подписчики
+    // Don't kill controller while it has subsribers
     ref.keepAlive();
-    // Уничтожаем контроллер, когда провайдер будет уничтожен
+    // Killing controller on provider dispose
     ref.onDispose(() {
       controller.dispose();
     });

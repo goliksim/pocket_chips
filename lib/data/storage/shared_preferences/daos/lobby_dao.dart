@@ -35,7 +35,7 @@ class LobbyDao extends Dao<LobbyStateEntity> {
     prefs = await SharedPreferences.getInstance();
 
     final text = jsonEncode(lobby);
-    logs.writeLog('Lobby info saved');
+    logs.writeLog('SharPref: Lobby info saved');
     prefs.setString(key, text);
   }
 }

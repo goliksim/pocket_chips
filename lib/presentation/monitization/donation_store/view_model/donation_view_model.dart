@@ -126,7 +126,7 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
     try {
       await _purchasesManager.buyItem(itemKey);
     } on Exception catch (e) {
-      // TODO настроить репорт ошибок
+      // TODO configure error reporting
       _toastManager.showToast(_strings.toast_unav);
       logs.writeLog(e.toString());
     }
@@ -142,7 +142,7 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
     try {
       await _purchasesManager.restorePurchases();
     } on Exception catch (e) {
-      // TODO настроить репорт ошибок
+      // TODO configure error reporting
       _toastManager.showToast(_strings.toast_unav);
       logs.writeLog(e.toString());
     }
@@ -169,7 +169,10 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
   bool _checkPurchased(String id) {
     switch (id) {
       case Constants.pocketChipsPROItemKey:
-        return ref.watch(proVersionModelHolderProvider).value?.isPurchased ??
+        return ref
+                .watch(proVersionOfferModelHolderProvider)
+                .value
+                ?.isPurchased ??
             false;
       default:
         return false;

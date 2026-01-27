@@ -14,7 +14,6 @@ void runUpdatePlayerTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -51,7 +50,6 @@ void runUpdatePlayerToExistTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -86,7 +84,6 @@ void runUpdatePlayerToExistNameTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -123,7 +120,6 @@ void runUpdatePlayerDisableDealerTest(
   AppRepository repository,
   MockToastManager toastManager,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,

@@ -35,7 +35,7 @@ class DialogWidget extends StatelessWidget {
                 stdBorderRadius,
               ),
             ),
-            child: PatternContainer(
+            child: PatternBackground(
               opacity: 0.4,
               child: Padding(
                 padding: EdgeInsets.all(edgeOffset ?? stdHorizontalOffset * 2),

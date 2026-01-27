@@ -10,7 +10,6 @@ void runStartingStackChangeTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,

@@ -12,10 +12,10 @@ class AppRouteInformationParser extends RouteInformationParser<AppRoute> {
       if (uri.path == page.path) {
         switch (page) {
           case AppPage.init:
-            // TODO: поддержка аргументов
+            // TODO: args support
 
-            //Читаем параметры из квери или подпутей
-            //final args = uri.queryParameters;
+            // Reading the params from the query or subpaths
+            // final args = uri.queryParameters;
 
             return AppRoute.init();
           case AppPage.menu:
@@ -27,7 +27,7 @@ class AppRouteInformationParser extends RouteInformationParser<AppRoute> {
         }
       }
     }
-    // поддержка корня
+    // root support
     if (uri.path == '/' || uri.path.isEmpty) {
       return AppRoute.init();
     }

@@ -58,15 +58,15 @@ class GameTable extends StatelessWidget {
       (stdButtonHeight * 1.3 * _getSin(a, addButton, multiply: -1));
 
   double _getCos(int index, int totalAmount) {
-    double randomOffset =
-        0; //thisLobby.lobbyRandomOffset[index] / thisLobby.lobbyPlayers.length;
+    double randomOffset = 0;
+    // thisLobby.lobbyRandomOffset[index] / thisLobby.lobbyPlayers.length;
     return cos(2 * pi * (index / totalAmount)) *
         pow((cos(2 * pi * (index / totalAmount) + randomOffset)).abs(), 0.3);
   }
 
   double _getSin(int index, int totalAmount, {double multiply = 0}) {
-    double randomOffset =
-        0; // thisLobby.lobbyRandomOffset[a]/thisLobby.lobbyPlayers.length*2;
+    double randomOffset = 0;
+    // thisLobby.lobbyRandomOffset[a]/thisLobby.lobbyPlayers.length*2;
     return sin(2 * pi * (index / totalAmount) + randomOffset) *
         pow(
           sin(2 * pi * (index / totalAmount) + 0.01 + randomOffset).abs(),
@@ -95,7 +95,7 @@ class GameTable extends StatelessWidget {
       fit: StackFit.expand,
       alignment: Alignment.center,
       children: [
-        //Table
+        // Table
         Container(
           margin: EdgeInsets.only(
             top: stdButtonHeight / 3,
@@ -115,21 +115,21 @@ class GameTable extends StatelessWidget {
             ),
           ),
         ),
-        // 3 карты по середине
+        // Pre-flop 3 cards
         Positioned(
           bottom: tableHeight * 0.295,
           child: TableCards.firstRow(
             stateEnum: viewState.gameStatus,
           ),
         ),
-        // 2 карты по середине
+        // Turn and River cards
         Positioned(
           bottom: tableHeight * 0.220,
           child: TableCards.secondRow(
             stateEnum: viewState.gameStatus,
           ),
         ),
-        // Блайнды
+        // Small/Big Blinds
         Positioned(
           bottom: tableHeight * 0.155,
           child: Text(
@@ -140,7 +140,7 @@ class GameTable extends StatelessWidget {
             ),
           ),
         ),
-        // Общая ставка
+        // Total bets
         Positioned(
           bottom: tableHeight * 0.125,
           child: FittedBox(
@@ -167,14 +167,15 @@ class GameTable extends StatelessWidget {
             ),
           ),
         ),
-
+        // Iteration throw players
         ...List.generate(totalElementCount, (index) => index).expand(
           (int index) {
-            final player = players[
-                (index - playersOffset - tableRotationOffset) % players.length];
+            final finalIndex =
+                (index - playersOffset - tableRotationOffset) % players.length;
+            final player = players[finalIndex];
 
             return [
-              // Карточки игроков
+              // Players cards
               Positioned(
                 bottom: _playerBottomOffset(
                   index,
@@ -204,7 +205,7 @@ class GameTable extends StatelessWidget {
                             0,
                       ),
               ),
-              // Ставки игроков
+              // Players bets
               if ((player.bet != 0) && (!showAddButton || index != 0))
                 Positioned(
                   bottom: _chipBottomOffset(index, totalElementCount),

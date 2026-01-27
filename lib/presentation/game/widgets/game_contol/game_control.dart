@@ -83,6 +83,7 @@ class _GameControlState extends State<GameControl> {
                                   activeState.raiseState.maxPossibleBet,
                               minPossibleBet:
                                   activeState.raiseState.minPossibleBet,
+                              currentBet: activeState.raiseState.currentBet,
                             )
                           : null,
                     ),
@@ -94,7 +95,7 @@ class _GameControlState extends State<GameControl> {
                 ),
               ),
               SizedBox(height: stdHorizontalOffset),
-              // Панелька нижних кнопок
+              // Bottom button panel
               state.map(
                 active: (activeState) => raiseButtonPressed
                     ? RaiseButtons(
@@ -134,7 +135,7 @@ class _InheritedWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) => state.map(
         active: (activeState) => RaiseProviderScope(
-          currentBet: activeState.raiseState.minPossibleBet,
+          additionalBet: activeState.raiseState.minPossibleBet,
           child: child,
         ),
         breakdown: (_) => child,

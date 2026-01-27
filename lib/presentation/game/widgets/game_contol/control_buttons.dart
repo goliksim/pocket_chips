@@ -20,8 +20,8 @@ class ControlButtons extends StatelessWidget {
     super.key,
   });
 
-  //Текст первой кнопки
-  String _firstButtonTitle(AppLocalizations strings) {
+  /// Bet or Raise button title
+  String _raiseButtonTitle(AppLocalizations strings) {
     if (state.raiseState.raiseIsAllIn) {
       return strings.game_all;
     }
@@ -29,7 +29,7 @@ class ControlButtons extends StatelessWidget {
     return state.raiseState.isFirstBet ? strings.game_bet : strings.game_raise;
   }
 
-  // Реализация кнопки Raise
+  /// Raise button callback
   void _raiseAction() {
     if (state.raiseState.raiseIsAllIn) {
       controlAction(GameControlResult.allIn());
@@ -38,8 +38,8 @@ class ControlButtons extends StatelessWidget {
     openRaiseField();
   }
 
-  //Текст средней кнопки
-  String _middleButtonTitle(AppLocalizations strings) => state.mainState.map(
+  /// Call/Check/AlIn button title
+  String _mainButtonTitle(AppLocalizations strings) => state.mainState.map(
         check: (_) => strings.game_check,
         call: (state) {
           final prefix =
@@ -49,8 +49,8 @@ class ControlButtons extends StatelessWidget {
         },
       );
 
-  // Реализация средней кнопки
-  void _universalAction() {
+  /// Call/Check/AlIn button callback
+  void _mainAction() {
     state.mainState.map(
       check: (_) {
         controlAction(GameControlResult.check());
@@ -74,29 +74,29 @@ class ControlButtons extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Кнопка подтверждения Raise / Bet
+        // Raise / Bet
         if (_raiseButtonActive)
           Flexible(
             flex: 10,
             fit: FlexFit.tight,
             child: ControlButtonWrapper(
-              title: _firstButtonTitle(strings),
+              title: _raiseButtonTitle(strings),
               color: context.theme.primaryColor,
               action: () => _raiseAction(),
             ),
           ),
         SizedBox(width: stdHorizontalOffset),
-
+        // Call/Check/AlIn
         Flexible(
           flex: _raiseButtonActive ? 20 : 31,
           fit: FlexFit.tight,
           child: ControlButtonWrapper(
-            title: _middleButtonTitle(strings),
+            title: _mainButtonTitle(strings),
             color: context.theme.secondaryColor,
-            action: () => _universalAction(),
+            action: () => _mainAction(),
           ),
-        ), // Кнопка Call/Check/Skip
-        // Кнопка Fold
+        ),
+        // Fold
         SizedBox(width: stdHorizontalOffset),
         Flexible(
           flex: 10,

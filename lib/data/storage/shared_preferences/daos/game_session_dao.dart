@@ -34,7 +34,7 @@ class GameSessionDao extends Dao<GameSessionEntity> {
     prefs = await SharedPreferences.getInstance();
 
     final text = jsonEncode(gameSession);
-    logs.writeLog('GameSession info saved');
+    logs.writeLog('SharPref: GameSession info saved');
     prefs.setString(key, text);
   }
 }

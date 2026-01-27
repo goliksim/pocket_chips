@@ -3,18 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/domain/models/game/game_session_state.dart';
+import 'package:pocket_chips/domain/models/game/game_state_effect.dart';
 import 'package:pocket_chips/domain/models/game/game_state_enum.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import '../../test_utils.dart';
-import '../game_state_machine_test.mocks.dart';
 
-/// Тестируем показ модального окна при начале ставок с 1 игроком
-/// Лобби никак не меняется, применяется автофолд игроков без фишек
+/// [StartingBettingTest] Сheck for pop-up notification if there are not enough players (other players may be inactive/zero).
+/// The lobby does not change in any way, autofolding of players without chips is applied
 void runStartingBettingWithNoPlayersTest(
   ProviderContainer container,
   AppRepository repository,
-  MockToastManager toastManager,
 ) async {
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
@@ -34,18 +33,14 @@ void runStartingBettingWithNoPlayersTest(
 
   final gameStateMachine = container.read(gameStateMachineProvider.notifier);
 
-  var toastManagerPushed = false;
-  when(toastManager.showToast(any)).thenAnswer((_) {
-    toastManagerPushed = true;
-  });
-
   await gameStateMachine.future;
   await gameStateMachine.startBetting();
 
   final gameState = gameStateMachine.state.requireValue;
 
-  expect(toastManagerPushed, true);
+  // Lobby check
   expect(gameState.lobbyState, lobbyState);
+  // Game state check
   expect(
     gameState.sessionState,
     gameSessionState.copyWith(
@@ -55,9 +50,16 @@ void runStartingBettingWithNoPlayersTest(
       },
     ),
   );
+  // Effects check
+  expect(
+    gameState.effects,
+    [
+      GameStateEffect.error(type: GameStateErrorType.fewPlayers),
+    ],
+  );
 }
 
-/// Тестируем обычное проставление смол и биг блайнда
+/// [StartingBettingTest] common placement of Small and Big blinds
 void runStartingBettingTest(
   ProviderContainer container,
   AppRepository repository,
@@ -101,8 +103,8 @@ void runStartingBettingTest(
   );
 }
 
-/// Тестируем обычное проставление смол и биг блайнда
-/// Тут тестируем кейс, что у первого игрока нет фишек
+/// [StartingBettingTest] placement of Small and Big blinds
+/// One of players has no chips
 void runStartingBetFirstNoChipsTest(
   ProviderContainer container,
   AppRepository repository,
@@ -158,8 +160,8 @@ void runStartingBetFirstNoChipsTest(
   );
 }
 
-/// Тестируем обычное проставление смол и биг блайнда
-/// Тут тестируем кейс, что у второго игрока нет фишек
+/// [StartingBettingTest] placement of Small and Big blinds
+/// One of players has no chips (Second)
 void runStartingBetSecondNoChipsTest(
   ProviderContainer container,
   AppRepository repository,
@@ -215,9 +217,9 @@ void runStartingBetSecondNoChipsTest(
   );
 }
 
-/// Тестируем обычное проставление смол и биг блайнда
-/// Тут тестируем кейс, что у первого и второго игроков нет фишек
-/// Биг блайнд уже на втором круге
+/// [StartingBettingTest] placement of Small and Big blinds
+/// Two of players has no chips
+/// The Big Blind Player will be on second lap
 void runStartingBetFirstSecondNoChipsTest(
   ProviderContainer container,
   AppRepository repository,
@@ -274,9 +276,9 @@ void runStartingBetFirstSecondNoChipsTest(
   );
 }
 
-/// Тестируем обычное проставление смол и биг блайнда
-/// Тут тестируем кейс, что у первого игрока нет фишек
-/// Биг блайнд еще на первом круге
+/// [StartingBettingTest] placement of Small and Big blinds
+/// Two of players has no chips
+/// The Big Blind Player is on first lap
 void runStartingBetFirstSecondNoChips2Test(
   ProviderContainer container,
   AppRepository repository,

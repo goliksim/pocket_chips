@@ -11,7 +11,6 @@ void runRemovePlayerTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -39,7 +38,6 @@ void runRemoveUnexistedPlayerTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -66,7 +64,6 @@ void runRemoveDealerPlayerTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -95,7 +92,6 @@ void runRemoveDealerFirstPlayerTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -124,7 +120,6 @@ void runRemoveLastPlayerTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(1);
   final lobbyState = createLobbyState(
     players,

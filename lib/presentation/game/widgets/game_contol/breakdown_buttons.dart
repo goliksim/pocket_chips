@@ -31,7 +31,6 @@ class BreakdownButtons extends StatelessWidget {
                   Icons.settings,
                   color: context.theme.onPrimary,
                   size: stdIconSize,
-                  //size: stdIconSize,
                 ),
               ),
               action: () => openSettings(),

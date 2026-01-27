@@ -37,7 +37,7 @@ mixin PurchasesMixin<T> {
       final ProductDetailsResponse response =
           await InAppPurchase.instance.queryProductDetails(kIds.toSet());
       if (response.notFoundIDs.isNotEmpty) {
-        // Handle the error.
+        // TODO: Handle the error.
       }
 
       final products = response.productDetails
@@ -57,7 +57,7 @@ mixin PurchasesMixin<T> {
 
   bool isConsumable(String productId);
 
-  /// Публичный метод покупки товара
+  /// Public method of purchasing products
   Future<void> buyProduct(ProductDetails details) async {
     final purchaseParam = PurchaseParam(productDetails: details);
     if (isConsumable(details.id)) {

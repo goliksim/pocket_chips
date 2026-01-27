@@ -156,7 +156,7 @@ class _HomePage extends ConsumerWidget {
       orElse: () => false,
     );
 
-    return PatternContainer(
+    return PatternBackground(
       child: Scaffold(
         appBar: AppBar(
           flexibleSpace: showBanner ? const AppBarBanner() : null,
@@ -228,7 +228,7 @@ class _HomePage extends ConsumerWidget {
                         : Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              //New Game
+                              // New Game
                               AttentionButton(
                                 onTap: () => viewModel.createNewGame(),
                                 needToAnimate: () => !shouldDrawContinue,

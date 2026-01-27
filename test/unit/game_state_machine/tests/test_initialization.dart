@@ -7,7 +7,7 @@ import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import '../../test_utils.dart';
 
-/// Тестируем корректную инициализацию нотифаера
+/// [InitializationTest] GameStateMachine initialization
 void runInitialization(
   ProviderContainer container,
   AppRepository repository,
@@ -26,7 +26,7 @@ void runInitialization(
   expect(gameState.sessionState, gameSessionState);
 }
 
-/// Тестируем автоматический фолд игроков без фишек
+/// [InitializationTest] GameStateMachine auto fold players
 void runInitializationAndAutoFold(
   ProviderContainer container,
   AppRepository repository,

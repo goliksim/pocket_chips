@@ -11,7 +11,6 @@ import '../../domain/models/game/game_state_enum.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/logs.dart';
 
-// Храним
 class HomePageViewModel extends AsyncNotifier<bool> {
   LobbyStateHolder get _lobbyStateHolder =>
       ref.read(lobbyStateHolderProvider.notifier);

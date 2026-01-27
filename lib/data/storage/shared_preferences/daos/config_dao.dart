@@ -56,7 +56,7 @@ class ConfigDao extends Dao<ConfigEntity> {
     } catch (e) {
       logs.writeLog('Starting app...\n --- ERROR OF READING CONFIG ---');
 
-      return null; //новое пустое лобби
+      return null;
     }
   }
 }

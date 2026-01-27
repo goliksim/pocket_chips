@@ -3,25 +3,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/domain/models/game/game_session_state.dart';
+import 'package:pocket_chips/domain/models/game/game_state_effect.dart';
 import 'package:pocket_chips/domain/models/game/game_state_enum.dart';
-import 'package:pocket_chips/domain/models/player/player_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
-import 'package:pocket_chips/presentation/game/widgets/winner_page/view_state/winner_choice_args.dart';
 
 import '../../test_utils.dart';
-import '../game_state_machine_test.mocks.dart';
 
-/// Тестируем распределение фишек и показ модального окна
+/// [ShowdownTest] Money distribution and winner dialog after all players folds
 void runShowdownWinFromFoldedTest(
   ProviderContainer container,
   AppRepository repository,
-  MockNavigationManager navigationManager,
 ) async {
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
     smallBlindValue: 20,
-    gameState: GameStatusEnum.showdown,
+    gameState: GameStatusEnum.river,
     banks: {
       players[0].uid: 100,
       players[1].uid: 80,
@@ -32,7 +29,6 @@ void runShowdownWinFromFoldedTest(
     lapCounter: 0,
     foldedPlayers: {
       players[0].uid,
-      players[1].uid,
     },
     currentPlayerUid: players[1].uid,
     firstPlayerUid: players[0].uid,
@@ -46,20 +42,13 @@ void runShowdownWinFromFoldedTest(
   when(repository.getGameSessionState())
       .thenAnswer((_) async => gameSessionState);
 
-  PlayerModel? winner;
-  when(navigationManager.showWinner(any)).thenAnswer((inc) async {
-    winner = inc.positionalArguments[0];
-  });
-
   final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
 
-  final currentState = await gameStateMachine.future;
-
-  await gameStateMachine.showWinnersAndEndLap(model: currentState);
-
+  await gameStateMachine.executeFold();
   final finalState = gameStateMachine.state.requireValue;
 
-  expect(winner, players[2]);
+  // Lobby check
   expect(
     finalState.lobbyState,
     lobbyState.copyWith(
@@ -72,6 +61,7 @@ void runShowdownWinFromFoldedTest(
       },
     ),
   );
+  // Game state check
   expect(
     finalState.sessionState,
     gameSessionState.copyWith(
@@ -81,23 +71,28 @@ void runShowdownWinFromFoldedTest(
       firstPlayerUid: null,
     ),
   );
+  // Effects check
+  expect(
+    finalState.effects,
+    [GameStateEffect.hasWinner(winnerUid: players[2].uid)],
+  );
 }
 
-/// Тестируем показ модального окна выбора и распределение выйгрыша при 1 победителе
+/// [ShowdownTest] Money distribution and winner selection dialog
+/// Selecting only one winner
 void runShowdownEqualBidsOneWinnerTest(
   ProviderContainer container,
   AppRepository repository,
-  MockNavigationManager navigationManager,
 ) async {
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
     smallBlindValue: 20,
-    gameState: GameStatusEnum.showdown,
+    gameState: GameStatusEnum.river,
     banks: {
-      players[0].uid: 60,
-      players[1].uid: 60,
-      players[2].uid: 60,
+      players[0].uid: 60, // dealer
+      players[1].uid: 60, // sm blind
+      players[2].uid: 60, // bb blind
     },
   );
   final gameSessionState = GameSessionState(
@@ -106,9 +101,9 @@ void runShowdownEqualBidsOneWinnerTest(
     currentPlayerUid: players[0].uid,
     firstPlayerUid: players[1].uid,
     bets: {
-      players[0].uid: 40,
-      players[1].uid: 40,
-      players[2].uid: 40,
+      players[0].uid: 40, // dealer
+      players[1].uid: 40, // sm blind
+      players[2].uid: 40, // bb blind
     },
   );
 
@@ -116,27 +111,31 @@ void runShowdownEqualBidsOneWinnerTest(
   when(repository.getGameSessionState())
       .thenAnswer((_) async => gameSessionState);
 
-  Set<String>? possibleWinners;
-  when(navigationManager.showWinnerChooseDialog(any)).thenAnswer((inc) async {
-    possibleWinners = (inc.positionalArguments[0] as WinnerChoiceArgs)
-        .possibleWinners
-        .map((p) => (p.uid))
-        .toSet();
-    return {players[0].uid};
-  });
-
   final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
 
-  final currentState = await gameStateMachine.future;
+  await gameStateMachine.executeCheck();
+  final tempState = gameStateMachine.state.requireValue;
 
-  await gameStateMachine.showWinnersAndEndLap(model: currentState);
+  // Effects check
+  final expectedWinners = players.map((p) => p.uid).toSet();
+  expect(
+    tempState.effects,
+    [
+      GameStateEffect.needWinnerSelection(
+        possibleWinnersUid: expectedWinners,
+        isSideSpot: false,
+      )
+    ],
+  );
 
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: {players[0].uid},
+  );
   final finalState = gameStateMachine.state.requireValue;
 
-  expect(
-    possibleWinners,
-    players.map((p) => p.uid).toSet(),
-  );
+  expect(finalState.effects, []);
+  // Lobby check
   expect(
     finalState.lobbyState,
     lobbyState.copyWith(
@@ -149,6 +148,7 @@ void runShowdownEqualBidsOneWinnerTest(
       },
     ),
   );
+  // Game state check
   expect(
     finalState.sessionState,
     gameSessionState.copyWith(
@@ -160,17 +160,17 @@ void runShowdownEqualBidsOneWinnerTest(
   );
 }
 
-/// Тестируем показ модального окна выбора и распределение выйгрыша при 2ух победителях
+/// [ShowdownTest] Money distribution and winner selection dialog
+/// Selecting two winners
 void runShowdownEqualBidsTwoWinnerTest(
   ProviderContainer container,
   AppRepository repository,
-  MockNavigationManager navigationManager,
 ) async {
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
     smallBlindValue: 20,
-    gameState: GameStatusEnum.showdown,
+    gameState: GameStatusEnum.river,
     banks: {
       players[0].uid: 60,
       players[1].uid: 60,
@@ -193,32 +193,31 @@ void runShowdownEqualBidsTwoWinnerTest(
   when(repository.getGameSessionState())
       .thenAnswer((_) async => gameSessionState);
 
-  Set<String>? possibleWinners;
-  when(navigationManager.showWinnerChooseDialog(any)).thenAnswer(
-    (inc) async {
-      possibleWinners = (inc.positionalArguments[0] as WinnerChoiceArgs)
-          .possibleWinners
-          .map((p) => (p.uid))
-          .toSet();
-      return {
-        players[0].uid,
-        players[1].uid,
-      };
-    },
+  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
+
+  await gameStateMachine.executeCheck();
+  final tempState = gameStateMachine.state.requireValue;
+
+  // Effects check
+  final expectedWinners = players.map((p) => p.uid).toSet();
+  expect(
+    tempState.effects,
+    [
+      GameStateEffect.needWinnerSelection(
+        possibleWinnersUid: expectedWinners,
+        isSideSpot: false,
+      )
+    ],
   );
 
-  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
-
-  final currentState = await gameStateMachine.future;
-
-  await gameStateMachine.showWinnersAndEndLap(model: currentState);
-
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: {players[0].uid, players[1].uid},
+  );
   final finalState = gameStateMachine.state.requireValue;
 
-  expect(
-    possibleWinners,
-    players.map((p) => p.uid).toSet(),
-  );
+  expect(finalState.effects, []);
+  // Lobby check
   expect(
     finalState.lobbyState,
     lobbyState.copyWith(
@@ -231,6 +230,7 @@ void runShowdownEqualBidsTwoWinnerTest(
       },
     ),
   );
+  // Game state check
   expect(
     finalState.sessionState,
     gameSessionState.copyWith(
@@ -242,17 +242,17 @@ void runShowdownEqualBidsTwoWinnerTest(
   );
 }
 
-/// Тестируем показ модального окна выбора и распределение выйгрыша при всех победителях
+/// [ShowdownTest] Money distribution and winner selection dialog
+/// Selecting all players as a winners
 void runShowdownEqualBidsAllWinnersTest(
   ProviderContainer container,
   AppRepository repository,
-  MockNavigationManager navigationManager,
 ) async {
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
     smallBlindValue: 20,
-    gameState: GameStatusEnum.showdown,
+    gameState: GameStatusEnum.river,
     banks: {
       players[0].uid: 60,
       players[1].uid: 60,
@@ -275,30 +275,31 @@ void runShowdownEqualBidsAllWinnersTest(
   when(repository.getGameSessionState())
       .thenAnswer((_) async => gameSessionState);
 
-  late final Set<String> possibleWinners;
-  when(navigationManager.showWinnerChooseDialog(any)).thenAnswer(
-    (inc) async {
-      possibleWinners = (inc.positionalArguments[0] as WinnerChoiceArgs)
-          .possibleWinners
-          .map((p) => (p.uid))
-          .toSet();
+  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
 
-      return Set<String>.of(possibleWinners);
-    },
+  await gameStateMachine.executeCheck();
+  final tempState = gameStateMachine.state.requireValue;
+
+  // Effects check
+  final expectedWinners = players.map((p) => p.uid).toSet();
+  expect(
+    tempState.effects,
+    [
+      GameStateEffect.needWinnerSelection(
+        possibleWinnersUid: expectedWinners,
+        isSideSpot: false,
+      )
+    ],
   );
 
-  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
-
-  final currentState = await gameStateMachine.future;
-
-  await gameStateMachine.showWinnersAndEndLap(model: currentState);
-
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: expectedWinners,
+  );
   final finalState = gameStateMachine.state.requireValue;
 
-  expect(
-    possibleWinners,
-    players.map((p) => p.uid).toSet(),
-  );
+  expect(finalState.effects, []);
+  // Lobby check
   expect(
     finalState.lobbyState,
     lobbyState.copyWith(
@@ -311,6 +312,7 @@ void runShowdownEqualBidsAllWinnersTest(
       },
     ),
   );
+  // Game state check
   expect(
     finalState.sessionState,
     gameSessionState.copyWith(
@@ -322,29 +324,28 @@ void runShowdownEqualBidsAllWinnersTest(
   );
 }
 
-/// Тестируем показ модального окна выбора и распределение выйгрыша в случае наличия основных и сайд спотов
-/// Тут побеждает игрок олина
-/// Скипаем в конце дилера до активного
+/// [ShowdownTest] Money distribution and winner selection dialog on Pre-flop
+/// Selecting AllIn player as a winner
+/// Skipping dealer to next active player
 void runShowdownTwoAllPreflopInTest(
   ProviderContainer container,
   AppRepository repository,
-  MockNavigationManager navigationManager,
 ) async {
   final players = createPlayers(4);
   final lobbyState = createLobbyState(
     players,
     smallBlindValue: 20,
-    gameState: GameStatusEnum.showdown,
+    gameState: GameStatusEnum.preFlop,
     banks: {
-      players[0].uid: 100,
-      players[1].uid: 0,
-      players[2].uid: 60,
-      players[3].uid: 0,
+      players[0].uid: 100, // folded
+      players[1].uid: 0, // all in 10
+      players[2].uid: 60, // bet 40
+      players[3].uid: 0, // all in 10
     },
   );
   final gameSessionState = GameSessionState(
     lapCounter: 0,
-    foldedPlayers: {players[0].uid},
+    foldedPlayers: {},
     currentPlayerUid: players[0].uid,
     firstPlayerUid: players[3].uid,
     bets: {
@@ -358,32 +359,31 @@ void runShowdownTwoAllPreflopInTest(
   when(repository.getGameSessionState())
       .thenAnswer((_) async => gameSessionState);
 
-  late final Set<String> possibleWinners;
-  when(navigationManager.showWinnerChooseDialog(any)).thenAnswer(
-    (inc) async {
-      possibleWinners = (inc.positionalArguments[0] as WinnerChoiceArgs)
-          .possibleWinners
-          .map((p) => (p.uid))
-          .toSet();
+  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
 
-      return {
-        players[1].uid,
-      };
-    },
+  await gameStateMachine.executeFold();
+  final tempState = gameStateMachine.state.requireValue;
+
+  // Effects check
+  final expectedWinners = {players[1].uid, players[2].uid, players[3].uid};
+  expect(
+    tempState.effects,
+    [
+      GameStateEffect.needWinnerSelection(
+        possibleWinnersUid: expectedWinners,
+        isSideSpot: false,
+      )
+    ],
   );
 
-  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
-
-  final currentState = await gameStateMachine.future;
-
-  await gameStateMachine.showWinnersAndEndLap(model: currentState);
-
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: {players[1].uid},
+  );
   final finalState = gameStateMachine.state.requireValue;
 
-  expect(
-    possibleWinners,
-    {players[1].uid, players[2].uid, players[3].uid},
-  );
+  expect(finalState.effects, []);
+  // Lobby check
   expect(
     finalState.lobbyState,
     lobbyState.copyWith(
@@ -397,6 +397,7 @@ void runShowdownTwoAllPreflopInTest(
       },
     ),
   );
+  // Game state check
   expect(
     finalState.sessionState,
     gameSessionState.copyWith(
@@ -408,18 +409,18 @@ void runShowdownTwoAllPreflopInTest(
   );
 }
 
-/// Тестируем показ модального окна выбора и распределение выйгрыша в случае наличия основных и сайд спотов
-/// Тут побеждает игрок бигблайнда
+/// [ShowdownTest] Money distribution and winner selection dialog on Pre-flop
+/// Selecting Richest player as a winner
+/// Other were in AllIn, but lost
 void runShowdownTwoAllPreflopIn2Test(
   ProviderContainer container,
   AppRepository repository,
-  MockNavigationManager navigationManager,
 ) async {
   final players = createPlayers(4);
   final lobbyState = createLobbyState(
     players,
     smallBlindValue: 20,
-    gameState: GameStatusEnum.showdown,
+    gameState: GameStatusEnum.preFlop,
     banks: {
       players[0].uid: 100,
       players[1].uid: 0,
@@ -429,7 +430,7 @@ void runShowdownTwoAllPreflopIn2Test(
   );
   final gameSessionState = GameSessionState(
     lapCounter: 0,
-    foldedPlayers: {players[0].uid},
+    foldedPlayers: {},
     currentPlayerUid: players[0].uid,
     firstPlayerUid: players[3].uid,
     bets: {
@@ -443,32 +444,31 @@ void runShowdownTwoAllPreflopIn2Test(
   when(repository.getGameSessionState())
       .thenAnswer((_) async => gameSessionState);
 
-  late final Set<String> possibleWinners;
-  when(navigationManager.showWinnerChooseDialog(any)).thenAnswer(
-    (inc) async {
-      possibleWinners = (inc.positionalArguments[0] as WinnerChoiceArgs)
-          .possibleWinners
-          .map((p) => (p.uid))
-          .toSet();
+  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
 
-      return {
-        players[2].uid,
-      };
-    },
+  await gameStateMachine.executeFold();
+  final tempState = gameStateMachine.state.requireValue;
+
+  // Effects check
+  final expectedWinners = {players[1].uid, players[2].uid, players[3].uid};
+  expect(
+    tempState.effects,
+    [
+      GameStateEffect.needWinnerSelection(
+        possibleWinnersUid: expectedWinners,
+        isSideSpot: false,
+      )
+    ],
   );
 
-  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
-
-  final currentState = await gameStateMachine.future;
-
-  await gameStateMachine.showWinnersAndEndLap(model: currentState);
-
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: {players[2].uid},
+  );
   final finalState = gameStateMachine.state.requireValue;
 
-  expect(
-    possibleWinners,
-    {players[1].uid, players[2].uid, players[3].uid},
-  );
+  expect(finalState.effects, []);
+  // Lobby check
   expect(
     finalState.lobbyState,
     lobbyState.copyWith(
@@ -483,6 +483,7 @@ void runShowdownTwoAllPreflopIn2Test(
       },
     ),
   );
+  // Game state check
   expect(
     finalState.sessionState,
     gameSessionState.copyWith(
@@ -494,18 +495,18 @@ void runShowdownTwoAllPreflopIn2Test(
   );
 }
 
-/// Тестируем показ модального окна выбора и распределение выйгрыша в случае наличия основных и сайд спотов
-/// Тут побеждает и игрок бигблайнда и олинщик
+/// [ShowdownTest] Money distribution and winner selection dialog
+/// Here we have main and side-spot
+/// Selecting AllIn and Big Blind Players as a winners
 void runShowdownTwoAllPreflopIn3Test(
   ProviderContainer container,
   AppRepository repository,
-  MockNavigationManager navigationManager,
 ) async {
   final players = createPlayers(4);
   final lobbyState = createLobbyState(
     players,
     smallBlindValue: 20,
-    gameState: GameStatusEnum.showdown,
+    gameState: GameStatusEnum.preFlop,
     banks: {
       players[0].uid: 100,
       players[1].uid: 0,
@@ -515,7 +516,7 @@ void runShowdownTwoAllPreflopIn3Test(
   );
   final gameSessionState = GameSessionState(
     lapCounter: 0,
-    foldedPlayers: {players[0].uid},
+    foldedPlayers: {},
     currentPlayerUid: players[0].uid,
     firstPlayerUid: players[3].uid,
     bets: {
@@ -529,33 +530,31 @@ void runShowdownTwoAllPreflopIn3Test(
   when(repository.getGameSessionState())
       .thenAnswer((_) async => gameSessionState);
 
-  late final Set<String> possibleWinners;
-  when(navigationManager.showWinnerChooseDialog(any)).thenAnswer(
-    (inc) async {
-      possibleWinners = (inc.positionalArguments[0] as WinnerChoiceArgs)
-          .possibleWinners
-          .map((p) => (p.uid))
-          .toSet();
+  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
 
-      return {
-        players[1].uid,
-        players[2].uid,
-      };
-    },
+  await gameStateMachine.executeFold();
+  final tempState = gameStateMachine.state.requireValue;
+
+  // Effects check
+  final expectedWinners = {players[1].uid, players[2].uid, players[3].uid};
+  expect(
+    tempState.effects,
+    [
+      GameStateEffect.needWinnerSelection(
+        possibleWinnersUid: expectedWinners,
+        isSideSpot: false,
+      )
+    ],
   );
 
-  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
-
-  final currentState = await gameStateMachine.future;
-
-  await gameStateMachine.showWinnersAndEndLap(model: currentState);
-
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: {players[1].uid, players[2].uid},
+  );
   final finalState = gameStateMachine.state.requireValue;
 
-  expect(
-    possibleWinners,
-    {players[1].uid, players[2].uid, players[3].uid},
-  );
+  expect(finalState.effects, []);
+  // Lobby check
   expect(
     finalState.lobbyState,
     lobbyState.copyWith(
@@ -569,6 +568,7 @@ void runShowdownTwoAllPreflopIn3Test(
       },
     ),
   );
+  // Game state check
   expect(
     finalState.sessionState,
     gameSessionState.copyWith(
@@ -580,18 +580,18 @@ void runShowdownTwoAllPreflopIn3Test(
   );
 }
 
-/// Тестируем показ модального окна выбора и распределение выйгрыша в случае наличия основных и сайд спотов
-/// Тут побеждают все
+/// [ShowdownTest] Money distribution and winner selection dialog
+/// Here we have main and side-spot
+/// Selecting all players as a winner
 void runShowdownTwoAllPreflopIn4Test(
   ProviderContainer container,
   AppRepository repository,
-  MockNavigationManager navigationManager,
 ) async {
   final players = createPlayers(4);
   final lobbyState = createLobbyState(
     players,
     smallBlindValue: 20,
-    gameState: GameStatusEnum.showdown,
+    gameState: GameStatusEnum.preFlop,
     banks: {
       players[0].uid: 100,
       players[1].uid: 0,
@@ -601,7 +601,7 @@ void runShowdownTwoAllPreflopIn4Test(
   );
   final gameSessionState = GameSessionState(
     lapCounter: 0,
-    foldedPlayers: {players[0].uid},
+    foldedPlayers: {},
     currentPlayerUid: players[0].uid,
     firstPlayerUid: players[3].uid,
     bets: {
@@ -615,30 +615,31 @@ void runShowdownTwoAllPreflopIn4Test(
   when(repository.getGameSessionState())
       .thenAnswer((_) async => gameSessionState);
 
-  late final Set<String> possibleWinners;
-  when(navigationManager.showWinnerChooseDialog(any)).thenAnswer(
-    (inc) async {
-      possibleWinners = (inc.positionalArguments[0] as WinnerChoiceArgs)
-          .possibleWinners
-          .map((p) => (p.uid))
-          .toSet();
+  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
 
-      return Set.of(possibleWinners);
-    },
+  await gameStateMachine.executeFold();
+  final tempState = gameStateMachine.state.requireValue;
+
+  // Effects check
+  final expectedWinners = {players[1].uid, players[2].uid, players[3].uid};
+  expect(
+    tempState.effects,
+    [
+      GameStateEffect.needWinnerSelection(
+        possibleWinnersUid: expectedWinners,
+        isSideSpot: false,
+      )
+    ],
   );
 
-  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
-
-  final currentState = await gameStateMachine.future;
-
-  await gameStateMachine.showWinnersAndEndLap(model: currentState);
-
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: expectedWinners,
+  );
   final finalState = gameStateMachine.state.requireValue;
 
-  expect(
-    possibleWinners,
-    {players[1].uid, players[2].uid, players[3].uid},
-  );
+  expect(finalState.effects, []);
+  // Lobby check
   expect(
     finalState.lobbyState,
     lobbyState.copyWith(
@@ -652,6 +653,7 @@ void runShowdownTwoAllPreflopIn4Test(
       },
     ),
   );
+  // Game state check
   expect(
     finalState.sessionState,
     gameSessionState.copyWith(
@@ -663,22 +665,22 @@ void runShowdownTwoAllPreflopIn4Test(
   );
 }
 
-/// Тестируем интересный кейс
-/// Игрок 1 поставил 40 и фолданул на флопе
-/// Игрок 2 поставил олин 300
-/// Игрок 3 рейзнул до 400
-/// Игрок 4 фолданул со ставкой 300
-/// Выйграл первый игрок
+/// [ShowdownTest] Interesting case
+/// Player 0 bet 40 and folded on the Flop
+/// Player 1 bet all-in 300
+/// Everyone call on the turn
+/// Player 2 raised to 400 on the River
+/// Player 3 folded with a bet of 300.
+/// The first player wins
 void runShowdownDistribution1Test(
   ProviderContainer container,
   AppRepository repository,
-  MockNavigationManager navigationManager,
 ) async {
   final players = createPlayers(4);
   final lobbyState = createLobbyState(
     players,
     smallBlindValue: 20,
-    gameState: GameStatusEnum.showdown,
+    gameState: GameStatusEnum.turn,
     banks: {
       players[0].uid: 460,
       players[1].uid: 0,
@@ -688,7 +690,7 @@ void runShowdownDistribution1Test(
   );
   final gameSessionState = GameSessionState(
     lapCounter: 1,
-    foldedPlayers: {players[0].uid, players[3].uid},
+    foldedPlayers: {players[0].uid},
     currentPlayerUid: players[3].uid,
     firstPlayerUid: players[1].uid,
     bets: {
@@ -703,32 +705,31 @@ void runShowdownDistribution1Test(
   when(repository.getGameSessionState())
       .thenAnswer((_) async => gameSessionState);
 
-  late final Set<String> possibleWinners;
-  when(navigationManager.showWinnerChooseDialog(any)).thenAnswer(
-    (inc) async {
-      possibleWinners = (inc.positionalArguments[0] as WinnerChoiceArgs)
-          .possibleWinners
-          .map((p) => (p.uid))
-          .toSet();
+  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
 
-      return {
-        players[1].uid,
-      };
-    },
+  await gameStateMachine.executeFold();
+  final tempState = gameStateMachine.state.requireValue;
+
+// Effects check
+  final expectedWinners = {players[1].uid, players[2].uid};
+  expect(
+    tempState.effects,
+    [
+      GameStateEffect.needWinnerSelection(
+        possibleWinnersUid: expectedWinners,
+        isSideSpot: false,
+      )
+    ],
   );
 
-  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
-
-  final currentState = await gameStateMachine.future;
-
-  await gameStateMachine.showWinnersAndEndLap(model: currentState);
-
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: {players[1].uid},
+  );
   final finalState = gameStateMachine.state.requireValue;
 
-  expect(
-    possibleWinners,
-    {players[1].uid, players[2].uid},
-  );
+  expect(finalState.effects, []);
+  // Lobby check
   expect(
     finalState.lobbyState,
     lobbyState.copyWith(
@@ -742,6 +743,7 @@ void runShowdownDistribution1Test(
       },
     ),
   );
+  // Game state check
   expect(
     finalState.sessionState,
     gameSessionState.copyWith(
@@ -754,16 +756,16 @@ void runShowdownDistribution1Test(
   );
 }
 
-/// Тестируем интересный кейс
-/// Игрок 1 поставил 40 и фолданул на флопе
-/// Игрок 2 поставил олин 300
-/// Игрок 3 рейзнул до 400
-/// Игрок 4 фолданул со ставкой 300
-/// Выйграл второй игрок, проверяем скип дилера
+/// [ShowdownTest] Interesting case
+/// Player 0 bet 40 and folded on the Flop
+/// Player 1 bet all-in 300
+/// Everyone call on the turn
+/// Player 2 raised to 400 on the River
+/// Player 3 folded with a bet of 300.
+/// The second player wins, we check the dealer's skip
 void runShowdownDistribution2Test(
   ProviderContainer container,
   AppRepository repository,
-  MockNavigationManager navigationManager,
 ) async {
   final players = createPlayers(4);
   final lobbyState = createLobbyState(
@@ -779,7 +781,7 @@ void runShowdownDistribution2Test(
   );
   final gameSessionState = GameSessionState(
     lapCounter: 1,
-    foldedPlayers: {players[0].uid, players[3].uid},
+    foldedPlayers: {players[0].uid},
     currentPlayerUid: players[3].uid,
     firstPlayerUid: players[1].uid,
     bets: {
@@ -794,32 +796,32 @@ void runShowdownDistribution2Test(
   when(repository.getGameSessionState())
       .thenAnswer((_) async => gameSessionState);
 
-  late final Set<String> possibleWinners;
-  when(navigationManager.showWinnerChooseDialog(any)).thenAnswer(
-    (inc) async {
-      possibleWinners = (inc.positionalArguments[0] as WinnerChoiceArgs)
-          .possibleWinners
-          .map((p) => (p.uid))
-          .toSet();
-
-      return {
-        players[2].uid,
-      };
-    },
-  );
-
   final gameStateMachine = container.read(gameStateMachineProvider.notifier);
 
-  final currentState = await gameStateMachine.future;
+  await gameStateMachine.future;
 
-  await gameStateMachine.showWinnersAndEndLap(model: currentState);
+  await gameStateMachine.executeFold();
+  final tempState = gameStateMachine.state.requireValue;
 
+// Effects check
+  final expectedWinners = {players[1].uid, players[2].uid};
+  expect(
+    tempState.effects,
+    [
+      GameStateEffect.needWinnerSelection(
+        possibleWinnersUid: expectedWinners,
+        isSideSpot: false,
+      )
+    ],
+  );
+
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: {players[2].uid},
+  );
   final finalState = gameStateMachine.state.requireValue;
 
-  expect(
-    possibleWinners,
-    {players[1].uid, players[2].uid},
-  );
+  expect(finalState.effects, []);
+  // Lobby check
   expect(
     finalState.lobbyState,
     lobbyState.copyWith(
@@ -846,24 +848,22 @@ void runShowdownDistribution2Test(
   );
 }
 
-/// Тестируем интересный кейс
-/// Игрок 1 поставил 40 и фолданул на флопе
-/// Игрок 2 поставил олин 300 и фолданул
-/// Игрок 3 рейзнул до 440
-/// Игрок 4 кол
-/// Игрок 5 кол
-/// Основной банк выйграл олинщик
-/// Cайд пот выйрал первый
+/// [ShowdownTest] Interesting case
+/// Player 1 bet 40 and folded on the Flop
+/// Player 2 bet all-in 300
+/// Player 3 raised to 440
+/// Player 4,0 called
+/// The main pot was won by all-in player
+/// The first player won the side-spot
 void runShowdownDistribution3Test(
   ProviderContainer container,
   AppRepository repository,
-  MockNavigationManager navigationManager,
 ) async {
   final players = createPlayers(5);
   final lobbyState = createLobbyState(
     players,
     smallBlindValue: 20,
-    gameState: GameStatusEnum.showdown,
+    gameState: GameStatusEnum.river,
     banks: {
       players[0].uid: 60,
       players[1].uid: 460,
@@ -890,41 +890,53 @@ void runShowdownDistribution3Test(
   when(repository.getGameSessionState())
       .thenAnswer((_) async => gameSessionState);
 
-  late final Set<String> winners1;
-  late final Set<String> winners2;
-  when(navigationManager.showWinnerChooseDialog(any)).thenAnswer(
-    (inc) async {
-      var winners = (inc.positionalArguments[0] as WinnerChoiceArgs)
-          .possibleWinners
-          .map((p) => (p.uid))
-          .toSet();
+  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
 
-      if (winners.length == 4) {
-        winners1 = winners;
-      } else {
-        winners2 = winners;
-      }
+  await gameStateMachine.executeCheck();
 
-      return winners.length == 4 ? {players[2].uid} : {players[0].uid};
-    },
+  final tempState1 = gameStateMachine.state.requireValue;
+
+  // Effects check
+  final expectedWinners1 = {
+    players[0].uid,
+    players[2].uid,
+    players[3].uid,
+    players[4].uid
+  };
+  expect(
+    tempState1.effects,
+    [
+      GameStateEffect.needWinnerSelection(
+        possibleWinnersUid: expectedWinners1,
+        isSideSpot: false,
+      )
+    ],
   );
 
-  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: {players[2].uid},
+  );
+  final tempState2 = gameStateMachine.state.requireValue;
 
-  final currentState = await gameStateMachine.future;
+  // Effects check
+  final expectedWinners2 = {players[0].uid, players[3].uid, players[4].uid};
+  expect(
+    tempState2.effects,
+    [
+      GameStateEffect.needWinnerSelection(
+        possibleWinnersUid: expectedWinners2,
+        isSideSpot: true,
+      )
+    ],
+  );
 
-  await gameStateMachine.showWinnersAndEndLap(model: currentState);
-
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: {players[0].uid},
+  );
   final finalState = gameStateMachine.state.requireValue;
 
-  expect(
-    winners1,
-    {players[0].uid, players[2].uid, players[3].uid, players[4].uid},
-  );
-  expect(
-    winners2,
-    {players[0].uid, players[3].uid, players[4].uid},
-  );
+  expect(finalState.effects, []);
   expect(
     finalState.lobbyState,
     lobbyState.copyWith(
@@ -951,34 +963,33 @@ void runShowdownDistribution3Test(
   );
 }
 
-/// Тестируем распределение фишек и показ модального окна
-/// Все игроки олин, выйгрывает последний, он остается дилером
+/// [ShowdownTest] Money distribution and winner selection dialog
+/// All players are AllIn, last one win, he will be dealer
 void runShowdownDistribution4Test(
   ProviderContainer container,
   AppRepository repository,
-  MockNavigationManager navigationManager,
 ) async {
   final players = createPlayers(4);
   final lobbyState = createLobbyState(
     players,
     smallBlindValue: 20,
-    gameState: GameStatusEnum.showdown,
+    gameState: GameStatusEnum.preFlop,
     banks: {
       players[0].uid: 0,
       players[1].uid: 0,
-      players[2].uid: 0,
+      players[2].uid: 460,
       players[3].uid: 0,
     },
   );
   final gameSessionState = GameSessionState(
     lapCounter: 1,
     foldedPlayers: {},
-    currentPlayerUid: players[0].uid,
+    currentPlayerUid: players[2].uid,
     firstPlayerUid: players[1].uid,
     bets: {
       players[0].uid: 500,
       players[1].uid: 500,
-      players[2].uid: 500,
+      players[2].uid: 40,
       players[3].uid: 500,
     },
   );
@@ -987,30 +998,32 @@ void runShowdownDistribution4Test(
   when(repository.getGameSessionState())
       .thenAnswer((_) async => gameSessionState);
 
-  late final Set<String> winners;
-  when(navigationManager.showWinnerChooseDialog(any)).thenAnswer(
-    (inc) async {
-      winners = (inc.positionalArguments[0] as WinnerChoiceArgs)
-          .possibleWinners
-          .map((p) => (p.uid))
-          .toSet();
+  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
 
-      return {players.last.uid};
-    },
+  await gameStateMachine.executeAllIn();
+
+  final tempState = gameStateMachine.state.requireValue;
+
+  // Effects check
+  final expectedWinners = players.map((e) => e.uid).toSet();
+  expect(
+    tempState.effects,
+    [
+      GameStateEffect.needWinnerSelection(
+        possibleWinnersUid: expectedWinners,
+        isSideSpot: false,
+      )
+    ],
   );
 
-  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
-
-  final currentState = await gameStateMachine.future;
-
-  await gameStateMachine.showWinnersAndEndLap(model: currentState);
-
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: {players.last.uid},
+  );
   final finalState = gameStateMachine.state.requireValue;
 
-  expect(
-    winners,
-    players.map((e) => e.uid).toSet(),
-  );
+  expect(finalState.effects, []);
+  // Lobby check
   expect(
     finalState.lobbyState,
     lobbyState.copyWith(
@@ -1024,6 +1037,7 @@ void runShowdownDistribution4Test(
       },
     ),
   );
+  // Game state check
   expect(
     finalState.sessionState,
     gameSessionState.copyWith(

@@ -55,12 +55,12 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
       return;
     }
 
-    // Ждем восстановления покупок и отрубаем ПРО, если не подтвердили
+    // Waiting for purchases to be restored and turning off the PRO if they haven't confirmed it.
     await Future.delayed(const Duration(seconds: 5)).then(
       (_) {
         if (!proConfirmedByRestore) {
           logs.writeLog('ProVersionManager: force disable');
-          //Disable PRO
+          // Disable PRO
           state = AsyncData(
             ProVersionModel(
               forceDisable: true,
@@ -91,19 +91,19 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
     return buyProduct(product.productDetails);
   }
 
-  //Получаем обновление о покупке, применяет покупку к логике приложения.
+  /// Receive a purchase update and apply the purchase to the app logic.
   @override
   Future<void> handlePurchase(PurchaseDetails purchaseDetails) async {
     if (purchaseDetails.status == PurchaseStatus.purchased ||
         purchaseDetails.status == PurchaseStatus.restored) {
-      // Валидируем покупку
+      // Validating the purchase
       var validPurchase = await verifyPurchase(purchaseDetails);
 
       if (validPurchase) {
-        // Применяем покупку
-        //TODO сделать модалку и повесить тесты
+        // Applying the purchase
+        //TODO make a dialog and add tests
         proConfirmedByRestore = true;
-        //Enable PRO
+        // Enable PRO
         state = AsyncData(
           ProVersionModel(
             isPurchased: true,
@@ -118,7 +118,7 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
       }
     }
 
-    // Подтверждаем, что покупка обработана правильно.
+    // Confirm that the purchase has been processed correctly.
     if (purchaseDetails.pendingCompletePurchase) {
       await InAppPurchase.instance.completePurchase(purchaseDetails);
     }

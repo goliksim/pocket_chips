@@ -64,13 +64,12 @@ class _AddPlayerButtonState extends State<AddPlayerButton> {
                           icon: const Icon(
                             Icons.add,
                             color: Colors.white,
-                            //size: stdIconSize,
                           ),
                           onPressed: () async {
                             setState(() {
                               addButtonPressed = true;
                             });
-                            //TODO: продлить, если нажали на внутренние кнопки
+                            //TODO: extend if pressed the internal buttons
                             await Future.delayed(const Duration(seconds: 10));
                             setState(() {
                               addButtonPressed = false;
@@ -100,7 +99,6 @@ class _AddPlayerButtonState extends State<AddPlayerButton> {
                               icon: const Icon(
                                 Icons.person_add,
                                 color: Colors.white,
-                                //size: stdIconSize,
                               ),
                               tooltip: context.strings.tooltip_add_new,
                               onPressed: () => widget.addPlayerCallback?.call(),
@@ -125,7 +123,6 @@ class _AddPlayerButtonState extends State<AddPlayerButton> {
                                 icon: const Icon(
                                   Icons.folder_shared,
                                   color: Colors.white,
-                                  //size: stdIconSize,
                                 ),
                                 tooltip: context.strings.tooltip_add_stor,
                                 onPressed: () =>

@@ -28,7 +28,7 @@ class GamePage extends ConsumerWidget {
         final tableRotationOffset =
             ref.watch(gameTableOffsetControllerProvider);
 
-        return PatternContainer(
+        return PatternBackground(
           opacity: 0.5,
           child: Scaffold(
             resizeToAvoidBottomInset: false,
@@ -42,9 +42,7 @@ class GamePage extends ConsumerWidget {
                   size: stdIconSize,
                 ),
               ),
-              iconTheme: IconThemeData(
-                color: context.theme.onBackground, //change your color here
-              ),
+              iconTheme: IconThemeData(color: context.theme.onBackground),
               titleTextStyle: context.theme.appBarStyle.copyWith(
                 fontSize: stdFontSize / 20 * 22,
               ),
@@ -63,7 +61,7 @@ class GamePage extends ConsumerWidget {
                           scaleX: -1,
                           child: IconButton(
                             icon: Icon(
-                              Icons.sync_sharp, //Icons.info_outline,
+                              Icons.sync_sharp,
                               color: context.theme.onBackground,
                               size: stdIconSize,
                             ),

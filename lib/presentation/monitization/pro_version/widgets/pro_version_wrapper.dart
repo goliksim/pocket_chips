@@ -21,7 +21,8 @@ class ProVersionWrapper extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isPro =
-        ref.watch(proVersionModelHolderProvider).value?.isPurchased ?? false;
+        ref.watch(proVersionOfferModelHolderProvider).value?.isPurchased ??
+            false;
 
     if (isPro || (conditionToEnable ?? false)) {
       return child;

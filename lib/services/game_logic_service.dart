@@ -4,7 +4,6 @@ import '../domain/models/game/game_state_model.dart';
 import '../domain/models/lobby/lobby_state_model.dart';
 import '../domain/models/player/player_id.dart';
 import '../domain/models/player/player_model.dart';
-import '../presentation/game/widgets/winner_page/view_state/possible_winner_item.dart';
 
 extension GameStateModelX on GameStateModel {
   bool isPlayerActive(PlayerId playerUid) =>
@@ -15,17 +14,10 @@ extension GameStateModelX on GameStateModel {
 
   bool get canStartOrContinueGame => activePlayersWithMoney.length >= 2;
 
-  List<PossibleWinnerItem> get possibleWinners => activePlayers
-      .map(
-        (p) => PossibleWinnerItem(
-          uid: p.uid,
-          assetUrl: p.assetUrl,
-          name: p.name,
-          bid: sessionState.bets[p.uid] ?? 0,
-        ),
-      )
-      .where((p) => p.bid > 0)
-      .toList();
+  Set<String> get possibleWinnersUids => activePlayers
+      .where((p) => (sessionState.bets[p.uid] ?? 0) > 0)
+      .map((p) => p.uid)
+      .toSet();
 
   PlayerModel? get currentPlayer =>
       lobbyState.players.findByUid(sessionState.currentPlayerUid);
@@ -41,51 +33,43 @@ extension GameStateModelX on GameStateModel {
 
 extension GameSessionStateX on GameStateModel {
   bool checkBidsEqual() {
-    int notZeroPlayers = 0;
+    final bets = activePlayers.map((p) => sessionState.bets[p.uid] ?? 0);
+    if (bets.isEmpty) return true;
 
-    var maxBet = sessionState.bets.values.maxOrNull ?? 0;
+    final maxBet = bets.max;
 
-    for (var player in activePlayers) {
+    for (final player in activePlayers) {
       final bid = sessionState.bets[player.uid] ?? 0;
       final bank = lobbyState.banks[player.uid] ?? 0;
 
-      bool equalBool = (bid == maxBet);
-      bool allInBool = ((bid > 0) && (bank <= 0));
+      bool isEqual = (bid == maxBet);
+      bool isAllIn = ((bid > 0) && (bank <= 0));
 
-      if (bank > 0) {
-        notZeroPlayers += 1;
-      }
-
-      if (!(equalBool || allInBool)) {
+      if (!(isEqual || isAllIn)) {
         return false;
       }
     }
 
-    //проверка на 1 оставшегося чела
-    if (notZeroPlayers <= 1) {
-      return true;
-    }
-
-    return sessionState.lapCounter != 0;
+    return true;
   }
 
-  // TODO: добавить настройки (запрет перебивания олл-ин рейза, если он меньше минимального рейза)
+  // TODO: add settings (disable over-raising an all-in raise if it is less than the minimum raise)
   // https://www.reddit.com/r/poker/comments/oqrmyk/minimal_raise/?tl=ru
 
-  /// Подсчет величины рейза-ререйза
+  /// Calculating the raise/reraise amount
   (int, bool) calculateRaiseValue(String currentPlayerUid) {
-    // Сколько нужно добавить для выравнивания
+    // How much should be added for equal bets?
     int toEqual = (sessionState.bets.values.maxOrNull ?? 0) -
         (sessionState.bets[currentPlayerUid] ?? 0);
 
-    // Подходит под ставку или ход в олл ин, если остался условно 1 бакс (бет)
+    // Suitable for a bet or an all-in move if there is still $1 left (bet)
     List<int> bids = activePlayers
         .map((p) => sessionState.bets[p.uid] ?? 0)
         .toSet()
         .toList()
       ..sort();
 
-    // Последнее повышение
+    // Last raise
     int lastRaise = 0;
     if (bids.length > 1) {
       lastRaise = bids[bids.length - 1] - bids[bids.length - 2];

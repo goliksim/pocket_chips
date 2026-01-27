@@ -1,4 +1,3 @@
-// Кнопка добавления игрока
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -28,7 +27,6 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
   late FocusNode focusNodeStack = FocusNode();
 
   Future<void> _onLogoTap() async {
-    //SystemChrome.restoreSystemUIOverlays();
     if (focusNodeName.hasFocus || focusNodeStack.hasFocus) {
       focusNodeStack.unfocus();
       focusNodeName.unfocus();
@@ -71,7 +69,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                // Аватарка
+                // Avatar
                 ProVersionWrapper(
                   child: GestureDetector(
                     onTap: () => _onLogoTap(),
@@ -112,7 +110,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Text on top
+                        // Dialog title (new or existed)
                         SizedBox(
                           height: stdButtonHeight * 0.5,
                           child: Center(
@@ -149,9 +147,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                               ),
                               hintText: context.strings.playp_edit_win1,
                               enabledBorder: UnderlineInputBorder(
-                                borderSide:
-                                    // цвет линнии в окне
-                                    BorderSide(
+                                borderSide: BorderSide(
                                   color: (player.nameInput?.isNotEmpty ?? false)
                                       ? context.theme.primaryColor
                                       : context.theme.hintColor,
@@ -191,9 +187,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                               hintText:
                                   '${context.strings.playp_edit_win2} - ${player.bankInput}',
                               enabledBorder: UnderlineInputBorder(
-                                borderSide:
-                                    // цвет линнии в окне
-                                    BorderSide(
+                                borderSide: BorderSide(
                                   color: (player.bankInput != null)
                                       ? context.theme.primaryColor
                                       : context.theme.hintColor,
@@ -233,16 +227,19 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                               flex: 2,
                               child: SizedBox(
                                 height: stdButtonHeight * 0.6,
-                                child: Checkbox(
-                                  checkColor: Colors.white,
-                                  fillColor: WidgetStateProperty.all<Color>(
-                                    player.makeDealer
-                                        ? context.theme.primaryColor
-                                        : context.theme.bgrColor,
+                                child: Transform.scale(
+                                  scale: 1.25,
+                                  child: Checkbox(
+                                    checkColor: Colors.white,
+                                    fillColor: WidgetStateProperty.all<Color>(
+                                      player.makeDealer
+                                          ? context.theme.primaryColor
+                                          : context.theme.bgrColor,
+                                    ),
+                                    value: player.makeDealer ||
+                                        player.forceDeadler,
+                                    onChanged: widget.viewModel.makeDealer,
                                   ),
-                                  value:
-                                      player.makeDealer || player.forceDeadler,
-                                  onChanged: widget.viewModel.makeDealer,
                                 ),
                               ),
                             ),
@@ -261,7 +258,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                             if (!validInput) {
                               return widget.viewModel.notifyWrongInput();
                             }
-                            // закрываем клаву, при нажатии кнопки
+                            // Сlose keyboard on confirm
                             if (focusNodeName.hasFocus ||
                                 focusNodeStack.hasFocus) {
                               focusNodeStack.unfocus();

@@ -27,7 +27,7 @@ class LobbyPage extends ConsumerWidget {
 
     return stateProvider.maybeWhen(
       skipLoadingOnReload: true,
-      data: (state) => PatternContainer(
+      data: (state) => PatternBackground(
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
@@ -98,7 +98,7 @@ class LobbyPage extends ConsumerWidget {
                   Expanded(
                     child: Column(
                       children: [
-                        //PlayerList
+                        // PlayerList
                         Flexible(
                           child: state.players.isNotEmpty
                               ? PlayerList(
@@ -137,7 +137,7 @@ class LobbyPage extends ConsumerWidget {
                               ),
                             ),
                           ),
-                        //FreeSpace
+                        // FreeSpace
                       ],
                     ),
                   ),

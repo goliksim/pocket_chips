@@ -19,7 +19,7 @@ class GameTableOffsetController extends Notifier<int> {
     state += 1;
   }
 
-  // Меняем отступы у игроков
+  // Random players spread
   /*
   void changeOffset() {
     Random rnd = Random();

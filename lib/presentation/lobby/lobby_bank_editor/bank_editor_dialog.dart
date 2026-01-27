@@ -1,4 +1,3 @@
-// Ячейка банка
 import 'package:flutter/material.dart';
 
 import '../../../utils/extensions.dart';

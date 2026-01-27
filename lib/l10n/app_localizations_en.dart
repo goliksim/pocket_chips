@@ -21,7 +21,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooltip_stor => 'Saved players';
 
   @override
-  String get tooltip_rot => 'Rotate';
+  String get tooltip_rot => 'Rotate players';
 
   @override
   String get tooltip_add_new => 'New';
@@ -31,6 +31,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tooltip_add_main => 'Add Player';
+
+  @override
+  String get tooltip_undo => 'Undo action';
 
   @override
   String get conf_canc => 'Cancel';
@@ -348,7 +351,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get game_bet => 'Bet';
 
   @override
+  String get game_bet_to => 'Bet to';
+
+  @override
   String get game_raise => 'Raise';
+
+  @override
+  String get game_raise_to => 'Raise to';
 
   @override
   String get game_raise_canc => 'Cancel';
@@ -390,7 +399,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toast_alred => 'already in lobby!';
 
   @override
-  String get toast_alred2 => 'Player with same name and icon already exist';
+  String get toast_alred2 => 'Player with same name already exist';
 
   @override
   String get toast_moreplay2 => 'You cant play without players';
@@ -414,7 +423,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toast_unav => 'Unavailible now';
 
   @override
-  String get toast_incorrect_player => 'Enter name and choose icon';
+  String get toast_incorrect_player => 'Check for name and initial stack';
 
   @override
   String get toast_playp_edit_new_dealer => 'New dealer is -';
@@ -513,7 +522,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pro_version_offer_price_duration => 'forever';
 
   @override
-  String get pro_version_offer_option_1 => 'Dark theme';
+  String get pro_version_offer_option_1 => 'Сhanging app theme';
 
   @override
   String get pro_version_offer_option_2 => 'No ads';
@@ -529,6 +538,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pro_version_offer_option_6 => 'Custom player avatars';
+
+  @override
+  String get pro_version_offer_option_7 => 'Undo last action';
 
   @override
   String get pro_version_offer_button_purchased => 'PRO active';

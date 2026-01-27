@@ -53,11 +53,12 @@ class OnboardingGamePage extends StatelessWidget {
           ),
           SizedBox(height: stdHorizontalOffset),
           RaiseProviderScope(
-            currentBet: 0,
+            additionalBet: 0,
             child: Builder(
               builder: (context) => RaiseFieldWidget(
                 maxPossibleBet: 500,
                 minPossibleBet: 0,
+                currentBet: 0,
               ),
             ),
           ),

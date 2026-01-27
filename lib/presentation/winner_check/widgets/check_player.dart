@@ -78,9 +78,7 @@ class _CheckPlayerState extends State<CheckPlayer> with ToastsMixin {
             color: context.theme.bankColor.withAlpha(0),
           ),
           borderRadius: BorderRadius.all(
-            Radius.circular(
-              stdBorderRadius,
-            ), //                 <--- border radius here
+            Radius.circular(stdBorderRadius), //<--- border radius here
           ),
         ),
         height: 170.h,

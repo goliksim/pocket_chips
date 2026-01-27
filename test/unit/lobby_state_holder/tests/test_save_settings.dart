@@ -12,7 +12,6 @@ void runSaveSettingsNoEditingTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -41,7 +40,6 @@ void runSaveSettingsSameBankTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -70,7 +68,6 @@ void runSaveSettingsNewBankTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(2);
   final lobbyState = createLobbyState(
     players,
@@ -108,7 +105,6 @@ void runSaveSettingsNewSmallBlindTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(2);
   final lobbyState = createLobbyState(
     players,

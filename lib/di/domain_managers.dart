@@ -90,7 +90,8 @@ final proVersionManagerProvider =
 );
 
 final proVersionProvider = Provider<bool>(
-  (ref) => ref.watch(proVersionModelHolderProvider).value?.isPurchased ?? false,
+  (ref) =>
+      ref.watch(proVersionOfferModelHolderProvider).value?.isPurchased ?? false,
 );
 
 final googleAdsManagerProvider = Provider<GoogleAdsManager>(

@@ -26,7 +26,7 @@ class ProVersionOfferViewModel extends Notifier<ProVersionOfferViewState> {
 
     logs.writeLog('ProVersionOfferViewModel: build');
 
-    final isPro = ref.watch(proVersionModelHolderProvider);
+    final isPro = ref.watch(proVersionOfferModelHolderProvider);
 
     return isPro.when(
       data: (data) => ProVersionOfferViewState(
@@ -46,7 +46,7 @@ class ProVersionOfferViewModel extends Notifier<ProVersionOfferViewState> {
     try {
       await _proVersionManager.buyPro();
     } on Exception catch (e) {
-      // TODO настроить репорт ошибок
+      // TODO configure error reporting
       _toastManager.showToast(_strings.toast_unav);
       logs.writeLog(e.toString());
     }

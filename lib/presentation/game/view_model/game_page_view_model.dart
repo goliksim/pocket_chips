@@ -7,11 +7,13 @@ import '../../../app/navigation/navigation_manager.dart';
 import '../../../di/domain_managers.dart';
 import '../../../di/model_holders.dart';
 import '../../../domain/model_holders/game_state_machine.dart';
+import '../../../domain/models/game/game_state_effect.dart';
 import '../../../domain/models/game/game_state_enum.dart';
 import '../../../domain/models/game/game_state_model.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../l10n/localization_extension.dart';
 import '../../../services/game_logic_service.dart';
+import '../../../services/toast_manager.dart';
 import '../../../utils/logs.dart';
 import '../view_state/game_page_view_state.dart';
 import '../view_state/game_player_item.dart';
@@ -19,6 +21,8 @@ import '../view_state/game_table_state.dart';
 import '../widgets/game_contol/view_model/game_control_view_model.dart';
 import '../widgets/game_contol/view_state/game_control_result.dart';
 import '../widgets/game_contol/view_state/game_page_control_state.dart';
+import '../widgets/winner_page/view_state/possible_winner_item.dart';
+import '../widgets/winner_page/view_state/winner_choice_args.dart';
 
 class GamePageViewModel extends AsyncNotifier<GamePageViewState>
     implements GameControlViewModel {
@@ -27,6 +31,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
   NavigationManager get _navigationManager =>
       ref.read(navigationManagerProvider);
   AppLocalizations get _strings => ref.read(stringsProvider);
+  ToastManager get _toastManager => ref.read(toastManagerProvider);
 
   GamePageViewState get viewState => state.requireValue;
 
@@ -38,9 +43,15 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
     final gameState = gameModel.lobbyState.gameState;
     final players = gameModel.lobbyState.players;
 
-    if (gameState == GameStatusEnum.showdown) {
-      logs.writeLog('GameVM: showing winner window');
-      _gameStateMachine.showWinnersAndEndLap(model: gameModel);
+    final effects = gameModel.effects;
+    print('GameVM: effects $effects');
+    if (effects.isNotEmpty) {
+      effects.forEach(
+        (effect) => _executeEffect(
+          effect: effect,
+          stateModel: gameModel,
+        ),
+      );
     }
 
     return GamePageViewState(
@@ -60,22 +71,12 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
                 ))
             .toList(),
         // TODO: players noise offset
-        //tableRotationOffset: tableRotationOffset,
         smallBlindValue: gameModel.lobbyState.smallBlindValue,
       ),
       gameStatus: gameState,
       currentGameState: _strings.getGameStateName(gameState),
       currentPlayerName: gameModel.currentPlayer?.name,
       canEditPlayer: gameState.canEditPlayers,
-    );
-  }
-
-  // Временное изменение текста
-  void changeGameStateText(GameStatusEnum enumValue) async {
-    state = AsyncData(
-      viewState.copyWith(
-        currentGameState: _strings.getGameStateName(enumValue),
-      ),
     );
   }
 
@@ -119,10 +120,8 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
             canStartBetting: gameModel.canStartOrContinueGame,
           );
         case GameStatusEnum.showdown:
-          if (currentPlayerUid == null) {
-            return GamePageControlState.showdown();
-          }
-          break;
+          return GamePageControlState.showdown();
+
         default:
           break;
       }
@@ -162,6 +161,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
           isFirstBet: isFirstBet,
           maxPossibleBet: maxPossibleBet,
           minPossibleBet: minPossibleBet,
+          currentBet: currentBet,
         ),
         mainState: currentPlayerCanSkip
             ? MainControlState.check()
@@ -173,5 +173,56 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
     } catch (e) {
       throw Exception();
     }
+  }
+
+  Future<void> _executeEffect({
+    required GameStateEffect effect,
+    required GameStateModel stateModel,
+  }) async {
+    effect.map(
+      error: (effect) {
+        logs.writeLog('GameVM: showing error notification');
+        switch (effect.type) {
+          case GameStateErrorType.fewPlayers:
+            _toastManager.showToast(_strings.toast_moreplay);
+            break;
+        }
+      },
+      hasWinner: (effect) {
+        final winner = stateModel.lobbyState.players
+            .firstWhere((p) => p.uid == effect.winnerUid);
+        logs.writeLog('GameVM: showing winner - ${winner.name}');
+
+        _navigationManager.showWinner(winner);
+      },
+      needWinnerSelection: (effect) async {
+        logs.writeLog('GameVM: calling winner selector');
+
+        final players = stateModel.lobbyState.players
+            .where((p) => effect.possibleWinnersUid.contains(p.uid));
+
+        final winners = await _navigationManager.showWinnerChooseDialog(
+          WinnerChoiceArgs(
+            title: effect.isSideSpot ? _strings.game_win4 : _strings.game_win3,
+            possibleWinners: players
+                .map(
+                  (p) => PossibleWinnerItem(
+                    name: p.name,
+                    assetUrl: p.assetUrl,
+                    uid: p.uid,
+                    bid: stateModel.sessionState.bets[p.uid] ?? 0,
+                  ),
+                )
+                .toList(),
+          ),
+        );
+
+        if (winners != null && winners.isNotEmpty) {
+          _gameStateMachine.executeWinnerSelection(
+            selectedWinners: winners,
+          );
+        }
+      },
+    );
   }
 }

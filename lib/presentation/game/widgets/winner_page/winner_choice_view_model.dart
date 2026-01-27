@@ -54,8 +54,6 @@ class WinnerChoiceViewModel with ChangeNotifier {
 
     if (markedUids.isNotEmpty) {
       pop(markedUids);
-
-      //await _moneyDistribution();
     } else {
       _toastManager.showToast(_strings.toast_winn);
     }

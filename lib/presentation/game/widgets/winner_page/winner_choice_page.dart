@@ -45,13 +45,13 @@ class WinnerChoiceWindow extends StatelessWidget {
                           ? standartPlayerCount
                           : possibleWinners.length)) +
                   stdButtonHeight * 1.5 +
-                  stdHorizontalOffset,
+                  stdHorizontalOffset * 1.5,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
                     height: stdButtonHeight * 0.5,
-                    child: Center(
+                    child: FittedBox(
                       child: Text(
                         title ?? context.strings.game_win3,
                         style: TextStyle(
@@ -61,6 +61,7 @@ class WinnerChoiceWindow extends StatelessWidget {
                       ),
                     ),
                   ),
+                  SizedBox(height: stdHorizontalOffset / 2),
                   Flexible(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(stdBorderRadius),
@@ -136,12 +137,16 @@ class WinnerChoiceWindow extends StatelessWidget {
                                         ),
                                         AspectRatio(
                                           aspectRatio: 1,
-                                          child: Checkbox(
-                                            activeColor:
-                                                context.theme.primaryColor,
-                                            value: markedState[winner.uid],
-                                            onChanged: (bool? value) =>
-                                                viewModel.onItemTap(winner.uid),
+                                          child: Transform.scale(
+                                            scale: 1.25,
+                                            child: Checkbox(
+                                              activeColor:
+                                                  context.theme.primaryColor,
+                                              value: markedState[winner.uid],
+                                              onChanged: (bool? value) =>
+                                                  viewModel
+                                                      .onItemTap(winner.uid),
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -156,23 +161,23 @@ class WinnerChoiceWindow extends StatelessWidget {
                   ),
                   SizedBox(height: stdHorizontalOffset),
                   SizedBox(
-                    height: stdButtonHeight * 0.75 * 0.75,
+                    height: stdButtonHeight * 0.7,
                     child: Row(
                       children: [
-                        MyButton(
-                          height: stdButtonHeight * 0.75 * 0.75,
-                          width: stdButtonHeight * 0.75 * 0.75,
-                          buttonColor: context.theme.secondaryColor,
-                          child: Icon(
-                            Icons.help_outline,
-                            color: context.theme.onPrimary,
+                        Flexible(
+                          flex: 3,
+                          child: MyButton(
+                            height: stdButtonHeight * 0.7,
+                            buttonColor: context.theme.secondaryColor,
+                            textString: context.strings.home_win_check,
+                            action: () => viewModel.showWinnerSolver(),
                           ),
-                          action: () => viewModel.showWinnerSolver(),
                         ),
                         SizedBox(width: stdHorizontalOffset),
                         Expanded(
+                          flex: 5,
                           child: MyButton(
-                            height: stdButtonHeight * 0.75 * 0.75,
+                            height: stdButtonHeight * 0.7,
                             width: double.infinity,
                             buttonColor: context.theme.primaryColor,
                             textString: context.strings.game_win_conf,

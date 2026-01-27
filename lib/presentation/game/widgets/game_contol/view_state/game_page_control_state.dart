@@ -24,6 +24,7 @@ abstract class RaiseControlState with _$RaiseControlState {
     required bool isFirstBet,
     required int maxPossibleBet,
     required int minPossibleBet,
+    required int currentBet,
   }) = _RaiseControlState;
 }
 

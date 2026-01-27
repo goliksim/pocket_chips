@@ -11,7 +11,6 @@ void runReorderSamePlayerTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -35,7 +34,6 @@ void runReorderSinglePlayerTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(1);
   final lobbyState = createLobbyState(
     players,
@@ -59,7 +57,6 @@ void runReorderTwoPlayersTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(2);
   final lobbyState = createLobbyState(
     players,
@@ -90,7 +87,6 @@ void runReorderToFirstTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(4);
   final lobbyState = createLobbyState(
     players,
@@ -117,7 +113,6 @@ void runReorderToLastTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(4);
   final lobbyState = createLobbyState(
     players,

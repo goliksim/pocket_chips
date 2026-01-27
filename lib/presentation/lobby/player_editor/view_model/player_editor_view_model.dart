@@ -110,30 +110,24 @@ class PlayerEditorViewModel with ChangeNotifier {
     return kDebugMode || (bankInput != null && bankInput > 0);
   }
 
-  bool get _validIcon => true;
   bool get _validName => playerState.nameInput?.isNotEmpty ?? false;
 
-  bool get validateInput => _validIcon && _validName && _validBank;
+  bool get validateInput => _validName && _validBank;
 
   void notifyWrongInput() {
     if (!_validName) {
       return _toastManager.showToast(_strings.toast_playp_edit_no_name);
     }
-    if (!_validIcon) {
-      return _toastManager.showToast(_strings.toast_playp_edit_no_icon);
-    }
+
     if (!_validBank) {
       return _toastManager.showToast(_strings.toast_bank3);
     }
   }
 
   Future<void> confirmEditing() async {
-    // проверка чтобы челикс не ввел пустой символ
-    //SystemChrome.restoreSystemUIOverlays();
-
     final lobby = _lobbyStateHolder.activeLobby;
 
-    // Проверяем, что новый игрок с норм данными
+    // Invalid input notification
     if (!validateInput) {
       _toastManager.showToast(_strings.toast_incorrect_player);
 
@@ -146,14 +140,7 @@ class PlayerEditorViewModel with ChangeNotifier {
       assetUrl: playerState.assetUrl,
     );
 
-    // Проверяем, что не ввели данные существующего игрока
-    if (newPlayerEditing && lobby.players.contains(playerModel)) {
-      _toastManager.showToast(_strings.toast_alred2);
-
-      return;
-    }
-
-    // Проверяем банк на минимальный блайнд
+    // Checking the stack for the minimum blind
     final bank = playerState.bankInput!;
     final currentBigBlind = lobby.bigBlindValue;
     if (bank < currentBigBlind) {

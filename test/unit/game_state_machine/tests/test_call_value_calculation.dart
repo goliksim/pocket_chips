@@ -9,7 +9,7 @@ import 'package:pocket_chips/services/game_logic_service.dart';
 
 import '../../test_utils.dart';
 
-/// Тестируем  колл для смол блайнда на префлопе
+/// [CallValueTest] for Small Blind Player on Pre-flop
 void runCallValueCalculationSmallBlindTest(
   ProviderContainer container,
   AppRepository repository,
@@ -48,7 +48,7 @@ void runCallValueCalculationSmallBlindTest(
   expect(isAllIn, false);
 }
 
-/// Тестируем  колл для биг блайнда на префлопе
+/// [CallValueTest] for Big Blind Player on Pre-flop
 void runCallValueCalculationBigBlindTest(
   ProviderContainer container,
   AppRepository repository,
@@ -87,7 +87,7 @@ void runCallValueCalculationBigBlindTest(
   expect(isAllIn, false);
 }
 
-/// Тестируем  колл для первого игрока на префлопе
+/// [CallValueTest] for First Player on Pre-flop
 void runCallValueCalculationBigBlind2Test(
   ProviderContainer container,
   AppRepository repository,
@@ -126,7 +126,7 @@ void runCallValueCalculationBigBlind2Test(
   expect(isAllIn, false);
 }
 
-/// Тестируем колл рейза для игрока на префлопе
+/// [CallValueTest] after Raise on Pre-flop
 void runCallRaisePreflopValueCalculationTest(
   ProviderContainer container,
   AppRepository repository,
@@ -166,7 +166,7 @@ void runCallRaisePreflopValueCalculationTest(
   expect(isAllIn, false);
 }
 
-/// Тестируем  колл рейза для игрока на флопе
+/// [CallValueTest] After Raise on Flop
 void runReCallFlopValueCalculationTest(
   ProviderContainer container,
   AppRepository repository,
@@ -207,7 +207,7 @@ void runReCallFlopValueCalculationTest(
   expect(isAllIn, false);
 }
 
-/// Тестируем колл для игрока на флопе
+/// [CallValueTest] on Flop
 void runCallValueCalculationTurnTest(
   ProviderContainer container,
   AppRepository repository,
@@ -248,7 +248,7 @@ void runCallValueCalculationTurnTest(
   expect(isAllIn, false);
 }
 
-/// Тестируем случай олина после рейза
+/// [CallValueTest] after Raise [AllIn case]
 void runCallRaiseValueCalculationAllInTest(
   ProviderContainer container,
   AppRepository repository,
@@ -290,8 +290,8 @@ void runCallRaiseValueCalculationAllInTest(
   expect(isAllIn, true);
 }
 
-/// Тест кола игрока после олина бигблайнда
-/// Ожидаем велечину кола размеров с бигблайнд
+/// [CallValueTest] after Raise of Big Blind Player
+/// Expect call value equal to big blind
 void runCallValueCalculationBBAllInTest(
   ProviderContainer container,
   AppRepository repository,

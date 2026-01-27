@@ -42,12 +42,12 @@ class PurchasesManager extends AsyncNotifier<List<PurchasableProduct>>
   Future<void> handlePurchase(PurchaseDetails purchaseDetails) async {
     if (purchaseDetails.status == PurchaseStatus.purchased ||
         purchaseDetails.status == PurchaseStatus.restored) {
-      // Валидируем покупку
+      // Validating the purchase
       var validPurchase = await verifyPurchase(purchaseDetails);
 
       if (validPurchase) {
-        // Применяем покупку
-        //TODO сделать модалку и повесить тесты
+        // Applying the purchase
+        //TODO make a dialog and add tests
         logs.writeLog('Purchase valid: ${purchaseDetails.productID}');
         toastManager.showToast(
           '${strings.toast_purchase_success_named} ${strings.getProductNameById(purchaseDetails.productID)}!',
@@ -58,7 +58,7 @@ class PurchasesManager extends AsyncNotifier<List<PurchasableProduct>>
     }
 
     if (purchaseDetails.status == PurchaseStatus.pending) {
-      //TODO сделать модалку и повесить тесты
+      //TODO make a dialog and add tests
       logs.writeLog('Purchase pending: ${purchaseDetails.productID}');
       toastManager.showToast(
         '${strings.toast_purchase_pending_state_named} ${strings.getProductNameById(purchaseDetails.productID)}...',
@@ -76,7 +76,7 @@ class PurchasesManager extends AsyncNotifier<List<PurchasableProduct>>
       return;
     }
 
-    // Подтверждаем, что покупка обработана правильно.
+    // Confirm that the purchase has been processed correctly.
     if (purchaseDetails.pendingCompletePurchase) {
       await InAppPurchase.instance.completePurchase(purchaseDetails);
     }
@@ -93,7 +93,6 @@ class PurchasesManager extends AsyncNotifier<List<PurchasableProduct>>
     return super.buyProduct(product.productDetails);
   }
 
-  /// Публичный метод обновления покупок
   /*void purchasesUpdate() {
     var subscriptions = <PurchasableProduct>[];
     var upgrades = <PurchasableProduct>[];

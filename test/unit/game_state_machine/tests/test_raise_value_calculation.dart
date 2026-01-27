@@ -9,7 +9,7 @@ import 'package:pocket_chips/services/game_logic_service.dart';
 
 import '../../test_utils.dart';
 
-/// Тестируем минимальный рейз для смол блайнда на префлопе
+/// [RaiseValueTest] min raise value for Small Blind on Pre-flop
 void runRaiseValueCalculationSmallBlindTest(
   ProviderContainer container,
   AppRepository repository,
@@ -48,7 +48,7 @@ void runRaiseValueCalculationSmallBlindTest(
   expect(isAllIn, false);
 }
 
-/// Тестируем минимальный рейз для биг блайнда на префлопе
+/// [RaiseValueTest] min raise value for Big Blind on Pre-flop
 void runRaiseValueCalculationBigBlindTest(
   ProviderContainer container,
   AppRepository repository,
@@ -87,7 +87,7 @@ void runRaiseValueCalculationBigBlindTest(
   expect(isAllIn, false);
 }
 
-/// Тестируем минимальный рейз для первого игрока на префлопе
+/// [RaiseValueTest] min raise value for First Player on Pre-flop
 void runRaiseValueCalculationBigBlind2Test(
   ProviderContainer container,
   AppRepository repository,
@@ -126,7 +126,7 @@ void runRaiseValueCalculationBigBlind2Test(
   expect(isAllIn, false);
 }
 
-/// Тестируем минимальный ре-рейз для игрока на префлопе
+/// [RaiseValueTest] min re-raise value after raise on Pre-flop
 void runReRaisePreflopValueCalculationTest(
   ProviderContainer container,
   AppRepository repository,
@@ -166,7 +166,7 @@ void runReRaisePreflopValueCalculationTest(
   expect(isAllIn, false);
 }
 
-/// Тестируем минимальный ре-рейз для игрока на флопе
+///[RaiseValueTest] min re-raise value after raise on Flop
 void runReRaiseFlopValueCalculationTest(
   ProviderContainer container,
   AppRepository repository,
@@ -207,7 +207,7 @@ void runReRaiseFlopValueCalculationTest(
   expect(isAllIn, false);
 }
 
-/// Тестируем минимальную ставку для игрока на флопе
+/// [RaiseValueTest] min bet value on Flop
 void runBetValueCalculationTurnTest(
   ProviderContainer container,
   AppRepository repository,
@@ -248,7 +248,7 @@ void runBetValueCalculationTurnTest(
   expect(isAllIn, false);
 }
 
-/// Тестируем случай олина для ре-рейза
+/// [RaiseValueTest] all-in re-raise
 void runReRaiseValueCalculationAllInTest(
   ProviderContainer container,
   AppRepository repository,

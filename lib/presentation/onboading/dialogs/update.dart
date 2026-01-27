@@ -27,7 +27,6 @@ class UpdateDialog extends StatelessWidget {
     return OnboardingDialog(
       onComplete: () => viewModel.onComplete(),
       pages: [
-        // first page
         PageModel(
           widget: OnboardingPage(
             title: '${context.strings.update_title} $version',

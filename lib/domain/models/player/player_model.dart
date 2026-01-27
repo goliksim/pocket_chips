@@ -16,7 +16,7 @@ abstract class PlayerModel with _$PlayerModel {
   const PlayerModel._();
 
   @override
-  //перегруженный оператор == для недобавления существующих игроков
+  //override operator == to not add existing players
   bool operator ==(covariant PlayerModel other) => ((uid == other.uid) &&
       (name == other.name) &&
       (assetUrl == other.assetUrl));

@@ -21,7 +21,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tooltip_stor => 'Сохраненные игроки';
 
   @override
-  String get tooltip_rot => 'Повернуть';
+  String get tooltip_rot => 'Поворот игроков';
 
   @override
   String get tooltip_add_new => 'Новый';
@@ -31,6 +31,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get tooltip_add_main => 'Добавить игрока';
+
+  @override
+  String get tooltip_undo => 'Отмена действия';
 
   @override
   String get conf_canc => 'Отменить';
@@ -345,10 +348,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get game_all => 'Ва-банк';
 
   @override
-  String get game_bet => 'Ставка';
+  String get game_bet => 'Cтавка';
+
+  @override
+  String get game_bet_to => 'Полная ставка';
 
   @override
   String get game_raise => 'Рейз';
+
+  @override
+  String get game_raise_to => 'Рейз до';
 
   @override
   String get game_raise_canc => 'Отмена';
@@ -390,7 +399,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get toast_alred => 'уже в лобби!';
 
   @override
-  String get toast_alred2 => 'Игрок с таким же именем и аватаром уже существует';
+  String get toast_alred2 => 'Игрок с таким же именем уже существует';
 
   @override
   String get toast_moreplay2 => 'Вы не можете начать игру без игроков';
@@ -414,7 +423,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get toast_unav => 'Недоступно';
 
   @override
-  String get toast_incorrect_player => 'Введите имя и выберите иконку';
+  String get toast_incorrect_player => 'Проверьте имя и начальный стек';
 
   @override
   String get toast_playp_edit_new_dealer => 'Новый дилер -';
@@ -513,13 +522,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pro_version_offer_price_duration => 'навсегда';
 
   @override
-  String get pro_version_offer_option_1 => 'Темная тема';
+  String get pro_version_offer_option_1 => 'Смена темы приложения';
 
   @override
   String get pro_version_offer_option_2 => 'Отсутствие рекламы';
 
   @override
-  String get pro_version_offer_option_3 => 'Ассистент для определения победителя';
+  String get pro_version_offer_option_3 => 'Определение победителя';
 
   @override
   String get pro_version_offer_option_4 => 'До 10 игроков в лобби';
@@ -529,6 +538,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pro_version_offer_option_6 => 'Кастомные аватары игроков';
+
+  @override
+  String get pro_version_offer_option_7 => 'Отмена последнего действия';
 
   @override
   String get pro_version_offer_button_purchased => 'PRO активен';

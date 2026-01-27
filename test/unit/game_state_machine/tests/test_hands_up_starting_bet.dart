@@ -8,9 +8,9 @@ import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import '../../test_utils.dart';
 
-/// Тест старта ставок при хенд-апе.
-/// В таком случае дилер делает смол-блайнд, и ходит первым на префлопе.
-/// Второй игрок - бигблайнд
+/// [HandUpTest] betting start
+/// In this case, the dealer makes a small blind and goes first on Pre-flop.
+/// The Big blind Player goes second
 void runHandUpStaringBetTest(
   ProviderContainer container,
   AppRepository repository,
@@ -101,8 +101,8 @@ void runHandUpStaringBetAllInTest(
   );
 }
 
-/// Тест старта ставок при хенд-апе (дилер вынуждены идти в олл-ин)
-/// В таком случае играет только банк дилера, игра сразу переходит к вскрытию карт.
+/// [HandUpTest] betting start (the Dealer needs to go AllIn)
+/// In this case, only the dealer's bank plays, and the game immediately go to Showdown.
 void runHandUpStaringBetFirstAllInTest(
   ProviderContainer container,
   AppRepository repository,
@@ -147,8 +147,8 @@ void runHandUpStaringBetFirstAllInTest(
   );
 }
 
-/// Тест старта ставок при хенд-апе (второй игрок вынуждены идти в олл-ин)
-/// В таком случае играет только банк второго игрока, игра сразу переходит к вскрытию карт.
+/// [HandUpTest] betting start (the second Player needs to go AllIn)
+/// In this case, only the second player's bank plays, and the game immediately go to Showdown.
 void runHandUpStaringBetSecondAllInTest(
   ProviderContainer container,
   AppRepository repository,
@@ -193,9 +193,10 @@ void runHandUpStaringBetSecondAllInTest(
   );
 }
 
-/// Тест старта ставок при хенд-апе (дилер не активный)
-/// В таком случае первый игрок - смолблайнд, второй - биг блайнд, играет первым смол блайнд
-/// Тут тестим скип 0левых игроков
+/// [HandUpTest] betting start с (Dealer is inactive)
+/// In this case, the First player is the Small Blind, the Second is the Big Blind
+/// The Small Blind goes first.
+/// Here testing the skip of zero(empty) players
 void runHandUpStartingBetNoChipsTest(
   ProviderContainer container,
   AppRepository repository,
@@ -255,9 +256,9 @@ void runHandUpStartingBetNoChipsTest(
   );
 }
 
-/// Тест старта ставок при хенд-апе (дилер - первый игрок)
-/// В таком случае первый игрок - смолблайнд, второй - биг блайнд, играет первым смол блайнд
-/// Тут тестим скип 0левых игроков
+/// [HandUpTest] betting start (Dealer is inactive, big blind on second lap)
+/// There are zero player in the middle
+/// Here testing the skip of zero(empty) players
 void runHandUpStartingBetNoChips2Test(
   ProviderContainer container,
   AppRepository repository,
@@ -315,9 +316,9 @@ void runHandUpStartingBetNoChips2Test(
   );
 }
 
-/// Тест старта ставок при хенд-апе (дилер не активный)
-/// В таком случае первый игрок - смолблайнд идет в олин, второй - биг блайнд, но только он играет
-/// Тут тестим скип 0левых игроков
+/// [HandUpTest] betting start (Dealer is inactive and Small Blind AllIn)
+/// In this case, the First Player is the Small blind and goes AllIn, the Second is Big Blind
+/// Expect transition to Showdown
 void runHandUpStartingBetHasNoChipsWithAllInTest(
   ProviderContainer container,
   AppRepository repository,

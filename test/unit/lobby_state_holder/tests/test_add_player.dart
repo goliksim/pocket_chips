@@ -13,7 +13,6 @@ void runAddPlayerTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -50,7 +49,6 @@ void runAddPlayerCustomBankTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -88,7 +86,6 @@ void runAddExistPlayerTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -123,7 +120,6 @@ void runAddExistNamePlayerTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(3);
   final lobbyState = createLobbyState(
     players,
@@ -158,7 +154,6 @@ void runAddPlayerWhileMaxTest(
   ProviderContainer container,
   AppRepository repository,
 ) async {
-  // Arrange
   final players = createPlayers(maxPlayerCount);
   final lobbyState = createLobbyState(
     players,

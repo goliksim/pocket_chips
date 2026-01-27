@@ -1,11 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
-import 'package:pocket_chips/app/navigation/navigation_manager.dart';
-import 'package:pocket_chips/di/domain_managers.dart';
 import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
-import 'package:pocket_chips/services/toast_manager.dart';
 
 import 'game_state_machine_test.mocks.dart';
 import 'tests/test_call_value_calculation.dart';
@@ -19,30 +16,20 @@ import 'tests/test_raise_value_calculation.dart';
 import 'tests/test_showndown_step.dart';
 import 'tests/test_starting_bet.dart';
 
-@GenerateMocks([
-  AppRepository,
-  ToastManager,
-  NavigationManager,
-])
+@GenerateMocks([AppRepository])
 void main() {
   group(
     'GameStateMachine',
     () {
       late ProviderContainer container;
       late MockAppRepository mockAppRepository;
-      late MockToastManager mockToastManager;
-      late MockNavigationManager mockNavigationManager;
 
       setUp(() {
         mockAppRepository = MockAppRepository();
-        mockToastManager = MockToastManager();
-        mockNavigationManager = MockNavigationManager();
 
         container = ProviderContainer.test(
           overrides: [
             appRepositoryProvider.overrideWithValue(mockAppRepository),
-            toastManagerProvider.overrideWithValue(mockToastManager),
-            navigationManagerProvider.overrideWithValue(mockNavigationManager),
           ],
         );
       });
@@ -96,7 +83,9 @@ void main() {
       test(
         '[Hands-up] startingBetting test, has inactive and all in',
         () => runHandUpStartingBetHasNoChipsWithAllInTest(
-            container, mockAppRepository),
+          container,
+          mockAppRepository,
+        ),
       );
 
       // ---
@@ -108,11 +97,7 @@ void main() {
 
       test(
         '[Starting-Betting] common test no players',
-        () => runStartingBettingWithNoPlayersTest(
-          container,
-          mockAppRepository,
-          mockToastManager,
-        ),
+        () => runStartingBettingWithNoPlayersTest(container, mockAppRepository),
       );
 
       test(
@@ -142,7 +127,9 @@ void main() {
       test(
         '[Raise Value] calculate pre-flop raise value for small blind',
         () => runRaiseValueCalculationSmallBlindTest(
-            container, mockAppRepository),
+          container,
+          mockAppRepository,
+        ),
       );
       test(
         '[Raise Value] calculate pre-flop raise value for big blind',
@@ -191,7 +178,9 @@ void main() {
       test(
         '[Call Value] calculate pre-flop call raise value',
         () => runCallRaisePreflopValueCalculationTest(
-            container, mockAppRepository),
+          container,
+          mockAppRepository,
+        ),
       );
       test(
         '[Call Value] calculate flop call raise value',
@@ -224,155 +213,88 @@ void main() {
         () => runExecuteFoldLastPlayerPreFlopTest(container, mockAppRepository),
       );
       test(
-        '[Execute FOLD] fold all players exept ine',
-        () => runExecuteFoldAllPlayersPreFlopTest(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        '[Execute FOLD] fold all players except one',
+        () => runExecuteFoldAllPlayersPreFlopTest(container, mockAppRepository),
       );
       test(
         '[Execute FOLD] fold player with 2 inactive',
-        () => runExecuteFoldPlayerWithInactiveTest(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        () =>
+            runExecuteFoldPlayerWithInactiveTest(container, mockAppRepository),
       );
 
       //---
 
       test(
         '[Execute CHECK] сheck on big blind player on pre-flop hand-up',
-        () => runExecuteCheckHandUpBigBlindTest(
-          container,
-          mockAppRepository,
-        ),
+        () => runExecuteCheckHandUpBigBlindTest(container, mockAppRepository),
       );
 
       // ---
 
       test(
         '[Showdown Test] check auto show single winner and money distibution',
-        () => runShowdownWinFromFoldedTest(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        () => runShowdownWinFromFoldedTest(container, mockAppRepository),
       );
       test(
         '[Showdown Test] show winner selection and money distribution for 1 winner',
-        () => runShowdownEqualBidsOneWinnerTest(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        () => runShowdownEqualBidsOneWinnerTest(container, mockAppRepository),
       );
       test(
         '[Showdown Test] show winner selection and money distribution for 2 winners',
-        () => runShowdownEqualBidsTwoWinnerTest(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        () => runShowdownEqualBidsTwoWinnerTest(container, mockAppRepository),
       );
       test(
         '[Showdown Test] show winner selection and money distribution for all winners',
-        () => runShowdownEqualBidsAllWinnersTest(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        () => runShowdownEqualBidsAllWinnersTest(container, mockAppRepository),
       );
       test(
         '[Showdown Test] show winner selection and money distribution with 2 allin player in pre-flop',
-        () => runShowdownTwoAllPreflopInTest(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        () => runShowdownTwoAllPreflopInTest(container, mockAppRepository),
       );
       test(
         '[Showdown Test] show winner selection and money distribution with 2 allin player in pre-flop (biglind winner)',
-        () => runShowdownTwoAllPreflopIn2Test(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        () => runShowdownTwoAllPreflopIn2Test(container, mockAppRepository),
       );
       test(
         '[Showdown Test] show winner selection and money distribution with 2 allin player in pre-flop (allin and biglind winner)',
-        () => runShowdownTwoAllPreflopIn3Test(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        () => runShowdownTwoAllPreflopIn3Test(container, mockAppRepository),
       );
       test(
         '[Showdown Test] show winner selection and money distribution with 2 allin player in pre-flop (all winners)',
-        () => runShowdownTwoAllPreflopIn4Test(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        () => runShowdownTwoAllPreflopIn4Test(container, mockAppRepository),
       );
       test(
         '[Showdown Test] distribution test 1',
-        () => runShowdownDistribution1Test(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        () => runShowdownDistribution1Test(container, mockAppRepository),
       );
       test(
         '[Showdown Test] distribution test 2',
-        () => runShowdownDistribution2Test(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        () => runShowdownDistribution2Test(container, mockAppRepository),
       );
       test(
         '[Showdown Test] distribution test 3',
-        () => runShowdownDistribution3Test(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        () => runShowdownDistribution3Test(container, mockAppRepository),
       );
       test(
         '[Showdown Test] distribution test 4',
-        () => runShowdownDistribution4Test(
-          container,
-          mockAppRepository,
-          mockNavigationManager,
-        ),
+        () => runShowdownDistribution4Test(container, mockAppRepository),
       );
 
       //---
 
       test(
         '[Call Test] final call after raise test',
-        () => runExecuteCallFinalAfterRaiseTest(
-          container,
-          mockAppRepository,
-        ),
+        () => runExecuteCallFinalAfterRaiseTest(container, mockAppRepository),
       );
       test(
         '[Call Test] final call after re-raise test',
-        () => runExecuteCallFinalAfterReRaiseTest(
-          container,
-          mockAppRepository,
-        ),
+        () => runExecuteCallFinalAfterReRaiseTest(container, mockAppRepository),
       );
 
       //---
       test(
         '[Raise Test] re-raise on last player before equal',
-        () => runExecuteReRaiseLastTest(
-          container,
-          mockAppRepository,
-        ),
+        () => runExecuteReRaiseLastTest(container, mockAppRepository),
       );
     },
   );
