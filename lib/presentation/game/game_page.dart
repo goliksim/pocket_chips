@@ -7,6 +7,7 @@ import '../../utils/theme/ui_values.dart';
 import '../common/widgets/loading_page.dart';
 import '../common/widgets/ui_widgets.dart';
 import '../monitization/ads/app_bar_banner.dart';
+import '../monitization/pro_version/widgets/pro_version_wrapper.dart';
 import 'widgets/game_contol/game_control.dart';
 import 'widgets/game_table/game_table.dart';
 import 'widgets/game_title_widget.dart';
@@ -54,24 +55,37 @@ class GamePage extends ConsumerWidget {
               centerTitle: true,
               backgroundColor: const Color(0x00000000),
               actions: <Widget>[
-                AspectRatio(
-                  aspectRatio: 1,
-                  child: viewState.canEditPlayer
-                      ? Transform.scale(
-                          scaleX: -1,
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.sync_sharp,
-                              color: context.theme.onBackground,
-                              size: stdIconSize,
-                            ),
-                            tooltip: context.strings.tooltip_rot,
-                            onPressed: () =>
-                                tableOffsetController.increaseOffset(),
-                          ),
-                        )
-                      : const SizedBox(),
-                ),
+                if (viewModel.canUndoAction)
+                  ProVersionWrapper(
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.restore,
+                          color: context.theme.onBackground,
+                          size: stdIconSize,
+                        ),
+                        tooltip: context.strings.tooltip_undo,
+                        onPressed: () => viewModel.undoLastAction(),
+                      ),
+                    ),
+                  ),
+                if (viewState.canEditPlayer)
+                  AspectRatio(
+                    aspectRatio: 1,
+                    child: Transform.scale(
+                      scaleX: -1,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.sync_sharp,
+                          color: context.theme.onBackground,
+                          size: stdIconSize,
+                        ),
+                        tooltip: context.strings.tooltip_rot,
+                        onPressed: () => tableOffsetController.increaseOffset(),
+                      ),
+                    ),
+                  ),
               ],
             ),
             backgroundColor: Colors.transparent,

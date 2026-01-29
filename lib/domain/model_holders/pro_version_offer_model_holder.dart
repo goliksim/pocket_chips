@@ -14,7 +14,8 @@ class ProVersionOfferModelHolder extends AsyncNotifier<ProVersionOfferModel> {
     return ref.watch(proVersionManagerProvider).maybeWhen(
           data: (data) {
             logs.writeLog(
-                'ProVersionModelHolder: build remotely with ${data.isPurchased}');
+              'ProVersionModelHolder: build remotely with ${data.isPurchased}',
+            );
             if (isProCached && data.forceDisable) {
               changePro(false);
 

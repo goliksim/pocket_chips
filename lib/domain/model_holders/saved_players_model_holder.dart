@@ -25,7 +25,7 @@ class SavedPlayersModelHolder extends AsyncNotifier<SavedPlayers> {
 
       runBuild();
     } catch (e) {
-      logs.writeLog('Ошибка при сохранении игрока: $e');
+      logs.writeLog('Save player error: $e');
 
       rethrow;
     }
@@ -37,7 +37,7 @@ class SavedPlayersModelHolder extends AsyncNotifier<SavedPlayers> {
 
       runBuild();
     } catch (e) {
-      logs.writeLog('Ошибка при обновлении данных игрока: $e');
+      logs.writeLog('Update saved player errro: $e');
     }
   }
 
@@ -47,7 +47,7 @@ class SavedPlayersModelHolder extends AsyncNotifier<SavedPlayers> {
 
       runBuild();
     } catch (e) {
-      logs.writeLog('Ошибка при удалении игрока: $e');
+      logs.writeLog('Delete saved player error: $e');
     }
   }
 }

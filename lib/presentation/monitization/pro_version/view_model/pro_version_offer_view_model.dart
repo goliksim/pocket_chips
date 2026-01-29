@@ -22,7 +22,7 @@ class ProVersionOfferViewModel extends Notifier<ProVersionOfferViewState> {
 
   @override
   ProVersionOfferViewState build() {
-    //TODO как-то заставить перезагружать менеджер при открытии экрана для консистентности при потере интернета
+    //TODO find best way to restart the manager when opening a screen to ensure consistency when the internet is lost
 
     logs.writeLog('ProVersionOfferViewModel: build');
 

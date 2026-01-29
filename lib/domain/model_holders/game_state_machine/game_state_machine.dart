@@ -3,59 +3,48 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../di/model_holders.dart';
-import '../../di/repositories.dart';
-import '../../services/game_logic_service.dart';
-import '../../utils/logs.dart';
-import '../models/game/game_session_state.dart';
-import '../models/game/game_state_effect.dart';
-import '../models/game/game_state_enum.dart';
-import '../models/game/game_state_model.dart';
-import '../models/lobby/lobby_state_model.dart';
-import '../models/player/player_id.dart';
-import '../models/player/player_model.dart';
-import 'lobby_state_holder.dart';
+import '../../../di/model_holders.dart';
+import '../../../di/repositories.dart';
+import '../../../services/game_logic_service.dart';
+import '../../../utils/logs.dart';
+import '../../models/game/game_session_state.dart';
+import '../../models/game/game_state_effect.dart';
+import '../../models/game/game_state_enum.dart';
+import '../../models/game/game_state_model.dart';
+import '../../models/lobby/lobby_state_model.dart';
+import '../../models/player/player_id.dart';
+import '../../models/player/player_model.dart';
+import '../lobby_state_holder.dart';
+import 'previous_state_notifier.dart';
 
 /// Main class with game logic
 class GameStateMachine extends AsyncNotifier<GameStateModel> {
   LobbyStateHolder get _lobbyStateHolder =>
       ref.read(lobbyStateHolderProvider.notifier);
 
+  GamePreviousStateNotifier get _previousStateNotifier =>
+      ref.read(gamePreviousStateNotifierProvider.notifier);
+  StatePair get _previousState => ref.read(gamePreviousStateNotifierProvider);
+
+  bool get canUndoAction => _previousState.previous != null;
+
   @override
   FutureOr<GameStateModel> build() async {
-    logs.writeLog('GameSM: READ DATA AND BUILD STATE');
+    logs.writeLog('GameSM: BUILDING Initial STATE');
 
-    final lobbyState = await ref.watch(lobbyStateHolderProvider.future);
+    // Reading because can't change lobbyStateHolder from this page
+    final lobbyState = await ref.read(lobbyStateHolderProvider.future);
 
     final sessionState = lobbyState.gameState.isStarted
         ? state.value?.sessionState ??
             await ref.read(appRepositoryProvider).getGameSessionState()
         : null;
 
-    final effects =
-        lobbyState.gameState.isStarted ? state.value?.effects : null;
-
-    final finalSessionState = sessionState ?? GameSessionState.initial();
-
-    final foldedByBank = <GameStatusEnum>{
-      GameStatusEnum.notStarted,
-      GameStatusEnum.gameBreak
-    }.contains(lobbyState.gameState)
-        ? lobbyState.banks.entries
-            .map((e) => e.value <= 0 ? e.key : null)
-            .nonNulls
-            .toSet()
-        : <String>{};
-
-    final finalFoldedPlayers = finalSessionState.foldedPlayers
-      ..addAll(foldedByBank);
-
-    final result = GameStateModel(
-      lobbyState: lobbyState,
-      sessionState: finalSessionState.copyWith(
-        foldedPlayers: finalFoldedPlayers,
+    final result = _autoFoldInactivePlayers(
+      GameStateModel(
+        lobbyState: lobbyState,
+        sessionState: sessionState ?? GameSessionState.initial(),
       ),
-      effects: effects ?? [],
     );
 
     if (result.lobbyState.gameState == GameStatusEnum.showdown) {
@@ -65,25 +54,26 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     return result;
   }
 
-  GameStateModel _resetShowdownEffects(GameStateModel model) {
-    if (model.effects.isEmpty && model.activePlayers.length > 1) {
-      return model.copyWith(
-        effects: [
-          GameStateEffect.needWinnerSelection(
-            possibleWinnersUid: model.possibleWinnersUids,
-            isSideSpot: false,
-          ),
-        ],
+  Future<void> undoLastAction() async {
+    final pair = _previousState;
+    logs.writeLog('GameSM: undo action');
+
+    // Can sometimes loose previous step because of game restoring
+    final previous =
+        pair.previous == state.value ? pair.current : pair.previous;
+
+    if (previous != null) {
+      await _updateGame(
+        previous,
+        clearPreviousState: true,
       );
     }
-
-    return model;
   }
 
   /// The first method in game, is contolling by client (current player)
   /// Places the initial bets and determines the first player to bet
   Future<void> startBetting() async {
-    final currentModel = state.requireValue;
+    final currentModel = _removeEffects(state.requireValue);
 
     if (!currentModel.canStartOrContinueGame) {
       logs.writeLog('GameSM: cannot start betting');
@@ -182,8 +172,24 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
     final model3 = _toBreakdown(model: model2);
 
-    await _updateGame(model3);
+    await _updateGame(
+      model3,
+      savePreviousState: false,
+    );
   }
+
+  GameStateModel _resetShowdownEffects(GameStateModel model) => model.copyWith(
+        effects: [
+          if (model.effects.isEmpty && model.activePlayers.length > 1)
+            GameStateEffect.needWinnerSelection(
+              possibleWinnersUid: model.possibleWinnersUids,
+              isSideSpot: false,
+            ),
+        ],
+      );
+
+  GameStateModel _removeEffects(GameStateModel model) =>
+      model.copyWith(effects: []);
 
   // Notifing the client of winner or requirement of winners selection
   GameStateModel _selectWinnersOnShowdown({
@@ -337,7 +343,8 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
           // If not a winner, then we contribute it to the general bank.
           if (!winners.contains(entry.key)) {
             logs.writeLog(
-                'GameSM: ${entry.key} not winner, increase dividingSum');
+              'GameSM: ${entry.key} not winner, increase dividingSum',
+            );
             sumToDivide += bid;
           } else {
             logs.writeLog('GameSM: ${entry.value} is winner bet, returning');
@@ -376,7 +383,8 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
         if (bet > 0) {
           logs.writeLog(
-              'GameSM: adding ${sumToDivide ~/ winnersCount} to $winnerUid');
+            'GameSM: adding ${sumToDivide ~/ winnersCount} to $winnerUid',
+          );
           final newBanks = Map.of(lobbyState.banks)
             ..update(
               winnerUid,
@@ -431,7 +439,9 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
   }
 
   // Next player determination
-  GameStateModel _calculateNextPlayerState(GameStateModel currentModel) {
+  GameStateModel _calculateNextPlayerState(GameStateModel model) {
+    final currentModel = _removeEffects(model);
+
     logs.writeLog('GameSM: finding next player state');
     var currentSession = currentModel.sessionState;
     final currentLobby = currentModel.lobbyState;
@@ -536,7 +546,8 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
       if (currentModel.isPlayerActiveWithMoney(localPlayer.uid)) {
         logs.writeLog(
-            'GameSM: first player in new street is ${localPlayer.name}');
+          'GameSM: first player in new street is ${localPlayer.name}',
+        );
         newSessionState = newSessionState.copyWith(
           currentPlayerUid: localPlayer.uid,
           firstPlayerUid: localPlayer.uid,
@@ -564,12 +575,14 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       ),
     );
 
-    return model1.copyWith(
+    final model2 = model1.copyWith(
       lobbyState: model1.lobbyState.copyWith(
         dealerId: _getNewDealerUid(model: model1),
         gameState: GameStatusEnum.gameBreak,
       ),
     );
+
+    return _autoFoldInactivePlayers(model2);
   }
 
   String? _getNewDealerUid({required GameStateModel model}) {
@@ -700,8 +713,45 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     return editableModel;
   }
 
-  Future<void> _updateGame(GameStateModel newModel) async {
+  // Making players with no money folded
+  GameStateModel _autoFoldInactivePlayers(GameStateModel model) {
+    final foldedByBank = <GameStatusEnum>{
+      GameStatusEnum.notStarted,
+      GameStatusEnum.gameBreak
+    }.contains(model.lobbyState.gameState)
+        ? model.lobbyState.banks.entries
+            .map((e) => e.value <= 0 ? e.key : null)
+            .nonNulls
+            .toSet()
+        : <String>{};
+
+    final foldedPlayers = model.sessionState.foldedPlayers
+      ..addAll(foldedByBank);
+
+    return model.copyWith(
+      sessionState: model.sessionState.copyWith(
+        foldedPlayers: foldedPlayers,
+      ),
+    );
+  }
+
+  Future<void> _updateGame(
+    GameStateModel newModel, {
+    bool savePreviousState = true,
+    bool clearPreviousState = false,
+  }) async {
     logs.writeLog('GameSM: UPDATE GAME');
+
+    if (savePreviousState) {
+      _previousStateNotifier.setState((
+        previous: state.value,
+        current: newModel,
+      ));
+    }
+    if (clearPreviousState) {
+      _previousStateNotifier.clearPrevious();
+    }
+
     state = AsyncData(newModel);
 
     await _lobbyStateHolder.updateLobby(newModel.lobbyState);
@@ -711,7 +761,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
           .read(appRepositoryProvider)
           .updateGameSessionState(newModel.sessionState);
     } catch (e) {
-      logs.writeLog('Ошибка при сохранении сессии: $e');
+      logs.writeLog('Save game session state error: $e');
     }
   }
 

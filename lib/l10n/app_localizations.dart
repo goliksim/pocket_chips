@@ -1103,6 +1103,12 @@ abstract class AppLocalizations {
   /// **'PRO users can now put their photos from the gallery to players'**
   String get update_3;
 
+  /// No description provided for @update_4.
+  ///
+  /// In en, this message translates to:
+  /// **'PRO users can now undo their last game action'**
+  String get update_4;
+
   /// No description provided for @pro_version_offer_title.
   ///
   /// In en, this message translates to:

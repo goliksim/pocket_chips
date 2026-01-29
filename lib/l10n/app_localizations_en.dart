@@ -513,6 +513,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get update_3 => 'PRO users can now put their photos from the gallery to players';
 
   @override
+  String get update_4 => 'PRO users can now undo their last game action';
+
+  @override
   String get pro_version_offer_title => 'Maximum features in the PRO version';
 
   @override

@@ -7,7 +7,7 @@ part 'pro_version_offer_model.freezed.dart';
 @freezed
 abstract class ProVersionOfferModel with _$ProVersionOfferModel {
   const factory ProVersionOfferModel({
-    @Default(false) isPurchased,
+    @Default(false) bool isPurchased,
     PurchasableProduct? availableProduct,
   }) = _ProVersionOfferModel;
 }

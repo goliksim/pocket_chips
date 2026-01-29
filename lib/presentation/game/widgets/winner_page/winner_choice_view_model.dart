@@ -30,10 +30,6 @@ class WinnerChoiceViewModel with ChangeNotifier {
     for (var player in possibleWinners) {
       markedState[player.uid] = false;
     }
-    /*logs.writeLog(
-        "Still Active players: ${thisLobby.lobbyPlayers.where((e) => e.isActive == true).map(
-              (e) => [e.name, e.bid],
-            ).join(' / ')}");*/
   }
 
   void onItemTap(String playerUid) {

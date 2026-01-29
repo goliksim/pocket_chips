@@ -26,7 +26,7 @@ class ConfigModelHolder extends AsyncNotifier<ConfigModel> {
     try {
       await ref.read(appRepositoryProvider).updateConfig(newConfig);
     } catch (e) {
-      logs.writeLog('Ошибка при сохранении конфига: $e');
+      logs.writeLog('Saving config error: $e');
     }
   }
 

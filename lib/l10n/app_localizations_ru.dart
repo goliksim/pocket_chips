@@ -513,6 +513,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get update_3 => 'ПРО пользователи теперь могут ставить игрокам свои фото из галереи';
 
   @override
+  String get update_4 => 'ПРО пользователи теперь могут отменять последнее действие игры';
+
+  @override
   String get pro_version_offer_title => 'Максимум возможностей в PRO версии';
 
   @override

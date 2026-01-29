@@ -402,7 +402,7 @@ void runShowdownTwoAllPreflopInTest(
     finalState.sessionState,
     gameSessionState.copyWith(
       bets: {},
-      foldedPlayers: {},
+      foldedPlayers: {players[3].uid},
       currentPlayerUid: null,
       firstPlayerUid: null,
     ),
@@ -488,7 +488,7 @@ void runShowdownTwoAllPreflopIn2Test(
     finalState.sessionState,
     gameSessionState.copyWith(
       bets: {},
-      foldedPlayers: {},
+      foldedPlayers: {players[1].uid, players[3].uid},
       currentPlayerUid: null,
       firstPlayerUid: null,
     ),
@@ -573,7 +573,7 @@ void runShowdownTwoAllPreflopIn3Test(
     finalState.sessionState,
     gameSessionState.copyWith(
       bets: {},
-      foldedPlayers: {},
+      foldedPlayers: {players[3].uid},
       currentPlayerUid: null,
       firstPlayerUid: null,
     ),
@@ -841,7 +841,7 @@ void runShowdownDistribution2Test(
     gameSessionState.copyWith(
       lapCounter: 0,
       bets: {},
-      foldedPlayers: {},
+      foldedPlayers: {players[1].uid},
       currentPlayerUid: null,
       firstPlayerUid: null,
     ),
@@ -1043,7 +1043,11 @@ void runShowdownDistribution4Test(
     gameSessionState.copyWith(
       lapCounter: 0,
       bets: {},
-      foldedPlayers: {},
+      foldedPlayers: {
+        players[0].uid,
+        players[1].uid,
+        players[2].uid,
+      },
       currentPlayerUid: null,
       firstPlayerUid: null,
     ),

@@ -9,6 +9,7 @@ import '../../../utils/theme/ui_values.dart';
 import '../onboarding_dialog.dart';
 import '../onboarding_view_model.dart';
 
+/// Screen with patchnote info
 class UpdateDialog extends StatelessWidget {
   final OnboardingViewModel viewModel;
 
@@ -43,6 +44,10 @@ class UpdateDialog extends StatelessWidget {
               _PatchNoteItem(
                 text: context.strings.update_3,
                 icon: Icons.photo,
+              ),
+              _PatchNoteItem(
+                text: context.strings.update_4,
+                icon: Icons.restore,
               ),
             ],
           ),

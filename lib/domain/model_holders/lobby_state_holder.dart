@@ -36,7 +36,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     try {
       await ref.read(appRepositoryProvider).updateLobbyState(newState);
     } catch (e) {
-      logs.writeLog('Ошибка при сохранении лобби: $e');
+      logs.writeLog('LobbySH: save lobby state error - $e');
     }
   }
 

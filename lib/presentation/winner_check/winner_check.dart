@@ -67,15 +67,13 @@ class __WinnerCheckState extends State<_WinnerCheck> {
                       callback: callback,
                       cards: context.playerCards![playerIndex],
                       number: playerIndex,
-                      winner: context.winner == playerIndex,
+                      winner: context.winner == (playerIndex + 1),
                       combination: context.combinations[playerIndex]?.hand,
                     ),
                   ),
               ],
             ),
-            SizedBox(
-              height: stdHorizontalOffset / 2,
-            ),
+            SizedBox(height: stdHorizontalOffset / 2),
           ],
         ),
       );

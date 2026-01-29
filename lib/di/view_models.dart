@@ -97,7 +97,6 @@ final bankEditorViewModelProvider = Provider.autoDispose<BankEditorViewModel>(
 final gamePageViewModelProvider =
     AsyncNotifierProvider.autoDispose<GamePageViewModel, GamePageViewState>(
   GamePageViewModel.new,
-  retry: (retryCount, error) => null,
 );
 
 final gameTableOffsetControllerProvider =

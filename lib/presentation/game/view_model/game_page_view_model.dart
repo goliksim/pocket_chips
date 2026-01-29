@@ -6,12 +6,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/navigation/navigation_manager.dart';
 import '../../../di/domain_managers.dart';
 import '../../../di/model_holders.dart';
-import '../../../domain/model_holders/game_state_machine.dart';
+import '../../../domain/model_holders/game_state_machine/game_state_machine.dart';
 import '../../../domain/models/game/game_state_effect.dart';
 import '../../../domain/models/game/game_state_enum.dart';
 import '../../../domain/models/game/game_state_model.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../l10n/localization_extension.dart';
+import '../../../services/event_push_service/handlers/event_handler.dart';
+import '../../../services/event_push_service/promotion_service.dart';
 import '../../../services/game_logic_service.dart';
 import '../../../services/toast_manager.dart';
 import '../../../utils/logs.dart';
@@ -32,25 +34,37 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
       ref.read(navigationManagerProvider);
   AppLocalizations get _strings => ref.read(stringsProvider);
   ToastManager get _toastManager => ref.read(toastManagerProvider);
+  PromotionManager get _promotionManager => ref.read(promotionManagerProvider);
 
   GamePageViewState get viewState => state.requireValue;
 
   @override
   FutureOr<GamePageViewState> build() async {
-    logs.writeLog('GameVM: READ DATA AND BUILD STATE');
+    logs.writeLog('GameVM: BUILDING STATE');
 
     final gameModel = await ref.watch(gameStateMachineProvider.future);
     final gameState = gameModel.lobbyState.gameState;
     final players = gameModel.lobbyState.players;
 
     final effects = gameModel.effects;
-    print('GameVM: effects $effects');
     if (effects.isNotEmpty) {
       effects.forEach(
         (effect) => _executeEffect(
           effect: effect,
           stateModel: gameModel,
         ),
+      );
+    }
+
+    // Showing add in the end of game
+    if (state.value?.gameStatus != null &&
+        gameModel.lobbyState.gameState == GameStatusEnum.gameBreak) {
+      _promotionManager.maybeShowPromotion(
+        types: [
+          EventType.donation,
+          EventType.advertisement,
+        ],
+        delay: Duration(milliseconds: 1750),
       );
     }
 
@@ -80,13 +94,25 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
     );
   }
 
+  bool get canUndoAction => _gameStateMachine.canUndoAction;
+
+  Future<void> undoLastAction() => _gameStateMachine.undoLastAction();
+
   Future<void> openPlayerEditor(String? playerUid) async {
     if (state.requireValue.canEditPlayer) {
-      return _navigationManager.showPlayerEditor(playerUid);
+      await _navigationManager.showPlayerEditor(playerUid);
+
+      //Rebuild after lobbyEditing
+      _gameStateMachine.runBuild();
     }
   }
 
-  Future<void> showSavedPlayers() => _navigationManager.showSavedPlayers();
+  Future<void> showSavedPlayers() async {
+    await _navigationManager.showSavedPlayers();
+
+    //Rebuild after lobbyEditing
+    _gameStateMachine.runBuild();
+  }
 
   void pop() => _navigationManager.popPage();
 
@@ -103,7 +129,12 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
       );
 
   @override
-  Future<void> openSettings() => _navigationManager.showLobbySettings();
+  Future<void> openSettings() async {
+    await _navigationManager.showLobbySettings();
+
+    //Rebuild after lobbyEditing
+    _gameStateMachine.runBuild();
+  }
 
   @override
   Future<void> startBetting() async => _gameStateMachine.startBetting();
