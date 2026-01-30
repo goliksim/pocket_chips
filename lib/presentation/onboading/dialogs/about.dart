@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:onboarding/onboarding.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../di/view_models.dart';
 import '../../../utils/extensions.dart';
 import '../onboarding_dialog.dart';
@@ -49,6 +50,8 @@ class AboutDialog extends StatelessWidget {
           );
 
           return OnboardingDialog(
+            key: OnboardingKeys.aboutDialog,
+            closeKey: OnboardingKeys.closeAboutDialogButton,
             onComplete: () => viewModel.onComplete(),
             pages: [
               PageModel(

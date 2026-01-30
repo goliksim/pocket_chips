@@ -21,6 +21,10 @@ targets:
             - lib/**/models/**
             - lib/**/entities/**
             - lib/**/view_state/**
+      mockito|mockBuilder:
+        generate_for:
+          - test/**.dart
+          - integration_test/**.dart
       source_gen:combining_builder:
         generate_for:
           include:

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../../app/keys/keys.dart';
 import '../../app/theme_provider.dart';
 import '../../di/domain_managers.dart';
 import '../../di/view_models.dart';
@@ -17,7 +18,7 @@ import '../monitization/pro_version/widgets/pro_version_wrapper.dart';
 
 class AnimatedHomePage extends ConsumerStatefulWidget {
   const AnimatedHomePage({
-    super.key,
+    super.key = HomeKeys.page,
   });
 
   @override
@@ -163,6 +164,7 @@ class _HomePage extends ConsumerWidget {
           leading: AspectRatio(
             aspectRatio: 1,
             child: IconButton(
+              key: HomeKeys.helpButton,
               icon: Icon(
                 Icons.help,
                 size: stdIconSize,

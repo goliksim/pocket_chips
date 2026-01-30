@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../services/assets_provider.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
@@ -149,6 +150,7 @@ class OnboardingLinksPage extends StatelessWidget {
           ),
           if (version != null)
             MyButton(
+              key: OnboardingKeys.showUpdateDialogButton,
               height: stdButtonHeight * 0.5,
               borderRadius: BorderRadius.circular(stdBorderRadius / 3),
               alignment: Alignment.centerLeft,

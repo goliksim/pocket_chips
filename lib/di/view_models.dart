@@ -129,7 +129,7 @@ final donationViewModelProvider =
   DonationViewModel.new,
 );
 
-final proVersionOfferViewModelProvider = NotifierProvider.autoDispose<
+final proVersionOfferViewModelProvider = AsyncNotifierProvider.autoDispose<
     ProVersionOfferViewModel, ProVersionOfferViewState>(
   ProVersionOfferViewModel.new,
 );

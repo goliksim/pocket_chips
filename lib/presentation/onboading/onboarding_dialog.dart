@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:onboarding/onboarding.dart';
 
+import '../../app/keys/keys.dart';
 import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
 import '../common/widgets/dialog_widget.dart';
@@ -10,10 +11,12 @@ import '../common/widgets/ui_widgets.dart';
 class OnboardingDialog extends StatefulWidget {
   final VoidCallback onComplete;
   final List<PageModel> pages;
+  final Key? closeKey;
 
   const OnboardingDialog({
     required this.onComplete,
     required this.pages,
+    this.closeKey,
     super.key,
   });
 
@@ -37,6 +40,7 @@ class _OnboardingDialogState extends State<OnboardingDialog> {
     required int finalIndex,
   }) =>
       MyButton(
+        key: OnboardingKeys.skipButton,
         buttonColor: context.theme.bankColor,
         height: stdButtonHeight * 0.75,
         textString: context.strings.about_skip,
@@ -52,6 +56,7 @@ class _OnboardingDialogState extends State<OnboardingDialog> {
       );
 
   Widget get _finishButton => MyButton(
+        key: widget.closeKey,
         buttonColor: context.theme.primaryColor,
         height: stdButtonHeight * 0.75,
         textString: context.strings.about_end,

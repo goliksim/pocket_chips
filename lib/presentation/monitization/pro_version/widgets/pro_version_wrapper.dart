@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/keys/keys.dart';
 import '../../../../di/domain_managers.dart';
 import '../../../../di/model_holders.dart';
 import '../../../../utils/extensions.dart';
@@ -29,10 +30,11 @@ class ProVersionWrapper extends ConsumerWidget {
     }
 
     return Stack(
+      key: ProVersionKeys.proVersionBlockWrapper,
       clipBehavior: Clip.none,
       children: [
         Opacity(
-          opacity: isPro ? 1.0 : 0.6,
+          opacity: 0.6,
           child: child,
         ),
         Positioned.fill(

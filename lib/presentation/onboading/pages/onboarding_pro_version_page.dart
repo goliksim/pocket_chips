@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../di/domain_managers.dart';
 import '../../../di/view_models.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 import '../../common/widgets/ui_widgets.dart';
-import '../../monitization/pro_version/view_state/pro_version_offer_view_state.dart';
 import '../onboarding_dialog.dart';
 
 class OnboardingProVersionPage extends ConsumerWidget {
@@ -49,9 +49,9 @@ class OnboardingProVersionPage extends ConsumerWidget {
                   ),
                 ],
               ),
-              state.map(
-                loading: (_) => SizedBox.shrink(),
-                (data) => data.alreadyPurchased
+              state.maybeWhen(
+                orElse: () => SizedBox.shrink(),
+                data: (data) => data.alreadyPurchased
                     ? Padding(
                         padding:
                             EdgeInsets.only(top: stdHorizontalOffset * 3 / 2),
@@ -140,9 +140,10 @@ class OnboardingProVersionPage extends ConsumerWidget {
             right: stdHorizontalOffset / 2,
             top: stdHorizontalOffset,
           ),
-          child: state.map(
-            (data) => data.alreadyPurchased
+          child: state.when(
+            data: (data) => data.alreadyPurchased
                 ? MyButton(
+                    key: ProVersionKeys.proVersionPurshasedButton,
                     height: stdHeight,
                     buttonColor: context.theme.hintColor,
                     textString:
@@ -153,6 +154,7 @@ class OnboardingProVersionPage extends ConsumerWidget {
                   )
                 : data.isAvailable
                     ? MyButton(
+                        key: ProVersionKeys.proVersionAvailableButton,
                         height: stdHeight,
                         buttonColor: context.theme.primaryColor,
                         textString: context
@@ -160,17 +162,19 @@ class OnboardingProVersionPage extends ConsumerWidget {
                         action: () => viewModel.purchasePro(),
                       )
                     : MyButton(
+                        key: ProVersionKeys.proVersionNotAvailableButton,
                         height: stdHeight,
                         buttonColor: context.theme.hintColor,
                         textString: context
                             .strings.pro_version_offer_button_not_available,
                       ),
-            loading: (_) => SizedBox(
+            loading: () => SizedBox(
               height: stdButtonHeight,
               child: Center(
                 child: CircularProgressIndicator(),
               ),
             ),
+            error: (_, __) => SizedBox(),
           ),
         ),
         if (isDialog) ...[

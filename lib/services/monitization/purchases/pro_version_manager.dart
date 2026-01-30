@@ -29,11 +29,15 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
   bool isConsumable(String productId) => true;
 
   bool proConfirmedByRestore = false;
+  Timer? _restoreTimer;
 
   @override
   FutureOr<ProVersionModel> build() async {
     init();
-    ref.onDispose(dispose);
+    ref.onDispose(() {
+      dispose();
+      _restoreTimer?.cancel();
+    });
 
     final product = (await loadPurchases())
         .firstWhere((p) => p.id == Constants.pocketChipsPROItemKey);
@@ -56,21 +60,19 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
     }
 
     // Waiting for purchases to be restored and turning off the PRO if they haven't confirmed it.
-    await Future.delayed(const Duration(seconds: 5)).then(
-      (_) {
-        if (!proConfirmedByRestore) {
-          logs.writeLog('ProVersionManager: force disable');
-          // Disable PRO
-          state = AsyncData(
-            ProVersionModel(
-              forceDisable: true,
-              isPurchased: false,
-              availableProduct: state.value?.availableProduct,
-            ),
-          );
-        }
-      },
-    );
+    _restoreTimer = Timer(const Duration(seconds: 5), () {
+      if (!proConfirmedByRestore) {
+        logs.writeLog('ProVersionManager: force disable');
+        // Disable PRO
+        state = AsyncData(
+          ProVersionModel(
+            forceDisable: true,
+            isPurchased: false,
+            availableProduct: state.value?.availableProduct,
+          ),
+        );
+      }
+    });
   }
 
   Future<void> buyPro() async {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:onboarding/onboarding.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 //import 'package:in_app_review/in_app_review.dart';
@@ -26,6 +27,8 @@ class UpdateDialog extends StatelessWidget {
     );
 
     return OnboardingDialog(
+      key: OnboardingKeys.updateDialog,
+      closeKey: OnboardingKeys.closeUpdateDialogButton,
       onComplete: () => viewModel.onComplete(),
       pages: [
         PageModel(

@@ -11,7 +11,7 @@ import '../../../../services/toast_manager.dart';
 import '../../../../utils/logs.dart';
 import '../view_state/pro_version_offer_view_state.dart';
 
-class ProVersionOfferViewModel extends Notifier<ProVersionOfferViewState> {
+class ProVersionOfferViewModel extends AsyncNotifier<ProVersionOfferViewState> {
   NavigationManager get _navigationManager =>
       ref.read(navigationManagerProvider);
   ToastManager get _toastManager => ref.read(toastManagerProvider);
@@ -21,24 +21,21 @@ class ProVersionOfferViewModel extends Notifier<ProVersionOfferViewState> {
       ref.read(proVersionManagerProvider.notifier);
 
   @override
-  ProVersionOfferViewState build() {
-    //TODO find best way to restart the manager when opening a screen to ensure consistency when the internet is lost
-
+  FutureOr<ProVersionOfferViewState> build() async {
     logs.writeLog('ProVersionOfferViewModel: build');
 
-    final isPro = ref.watch(proVersionOfferModelHolderProvider);
+    if (state.value == null) {
+      Future.microtask(
+        () => ref.read(proVersionManagerProvider.notifier).runBuild(),
+      );
+    }
 
-    return isPro.when(
-      data: (data) => ProVersionOfferViewState(
-        isAvailable: data.availableProduct != null,
-        alreadyPurchased: data.isPurchased,
-        priceText: data.availableProduct?.price,
-      ),
-      loading: () => ProVersionOfferViewState.loading(),
-      error: (_, __) => ProVersionOfferViewState(
-        isAvailable: false,
-        alreadyPurchased: false,
-      ),
+    final data = await ref.watch(proVersionOfferModelHolderProvider.future);
+
+    return ProVersionOfferViewState(
+      isAvailable: data.availableProduct != null,
+      alreadyPurchased: data.isPurchased,
+      priceText: data.availableProduct?.price,
     );
   }
 

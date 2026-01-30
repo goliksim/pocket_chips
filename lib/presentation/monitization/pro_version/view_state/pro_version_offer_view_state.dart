@@ -9,7 +9,4 @@ abstract class ProVersionOfferViewState with _$ProVersionOfferViewState {
     required bool alreadyPurchased,
     String? priceText,
   }) = _ProVersionOfferViewState;
-
-  const factory ProVersionOfferViewState.loading() =
-      _ProVersionOfferViewLoadingState;
 }
