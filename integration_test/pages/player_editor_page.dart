@@ -6,16 +6,22 @@ class PlayerEditorTester {
 
   PlayerEditorTester(this.tester);
 
-  Future<void> verifyIsVisible() async {
+  Future<void> verifyIsVisible({bool isVisible = true}) async {
     await tester.pumpAndSettle();
 
-    expect(find.byKey(PlayerEditorKeys.dialog), findsOneWidget);
+    expect(
+      find.byKey(PlayerEditorKeys.dialog),
+      isVisible ? findsOneWidget : findsNothing,
+    );
   }
 
-  Future<void> verifyIsNotVisible() async {
+  Future<void> verifyAvatarSelectorIsVisible({bool isVisible = true}) async {
     await tester.pumpAndSettle();
 
-    expect(find.byKey(PlayerEditorKeys.dialog), findsNothing);
+    expect(
+      find.byKey(PlayerEditorKeys.avatarSelectorDialog),
+      isVisible ? findsOneWidget : findsNothing,
+    );
   }
 
   Future<void> enterName(String text) async {

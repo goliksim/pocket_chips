@@ -7,10 +7,22 @@ class GamePageTester {
 
   GamePageTester(this.tester);
 
-  Future<void> verifyIsVisible() async {
+  Future<void> verifyIsVisible({bool isVisible = true}) async {
     await tester.pumpAndSettle();
 
-    expect(find.byKey(GameKeys.page), findsOneWidget);
+    expect(
+      find.byKey(GameKeys.page),
+      isVisible ? findsOneWidget : findsNothing,
+    );
+  }
+
+  Future<void> verifySettingsIsVisible({bool isVisible = true}) async {
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(CommonKeys.settingsDialog),
+      isVisible ? findsOneWidget : findsNothing,
+    );
   }
 
   Future<void> verifyGameStatus(GameStatusEnum status) async {
@@ -44,6 +56,12 @@ class GamePageTester {
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(GameKeys.startGameButton));
+  }
+
+  Future<void> tapSettingsButton() async {
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(GameKeys.settingsButton));
   }
 
   Future<void> _verifyGameStatusNotStarted() async {

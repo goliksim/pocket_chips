@@ -38,6 +38,7 @@ class LobbyPage extends ConsumerWidget {
             scrolledUnderElevation: 0,
             toolbarHeight: stdButtonHeight * 0.75,
             leading: IconButton(
+              key: CommonKeys.closePageButton,
               onPressed: () => viewModel.pop(),
               icon: Icon(
                 Icons.arrow_back,

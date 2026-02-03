@@ -112,7 +112,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
     _gameStateMachine.runBuild();
   }
 
-  void pop() => _navigationManager.popPage();
+  void pop() => _navigationManager.pop();
 
   @override
   GamePageControlState get controlsState => state.requireValue.controlState;

@@ -41,6 +41,7 @@ class GamePage extends ConsumerWidget {
               flexibleSpace: const AppBarBanner(),
               toolbarHeight: stdButtonHeight * 0.75,
               leading: IconButton(
+                key: CommonKeys.closePageButton,
                 onPressed: () => viewModel.pop(),
                 icon: Icon(
                   Icons.arrow_back,

@@ -74,6 +74,7 @@ class _PickIconState extends State<PlayerLogoPicker> {
 
   @override
   Widget build(BuildContext context) => Dialog(
+        key: PlayerEditorKeys.avatarSelectorDialog,
         elevation: 0,
         backgroundColor: context.theme.bgrColor,
         insetPadding: EdgeInsets.symmetric(

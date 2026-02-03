@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/keys/keys.dart';
 import '../../domain/models/game_settings_model.dart';
 import '../../services/toast_manager.dart';
 import '../../utils/extensions.dart';
@@ -118,6 +119,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
 
   @override
   Widget build(BuildContext context) => Dialog(
+        key: CommonKeys.settingsDialog,
         elevation: 0,
         backgroundColor: context.theme.bgrColor,
         insetPadding: EdgeInsets.symmetric(

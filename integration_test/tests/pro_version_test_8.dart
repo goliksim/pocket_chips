@@ -133,10 +133,11 @@ Future<void> runProVersionTest8(
   await playerEditorPage.verifyIsVisible();
   await playerEditorPage.enterName(testName);
   await playerEditorPage.tapAvatar();
+  await playerEditorPage.verifyAvatarSelectorIsVisible();
   await playerEditorPage.selectAvatar(assetIndex);
   await playerEditorPage.verifyAvatarByAssetUrl(assetUrl);
   await playerEditorPage.tapConfirmButton();
-  await playerEditorPage.verifyIsNotVisible();
+  await playerEditorPage.verifyIsVisible(isVisible: false);
   await tester.pumpAndSettle(Duration(seconds: 1)); // Auto-scroll waiting
   await lobbyPage.findPlayerWithName(testName);
   await lobbyPage.findPlayerWithAssetUrl(assetUrl);

@@ -6,10 +6,13 @@ class OnboardingPageTester {
 
   OnboardingPageTester(this.tester);
 
-  Future<void> verifyAboutDialogIsVisible() async {
+  Future<void> verifyAboutDialogIsVisible({bool isVisible = true}) async {
     await tester.pumpAndSettle();
 
-    expect(find.byKey(OnboardingKeys.aboutDialog), findsOneWidget);
+    expect(
+      find.byKey(OnboardingKeys.aboutDialog),
+      isVisible ? findsOneWidget : findsNothing,
+    );
   }
 
   Future<void> tapSkipButton() async {
@@ -41,10 +44,13 @@ class OnboardingPageTester {
     await tester.tap(find.byKey(OnboardingKeys.showUpdateDialogButton));
   }
 
-  Future<void> verifyUpdateDialogIsVisible() async {
+  Future<void> verifyUpdateDialogIsVisible({bool isVisible = true}) async {
     await tester.pumpAndSettle();
 
-    expect(find.byKey(OnboardingKeys.updateDialog), findsOneWidget);
+    expect(
+      find.byKey(OnboardingKeys.updateDialog),
+      isVisible ? findsOneWidget : findsNothing,
+    );
   }
 
   Future<void> closeUpdateDialog() async {

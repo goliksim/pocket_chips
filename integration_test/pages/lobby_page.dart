@@ -6,10 +6,13 @@ class LobbyPageTester {
 
   LobbyPageTester(this.tester);
 
-  Future<void> verifyIsVisible() async {
+  Future<void> verifyIsVisible({bool isVisible = true}) async {
     await tester.pumpAndSettle();
 
-    expect(find.byKey(LobbyKeys.page), findsOneWidget);
+    expect(
+      find.byKey(LobbyKeys.page),
+      isVisible ? findsOneWidget : findsNothing,
+    );
   }
 
   Future<void> tapSavedPlayersButton() async {

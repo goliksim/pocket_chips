@@ -118,7 +118,7 @@ Future<void> runProVersionTest7(
   await proVersionPage.verifyOfferIsVisible();
   await proVersionPage.tapCloseButton();
   await playerEditorPage.tapConfirmButton();
-  await playerEditorPage.verifyIsNotVisible();
+  await playerEditorPage.verifyIsVisible(isVisible: false);
   await tester.pumpAndSettle(Duration(seconds: 1)); // Auto-scroll waiting
   await lobbyPage.findPlayerWithName(testName);
 

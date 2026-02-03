@@ -69,7 +69,7 @@ class LobbyPageViewModel extends AsyncNotifier<LobbyPageState> {
     }
   }
 
-  void pop() => _navigationManager.popPage();
+  void pop() => _navigationManager.pop();
 
   Future<bool> savePlayer(String playerUid) async {
     final isPro = ref.read(proVersionProvider);

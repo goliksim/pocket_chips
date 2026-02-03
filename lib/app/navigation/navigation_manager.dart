@@ -186,11 +186,22 @@ class NavigationManager extends ChangeNotifier {
     }
   }
 
-  void popPage() {
+  bool handleBackNavigation() {
+    if (ModalRoute.of(context)?.isCurrent == true &&
+        ModalRoute.of(context) is! PageRoute) {
+      Navigator.of(context).pop();
+      return true;
+    } else {
+      return _popPage();
+    }
+  }
+
+  bool _popPage() {
     if (_stack.length > 1) {
       _stack.removeLast();
       notifyListeners();
-      return;
+      return true;
     }
+    return false;
   }
 }

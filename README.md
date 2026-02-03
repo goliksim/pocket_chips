@@ -28,7 +28,6 @@ The application stores players' chips, and also allows you to place bets and div
 - Distribution of the final pot by side-pot
 - Choose the funny avatar of the player that best suits you!
 - Unique interface design
-- No forced advertising and purchases
 
 ## Installation
 
@@ -58,8 +57,8 @@ flutter run
 - **Flutter/Dart**: My app is built with Flutter on Dart.
 - **State Management**: Riverpod + ChangeNotifier.
 - **API Integration**: Offline app.
-- **Database**: Shared preferences.
-- **Testing**: Unit tests with flutter_test and mockito.
+- **Database**: Shared preferences + FlutterSecureStorage.
+- **Testing**: Unit/Integration tests with flutter_test/integration_test and mockito.
 
 
 ## Contributing

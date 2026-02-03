@@ -57,7 +57,8 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
           final didPop = route.didPop(result);
           if (!didPop) return false;
 
-          return true;
+          final wasHandled = navigationManager.handleBackNavigation();
+          return wasHandled;
         },
       ),
     );

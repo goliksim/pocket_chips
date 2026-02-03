@@ -26,6 +26,7 @@ class HomeKeys {
   static const Key continueButton = Key('continueButton');
   static const Key newGameButton = Key('newGameButton');
   static const Key solverButton = Key('solverButton');
+  static const Key donationButton = Key('donationButton');
 }
 
 /// Keys for the Lobby Page.
@@ -51,11 +52,13 @@ class GameKeys {
       Key('gameStatusTitle_${status.name}');
 
   static const startGameButton = Key('startGameButton');
+  static const settingsButton = Key('settingsButton');
 }
 
 /// Keys for the Player Editor Page.
 class PlayerEditorKeys {
   static const Key dialog = Key('playerEditorDialog');
+  static const Key avatarSelectorDialog = Key('avatarSelectorDialog');
   static const Key editorAvatar = Key('editorAvatar');
   static Key selectableAvatar(int index) => Key('selectableAvatar_$index');
   static Key avatarKeyByAsset(String asset) => Key('asset_avatar_$asset');
@@ -78,9 +81,13 @@ class ProVersionKeys {
 }
 
 class SolverKeys {
-  static const Key page = Key('solverPage');
+  static const Key page = Key('solverDialog');
 
   static const Key closeButton = Key('closeButton');
+}
+
+class DonationKeys {
+  static const Key dialog = Key('donationDialog');
 }
 
 class SavedPlayersKeys {
@@ -91,7 +98,10 @@ class SavedPlayersKeys {
 
 class CommonKeys {
   static Key themeKey(Themes theme) => Key('theme_${theme.name}');
+  static const Key closePageButton = Key('close_page_button');
 
   static const Key confirmationWindow = Key('confirmationWindow');
   static const Key confirmButton = Key('confirmButton');
+
+  static const Key settingsDialog = Key('settingsDialog');
 }

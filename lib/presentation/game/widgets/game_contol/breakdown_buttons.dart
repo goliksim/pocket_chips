@@ -23,6 +23,7 @@ class BreakdownButtons extends StatelessWidget {
           Flexible(
             flex: 10,
             child: MyButton(
+              key: GameKeys.settingsButton,
               height: stdButtonHeight,
               width: double.infinity,
               buttonColor: context.theme.additionButtonColor,

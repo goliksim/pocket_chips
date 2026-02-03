@@ -157,160 +157,164 @@ class _HomePage extends ConsumerWidget {
       orElse: () => false,
     );
 
-    return PatternBackground(
-      child: Scaffold(
-        appBar: AppBar(
-          flexibleSpace: showBanner ? const AppBarBanner() : null,
-          leading: AspectRatio(
-            aspectRatio: 1,
-            child: IconButton(
-              key: HomeKeys.helpButton,
-              icon: Icon(
-                Icons.help,
-                size: stdIconSize,
+    return PopScope(
+      canPop: false,
+      child: PatternBackground(
+        child: Scaffold(
+          appBar: AppBar(
+            flexibleSpace: showBanner ? const AppBarBanner() : null,
+            leading: AspectRatio(
+              aspectRatio: 1,
+              child: IconButton(
+                key: HomeKeys.helpButton,
+                icon: Icon(
+                  Icons.help,
+                  size: stdIconSize,
+                ),
+                tooltip: context.strings.home_abo,
+                onPressed: () => viewModel.showAboutInfo(),
               ),
-              tooltip: context.strings.home_abo,
-              onPressed: () => viewModel.showAboutInfo(),
             ),
-          ),
-          toolbarHeight: stdButtonHeight * 0.75,
-          automaticallyImplyLeading: false,
-          backgroundColor: const Color(0x00000000),
-          iconTheme: IconThemeData(
-            color: context.theme.onBackground,
-          ),
-          elevation: 0,
-          centerTitle: true,
-          title: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: context.theme.appBarStyle.copyWith(
-              fontWeight: FontWeight.w700,
-              fontSize: stdFontSize / 20 * 28,
+            toolbarHeight: stdButtonHeight * 0.75,
+            automaticallyImplyLeading: false,
+            backgroundColor: const Color(0x00000000),
+            iconTheme: IconThemeData(
+              color: context.theme.onBackground,
             ),
-          ),
-          actions: <Widget>[
-            ProVersionWrapper(
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: IconButton(
-                  key: HomeKeys.themeSwapButton,
-                  icon: Icon(
-                    (context.theme.isDark)
-                        ? Icons.nightlight_round
-                        : Icons.mode_night_outlined,
-                    size: stdIconSize,
+            elevation: 0,
+            centerTitle: true,
+            title: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: context.theme.appBarStyle.copyWith(
+                fontWeight: FontWeight.w700,
+                fontSize: stdFontSize / 20 * 28,
+              ),
+            ),
+            actions: <Widget>[
+              ProVersionWrapper(
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: IconButton(
+                    key: HomeKeys.themeSwapButton,
+                    icon: Icon(
+                      (context.theme.isDark)
+                          ? Icons.nightlight_round
+                          : Icons.mode_night_outlined,
+                      size: stdIconSize,
+                    ),
+                    tooltip: context.strings.tooltip_theme,
+                    onPressed: () => viewModel.changeTheme(),
                   ),
-                  tooltip: context.strings.tooltip_theme,
-                  onPressed: () => viewModel.changeTheme(),
                 ),
               ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.transparent,
-        body: Center(
-          child: Container(
-            width: stdButtonWidth,
-            margin: EdgeInsets.only(
-              bottom: adaptiveOffset,
-              left: adaptiveOffset,
-              right: adaptiveOffset,
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AspectRatio(
-                    aspectRatio: 0.8,
-                    child: ChipsImage(),
-                  ),
-                  Expanded(
-                    child: isLoading
-                        ? Center(child: CircularProgressIndicator())
-                        : Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              // New Game
-                              AttentionButton(
-                                key: HomeKeys.newGameButton,
-                                onTap: () => viewModel.createNewGame(),
-                                needToAnimate: () => !shouldDrawContinue,
-                                bgColor: shouldDrawContinue
-                                    ? context.theme.secondaryColor
-                                    : context.theme.primaryColor,
-                                textColor: context.theme.onBackground,
-                                textWidget: Text(
-                                  context.strings.home_new,
-                                  style: context.theme.stdTextStyle.copyWith(
-                                    fontSize: stdFontSize,
-                                  ),
-                                ),
-                              ),
-                              // Continue Button
-                              if (shouldDrawContinue) ...[
-                                SizedBox(height: stdHorizontalOffset),
-                                ProVersionWrapper(
-                                  offset: -5,
-                                  child: MyButton(
-                                    key: HomeKeys.continueButton,
-                                    height: stdButtonHeight,
-                                    width: double.infinity,
-                                    borderRadius:
-                                        BorderRadius.circular(stdBorderRadius),
-                                    buttonColor: context.theme.primaryColor,
-                                    textString: context.strings.home_cont,
-                                    action: () {
-                                      if (shouldDrawContinue) {
-                                        viewModel.continueGame();
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                              SizedBox(height: stdHorizontalOffset),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: MyButton(
-                                      height: stdButtonHeight,
-                                      borderRadius: BorderRadius.circular(
-                                          stdBorderRadius),
-                                      buttonColor:
-                                          context.theme.additionButtonColor,
-                                      textString: context.strings.home_sup,
-                                      action: () => viewModel.showDonation(),
+            ],
+          ),
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: Container(
+              width: stdButtonWidth,
+              margin: EdgeInsets.only(
+                bottom: adaptiveOffset,
+                left: adaptiveOffset,
+                right: adaptiveOffset,
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 0.8,
+                      child: ChipsImage(),
+                    ),
+                    Expanded(
+                      child: isLoading
+                          ? Center(child: CircularProgressIndicator())
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                // New Game
+                                AttentionButton(
+                                  key: HomeKeys.newGameButton,
+                                  onTap: () => viewModel.createNewGame(),
+                                  needToAnimate: () => !shouldDrawContinue,
+                                  bgColor: shouldDrawContinue
+                                      ? context.theme.secondaryColor
+                                      : context.theme.primaryColor,
+                                  textColor: context.theme.onBackground,
+                                  textWidget: Text(
+                                    context.strings.home_new,
+                                    style: context.theme.stdTextStyle.copyWith(
+                                      fontSize: stdFontSize,
                                     ),
                                   ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                        left: stdHorizontalOffset,
-                                      ),
-                                      child: ProVersionWrapper(
-                                        offset: -5,
-                                        child: MyButton(
-                                          key: HomeKeys.solverButton,
-                                          height: stdButtonHeight,
-                                          borderRadius: BorderRadius.circular(
-                                            stdBorderRadius,
-                                          ),
-                                          buttonColor:
-                                              context.theme.additionButtonColor,
-                                          textString:
-                                              context.strings.home_win_check,
-                                          action: () =>
-                                              viewModel.showWinnerSolver(),
-                                        ),
-                                      ),
+                                ),
+                                // Continue Button
+                                if (shouldDrawContinue) ...[
+                                  SizedBox(height: stdHorizontalOffset),
+                                  ProVersionWrapper(
+                                    offset: -5,
+                                    child: MyButton(
+                                      key: HomeKeys.continueButton,
+                                      height: stdButtonHeight,
+                                      width: double.infinity,
+                                      borderRadius: BorderRadius.circular(
+                                          stdBorderRadius),
+                                      buttonColor: context.theme.primaryColor,
+                                      textString: context.strings.home_cont,
+                                      action: () {
+                                        if (shouldDrawContinue) {
+                                          viewModel.continueGame();
+                                        }
+                                      },
                                     ),
                                   ),
                                 ],
-                              ),
-                            ],
-                          ),
-                  ),
-                ],
+                                SizedBox(height: stdHorizontalOffset),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: MyButton(
+                                        key: HomeKeys.donationButton,
+                                        height: stdButtonHeight,
+                                        borderRadius: BorderRadius.circular(
+                                            stdBorderRadius),
+                                        buttonColor:
+                                            context.theme.additionButtonColor,
+                                        textString: context.strings.home_sup,
+                                        action: () => viewModel.showDonation(),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(
+                                          left: stdHorizontalOffset,
+                                        ),
+                                        child: ProVersionWrapper(
+                                          offset: -5,
+                                          child: MyButton(
+                                            key: HomeKeys.solverButton,
+                                            height: stdButtonHeight,
+                                            borderRadius: BorderRadius.circular(
+                                              stdBorderRadius,
+                                            ),
+                                            buttonColor: context
+                                                .theme.additionButtonColor,
+                                            textString:
+                                                context.strings.home_win_check,
+                                            action: () =>
+                                                viewModel.showWinnerSolver(),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

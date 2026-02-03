@@ -78,10 +78,9 @@ final themeManagerProvider = NotifierProvider<ThemeManager, ThemeMode>(
   ThemeManager.new,
 );
 
-final purchasesManagerProvider =
-    AsyncNotifierProvider<PurchasesManager, List<PurchasableProduct>>(
+final purchasesManagerProvider = AsyncNotifierProvider.autoDispose<
+    PurchasesManager, List<PurchasableProduct>>(
   PurchasesManager.new,
-  isAutoDispose: true,
 );
 
 final proVersionManagerProvider =
