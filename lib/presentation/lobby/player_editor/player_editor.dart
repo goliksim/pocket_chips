@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../services/assets_provider.dart';
 import '../../../services/toast_manager.dart';
 import '../../../utils/extensions.dart';
@@ -32,7 +33,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
       focusNodeName.unfocus();
       await Future.delayed(const Duration(milliseconds: 500));
     }
-    widget.viewModel.openLogoEditor();
+    await widget.viewModel.openLogoEditor();
   }
 
   void _onBankChanged(String value) {
@@ -54,6 +55,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
         final validInput = widget.viewModel.validateInput;
 
         return Dialog(
+          key: PlayerEditorKeys.dialog,
           elevation: stdElevation,
           backgroundColor: context.theme.bgrColor,
           insetPadding: EdgeInsets.symmetric(horizontal: adaptiveOffset),
@@ -72,6 +74,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                 // Avatar
                 ProVersionWrapper(
                   child: GestureDetector(
+                    key: PlayerEditorKeys.editorAvatar,
                     onTap: () => _onLogoTap(),
                     child: Stack(
                       children: [
@@ -79,6 +82,9 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                           assetUrl: player.assetUrl,
                           radius: (stdDialogHeight / 2) / 2,
                           filterQuality: FilterQuality.high,
+                          key: PlayerEditorKeys.avatarKeyByAsset(
+                            player.assetUrl,
+                          ),
                         ),
                         Container(
                           width: stdDialogHeight / 2,
@@ -130,6 +136,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                         SizedBox(
                           height: stdButtonHeight * 0.6,
                           child: TextFormField(
+                            key: PlayerEditorKeys.usernameField,
                             initialValue: player.nameInput,
                             focusNode: focusNodeName,
                             style: TextStyle(
@@ -246,6 +253,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                           ],
                         ),
                         MyButton(
+                          key: PlayerEditorKeys.confirmButton,
                           height: stdButtonHeight * 0.75,
                           width: double.infinity,
                           buttonColor: validInput

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../di/domain_managers.dart';
 import '../utils/theme/themes.dart';
+import 'keys/keys.dart';
 
 class ThemeProvider extends InheritedWidget {
   const ThemeProvider({
@@ -44,6 +45,7 @@ class AppThemeBuilder extends ConsumerWidget {
     final theme = isDarkMode ? Themes.dark() : Themes.light();
 
     return ThemeProvider(
+      key: CommonKeys.themeKey(theme),
       theme: theme,
       child: builder(context, theme),
     );

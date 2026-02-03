@@ -7,6 +7,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../../../app/keys/keys.dart';
 import '../../../../services/assets_provider.dart';
 import '../../../../utils/extensions.dart';
 import '../../../../utils/theme/ui_values.dart';
@@ -125,6 +126,7 @@ class _PickIconState extends State<PlayerLogoPicker> {
                     );
                   }
                   return GestureDetector(
+                    key: PlayerEditorKeys.selectableAvatar(index),
                     onTap: () => _selectLogo(index),
                     child: Padding(
                       padding: EdgeInsets.all(stdHorizontalOffset / 2),

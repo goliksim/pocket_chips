@@ -12,7 +12,6 @@ abstract class GamePageViewState with _$GamePageViewState {
     required GameStatusEnum gameStatus,
     required GamePageControlState controlState,
     required GameTableState tableState,
-    required String currentGameState,
     required bool canEditPlayer,
     String? currentPlayerName,
   }) = _GamePageViewState;

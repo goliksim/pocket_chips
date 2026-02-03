@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../di/view_models.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
@@ -25,6 +26,7 @@ class SavedPlayerList extends ConsumerWidget {
         child: CircularProgressIndicator(),
       ),
       data: (players) => Dialog(
+        key: SavedPlayersKeys.dialog,
         elevation: 0,
         backgroundColor: context.theme.bgrColor,
         insetPadding: EdgeInsets.symmetric(
@@ -88,6 +90,9 @@ class SavedPlayerList extends ConsumerWidget {
                                     stdBorderRadius,
                                   ),
                                   child: PlayerCard.saved(
+                                    key: SavedPlayersKeys.playerCard(
+                                      players[index].name,
+                                    ),
                                     player: players[index],
                                     rightCallback: () =>
                                         viewModel.usePlayer(players[index].uid),

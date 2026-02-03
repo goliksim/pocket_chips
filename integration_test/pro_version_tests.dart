@@ -10,6 +10,8 @@ import 'tests/pro_version_test_3.dart';
 import 'tests/pro_version_test_4.dart';
 import 'tests/pro_version_test_5.dart';
 import 'tests/pro_version_test_6.dart';
+import 'tests/pro_version_test_7.dart';
+import 'tests/pro_version_test_8.dart';
 
 @GenerateMocks([AppRepository])
 void main() {
@@ -67,6 +69,22 @@ void main() {
       testWidgets(
         'Pro Version Test 6',
         (WidgetTester tester) => runProVersionTest6(
+          tester,
+          mockAppRepository,
+        ),
+      );
+
+      testWidgets(
+        'Pro Version Test 7',
+        (WidgetTester tester) => runProVersionTest7(
+          tester,
+          mockAppRepository,
+        ),
+      );
+
+      testWidgets(
+        'Pro Version Test 8',
+        (WidgetTester tester) => runProVersionTest8(
           tester,
           mockAppRepository,
         ),

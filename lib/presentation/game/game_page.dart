@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/keys/keys.dart';
 import '../../di/view_models.dart';
+import '../../l10n/localization_extension.dart';
 import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
 import '../common/widgets/loading_page.dart';
@@ -13,7 +15,9 @@ import 'widgets/game_table/game_table.dart';
 import 'widgets/game_title_widget.dart';
 
 class GamePage extends ConsumerWidget {
-  const GamePage({super.key});
+  const GamePage({
+    super.key = GameKeys.page,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,7 +53,9 @@ class GamePage extends ConsumerWidget {
               ),
               elevation: 0,
               title: GameTitleWidget(
-                gameState: viewState.currentGameState,
+                key: GameKeys.gameStatusTitle(viewState.gameStatus),
+                gameState:
+                    context.strings.getGameStateName(viewState.gameStatus),
                 player: viewState.currentPlayerName,
               ),
               centerTitle: true,
@@ -60,6 +66,7 @@ class GamePage extends ConsumerWidget {
                     child: AspectRatio(
                       aspectRatio: 1,
                       child: IconButton(
+                        key: GameKeys.undoButton,
                         icon: Icon(
                           Icons.restore,
                           color: context.theme.onBackground,

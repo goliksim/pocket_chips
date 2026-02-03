@@ -11,7 +11,6 @@ import '../../../domain/models/game/game_state_effect.dart';
 import '../../../domain/models/game/game_state_enum.dart';
 import '../../../domain/models/game/game_state_model.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../../l10n/localization_extension.dart';
 import '../../../services/event_push_service/handlers/event_handler.dart';
 import '../../../services/event_push_service/promotion_service.dart';
 import '../../../services/game_logic_service.dart';
@@ -88,7 +87,6 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         smallBlindValue: gameModel.lobbyState.smallBlindValue,
       ),
       gameStatus: gameState,
-      currentGameState: _strings.getGameStateName(gameState),
       currentPlayerName: gameModel.currentPlayer?.name,
       canEditPlayer: gameState.canEditPlayers,
     );

@@ -72,8 +72,7 @@ class LobbyPageViewModel extends AsyncNotifier<LobbyPageState> {
   void pop() => _navigationManager.popPage();
 
   Future<bool> savePlayer(String playerUid) async {
-    final isPro =
-        ref.read(proVersionManagerProvider).value?.isPurchased ?? false;
+    final isPro = ref.read(proVersionProvider);
 
     if (!isPro) {
       _navigationManager.showProVersionOfferDialog();
@@ -168,8 +167,8 @@ class LobbyPageViewModel extends AsyncNotifier<LobbyPageState> {
             previous?.whenData(
               (oldLobby) {
                 if (newLobby.players.length > oldLobby.players.length) {
-                  Future.microtask(
-                    () {
+                  Future.delayed(Duration(milliseconds: 500)).then(
+                    (_) {
                       final scrollController = ref
                           .read(lobbyScrollControllerProvider)
                           .scrollController;

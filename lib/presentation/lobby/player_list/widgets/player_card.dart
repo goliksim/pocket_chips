@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+import '../../../../app/keys/keys.dart';
 import '../../../../services/assets_provider.dart';
 import '../../../../utils/extensions.dart';
 import '../../../../utils/theme/empty_asset_filter.dart';
@@ -130,6 +131,9 @@ class PlayerCard extends StatelessWidget {
                             padding:
                                 EdgeInsets.all(0.20 * stdButtonHeight * 0.75),
                             child: PlayerAvatar(
+                              key: LobbyKeys.userAvatarKeyByAsset(
+                                player.assetUrl,
+                              ),
                               assetUrl: player.assetUrl,
                               colorFilter: (player.assetUrl ==
                                       AssetsProvider.emptyPlayerAsset)
@@ -149,7 +153,7 @@ class PlayerCard extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${player.name}  ',
+                                  player.name,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(

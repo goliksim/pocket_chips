@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/keys/keys.dart';
 import '../../di/view_models.dart';
 import '../../domain/models/lobby/lobby_state_model.dart';
 import '../../utils/extensions.dart';
@@ -16,7 +17,9 @@ import 'widgets/lobby_reset_game_button.dart';
 import 'widgets/lobby_stack_button.dart';
 
 class LobbyPage extends ConsumerWidget {
-  const LobbyPage({super.key});
+  const LobbyPage({
+    super.key = LobbyKeys.page,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -57,6 +60,7 @@ class LobbyPage extends ConsumerWidget {
                 child: AspectRatio(
                   aspectRatio: 1,
                   child: IconButton(
+                    key: LobbyKeys.savedPlayersButton,
                     splashColor: context.theme.bankColor,
                     highlightColor: Colors.transparent,
                     icon: Icon(
@@ -116,12 +120,6 @@ class LobbyPage extends ConsumerWidget {
                                 )
                               : const SizedBox(),
                         ),
-
-                        /*if (players.length > standartPlayerCount)
-                        SizedBox(
-                          height: stdHorizontalOffset / 2,
-                          width: double.infinity,
-                        ),*/
                         if (state.canAddPlayer)
                           Padding(
                             padding: EdgeInsets.symmetric(
@@ -132,12 +130,12 @@ class LobbyPage extends ConsumerWidget {
                               conditionToEnable:
                                   state.players.length < noProPlayerCount,
                               child: AttentionAddPlayerButton(
+                                key: LobbyKeys.addPlayerButton,
                                 onTap: () => viewModel.openNewPlayerEditor(),
                                 needToAnimate: () => state.players.isEmpty,
                               ),
                             ),
                           ),
-                        // FreeSpace
                       ],
                     ),
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 import '../../common/widgets/ui_widgets.dart';
@@ -66,6 +67,7 @@ class PlayerList extends StatelessWidget {
                         _ReorderableWrapper(
                       isOrdering: index == value,
                       child: PlayerCard(
+                        key: LobbyKeys.playerCard(player.name),
                         canReorderOrDismiss: canReorder,
                         player: player,
                         rightCallback: () =>

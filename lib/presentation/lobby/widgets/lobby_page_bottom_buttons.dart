@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 import '../../common/widgets/ui_widgets.dart';
@@ -29,6 +30,7 @@ class LobbyPageBottomButtons extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             MyButton(
+              key: LobbyKeys.gameButton,
               height: stdButtonHeight,
               buttonColor: context.theme.primaryColor,
               action: () => onStartGame(),

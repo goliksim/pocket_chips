@@ -12,6 +12,21 @@ class ProVersionOfferPageTester {
     await tester.tap(find.byKey(ProVersionKeys.proVersionAvailableButton));
   }
 
+  Future<void> tapCloseButton() async {
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(ProVersionKeys.proVersionCloseButton));
+  }
+
+  Future<void> verifyOfferIsVisible({bool isVisible = true}) async {
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(ProVersionKeys.proVersionOfferDialog),
+      isVisible ? findsOneWidget : findsNothing,
+    );
+  }
+
   Future<void> verifyProVersionIsPurchased() async {
     await tester.pumpAndSettle();
 

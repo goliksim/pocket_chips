@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../services/assets_provider.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
@@ -20,6 +21,7 @@ class ConfirmationWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Dialog(
+        key: CommonKeys.confirmationWindow,
         elevation: 0,
         backgroundColor: context.theme.bgrColor,
         insetPadding: EdgeInsets.symmetric(
@@ -67,6 +69,7 @@ class ConfirmationWindow extends StatelessWidget {
                 children: [
                   Expanded(
                     child: MyButton(
+                      key: CommonKeys.confirmButton,
                       height: stdButtonHeight * 0.75,
                       width: double.infinity,
                       buttonColor: context.theme.bgrColor,

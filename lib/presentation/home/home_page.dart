@@ -194,6 +194,7 @@ class _HomePage extends ConsumerWidget {
               child: AspectRatio(
                 aspectRatio: 1,
                 child: IconButton(
+                  key: HomeKeys.themeSwapButton,
                   icon: Icon(
                     (context.theme.isDark)
                         ? Icons.nightlight_round
@@ -232,6 +233,7 @@ class _HomePage extends ConsumerWidget {
                             children: [
                               // New Game
                               AttentionButton(
+                                key: HomeKeys.newGameButton,
                                 onTap: () => viewModel.createNewGame(),
                                 needToAnimate: () => !shouldDrawContinue,
                                 bgColor: shouldDrawContinue
@@ -251,6 +253,7 @@ class _HomePage extends ConsumerWidget {
                                 ProVersionWrapper(
                                   offset: -5,
                                   child: MyButton(
+                                    key: HomeKeys.continueButton,
                                     height: stdButtonHeight,
                                     width: double.infinity,
                                     borderRadius:
@@ -287,6 +290,7 @@ class _HomePage extends ConsumerWidget {
                                       child: ProVersionWrapper(
                                         offset: -5,
                                         child: MyButton(
+                                          key: HomeKeys.solverButton,
                                           height: stdButtonHeight,
                                           borderRadius: BorderRadius.circular(
                                             stdBorderRadius,

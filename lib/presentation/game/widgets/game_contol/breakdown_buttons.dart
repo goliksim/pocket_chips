@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/keys/keys.dart';
 import '../../../../utils/extensions.dart';
 import '../../../../utils/theme/ui_values.dart';
 import '../../../common/widgets/ui_widgets.dart';
@@ -40,6 +41,7 @@ class BreakdownButtons extends StatelessWidget {
           Expanded(
             flex: 31,
             child: MyButton(
+              key: GameKeys.startGameButton,
               height: stdButtonHeight,
               width: double.infinity,
               buttonColor: context.theme.primaryColor

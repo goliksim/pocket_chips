@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/keys/keys.dart';
 import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
 import '../common/widgets/dialog_widget.dart';
@@ -34,6 +35,7 @@ class __WinnerCheckState extends State<_WinnerCheck> {
 
   @override
   Widget build(BuildContext context) => DialogWidget(
+        key: SolverKeys.page,
         edgeOffset: stdHorizontalOffset,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

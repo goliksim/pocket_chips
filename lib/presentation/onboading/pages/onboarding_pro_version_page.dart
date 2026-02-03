@@ -180,6 +180,7 @@ class OnboardingProVersionPage extends ConsumerWidget {
         if (isDialog) ...[
           SizedBox(height: stdHorizontalOffset),
           MyButton(
+            key: ProVersionKeys.proVersionCloseButton,
             side: BorderSide(
               width: 2.5,
               color: context.theme.hintColor,
