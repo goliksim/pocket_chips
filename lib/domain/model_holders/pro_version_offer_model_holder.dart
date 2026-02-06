@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../di/domain_managers.dart';
 import '../../di/repositories.dart';
-import '../../services/monitization/purchases/models/pro_version_offer_model.dart';
 import '../../utils/logs.dart';
+import '../models/pro_version/pro_version_offer_model.dart';
 
 class ProVersionOfferModelHolder extends AsyncNotifier<ProVersionOfferModel> {
   @override

@@ -257,6 +257,18 @@ abstract class AppLocalizations {
   /// **'Enjoying the app? Support me!'**
   String get support_tittle_triggered;
 
+  /// No description provided for @support_methods_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load support methods. Check your internet connection'**
+  String get support_methods_unavailable;
+
+  /// No description provided for @support_methods_unavailable_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get support_methods_unavailable_retry;
+
   /// No description provided for @support_video.
   ///
   /// In en, this message translates to:

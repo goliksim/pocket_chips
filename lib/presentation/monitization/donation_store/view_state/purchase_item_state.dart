@@ -18,5 +18,18 @@ abstract class PurchaseItemState with _$PurchaseItemState {
 
   const factory PurchaseItemState.loading({
     @Default(DonationLeadItem.loading()) DonationLeadItem lead,
+    String? id,
   }) = _PurchaseItemLoadingState;
+
+  const PurchaseItemState._();
+
+  bool get alreadyPurchased => map(
+        (data) => data.alreadyPurchased,
+        loading: (_) => false,
+      );
+
+  bool get isLoaded => map(
+        (data) => true,
+        loading: (_) => false,
+      );
 }

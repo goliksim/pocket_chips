@@ -67,6 +67,12 @@ class HomePageTester {
     await tester.tap(find.byKey(HomeKeys.solverButton));
   }
 
+  Future<void> tapDonationButton() async {
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(HomeKeys.donationButton));
+  }
+
   Future<void> tapConfirmationButton() async {
     await tester.pumpAndSettle();
 

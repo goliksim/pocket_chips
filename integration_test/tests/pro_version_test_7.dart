@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pocket_chips/app/application.dart';
-import 'package:pocket_chips/di/domain_managers.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
@@ -13,7 +12,7 @@ import 'package:pocket_chips/domain/repositories/app_repository.dart';
 import 'package:pocket_chips/services/assets_provider.dart';
 
 import '../mocks/lobby_state_holder_mock.dart';
-import '../mocks/pro_version_manager_mock.dart';
+import '../mocks/purchases_repository_mock.dart';
 import '../pages/game_page.dart';
 import '../pages/home_page.dart';
 import '../pages/lobby_page.dart';
@@ -47,10 +46,9 @@ Future<void> runProVersionTest7(
     banks: {for (var player in players) player.uid: 100},
   );
 
-  // Создаем мок-менеджер с начальным состоянием и состоянием после restorePurchases
-  final mockManager = MockProVersionManager(
-    restoredState: null,
-  );
+  final mockPurchasesRepository =
+      MockPurchasesRepository(hasPurchasesForRestore: false)
+        ..setScenario(MockScenario.offline);
 
   when(repository.getConfig()).thenAnswer(
     (_) async => mockConfig,
@@ -63,7 +61,7 @@ Future<void> runProVersionTest7(
     ProviderScope(
       overrides: [
         appRepositoryProvider.overrideWithValue(repository),
-        proVersionManagerProvider.overrideWith(() => mockManager),
+        proVersionRepository.overrideWithValue(mockPurchasesRepository),
         lobbyStateHolderProvider.overrideWith(
           () => MockLobbyStateHolder(initialState: mockLobbyState),
         )

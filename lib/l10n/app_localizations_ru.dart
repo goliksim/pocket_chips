@@ -90,6 +90,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get support_tittle_triggered => 'Нравится приложение? Поддержи меня!';
 
   @override
+  String get support_methods_unavailable => 'Не удалось загрузить способы поддержки. Проверьте наличие интернета.';
+
+  @override
+  String get support_methods_unavailable_retry => 'Повторить';
+
+  @override
   String get support_video => 'Посмотреть рекламу';
 
   @override

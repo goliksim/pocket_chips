@@ -2,14 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../../../di/domain_managers.dart';
+import '../../../di/repositories.dart';
+import '../../../domain/models/pro_version/pro_version_model.dart';
+import '../../../domain/models/purchases/purchase_details.dart';
+import '../../../domain/models/purchases/purchase_status.dart';
+import '../../../domain/repositories/purchases_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/logs.dart';
 import '../../toast_manager.dart';
-import 'models/pro_version_model.dart';
 import 'purchases_mixin.dart';
 
 class ProVersionManager extends AsyncNotifier<ProVersionModel>
@@ -21,18 +24,20 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
   ToastManager get toastManager => ref.read(toastManagerProvider);
   @override
   AppLocalizations get strings => ref.read(stringsProvider);
+  @override
+  // Important to use ProVersionRepository here
+  PurchasesRepository get repository => ref.read(proVersionRepository);
 
   @override
   List<String> get kIds => [Constants.pocketChipsPROItemKey];
-
-  @override
-  bool isConsumable(String productId) => true;
 
   bool proConfirmedByRestore = false;
   Timer? _restoreTimer;
 
   @override
   FutureOr<ProVersionModel> build() async {
+    logs.writeLog('ProVersionManager build');
+
     init();
     ref.onDispose(() {
       dispose();
@@ -54,7 +59,7 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
     try {
       await super.restorePurchases();
     } on Exception catch (e) {
-      toastManager.showToast(e.toString());
+      logs.writeLog('$logName: ${e.toString()}');
 
       return;
     }
@@ -90,7 +95,7 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
       throw Exception('Product not found to buy');
     }
 
-    return buyProduct(product.productDetails);
+    return buyProduct(product.id);
   }
 
   /// Receive a purchase update and apply the purchase to the app logic.
@@ -99,7 +104,10 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
     if (purchaseDetails.status == PurchaseStatus.purchased ||
         purchaseDetails.status == PurchaseStatus.restored) {
       // Validating the purchase
-      var validPurchase = await verifyPurchase(purchaseDetails);
+      var validPurchase =
+          await repository.verifyPurchase(purchaseDetails.purchaseId);
+
+      logs.writeLog('ProVersionManager restore valid $validPurchase');
 
       if (validPurchase) {
         // Applying the purchase
@@ -122,7 +130,7 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
 
     // Confirm that the purchase has been processed correctly.
     if (purchaseDetails.pendingCompletePurchase) {
-      await InAppPurchase.instance.completePurchase(purchaseDetails);
+      await repository.completePurchase(purchaseDetails.purchaseId);
     }
   }
 

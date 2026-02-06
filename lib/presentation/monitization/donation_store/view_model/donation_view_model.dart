@@ -5,11 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/navigation/navigation_manager.dart';
 import '../../../../di/domain_managers.dart';
 import '../../../../di/model_holders.dart';
+import '../../../../domain/models/purchases/purchasable_product.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../l10n/localization_extension.dart';
-import '../../../../services/monitization/purchases/models/purchasable_product.dart';
 import '../../../../services/monitization/purchases/purchases_manager.dart';
 import '../../../../services/monitization/video_ads/google_ads_manager.dart';
+import '../../../../services/monitization/video_ads/models/iterstitial_ad_state.dart';
 import '../../../../services/toast_manager.dart';
 import '../../../../utils/constants.dart';
 import '../../../../utils/logs.dart';
@@ -27,86 +28,28 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
   PurchasesManager get _purchasesManager =>
       ref.read(purchasesManagerProvider.notifier);
 
-  GoogleAdsManager get _googleAdsManager => ref.read(googleAdsManagerProvider);
+  GoogleAdsManager get _googleAdsManager =>
+      ref.read(googleAdsManagerProvider.notifier);
 
   @override
   FutureOr<DonationViewState> build() async {
-    logs.writeLog('DonationVM: build');
-
-    _googleAdsManager
-      ..removeListener(_updateVideoAd)
-      ..addListener(_updateVideoAd);
-
-    final adIsLoaded = _googleAdsManager.loaded;
-
-    final videoAd = adIsLoaded
-        ? LoadedPurchaseItemState(
-            id: Constants.videoAdItemKey,
-            lead: DonationLeadItem.videoAd(),
-            name: _strings.support_video,
-            priceText: _strings.support_free,
-            action: DonationItemAction.watchAd,
-          )
-        : PurchaseItemState.loading();
+    final videoAdState = ref.read(googleAdsManagerProvider);
+    logs.writeLog('DonationVM: build $videoAdState');
+    final videoAdItem = _getAdItemState(videoAdState);
 
     final manager = ref.read(purchasesManagerProvider);
 
-    if (manager.value != null) {
-      ref.read(purchasesManagerProvider.notifier).build();
+    //Refreshing
+    if (videoAdState == IterstitialAdState.unavailable) {
+      _googleAdsManager.reload();
     }
 
-    ref.listen(
-      purchasesManagerProvider,
-      (prev, next) {
-        next.maybeWhen(
-          data: (products) {
-            final oldProducts = state.value?.availableItems ?? [];
-            final oldProductsSet = oldProducts.map((e) => e.id).toSet();
-
-            state = AsyncValue.data(
-              DonationViewState(
-                availableItems: [
-                  ...oldProducts,
-                  ...products
-                      .where((e) => !oldProductsSet.contains(e.id))
-                      .map(_buildItem)
-                      .toSet(),
-                ],
-                videoAdItem: state.value?.videoAdItem,
-              ),
-            );
-          },
-          orElse: () {},
-        );
-      },
-    );
+    _listenPurchases(ref);
+    _listenVideoAd(ref);
 
     return DonationViewState(
-      videoAdItem: videoAd,
-      availableItems: [
-        ...?manager.value?.map(_buildItem).toSet(),
-      ],
-    );
-  }
-
-  void _updateVideoAd() {
-    final loaded = _googleAdsManager.loaded;
-
-    final newVideoItem = loaded
-        ? LoadedPurchaseItemState(
-            id: Constants.videoAdItemKey,
-            lead: DonationLeadItem.videoAd(),
-            name: _strings.support_video,
-            priceText: _strings.support_free,
-            action: DonationItemAction.watchAd,
-          )
-        : PurchaseItemState.loading();
-
-    state = AsyncValue.data(
-      DonationViewState(
-        availableItems: state.value?.availableItems ?? [],
-        videoAdItem: newVideoItem,
-      ),
+      videoAdItem: videoAdItem,
+      availableItems: manager.value?.map(_buildItem).toList() ?? [],
     );
   }
 
@@ -114,28 +57,12 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
         (item) async {
           switch (item.action) {
             case DonationItemAction.purchase:
-              return purchaseItem(item.id);
+              return _purchaseItem(item.id);
             case DonationItemAction.watchAd:
-              return watchVideoAd();
+              return _watchVideoAd();
           }
         },
         loading: (_) async {},
-      );
-
-  Future<void> purchaseItem(String itemKey) async {
-    try {
-      await _purchasesManager.buyItem(itemKey);
-    } on Exception catch (e) {
-      // TODO configure error reporting
-      _toastManager.showToast(_strings.toast_unav);
-      logs.writeLog(e.toString());
-    }
-  }
-
-  Future<void> watchVideoAd() => _googleAdsManager.showInterstitialAd(
-        onAdDismissed: () {
-          _toastManager.showToast(_strings.toast_video_ad_success);
-        },
       );
 
   Future<void> restorePurchases() async {
@@ -148,7 +75,28 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
     }
   }
 
+  void retry() async {
+    _googleAdsManager.reload();
+    _purchasesManager.runBuild();
+  }
+
   void pop() => _navigationManager.pop();
+
+  Future<void> _purchaseItem(String itemKey) async {
+    try {
+      await _purchasesManager.buyProduct(itemKey);
+    } on Exception catch (e) {
+      // TODO configure error reporting
+      _toastManager.showToast(_strings.toast_unav);
+      logs.writeLog(e.toString());
+    }
+  }
+
+  Future<void> _watchVideoAd() => _googleAdsManager.showInterstitialAd(
+        onAdDismissed: () {
+          _toastManager.showToast(_strings.toast_video_ad_success);
+        },
+      );
 
   DonationLeadItem _getLeadById(String id) {
     switch (id) {
@@ -188,4 +136,67 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
         action: DonationItemAction.purchase,
         alreadyPurchased: _checkPurchased(product.id),
       );
+
+  void _listenPurchases(Ref ref) => ref.listen(
+        purchasesManagerProvider,
+        (prev, next) {
+          next.maybeWhen(
+            data: (products) {
+              final oldProducts = state.value?.availableItems ?? [];
+              final oldProductsSet = oldProducts.map((e) => e.id).toSet();
+
+              final availableItems = [
+                ...oldProducts,
+                ...products
+                    .where((e) => !oldProductsSet.contains(e.id))
+                    .map(_buildItem)
+                    .toSet(),
+              ];
+
+              Future.microtask(() {
+                state = AsyncValue.data(
+                  DonationViewState(
+                    availableItems: availableItems,
+                    videoAdItem: state.value?.videoAdItem,
+                  ),
+                );
+              });
+            },
+            orElse: () {},
+          );
+        },
+      );
+
+  void _listenVideoAd(Ref ref) => ref.listen(
+        googleAdsManagerProvider,
+        (prev, next) {
+          final newVideoItem = _getAdItemState(next);
+
+          state = AsyncValue.data(
+            DonationViewState(
+              availableItems: state.value?.availableItems ?? [],
+              videoAdItem: newVideoItem,
+            ),
+          );
+        },
+      );
+
+  PurchaseItemState? _getAdItemState(IterstitialAdState adState) {
+    switch (adState) {
+      case IterstitialAdState.loading:
+        return PurchaseItemState.loading(
+          id: Constants.videoAdItemKey,
+        );
+      case IterstitialAdState.ready:
+        return LoadedPurchaseItemState(
+          id: Constants.videoAdItemKey,
+          lead: DonationLeadItem.videoAd(),
+          name: _strings.support_video,
+          priceText: _strings.support_free,
+          action: DonationItemAction.watchAd,
+        );
+      default:
+        return null;
+    }
+  }
 }

@@ -90,6 +90,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get support_tittle_triggered => 'Enjoying the app? Support me!';
 
   @override
+  String get support_methods_unavailable => 'Failed to load support methods. Check your internet connection';
+
+  @override
+  String get support_methods_unavailable_retry => 'Retry';
+
+  @override
   String get support_video => 'Video ads';
 
   @override

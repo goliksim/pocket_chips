@@ -88,6 +88,16 @@ class SolverKeys {
 
 class DonationKeys {
   static const Key dialog = Key('donationDialog');
+  static const Key itemsUnavailable = Key('itemsUnavailable');
+  static const Key restoreButton = Key('restoreButton');
+  static const Key retryButton = Key('retryButtin');
+
+  static Key item({
+    required String id,
+    required bool loaded,
+    required bool isBuyed,
+  }) =>
+      Key('item_${id}_isBuyed_${isBuyed}_loaded_$loaded');
 }
 
 class SavedPlayersKeys {

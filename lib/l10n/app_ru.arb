@@ -26,6 +26,8 @@
     "home_win_check":"Ассистент",
     "support_tittle":"Способы поддержки:",
     "support_tittle_triggered":"Нравится приложение? Поддержи меня!",
+    "support_methods_unavailable":"Не удалось загрузить способы поддержки. Проверьте наличие интернета.",
+    "support_methods_unavailable_retry":"Повторить",
     "support_video":"Посмотреть рекламу",
     "support_modest":"Скромное пожертвование",
     "support_nice":"Разумное пожертвование",

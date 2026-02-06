@@ -26,6 +26,8 @@
     "home_win_check":"Solver",
     "support_tittle":"You can support me by:",
     "support_tittle_triggered":"Enjoying the app? Support me!",
+    "support_methods_unavailable":"Failed to load support methods. Check your internet connection",
+    "support_methods_unavailable_retry":"Retry",
     "support_video":"Video ads",
     "support_modest":"Modest donation",
     "support_nice":"Nice donation",

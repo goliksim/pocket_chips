@@ -2,25 +2,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pocket_chips/app/application.dart';
+import 'package:pocket_chips/di/domain_managers.dart';
 import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
+import '../mocks/google_ads_manager_mock.dart' hide MockScenario;
 import '../mocks/purchases_repository_mock.dart';
+import '../pages/donation_page.dart';
 import '../pages/home_page.dart';
-import '../pages/onboarding_page.dart';
-import '../pages/pro_version_offer_page.dart';
 
-/// [ProVersionTest]
-/// No cached PRO mode, restoring from store
-/// Checking Pro Mode during onboarding and on HomePage
-Future<void> runProVersionTest4(
+/// [MonitizationTest]
+/// Cached PRO mode
+/// Loading video ad after and items
+Future<void> runMonitizationTest2(
   WidgetTester tester,
   AppRepository repository,
 ) async {
   final mockConfig = ConfigModel(
     isDark: false,
-    firstLaunch: true,
+    firstLaunch: false,
     locale: 'en',
     version: '2.0.0',
   );
@@ -28,19 +29,24 @@ Future<void> runProVersionTest4(
   final mockPurchasesRepository =
       MockPurchasesRepository(hasPurchasesForRestore: true)
         ..setScenario(MockScenario.success);
+  final mockGoogleAdsManager = MockGoogleAdsManager(
+    loadingTime: Duration(seconds: 2),
+  );
 
   when(repository.getConfig()).thenAnswer(
     (_) async => mockConfig,
   );
   when(repository.isProVersion()).thenAnswer(
-    (_) async => false,
+    (_) async => true,
   );
 
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         appRepositoryProvider.overrideWithValue(repository),
+        purchasesRepositoryProvider.overrideWithValue(mockPurchasesRepository),
         proVersionRepository.overrideWithValue(mockPurchasesRepository),
+        googleAdsManagerProvider.overrideWith(() => mockGoogleAdsManager),
       ],
       child: const MyApp(),
     ),
@@ -48,19 +54,19 @@ Future<void> runProVersionTest4(
 
   await tester.pumpAndSettle();
 
-  final onboardingPage = OnboardingPageTester(tester);
-
-  await onboardingPage.verifyAboutDialogIsVisible();
-  await onboardingPage.swipePage();
-
-  await tester.pumpAndSettle(Duration(seconds: 3));
-  final proVerionOfferPage = ProVersionOfferPageTester(tester);
-  await proVerionOfferPage.verifyProVersionIsPurchased();
-
-  await onboardingPage.tapSkipButton();
-  await onboardingPage.closeOnboardingDialog();
-
   final homePage = HomePageTester(tester);
+  final donationPage = DonationPageTester(tester);
 
-  await homePage.verifyIsProVersionScreen();
+  await homePage.tapDonationButton();
+
+  await tester.pump(Duration(seconds: 1)); //Dialog opening
+  await donationPage.verifyIsVisible();
+  await donationPage.verifyVideoAd(isLoaded: false);
+
+  await tester.pumpAndSettle();
+  await donationPage.verifyProMode(isPurchased: true);
+
+  await tester.pumpAndSettle();
+  await donationPage.verifyVideoAd(isLoaded: true);
+  await donationPage.verifyProMode(isPurchased: true);
 }

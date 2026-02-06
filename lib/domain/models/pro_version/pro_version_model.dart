@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'purchasable_product.dart';
+import '../purchases/purchasable_product.dart';
 
 part 'pro_version_model.freezed.dart';
 

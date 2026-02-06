@@ -6,17 +6,18 @@ import '../app/navigation/route_information_parser.dart';
 import '../app/navigation/router_delegate.dart';
 import '../data/storage/secure_storage/secure_storage.dart';
 import '../data/storage/shared_preferences/shared_preferences_storage.dart';
+import '../domain/models/pro_version/pro_version_model.dart';
+import '../domain/models/purchases/purchasable_product.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/localization.dart';
 import '../services/event_push_service/handlers/ads_handler.dart';
 import '../services/event_push_service/handlers/donation_handler.dart';
 import '../services/event_push_service/promotion_service.dart';
 import '../services/initialization_manager.dart';
-import '../services/monitization/purchases/models/pro_version_model.dart';
-import '../services/monitization/purchases/models/purchasable_product.dart';
 import '../services/monitization/purchases/pro_version_manager.dart';
 import '../services/monitization/purchases/purchases_manager.dart';
 import '../services/monitization/video_ads/google_ads_manager.dart';
+import '../services/monitization/video_ads/models/iterstitial_ad_state.dart';
 import '../services/toast_manager.dart';
 import '../utils/theme/theme_manager.dart';
 import 'model_holders.dart';
@@ -93,8 +94,9 @@ final proVersionProvider = Provider<bool>(
       ref.watch(proVersionOfferModelHolderProvider).value?.isPurchased ?? false,
 );
 
-final googleAdsManagerProvider = Provider<GoogleAdsManager>(
-  (ref) => GoogleAdsManager(),
+final googleAdsManagerProvider =
+    NotifierProvider<GoogleAdsManager, IterstitialAdState>(
+  GoogleAdsManager.new,
 );
 
 final promotionManagerProvider = Provider<PromotionManager>(
@@ -114,7 +116,7 @@ final donationHandlerProvider = Provider<DonationHandler>(
 
 final adsHandler = Provider<AdvertisementHandler>(
   (ref) => AdvertisementHandler(
-    googleAdsManager: ref.read(googleAdsManagerProvider),
+    googleAdsManager: ref.read(googleAdsManagerProvider.notifier),
     isPro: ref.watch(proVersionProvider),
   ),
 );

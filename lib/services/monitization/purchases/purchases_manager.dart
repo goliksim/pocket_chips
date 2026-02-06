@@ -1,16 +1,18 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
 
 import '../../../di/domain_managers.dart';
+import '../../../di/repositories.dart';
+import '../../../domain/models/purchases/purchasable_product.dart';
+import '../../../domain/models/purchases/purchase_details.dart';
+import '../../../domain/models/purchases/purchase_status.dart';
+import '../../../domain/repositories/purchases_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../l10n/localization_extension.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/logs.dart';
 import '../../toast_manager.dart';
-import 'models/purchasable_product.dart';
 import 'purchases_mixin.dart';
 
 class PurchasesManager extends AsyncNotifier<List<PurchasableProduct>>
@@ -21,29 +23,36 @@ class PurchasesManager extends AsyncNotifier<List<PurchasableProduct>>
   @override
   ToastManager get toastManager => ref.read(toastManagerProvider);
   @override
+  PurchasesRepository get repository => ref.read(purchasesRepositoryProvider);
+  @override
   AppLocalizations get strings => ref.read(stringsProvider);
 
   @override
   List<String> get kIds => Constants.inAppProductsKeys.toList();
 
   @override
-  bool isConsumable(String productId) =>
-      Constants.inAppConsumableProductsKeys.contains(productId);
-
-  @override
   FutureOr<List<PurchasableProduct>> build() {
     init();
-    ref.onDispose(dispose);
+    logs.writeLog('PurchasesManager build');
+    ref.onDispose(() {
+      logs.writeLog('PurchasesManager dispose');
+      dispose();
+    });
 
     return loadPurchases();
   }
 
   @override
   Future<void> handlePurchase(PurchaseDetails purchaseDetails) async {
+    if (!ref.mounted) {
+      return;
+    }
+
     if (purchaseDetails.status == PurchaseStatus.purchased ||
         purchaseDetails.status == PurchaseStatus.restored) {
       // Validating the purchase
-      var validPurchase = await verifyPurchase(purchaseDetails);
+      var validPurchase =
+          await repository.verifyPurchase(purchaseDetails.productID);
 
       if (validPurchase) {
         // Applying the purchase
@@ -66,7 +75,7 @@ class PurchasesManager extends AsyncNotifier<List<PurchasableProduct>>
     }
 
     if (purchaseDetails.status == PurchaseStatus.error) {
-      logs.writeLog('Error purchase: ${purchaseDetails.error?.message}');
+      logs.writeLog('Error purchase: ${purchaseDetails.productID}');
       toastManager.showToast(
         '${strings.toast_purchase_error_named} ${strings.getProductNameById(purchaseDetails.productID)}.',
       );
@@ -78,65 +87,7 @@ class PurchasesManager extends AsyncNotifier<List<PurchasableProduct>>
 
     // Confirm that the purchase has been processed correctly.
     if (purchaseDetails.pendingCompletePurchase) {
-      await InAppPurchase.instance.completePurchase(purchaseDetails);
+      await repository.completePurchase(purchaseDetails.productID);
     }
   }
-
-  Future<void> buyItem(String productId) async {
-    final product = state.requireValue
-        .firstWhereOrNull((element) => element.id == productId);
-
-    if (product == null) {
-      throw Exception('Product not found');
-    }
-
-    return super.buyProduct(product.productDetails);
-  }
-
-  /*void purchasesUpdate() {
-    var subscriptions = <PurchasableProduct>[];
-    var upgrades = <PurchasableProduct>[];
-    // Get a list of purchasable products for the subscription and upgrade.
-    // This should be 1 per type.
-    if (products.isNotEmpty) {
-      subscriptions = products
-          .where((element) => element.productDetails.id == storeKeySubscription)
-          .toList();
-      upgrades = products
-          .where((element) => element.productDetails.id == storeKeyUpgrade)
-          .toList();
-    }
-
-    // Set the subscription and show/hide purchased on the purchases page.
-    if (iapRepository.hasActiveSubscription) {
-      subscriptionManager.applySubscription();
-      for (var element in subscriptions) {
-        _updateStatus(element, ProductStatus.purchased);
-      }
-    } else {
-      subscriptionManager.removeSubscription();
-      for (var element in subscriptions) {
-        _updateStatus(element, ProductStatus.purchasable);
-      }
-    }
-
-    // Set the single buy upgrade and show/hide purchased on the purchases page.
-    if (iapRepository.hasUpgrade != _upgrade) {
-      _upgrade = iapRepository.hasUpgrade;
-      for (var element in upgrades) {
-        _updateStatus(
-          element,
-          _upgrade ? ProductStatus.purchased : ProductStatus.purchasable,
-        );
-      }
-      notifyListeners();
-    }
-  }
-
-  void _updateStatus(PurchasableProduct product, ProductStatus status) {
-    if (product.status != status) {
-      product.status = status;
-      notifyListeners();
-    }
-  }*/
 }

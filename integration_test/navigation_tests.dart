@@ -4,7 +4,6 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pocket_chips/app/application.dart';
-import 'package:pocket_chips/di/domain_managers.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
@@ -13,7 +12,7 @@ import 'package:pocket_chips/domain/models/player/player_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 import 'package:pocket_chips/services/assets_provider.dart';
 
-import 'mocks/pro_version_manager_mock.dart';
+import 'mocks/purchases_repository_mock.dart';
 import 'navigation_tests.mocks.dart';
 import 'pages/common_tester.dart';
 import 'pages/game_page.dart';
@@ -52,10 +51,9 @@ void main() {
         banks: {for (var player in players) player.uid: 100},
       );
 
-      // Создаем мок-менеджер с начальным состоянием и состоянием после restorePurchases
-      final mockManager = MockProVersionManager(
-        restoredState: null,
-      );
+      final mockPurchasesRepository =
+          MockPurchasesRepository(hasPurchasesForRestore: false)
+            ..setScenario(MockScenario.success);
 
       when(repository.getConfig()).thenAnswer(
         (_) async => mockConfig,
@@ -68,7 +66,8 @@ void main() {
         ProviderScope(
           overrides: [
             appRepositoryProvider.overrideWithValue(repository),
-            proVersionManagerProvider.overrideWith(() => mockManager),
+            purchasesRepositoryProvider
+                .overrideWithValue(mockPurchasesRepository),
             lobbyStateHolderProvider.overrideWithBuild(
               (_, __) async => mockLobbyState,
             ),

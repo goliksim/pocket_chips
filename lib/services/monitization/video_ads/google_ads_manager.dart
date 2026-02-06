@@ -1,25 +1,34 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../../utils/logs.dart';
+import 'models/iterstitial_ad_state.dart';
 
-class GoogleAdsManager with ChangeNotifier {
+class GoogleAdsManager extends Notifier<IterstitialAdState> {
   static const int _maxFailedLoadAttempts = 3;
 
-  InterstitialAd? _interstitialAd;
   int _numInterstitialLoadAttempts = 0;
+  InterstitialAd? _interstitialAd;
+
+  bool get isReady => state == IterstitialAdState.ready;
 
   //RewardedAd? _rewardedAd;
   //final int _numRewardedLoadAttempts = 0;
 
-  GoogleAdsManager() {
-    _createInterstitialAd();
-    //_createRewardedAd();
-  }
+  @override
+  IterstitialAdState build() {
+    ref.onDispose(() {
+      _interstitialAd?.dispose();
+    });
 
-  bool get loaded => _interstitialAd != null;
+    _createInterstitialAd();
+
+    return IterstitialAdState.loading;
+  }
 
   static String get _interstitialAdUnitId {
     if (Platform.isAndroid) {
@@ -31,11 +40,10 @@ class GoogleAdsManager with ChangeNotifier {
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    _interstitialAd?.dispose();
-    //_rewardedAd?.dispose();
+  void reload() {
+    logs.writeLog('GoogleAdsManager reload');
+
+    _createInterstitialAd();
   }
 
   Future<void> showInterstitialAd({VoidCallback? onAdDismissed}) async {
@@ -64,8 +72,9 @@ class GoogleAdsManager with ChangeNotifier {
         _createInterstitialAd();
       },
     );
-    _interstitialAd!.show();
-    _interstitialAd = null;
+    _interstitialAd?.show();
+
+    state = IterstitialAdState.loading;
   }
 
   void _createInterstitialAd() {
@@ -77,21 +86,21 @@ class GoogleAdsManager with ChangeNotifier {
           logs.writeLog(
             'InterstitialAd loaded: ${ad.responseInfo?.responseId}',
           );
-          _interstitialAd = ad;
           _numInterstitialLoadAttempts = 0;
-          _interstitialAd!.setImmersiveMode(true);
+          ad.setImmersiveMode(true);
+          _interstitialAd = ad;
 
-          notifyListeners();
+          state = IterstitialAdState.ready;
         },
         onAdFailedToLoad: (LoadAdError error) {
           logs.writeLog('InterstitialAd failed to load: $error.');
           _numInterstitialLoadAttempts += 1;
-          _interstitialAd = null;
+
           if (_numInterstitialLoadAttempts < _maxFailedLoadAttempts) {
             _createInterstitialAd();
+          } else {
+            state = IterstitialAdState.unavailable;
           }
-
-          notifyListeners();
         },
       ),
     );

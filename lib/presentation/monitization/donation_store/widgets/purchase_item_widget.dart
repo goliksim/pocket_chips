@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/keys/keys.dart';
 import '../../../../utils/extensions.dart';
 import '../../../../utils/theme/ui_values.dart';
 import '../../../common/widgets/ui_widgets.dart';
@@ -18,6 +19,11 @@ class PurchaseItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
+        key: DonationKeys.item(
+          id: itemState.id ?? 'unknown',
+          isBuyed: itemState.alreadyPurchased,
+          loaded: itemState.isLoaded,
+        ),
         height: stdButtonHeight,
         width: double.infinity,
         child: Column(
@@ -37,56 +43,56 @@ class PurchaseItemWidget extends StatelessWidget {
                       Expanded(
                         child: DonationLeadBuilder(item: itemState.lead),
                       ),
-                      itemState.map(
-                        (item) => Text(
-                          item.name,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: context.theme.onBackground,
-                            fontSize: stdFontSize * 0.8,
-                          ),
-                        ),
-                        loading: (_) => SizedBox.shrink(),
-                      ),
-                      // PRICE BOX
-                      itemState.map(
-                        (item) => ColoredBox(
-                          color: item.alreadyPurchased
-                              ? context.theme.successColor
-                              : context.theme.primaryColor,
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: stdButtonHeight * 0.5,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  item.alreadyPurchased
-                                      ? context.strings.purchase_done_text
-                                      : item.priceText,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: context.theme.onPrimary,
-                                    fontSize: stdFontSize * 0.9,
-                                  ),
-                                ),
-                              ],
+                      ...itemState.map(
+                        (item) => [
+                          Text(
+                            item.name,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: context.theme.onBackground,
+                              fontSize: stdFontSize * 0.8,
                             ),
                           ),
-                        ),
-                        loading: (_) => ColoredBox(
-                          color: context.theme.primaryColor,
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: stdButtonHeight * 0.5,
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 3,
-                                color: context.theme.onPrimary,
+                          ColoredBox(
+                            color: item.alreadyPurchased
+                                ? context.theme.successColor
+                                : context.theme.primaryColor,
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: stdButtonHeight * 0.5,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    item.alreadyPurchased
+                                        ? context.strings.purchase_done_text
+                                        : item.priceText,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: context.theme.onPrimary,
+                                      fontSize: stdFontSize * 0.9,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        ),
+                        ],
+                        loading: (_) => [
+                          ColoredBox(
+                            color: context.theme.primaryColor,
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: stdButtonHeight * 0.5,
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                  color: context.theme.onPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

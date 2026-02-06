@@ -5,8 +5,8 @@ import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/domain_managers.dart';
 import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
+import 'package:pocket_chips/domain/models/pro_version/pro_version_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
-import 'package:pocket_chips/services/monitization/purchases/models/pro_version_model.dart';
 
 import '../pages/home_page.dart';
 import '../pages/onboarding_page.dart';

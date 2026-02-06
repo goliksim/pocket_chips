@@ -15,6 +15,8 @@ extension CheckCardsBuilder on BuildContext {
       CheckCardsInherited.of(this).updateCombinations;
 }
 
+//TODO refactoring
+// ignore: must_be_immutable
 class CheckCardsInherited extends InheritedWidget {
   CheckCardsInherited({
     required this.winner,
