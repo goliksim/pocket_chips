@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 import '../../common/widgets/ui_widgets.dart';
@@ -10,7 +11,7 @@ class LobbyResetButton extends StatelessWidget {
 
   const LobbyResetButton({
     required this.onTap,
-    super.key,
+    super.key = LobbyKeys.resetLobbyButton,
   });
 
   @override

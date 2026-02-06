@@ -119,7 +119,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
 
   @override
   Widget build(BuildContext context) => Dialog(
-        key: CommonKeys.settingsDialog,
+        key: GameSettingsKeys.dialog,
         elevation: 0,
         backgroundColor: context.theme.bgrColor,
         insetPadding: EdgeInsets.symmetric(
@@ -185,6 +185,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                           child: Form(
                             key: _formKey,
                             child: TextFormField(
+                              key: GameSettingsKeys.stackField,
                               focusNode: focusNode1,
                               controller: _bankController,
                               keyboardType: TextInputType.number,
@@ -238,6 +239,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                       child: SizedBox(
                         height: stdButtonHeight / 2,
                         child: TextFormField(
+                          key: GameSettingsKeys.smallBlindField,
                           focusNode: focusNode2,
                           controller: _sbController,
                           maxLines: 1,
@@ -790,6 +792,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                 */
               // Save Button
               MyButton(
+                key: GameSettingsKeys.confirmButton,
                 height: stdButtonHeight * 0.75,
                 width: double.infinity,
                 buttonColor: context.theme.primaryColor,

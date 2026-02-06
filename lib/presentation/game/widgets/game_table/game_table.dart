@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../app/keys/keys.dart';
 import '../../../../domain/models/lobby/lobby_state_model.dart';
 import '../../../../services/assets_provider.dart';
 import '../../../../utils/extensions.dart';
@@ -133,6 +134,7 @@ class GameTable extends StatelessWidget {
         Positioned(
           bottom: tableHeight * 0.155,
           child: Text(
+            key: GameKeys.blinds(tableState.smallBlindValue),
             '${tableState.smallBlindValue.toSeparated} / ${(tableState.smallBlindValue * 2).toSeparated}',
             style: TextStyle(
               color: context.theme.onBackground.withAlpha(200),

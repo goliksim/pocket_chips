@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 import '../../common/widgets/ui_widgets.dart';
@@ -11,7 +12,7 @@ class LobbyStackButton extends StatelessWidget {
   const LobbyStackButton({
     required this.onTap,
     required this.startingStack,
-    super.key,
+    super.key = LobbyKeys.startingStackButton,
   });
 
   @override

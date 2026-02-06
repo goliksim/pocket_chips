@@ -41,6 +41,7 @@ class LobbyPageBottomButtons extends StatelessWidget {
             // Settings
             if (canEditSettings)
               MyButton(
+                key: LobbyKeys.settingsButton,
                 height: stdButtonHeight,
                 buttonColor: context.theme.secondaryColor,
                 action: () => openSettingsTap(),

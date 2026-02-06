@@ -33,14 +33,27 @@ class HomeKeys {
 class LobbyKeys {
   static const Key page = Key('lobbyPage');
 
+  static const Key startingStackButton = Key('startingStackButton');
+  static const Key resetLobbyButton = Key('resetLobbyButton');
   static const Key savedPlayersButton = Key('savedPlayersButton');
   static const Key addPlayerButton = Key('addPlayerButton');
 
   static const Key gameButton = Key('gameButton');
+  static const Key settingsButton = Key('settingsButton');
 
   static Key playerCard(String name) => Key('playerCard_$name');
+  static Key playerBank(int bank) => Key('playerBank_$bank');
+  static const Key dealerIcon = Key('player_dealer_icon');
+
   static Key userAvatarKeyByAsset(String asset) =>
       Key('user_asset_avatar_$asset');
+}
+
+class BankEditorKeys {
+  static Key dialog = Key('bank_editor_dialog');
+
+  static Key textField = Key('bank_editor_text_field');
+  static Key confirmButton = Key('bank_editor_confirm_button');
 }
 
 /// Keys for the Game Page.
@@ -50,6 +63,8 @@ class GameKeys {
 
   static Key gameStatusTitle(GameStatusEnum status) =>
       Key('gameStatusTitle_${status.name}');
+  static Key blinds(int smallBlind) =>
+      Key('blinds_${smallBlind}_${smallBlind * 2}');
 
   static const startGameButton = Key('startGameButton');
   static const settingsButton = Key('settingsButton');
@@ -64,6 +79,8 @@ class PlayerEditorKeys {
   static Key avatarKeyByAsset(String asset) => Key('asset_avatar_$asset');
 
   static const Key usernameField = Key('usernameField');
+  static const Key bankField = Key('bankField');
+  static const Key dealerCheckbox = Key('dealerCheckbox');
 
   static const Key confirmButton = Key('confirmButton');
 }
@@ -106,12 +123,19 @@ class SavedPlayersKeys {
   static Key playerCard(String name) => Key('saved_playerCard_$name');
 }
 
+class GameSettingsKeys {
+  static const Key dialog = Key('settings_dialog');
+
+  static const Key stackField = Key('settings_stack_field');
+  static const Key smallBlindField = Key('settings_sm_blind_field');
+
+  static const Key confirmButton = Key('settings_confirm_button');
+}
+
 class CommonKeys {
   static Key themeKey(Themes theme) => Key('theme_${theme.name}');
   static const Key closePageButton = Key('close_page_button');
 
   static const Key confirmationWindow = Key('confirmationWindow');
   static const Key confirmButton = Key('confirmButton');
-
-  static const Key settingsDialog = Key('settingsDialog');
 }

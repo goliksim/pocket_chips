@@ -176,6 +176,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                         SizedBox(
                           height: stdButtonHeight * 0.6,
                           child: TextFormField(
+                            key: PlayerEditorKeys.bankField,
                             keyboardType: TextInputType.number,
                             focusNode: focusNodeStack,
                             style: TextStyle(
@@ -237,6 +238,7 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                                 child: Transform.scale(
                                   scale: 1.25,
                                   child: Checkbox(
+                                    key: PlayerEditorKeys.dealerCheckbox,
                                     checkColor: Colors.white,
                                     fillColor: WidgetStateProperty.all<Color>(
                                       player.makeDealer

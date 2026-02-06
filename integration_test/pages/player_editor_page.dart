@@ -30,6 +30,18 @@ class PlayerEditorTester {
     await tester.enterText(find.byKey(PlayerEditorKeys.usernameField), text);
   }
 
+  Future<void> enterBank(String text) async {
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(PlayerEditorKeys.bankField), text);
+  }
+
+  Future<void> toggleDealer() async {
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(PlayerEditorKeys.dealerCheckbox));
+  }
+
   Future<void> tapConfirmButton() async {
     await tester.pumpAndSettle();
 

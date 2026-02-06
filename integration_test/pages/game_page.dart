@@ -20,9 +20,15 @@ class GamePageTester {
     await tester.pumpAndSettle();
 
     expect(
-      find.byKey(CommonKeys.settingsDialog),
+      find.byKey(GameSettingsKeys.dialog),
       isVisible ? findsOneWidget : findsNothing,
     );
+  }
+
+  Future<void> verifySmallBlind(int smallBlind) async {
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(GameKeys.blinds(smallBlind)), findsOneWidget);
   }
 
   Future<void> verifyGameStatus(GameStatusEnum status) async {

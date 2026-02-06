@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 import '../../common/widgets/ui_widgets.dart';
@@ -42,6 +43,7 @@ class _BankWindowState extends State<BankEditorDialog> {
 
   @override
   Widget build(BuildContext context) => Dialog(
+        key: BankEditorKeys.dialog,
         elevation: 0,
         backgroundColor: context.theme.bgrColor,
         insetPadding: EdgeInsets.symmetric(
@@ -87,6 +89,7 @@ class _BankWindowState extends State<BankEditorDialog> {
                   borderRadius: BorderRadius.circular(stdBorderRadius),
                 ),
                 child: TextFormField(
+                  key: BankEditorKeys.textField,
                   controller: _bankController,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
@@ -119,6 +122,7 @@ class _BankWindowState extends State<BankEditorDialog> {
                 height: stdHorizontalOffset,
               ),
               MyButton(
+                key: BankEditorKeys.confirmButton,
                 height: stdButtonHeight * 0.75,
                 width: double.infinity,
                 buttonColor: (tmpBank >= 1)

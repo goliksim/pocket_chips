@@ -18,13 +18,29 @@ class LobbyPageTester {
   Future<void> tapSavedPlayersButton() async {
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(LobbyKeys.savedPlayersButton));
+    final finder = find.byKey(LobbyKeys.savedPlayersButton);
+    await tester.ensureVisible(finder);
+    await tester.tap(finder);
   }
 
   Future<void> tapAddPlayersButton() async {
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(LobbyKeys.addPlayerButton));
+    final finder = find.byKey(LobbyKeys.addPlayerButton);
+    await tester.ensureVisible(finder);
+    await tester.tap(finder);
+  }
+
+  Future<void> tapStartingStackButton() async {
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(LobbyKeys.startingStackButton));
+  }
+
+  Future<void> tapSettingsButton() async {
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(LobbyKeys.settingsButton));
   }
 
   Future<void> toGame() async {
@@ -46,6 +62,45 @@ class LobbyPageTester {
       find.byKey(LobbyKeys.userAvatarKeyByAsset(assetUrl)),
       findsOneWidget,
     );
+  }
+
+  Future<void> verifyPlayerBank({
+    required String name,
+    required int expectedBank,
+  }) async {
+    await tester.pumpAndSettle();
+
+    final cardFinder = find.byKey(LobbyKeys.playerCard(name));
+    final bankFinder = find.descendant(
+      of: cardFinder,
+      matching: find.byKey(LobbyKeys.playerBank(expectedBank)),
+    );
+
+    expect(bankFinder, findsOneWidget);
+  }
+
+  Future<void> verifyAddPlayerButtonVisible(bool isVisible) async {
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(LobbyKeys.addPlayerButton),
+      isVisible ? findsOneWidget : findsNothing,
+    );
+  }
+
+  Future<void> verifyDealerVisible({
+    required String name,
+    bool isVisible = true,
+  }) async {
+    await tester.pumpAndSettle();
+
+    final cardFinder = find.byKey(LobbyKeys.playerCard(name));
+    final dealerIcon = find.descendant(
+      of: cardFinder,
+      matching: find.byKey(LobbyKeys.dealerIcon),
+    );
+
+    expect(dealerIcon, isVisible ? findsOneWidget : findsNothing);
   }
 
   Future<void> savePlayerByName(String name) async {
@@ -72,7 +127,7 @@ class LobbyPageTester {
     await tester.timedDrag(
       find.byKey(LobbyKeys.playerCard(name)),
       offset,
-      Duration(seconds: 10),
+      Duration(seconds: 2),
     );
   }
 }

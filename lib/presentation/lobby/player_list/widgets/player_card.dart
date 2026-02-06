@@ -164,6 +164,7 @@ class PlayerCard extends StatelessWidget {
                                 ),
                                 if (player.bank != null)
                                   Text(
+                                    key: LobbyKeys.playerBank(player.bank!),
                                     player.bank!.toSeparatedBank,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -190,6 +191,7 @@ class PlayerCard extends StatelessWidget {
                         message: context.strings.tooltip_dealer,
                         verticalOffset: stdButtonHeight / 6,
                         child: Icon(
+                          key: LobbyKeys.dealerIcon,
                           MdiIcons.cardsPlaying,
                           color: context.theme.primaryColor,
                           size: stdIconSize * 0.9,
