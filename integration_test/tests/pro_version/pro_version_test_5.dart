@@ -6,15 +6,15 @@ import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
-import '../mocks/purchases_repository_mock.dart';
-import '../pages/home_page.dart';
-import '../pages/onboarding_page.dart';
-import '../pages/pro_version_offer_page.dart';
+import '../../mocks/purchases_repository_mock.dart';
+import '../../pages/home_page.dart';
+import '../../pages/onboarding_page.dart';
+import '../../pages/pro_version_offer_page.dart';
 
 /// [ProVersionTest]
-/// Cached PRO mode, store is available and returned PRO MODE
-/// Restored from store
-Future<void> runProVersionTest1(
+/// No cached PRO mode, didn't restore from store (force disable)
+/// Checking Pro Mode during onboarding and on HomePage
+Future<void> runProVersionTest5(
   WidgetTester tester,
   AppRepository repository,
 ) async {
@@ -25,16 +25,16 @@ Future<void> runProVersionTest1(
     version: '2.0.0',
   );
 
+  final mockPurchasesRepository =
+      MockPurchasesRepository(hasPurchasesForRestore: false)
+        ..setScenario(MockScenario.success);
+
   when(repository.getConfig()).thenAnswer(
     (_) async => mockConfig,
   );
   when(repository.isProVersion()).thenAnswer(
-    (_) async => true,
+    (_) async => false,
   );
-
-  final mockPurchasesRepository =
-      MockPurchasesRepository(hasPurchasesForRestore: true)
-        ..setScenario(MockScenario.success);
 
   await tester.pumpWidget(
     ProviderScope(
@@ -51,17 +51,16 @@ Future<void> runProVersionTest1(
   final onboardingPage = OnboardingPageTester(tester);
 
   await onboardingPage.verifyAboutDialogIsVisible();
-
   await onboardingPage.swipePage();
-  await tester.pumpAndSettle(Duration(seconds: 3));
 
+  await tester.pumpAndSettle(Duration(seconds: 3));
   final proVerionOfferPage = ProVersionOfferPageTester(tester);
-  await proVerionOfferPage.verifyProVersionIsPurchased();
+  await proVerionOfferPage.verifyProVersionIsAvailable();
 
   await onboardingPage.tapSkipButton();
   await onboardingPage.closeOnboardingDialog();
 
   final homePage = HomePageTester(tester);
 
-  await homePage.verifyIsProVersionScreen();
+  await homePage.verifyIsNotProVersionScreen();
 }

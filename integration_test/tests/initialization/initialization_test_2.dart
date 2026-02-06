@@ -7,9 +7,9 @@ import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/models/pro_version/pro_version_model.dart';
 
-import '../initialization_tests.mocks.dart';
-import '../pages/home_page.dart';
-import '../pages/onboarding_page.dart';
+import '../../initialization_tests.mocks.dart';
+import '../../pages/home_page.dart';
+import '../../pages/onboarding_page.dart';
 
 /// [InitializationTest]
 /// Checking the patch note display for launch

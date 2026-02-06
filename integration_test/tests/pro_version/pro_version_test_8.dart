@@ -10,19 +10,23 @@ import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 import 'package:pocket_chips/services/assets_provider.dart';
+import 'package:pocket_chips/utils/theme/themes.dart';
 
-import '../mocks/lobby_state_holder_mock.dart';
-import '../mocks/purchases_repository_mock.dart';
-import '../pages/game_page.dart';
-import '../pages/home_page.dart';
-import '../pages/lobby_page.dart';
-import '../pages/player_editor_page.dart';
-import '../pages/pro_version_offer_page.dart';
+import '../../mocks/lobby_state_holder_mock.dart';
+import '../../mocks/purchases_repository_mock.dart';
+import '../../pages/common_tester.dart';
+import '../../pages/game_page.dart';
+import '../../pages/home_page.dart';
+import '../../pages/lobby_page.dart';
+import '../../pages/player_editor_page.dart';
+import '../../pages/pro_version_offer_page.dart';
+import '../../pages/saved_players_page.dart';
+import '../../pages/solver_page.dart';
 
 /// [ProVersionTest]
-/// No cached PRO mode, store is unavailable
-/// Checking all pro features locked
-Future<void> runProVersionTest7(
+/// Cached PRO mode, store is unavailable
+/// Checking all pro features available
+Future<void> runProVersionTest8(
   WidgetTester tester,
   AppRepository repository,
 ) async {
@@ -33,13 +37,22 @@ Future<void> runProVersionTest7(
     version: '2.0.0',
   );
   final players = List.generate(
-    noProPlayerCount - 1,
+    noProPlayerCount,
     (index) => PlayerModel(
       uid: 'test_uid_$index',
       name: 'name_$index',
       assetUrl: AssetsProvider.emptyPlayerAsset,
     ),
   );
+
+  final restoredName = 'saved_name';
+  final savedPlayers = [
+    PlayerModel(
+      uid: 'saved-uid',
+      name: restoredName,
+      assetUrl: AssetsProvider.emptyPlayerAsset,
+    ),
+  ];
 
   final mockLobbyState = LobbyStateModel(
     players: players,
@@ -54,7 +67,10 @@ Future<void> runProVersionTest7(
     (_) async => mockConfig,
   );
   when(repository.isProVersion()).thenAnswer(
-    (_) async => false,
+    (_) async => true,
+  );
+  when(repository.getSavedPlayers()).thenAnswer(
+    (_) async => savedPlayers,
   );
 
   await tester.pumpWidget(
@@ -64,7 +80,7 @@ Future<void> runProVersionTest7(
         proVersionRepository.overrideWithValue(mockPurchasesRepository),
         lobbyStateHolderProvider.overrideWith(
           () => MockLobbyStateHolder(initialState: mockLobbyState),
-        )
+        ),
       ],
       child: const MyApp(),
     ),
@@ -74,60 +90,59 @@ Future<void> runProVersionTest7(
 
   final homePage = HomePageTester(tester);
 
-  await homePage.verifyIsNotProVersionScreen();
+  await homePage.verifyIsProVersionScreen();
 
   final proVersionPage = ProVersionOfferPageTester(tester);
 
   // Change theme feature
   await homePage.tapChangeThemeButton();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
+  await homePage.verifyTheme(Themes.dark());
 
-  // Continue game feature
-  await homePage.tapContinueButton();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
+  final solverPage = SolverPageTester(tester);
 
   // Solver feature
   await homePage.tapSolverButton();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
+  await solverPage.verifyIsVisible();
+  await CommonTester.closeDialog(tester);
 
   final lobbyPage = LobbyPageTester(tester);
 
-  await homePage.tapNewGameButton();
-  await homePage.verifyConfirmationWindowIsVisible();
-  await homePage.tapConfirmationButton();
+  // Continue game feature
+  await homePage.tapContinueButton();
   await lobbyPage.verifyIsVisible();
+
+  final savedPlayersPage = SavedPlayersPageTester(tester);
 
   // Saved players feature
   await lobbyPage.tapSavedPlayersButton();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
+  await savedPlayersPage.verifyIsVisible();
+  await savedPlayersPage.usePlayerByName(restoredName);
+  await CommonTester.closeDialog(tester);
+  await tester.pumpAndSettle(Duration(seconds: 1)); // Auto-scroll waiting
+  await lobbyPage.findPlayerWithName(restoredName);
 
   final playerEditorPage = PlayerEditorTester(tester);
 
-  // Add players feature (5th player free, 6th player unavailable)
+  // Add players feature (6th player available)
   await lobbyPage.tapAddPlayersButton();
   final testName = 'test_123';
+  final assetIndex = 0;
+  final assetUrl = AssetsProvider.playerAssetByIndex(0);
   await playerEditorPage.verifyIsVisible();
   await playerEditorPage.enterName(testName);
   await playerEditorPage.tapAvatar();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
+  await playerEditorPage.verifyAvatarSelectorIsVisible();
+  await playerEditorPage.selectAvatar(assetIndex);
+  await playerEditorPage.verifyAvatarByAssetUrl(assetUrl);
   await playerEditorPage.tapConfirmButton();
   await playerEditorPage.verifyIsVisible(isVisible: false);
   await tester.pumpAndSettle(Duration(seconds: 1)); // Auto-scroll waiting
   await lobbyPage.findPlayerWithName(testName);
-
-  await lobbyPage.tapAddPlayersButton();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
+  await lobbyPage.findPlayerWithAssetUrl(assetUrl);
 
   // Save player feature
   await lobbyPage.savePlayerByName(testName);
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
+  await proVersionPage.verifyOfferIsVisible(isVisible: false);
 
   final gamePage = GamePageTester(tester);
 
@@ -138,6 +153,6 @@ Future<void> runProVersionTest7(
   await gamePage.startGame();
   await gamePage.verifyGameStatus(GameStatusEnum.preFlop);
   await gamePage.tapUndoActionButton();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
+  await gamePage.verifyUndoButtonIsNotVisible();
+  await gamePage.verifyGameStatus(GameStatusEnum.notStarted);
 }

@@ -7,10 +7,10 @@ import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
-import '../mocks/google_ads_manager_mock.dart' hide MockScenario;
-import '../mocks/purchases_repository_mock.dart';
-import '../pages/donation_page.dart';
-import '../pages/home_page.dart';
+import '../../mocks/google_ads_manager_mock.dart' hide MockScenario;
+import '../../mocks/purchases_repository_mock.dart';
+import '../../pages/donation_page.dart';
+import '../../pages/home_page.dart';
 
 /// [MonitizationTest]
 /// Cached PRO mode

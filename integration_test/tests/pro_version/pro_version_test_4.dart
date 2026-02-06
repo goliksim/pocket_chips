@@ -6,16 +6,15 @@ import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
-import '../mocks/purchases_repository_mock.dart';
-import '../pages/home_page.dart';
-import '../pages/onboarding_page.dart';
-import '../pages/pro_version_offer_page.dart';
+import '../../mocks/purchases_repository_mock.dart';
+import '../../pages/home_page.dart';
+import '../../pages/onboarding_page.dart';
+import '../../pages/pro_version_offer_page.dart';
 
 /// [ProVersionTest]
-/// No cached PRO mode, store is unavailable
-/// Closing onboarding, returning with connection, restore PRO MODE
+/// No cached PRO mode, restoring from store
 /// Checking Pro Mode during onboarding and on HomePage
-Future<void> runProVersionTest6(
+Future<void> runProVersionTest4(
   WidgetTester tester,
   AppRepository repository,
 ) async {
@@ -25,9 +24,10 @@ Future<void> runProVersionTest6(
     locale: 'en',
     version: '2.0.0',
   );
+
   final mockPurchasesRepository =
       MockPurchasesRepository(hasPurchasesForRestore: true)
-        ..setScenario(MockScenario.offline);
+        ..setScenario(MockScenario.success);
 
   when(repository.getConfig()).thenAnswer(
     (_) async => mockConfig,
@@ -53,31 +53,14 @@ Future<void> runProVersionTest6(
   await onboardingPage.verifyAboutDialogIsVisible();
   await onboardingPage.swipePage();
 
-  await tester.pumpAndSettle();
-
+  await tester.pumpAndSettle(Duration(seconds: 3));
   final proVerionOfferPage = ProVersionOfferPageTester(tester);
-  await proVerionOfferPage.verifyProVersionIsNotAvailable();
+  await proVerionOfferPage.verifyProVersionIsPurchased();
 
   await onboardingPage.tapSkipButton();
   await onboardingPage.closeOnboardingDialog();
 
   final homePage = HomePageTester(tester);
-
-  await homePage.verifyIsNotProVersionScreen();
-
-  // Turning on connection
-  mockPurchasesRepository.setScenario(MockScenario.success);
-
-  await homePage.tapHelpButton();
-  await onboardingPage.verifyAboutDialogIsVisible();
-  await onboardingPage.swipePage();
-
-  await tester.pumpAndSettle();
-  await proVerionOfferPage.verifyProVersionIsAvailable();
-  await proVerionOfferPage.tapBuyPROButton();
-
-  await onboardingPage.tapSkipButton();
-  await onboardingPage.closeOnboardingDialog();
 
   await homePage.verifyIsProVersionScreen();
 }

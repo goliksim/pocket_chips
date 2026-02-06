@@ -6,15 +6,16 @@ import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
-import '../mocks/purchases_repository_mock.dart';
-import '../pages/home_page.dart';
-import '../pages/onboarding_page.dart';
-import '../pages/pro_version_offer_page.dart';
+import '../../mocks/purchases_repository_mock.dart';
+import '../../pages/home_page.dart';
+import '../../pages/onboarding_page.dart';
+import '../../pages/pro_version_offer_page.dart';
 
 /// [ProVersionTest]
-/// No cached PRO mode, didn't restore from store (force disable)
+/// No cached PRO mode, store is unavailable
+/// Closing onboarding, returning with connection, restore PRO MODE
 /// Checking Pro Mode during onboarding and on HomePage
-Future<void> runProVersionTest5(
+Future<void> runProVersionTest6(
   WidgetTester tester,
   AppRepository repository,
 ) async {
@@ -24,10 +25,9 @@ Future<void> runProVersionTest5(
     locale: 'en',
     version: '2.0.0',
   );
-
   final mockPurchasesRepository =
-      MockPurchasesRepository(hasPurchasesForRestore: false)
-        ..setScenario(MockScenario.success);
+      MockPurchasesRepository(hasPurchasesForRestore: true)
+        ..setScenario(MockScenario.offline);
 
   when(repository.getConfig()).thenAnswer(
     (_) async => mockConfig,
@@ -53,9 +53,10 @@ Future<void> runProVersionTest5(
   await onboardingPage.verifyAboutDialogIsVisible();
   await onboardingPage.swipePage();
 
-  await tester.pumpAndSettle(Duration(seconds: 3));
+  await tester.pumpAndSettle();
+
   final proVerionOfferPage = ProVersionOfferPageTester(tester);
-  await proVerionOfferPage.verifyProVersionIsAvailable();
+  await proVerionOfferPage.verifyProVersionIsNotAvailable();
 
   await onboardingPage.tapSkipButton();
   await onboardingPage.closeOnboardingDialog();
@@ -63,4 +64,20 @@ Future<void> runProVersionTest5(
   final homePage = HomePageTester(tester);
 
   await homePage.verifyIsNotProVersionScreen();
+
+  // Turning on connection
+  mockPurchasesRepository.setScenario(MockScenario.success);
+
+  await homePage.tapHelpButton();
+  await onboardingPage.verifyAboutDialogIsVisible();
+  await onboardingPage.swipePage();
+
+  await tester.pumpAndSettle();
+  await proVerionOfferPage.verifyProVersionIsAvailable();
+  await proVerionOfferPage.tapBuyPROButton();
+
+  await onboardingPage.tapSkipButton();
+  await onboardingPage.closeOnboardingDialog();
+
+  await homePage.verifyIsProVersionScreen();
 }

@@ -8,8 +8,8 @@ import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/models/pro_version/pro_version_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
-import '../pages/home_page.dart';
-import '../pages/onboarding_page.dart';
+import '../../pages/home_page.dart';
+import '../../pages/onboarding_page.dart';
 
 /// [InitializationTest]
 /// Checking the onboarding display for the first launch

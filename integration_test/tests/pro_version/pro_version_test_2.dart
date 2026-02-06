@@ -6,10 +6,10 @@ import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
-import '../mocks/purchases_repository_mock.dart';
-import '../pages/home_page.dart';
-import '../pages/onboarding_page.dart';
-import '../pages/pro_version_offer_page.dart';
+import '../../mocks/purchases_repository_mock.dart';
+import '../../pages/home_page.dart';
+import '../../pages/onboarding_page.dart';
+import '../../pages/pro_version_offer_page.dart';
 
 /// [ProVersionTest]
 /// Сached PRO mode,  didn't restore from store - force disable

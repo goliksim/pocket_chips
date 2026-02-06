@@ -4,8 +4,8 @@ import 'package:mockito/annotations.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import 'initialization_tests.mocks.dart';
-import 'tests/initialization_test_1.dart';
-import 'tests/initialization_test_2.dart';
+import 'tests/initialization/initialization_test_1.dart';
+import 'tests/initialization/initialization_test_2.dart';
 
 @GenerateMocks([AppRepository])
 void main() {
