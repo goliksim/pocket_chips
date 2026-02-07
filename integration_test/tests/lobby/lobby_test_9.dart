@@ -3,7 +3,7 @@ import 'package:pocket_chips/app/keys/keys.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 import 'package:pocket_chips/services/assets_provider.dart';
 
-import '../../lobby_tests.mocks.dart';
+import '../../lobby_test.mocks.dart';
 import '../../pages/home_page.dart';
 import '../../pages/lobby_page.dart';
 import '../../pages/player_editor_page.dart';

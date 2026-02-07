@@ -13,7 +13,7 @@ import 'package:pocket_chips/domain/repositories/app_repository.dart';
 import 'package:pocket_chips/services/assets_provider.dart';
 
 import 'mocks/purchases_repository_mock.dart';
-import 'navigation_tests.mocks.dart';
+import 'navigation_test.mocks.dart';
 import 'pages/common_tester.dart';
 import 'pages/game_page.dart';
 import 'pages/home_page.dart';

@@ -45,9 +45,7 @@ class PurchasesRepositoryImpl implements PurchasesRepository {
       _inAppPurchaseRepository.restorePurchases();
 
   @override
-  Future<bool> verifyPurchase(String purchaseId) async {
-    // TODO verify with backend
-    // https://github.com/flutter/codelabs/blob/main/in_app_purchases/complete/app/lib/logic/dash_purchases.dart#L116
-    return true;
-  }
+  // TODO verify with backend
+  // https://github.com/flutter/codelabs/blob/main/in_app_purchases/complete/app/lib/logic/dash_purchases.dart#L116
+  Future<bool> verifyPurchase(String purchaseId) async => true;
 }

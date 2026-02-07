@@ -3,7 +3,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
-import 'game_tests.mocks.dart';
+import 'game_test.mocks.dart';
 import 'tests/game/game_test_1.dart';
 import 'tests/game/game_test_10.dart';
 import 'tests/game/game_test_2.dart';

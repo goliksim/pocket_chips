@@ -11,7 +11,7 @@ import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 import 'package:pocket_chips/services/assets_provider.dart';
 
-import '../../game_tests.mocks.dart';
+import '../../game_test.mocks.dart';
 import '../../mocks/lobby_state_holder_mock.dart';
 import '../../mocks/purchases_repository_mock.dart';
 import '../../pages/home_page.dart';

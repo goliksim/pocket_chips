@@ -53,6 +53,8 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
       builder: (context, theme) => Navigator(
         key: navigatorKey,
         pages: pages,
+        // TODO: refactor to use onDidRemovePage
+        //ignore: deprecated_member_use
         onPopPage: (route, result) {
           final didPop = route.didPop(result);
           if (!didPop) return false;

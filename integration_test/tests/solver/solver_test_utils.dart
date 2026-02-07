@@ -9,7 +9,7 @@ import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 
 import '../../mocks/lobby_state_holder_mock.dart';
 import '../../mocks/purchases_repository_mock.dart';
-import '../../solver_tests.mocks.dart';
+import '../../solver_test.mocks.dart';
 
 ConfigModel defaultConfig() => ConfigModel(
       isDark: false,

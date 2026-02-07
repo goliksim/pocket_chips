@@ -3,16 +3,16 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
-import 'initialization_tests.mocks.dart';
-import 'tests/initialization/initialization_test_1.dart';
-import 'tests/initialization/initialization_test_2.dart';
+import 'lobby_test.mocks.dart';
+import 'tests/lobby/lobby_test_11.dart';
+import 'tests/lobby/lobby_test_12.dart';
 
 @GenerateMocks([AppRepository])
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group(
-    'Initialization tests',
+    'Lobby tests',
     () {
       late MockAppRepository mockAppRepository;
 
@@ -21,19 +21,13 @@ void main() {
       });
 
       testWidgets(
-        'Initialization Test 1',
-        (WidgetTester tester) => runInitialization1(
-          tester,
-          mockAppRepository,
-        ),
+        'Lobby Test 11',
+        (WidgetTester tester) => runLobbyTest11(tester, mockAppRepository),
       );
 
       testWidgets(
-        'Initialization Test 2',
-        (WidgetTester tester) => runInitialization2(
-          tester,
-          mockAppRepository,
-        ),
+        'Lobby Test 12',
+        (WidgetTester tester) => runLobbyTest12(tester, mockAppRepository),
       );
     },
   );

@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pocket_chips/domain/models/game/game_state_enum.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
-import '../../game_tests.mocks.dart';
+import '../../game_test.mocks.dart';
 import '../../pages/game_page.dart';
 import 'game_test_utils.dart';
 

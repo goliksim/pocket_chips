@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
-import '../../lobby_tests.mocks.dart';
+import '../../lobby_test.mocks.dart';
 import '../../pages/bank_editor_dialog.dart';
 import '../../pages/game_page.dart';
 import '../../pages/game_settings_dialog.dart';

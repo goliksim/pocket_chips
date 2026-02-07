@@ -9,7 +9,7 @@ import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 import 'package:pocket_chips/services/assets_provider.dart';
 
-import '../../lobby_tests.mocks.dart';
+import '../../lobby_test.mocks.dart';
 import '../../mocks/lobby_state_holder_mock.dart';
 import '../../mocks/purchases_repository_mock.dart';
 

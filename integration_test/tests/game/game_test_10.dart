@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
-import '../../game_tests.mocks.dart';
+import '../../game_test.mocks.dart';
 import '../../pages/common_tester.dart';
 import '../../pages/game_page.dart';
 import '../../pages/lobby_page.dart';

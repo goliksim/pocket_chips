@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../pages/home_page.dart';
 import '../../pages/solver_page.dart';
-import '../../solver_tests.mocks.dart';
+import '../../solver_test.mocks.dart';
 import 'solver_test_utils.dart';
 
 /// [SolverTest]
