@@ -7,9 +7,8 @@ extension CheckCardsBuilder on BuildContext {
   int get winner => CheckCardsInherited.of(this).winner;
   List<Combination?> get combinations =>
       CheckCardsInherited.of(this).combinations;
-  List<Card?>? get tableCards => CheckCardsInherited.of(this).tableCards;
-  List<List<Card?>>? get playerCards =>
-      CheckCardsInherited.of(this).playerCards;
+  List<Card?> get tableCards => CheckCardsInherited.of(this).tableCards;
+  List<List<Card?>> get playerCards => CheckCardsInherited.of(this).playerCards;
   Function(Card?) get notInCards => CheckCardsInherited.of(this).notInCards;
   Function get updateCombinations =>
       CheckCardsInherited.of(this).updateCombinations;

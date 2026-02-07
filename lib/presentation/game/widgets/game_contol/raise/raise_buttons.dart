@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../app/keys/keys.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../utils/extensions.dart';
 import '../../../../../utils/theme/ui_values.dart';
@@ -61,6 +62,7 @@ class _RaiseButtonsState extends State<RaiseButtons> {
           flex: 10,
           fit: FlexFit.tight,
           child: ControlButtonWrapper(
+            key: GameControlKeys.raiseCancelButton,
             title: context.strings.game_raise_canc,
             color: context.theme.alertColor,
             action: () => widget.onClose(),
@@ -72,6 +74,7 @@ class _RaiseButtonsState extends State<RaiseButtons> {
           flex: 31,
           fit: FlexFit.tight,
           child: ControlButtonWrapper(
+            key: GameControlKeys.raiseConfirmButton,
             title: _raiseBetConfirmationText(
               strings: context.strings,
               additionalBet: additionalBet,

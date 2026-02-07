@@ -217,6 +217,7 @@ class GameTable extends StatelessWidget {
                     totalElementCount,
                   ),
                   child: _BetWidget(
+                    key: GameTableKeys.playerBet(player.name, player.bet),
                     bet: player.bet,
                   ),
                 ),
@@ -233,6 +234,7 @@ class _BetWidget extends StatelessWidget {
 
   const _BetWidget({
     required this.bet,
+    super.key,
   });
 
   @override

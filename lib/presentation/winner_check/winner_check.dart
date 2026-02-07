@@ -62,12 +62,12 @@ class __WinnerCheckState extends State<_WinnerCheck> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 for (int playerIndex = 0;
-                    playerIndex < context.playerCards!.length;
+                    playerIndex < context.playerCards.length;
                     playerIndex++)
                   Flexible(
                     child: CheckPlayer(
                       callback: callback,
-                      cards: context.playerCards![playerIndex],
+                      cards: context.playerCards[playerIndex],
                       number: playerIndex,
                       winner: context.winner == (playerIndex + 1),
                       combination: context.combinations[playerIndex]?.hand,

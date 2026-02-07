@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../domain/models/cards/card_model.dart' as c;
 import '../../../domain/models/cards/card_model.dart';
 import '../../../domain/winner_solver.dart';
@@ -35,7 +36,7 @@ class CheckPlayer extends StatefulWidget {
 class _CheckPlayerState extends State<CheckPlayer> with ToastsMixin {
   void updateHand(int index, Card? card) {
     if (context.notInCards(card)) {
-      context.playerCards![widget.number][index] = card;
+      context.playerCards[widget.number][index] = card;
       context.updateCombinations();
       widget.callback();
     } else {
@@ -90,6 +91,9 @@ class _CheckPlayerState extends State<CheckPlayer> with ToastsMixin {
                 child: FittedBox(
                   fit: BoxFit.fitHeight,
                   child: Text(
+                    key: widget.winner
+                        ? SolverKeys.winnerBadge(widget.number)
+                        : null,
                     '  ${context.strings.check_player} ${widget.number + 1}${widget.winner ? ' 👑' : ''}',
                     style: TextStyle(
                       color: context.theme.onBackground,
@@ -101,19 +105,28 @@ class _CheckPlayerState extends State<CheckPlayer> with ToastsMixin {
             ),
             Flexible(
               child: RotationCard(
-                firstSide: (int index) => CardButton(
-                  action: (card) {
-                    updateHand(index, card);
-                  },
-                  child: CardFront(
-                    card: context.playerCards![widget.number][index],
-                  ),
-                ),
+                firstSide: (int index) {
+                  final card = context.playerCards[widget.number][index]!;
+
+                  return CardButton(
+                    key: SolverKeys.playerCardButtonFront(widget.number, index),
+                    action: (card) {
+                      updateHand(index, card);
+                    },
+                    child: CardFront(
+                      key: SolverKeys.playerCardFront(widget.number, index),
+                      card: card,
+                    ),
+                  );
+                },
                 secondSide: (int index) => CardButton(
+                  key: SolverKeys.playerCardButtonBack(widget.number, index),
                   action: (card) {
                     updateHand(index, card);
                   },
-                  child: CardBack(),
+                  child: CardBack(
+                    key: SolverKeys.playerCardBack(widget.number, index),
+                  ),
                 ),
                 count: 2,
                 conditionByIndex: (int index) => widget.cards[index] != null,

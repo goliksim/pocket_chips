@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/keys/keys.dart';
 import '../../../../services/assets_provider.dart';
 import '../../../../utils/extensions.dart';
 import '../../../../utils/theme/empty_asset_filter.dart';
@@ -21,6 +22,7 @@ class PlayerField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AnimatedContainer(
+        key: GameTableKeys.playerCard(player.name),
         duration: const Duration(milliseconds: 300),
         height: stdHeight,
         width: stdHeight * 2.2,
@@ -51,6 +53,9 @@ List<Widget> _reversablePlayerWidgetList(
 ) =>
     [
       Stack(
+        key: player.isCurrent
+            ? GameTableKeys.currentPlayerMarker(player.name)
+            : null,
         children: [
           SizedBox(
             width: stdHeight,
@@ -102,6 +107,7 @@ List<Widget> _reversablePlayerWidgetList(
                   fit: BoxFit.fitHeight,
                   child: Text(
                     player.bank.toCompactBank,
+                    key: GameTableKeys.playerBank(player.name, player.bank),
                     style: TextStyle(
                       fontSize: stdFontSize * 0.75,
                       color: player.isCurrent

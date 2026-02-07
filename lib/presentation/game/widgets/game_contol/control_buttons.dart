@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/keys/keys.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../utils/extensions.dart';
 import '../../../../utils/theme/ui_values.dart';
@@ -80,6 +81,7 @@ class ControlButtons extends StatelessWidget {
             flex: 10,
             fit: FlexFit.tight,
             child: ControlButtonWrapper(
+              key: GameControlKeys.raiseButton,
               title: _raiseButtonTitle(strings),
               color: context.theme.primaryColor,
               action: () => _raiseAction(),
@@ -91,6 +93,9 @@ class ControlButtons extends StatelessWidget {
           flex: _raiseButtonActive ? 20 : 31,
           fit: FlexFit.tight,
           child: ControlButtonWrapper(
+            key: _raiseButtonActive
+                ? GameControlKeys.callButton
+                : GameControlKeys.allInButton,
             title: _mainButtonTitle(strings),
             color: context.theme.secondaryColor,
             action: () => _mainAction(),
@@ -102,6 +107,7 @@ class ControlButtons extends StatelessWidget {
           flex: 10,
           fit: FlexFit.tight,
           child: ControlButtonWrapper(
+            key: GameControlKeys.foldButton,
             title: context.strings.game_fold,
             color: context.theme.additionButtonColor,
             action: () => controlAction(GameControlResult.fold()),

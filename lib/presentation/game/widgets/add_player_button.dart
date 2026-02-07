@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 import '../../monitization/pro_version/widgets/pro_version_wrapper.dart';
@@ -22,6 +25,39 @@ class AddPlayerButton extends StatefulWidget {
 
 class _AddPlayerButtonState extends State<AddPlayerButton> {
   bool addButtonPressed = false;
+  Timer? _expandedButtonTimer;
+
+  @override
+  void dispose() {
+    _expandedButtonTimer?.cancel();
+    super.dispose();
+  }
+
+  void _onMainButtonPressed() {
+    setState(() {
+      addButtonPressed = true;
+    });
+    _expandedButtonTimer?.cancel();
+    _expandedButtonTimer = Timer(
+      const Duration(seconds: 10),
+      () {
+        if (mounted) {
+          setState(() {
+            addButtonPressed = false;
+          });
+        }
+      },
+    );
+  }
+
+  void _forceClose() {
+    _expandedButtonTimer?.cancel();
+    if (mounted) {
+      setState(() {
+        addButtonPressed = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) => widget.canEditPlayers
@@ -59,22 +95,14 @@ class _AddPlayerButtonState extends State<AddPlayerButton> {
                       ),
                       child: FittedBox(
                         child: IconButton(
+                          key: GameTableKeys.addMainButton,
                           tooltip: context.strings.tooltip_add_main,
                           splashRadius: stdButtonHeight * 0.75 * 0.45,
                           icon: const Icon(
                             Icons.add,
                             color: Colors.white,
                           ),
-                          onPressed: () async {
-                            setState(() {
-                              addButtonPressed = true;
-                            });
-                            //TODO: extend if pressed the internal buttons
-                            await Future.delayed(const Duration(seconds: 10));
-                            setState(() {
-                              addButtonPressed = false;
-                            });
-                          },
+                          onPressed: () => _onMainButtonPressed(),
                         ),
                       ),
                     )
@@ -95,13 +123,17 @@ class _AddPlayerButtonState extends State<AddPlayerButton> {
                           child: FittedBox(
                             fit: BoxFit.fitWidth,
                             child: IconButton(
+                              key: GameTableKeys.addNewPlayerButton,
                               splashRadius: stdButtonHeight * 0.75 * 0.45,
                               icon: const Icon(
                                 Icons.person_add,
                                 color: Colors.white,
                               ),
                               tooltip: context.strings.tooltip_add_new,
-                              onPressed: () => widget.addPlayerCallback?.call(),
+                              onPressed: () {
+                                _forceClose();
+                                widget.addPlayerCallback?.call();
+                              },
                             ),
                           ),
                         ),
@@ -119,14 +151,17 @@ class _AddPlayerButtonState extends State<AddPlayerButton> {
                             offset: -5,
                             child: FittedBox(
                               child: IconButton(
+                                key: GameTableKeys.addSavedPlayerButton,
                                 splashRadius: stdButtonHeight * 0.75 * 0.45,
                                 icon: const Icon(
                                   Icons.folder_shared,
                                   color: Colors.white,
                                 ),
                                 tooltip: context.strings.tooltip_add_stor,
-                                onPressed: () =>
-                                    widget.openPlayersListCallback?.call(),
+                                onPressed: () {
+                                  _forceClose();
+                                  widget.openPlayersListCallback?.call();
+                                },
                               ),
                             ),
                           ),

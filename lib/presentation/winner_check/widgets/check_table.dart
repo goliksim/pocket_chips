@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../domain/models/cards/card_model.dart';
 import '../../../services/toast_manager.dart';
 import '../../../utils/extensions.dart';
@@ -26,7 +27,7 @@ class CheckTable extends StatefulWidget {
 class _CheckTableState extends State<CheckTable> with ToastsMixin {
   void updateTable(int index, Card? card) {
     if (context.notInCards(card)) {
-      context.tableCards![index] = card;
+      context.tableCards[index] = card;
       context.updateCombinations();
       widget.callback();
     } else {
@@ -63,15 +64,21 @@ class _CheckTableState extends State<CheckTable> with ToastsMixin {
               child: RotationCard(
                 count: 3,
                 conditionByIndex: (int index) =>
-                    context.tableCards![index] != null,
+                    context.tableCards[index] != null,
                 durationByIndex: (int index) => 500,
-                firstSide: (int index) => CardButton(
-                  action: (card) {
-                    updateTable(index, card);
-                  },
-                  child: CardFront(card: context.tableCards![index]),
-                ),
+                firstSide: (int index) {
+                  final card = context.tableCards[index]!;
+
+                  return CardButton(
+                    key: SolverKeys.tableCardFront(index),
+                    action: (card) {
+                      updateTable(index, card);
+                    },
+                    child: CardFront(card: card),
+                  );
+                },
                 secondSide: (int index) => CardButton(
+                  key: SolverKeys.tableCardBack(index),
                   action: (card) {
                     updateTable(index, card);
                   },
@@ -84,15 +91,21 @@ class _CheckTableState extends State<CheckTable> with ToastsMixin {
               child: RotationCard(
                 count: 2,
                 conditionByIndex: (int index) =>
-                    context.tableCards![index + 3] != null,
+                    context.tableCards[index + 3] != null,
                 durationByIndex: (int index) => 500,
-                firstSide: (int index) => CardButton(
-                  action: (card) {
-                    updateTable(index + 3, card);
-                  },
-                  child: CardFront(card: context.tableCards![index + 3]),
-                ),
+                firstSide: (int index) {
+                  final card = context.tableCards[index + 3]!;
+
+                  return CardButton(
+                    key: SolverKeys.tableCardFront(index + 3),
+                    action: (card) {
+                      updateTable(index + 3, card);
+                    },
+                    child: CardFront(card: card),
+                  );
+                },
                 secondSide: (int index) => CardButton(
+                  key: SolverKeys.tableCardBack(index + 3),
                   action: (card) {
                     updateTable(index + 3, card);
                   },

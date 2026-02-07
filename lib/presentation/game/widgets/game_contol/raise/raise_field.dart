@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../app/keys/keys.dart';
 import '../../../../../services/assets_provider.dart';
 import '../../../../../utils/extensions.dart';
 import '../../../../../utils/theme/ui_values.dart';
@@ -54,6 +55,7 @@ class RaiseFieldWidgetState extends State<RaiseFieldWidget> {
     final provider = RaiseProviderScope.of(context);
 
     return ClipRRect(
+      key: GameControlKeys.raiseField,
       borderRadius: BorderRadius.circular(stdBorderRadius),
       child: ColoredBox(
         color: context.theme.playerColor,
@@ -128,6 +130,7 @@ class _CoinsRow extends StatelessWidget {
                   borderRadius: BorderRadius.circular(stdBorderRadius),
                 ),
                 child: TextButton(
+                  key: GameControlKeys.raiseChip(coin),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.all(4),
                     shape: RoundedRectangleBorder(
@@ -199,6 +202,7 @@ class _RaiseSliderState extends State<_RaiseSlider> {
               Flexible(
                 child: Text(
                   totalBetMin.toCompact,
+                  key: GameControlKeys.raiseMinLabel,
                   textAlign: TextAlign.right,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -211,6 +215,7 @@ class _RaiseSliderState extends State<_RaiseSlider> {
               Expanded(
                 flex: 3,
                 child: Slider(
+                  key: GameControlKeys.raiseSlider,
                   label: '$tmpBid',
                   value: tmpBid.toDouble(),
                   onChanged: (newValue) {
@@ -227,6 +232,7 @@ class _RaiseSliderState extends State<_RaiseSlider> {
               Flexible(
                 child: Text(
                   totalBetMax.toCompact,
+                  key: GameControlKeys.raiseMaxLabel,
                   textAlign: TextAlign.left,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,

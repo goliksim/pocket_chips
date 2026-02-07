@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/keys/keys.dart';
 import '../../../domain/models/cards/card_model.dart' as c;
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
 
 class CardPicker extends StatefulWidget {
+  final Function(c.Card?) action;
+
   const CardPicker({
     required this.action,
     super.key,
   });
-  final Function(c.Card?) action;
 
   @override
   State<CardPicker> createState() => _CardPickerState();
@@ -46,6 +48,7 @@ class _CardPickerState extends State<CardPicker> {
   Widget build(BuildContext context) {
     _returnCard(context);
     return Dialog(
+      key: SolverKeys.cardPickerDialog,
       elevation: 0,
       backgroundColor: context.theme.bgrColor,
       insetPadding: EdgeInsets.symmetric(
@@ -90,6 +93,7 @@ class _CardPickerState extends State<CardPicker> {
                         pickedKey,
                         _updateKey,
                         context,
+                        key: SolverKeys.cardPickerValue(index),
                       ),
                     ),
                 ],
@@ -106,6 +110,7 @@ class _CardPickerState extends State<CardPicker> {
                         pickedKey,
                         _updateKey,
                         context,
+                        key: SolverKeys.cardPickerValue(index),
                       ),
                     ),
                 ],
@@ -121,10 +126,13 @@ class _CardPickerState extends State<CardPicker> {
                   for (int index = 0; index < 4; index++)
                     Flexible(
                       child: _suitButton(
-                        ['s', 'c', 'h', 'd'][index],
+                        c.CardSuit.values[index].name,
                         pickedSuit,
                         _updateSuit,
                         context,
+                        key: SolverKeys.cardPickerSuit(
+                          c.CardSuit.values[index].name,
+                        ),
                       ),
                     ),
                 ],
@@ -141,13 +149,15 @@ Widget _keyButton(
   int index,
   int? picked,
   Function(int) action,
-  BuildContext context,
-) =>
+  BuildContext context, {
+  Key? key,
+}) =>
     AspectRatio(
       aspectRatio: 1,
       child: GestureDetector(
         onTap: () => action(index),
         child: Card(
+          key: key,
           margin: EdgeInsets.all(stdHorizontalOffset / 6),
           color: context.theme.bgrColor,
           shape: RoundedRectangleBorder(
@@ -177,13 +187,15 @@ Widget _suitButton(
   String suit,
   String? picked,
   Function(String) action,
-  BuildContext context,
-) =>
+  BuildContext context, {
+  Key? key,
+}) =>
     AspectRatio(
       aspectRatio: 1,
       child: GestureDetector(
         onTap: () => action(suit),
         child: Card(
+          key: key,
           margin: EdgeInsets.all(stdHorizontalOffset / 6),
           color: context.theme.bankColor,
           shape: RoundedRectangleBorder(

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../../../app/keys/keys.dart';
 import '../../../../domain/models/player/player_model.dart';
 import '../../../../services/assets_provider.dart';
 import '../../../../utils/extensions.dart';
@@ -37,6 +38,7 @@ class _WinnerWindowState extends State<WinnerWindow> {
 
   @override
   Widget build(BuildContext context) => Dialog(
+        key: WinnerKeys.winnerDialog,
         elevation: 0,
         backgroundColor: context.theme.bgrColor,
         insetPadding: EdgeInsets.symmetric(

@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../../app/keys/keys.dart';
 import '../../../../../../domain/models/cards/card_model.dart' as c;
 import '../../../../../../utils/extensions.dart';
 import '../../../../../../utils/theme/ui_values.dart';
 import '../card_widget.dart';
 
 class CardFront extends StatelessWidget {
-  const CardFront({super.key, this.card});
-  final c.Card? card;
+  final c.Card card;
+
+  const CardFront({
+    required this.card,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) => CardWidget(
+        key: SolverKeys.cardValue(card.key, card.suit.name),
         child: ColoredBox(
           color: (context.theme.name == 'dark')
               ? context.theme.bankColor
@@ -22,7 +28,7 @@ class CardFront extends StatelessWidget {
                 top: stdHorizontalOffset / 2,
                 left: stdHorizontalOffset / 2,
                 child: Text(
-                  card!.keyString,
+                  card.keyString,
                   style: TextStyle(
                     color: context.theme.onBackground,
                     fontSize: stdFontSize * 0.6,
@@ -36,7 +42,7 @@ class CardFront extends StatelessWidget {
                   flipY: true,
                   flipX: true,
                   child: Text(
-                    card!.keyString,
+                    card.keyString,
                     style: TextStyle(
                       color: context.theme.onBackground,
                       fontSize: stdFontSize * 0.6,
@@ -46,8 +52,8 @@ class CardFront extends StatelessWidget {
               ),
               Positioned(
                 child: Icon(
-                  c.cardsIconMap[card!.suit.name],
-                  color: ['s', 'c'].any((e) => e == card!.suit.name)
+                  c.cardsIconMap[card.suit.name],
+                  color: ['s', 'c'].any((e) => e == card.suit.name)
                       ? context.theme.onBackground
                       : Colors.red,
                   size: stdFontSize * 1.5,

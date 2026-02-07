@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocket_chips/domain/model_holders/lobby_state_holder.dart';
 import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 
@@ -17,5 +18,7 @@ class MockLobbyStateHolder extends LobbyStateHolder {
       _initialState ?? LobbyStateModel.empty();
 
   @override
-  Future<void> createNewLobby() async {}
+  Future<void> createNewLobby() async {
+    state = AsyncValue.data(LobbyStateModel.empty());
+  }
 }
