@@ -40,7 +40,7 @@ Future<void> runProVersionTest2(
     ProviderScope(
       overrides: [
         appRepositoryProvider.overrideWithValue(repository),
-        proVersionRepository.overrideWithValue(mockPurchasesRepository),
+        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
       ],
       child: const MyApp(),
     ),
@@ -53,7 +53,7 @@ Future<void> runProVersionTest2(
   await onboardingPage.verifyAboutDialogIsVisible();
 
   // Waiting for force disable
-  await tester.pump(Duration(seconds: 3));
+  await tester.pump(Duration(seconds: 5));
   await onboardingPage.swipePage();
 
   await tester.pumpAndSettle();

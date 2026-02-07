@@ -52,7 +52,7 @@ void main() {
       );
 
       final mockPurchasesRepository =
-          MockPurchasesRepository(hasPurchasesForRestore: false)
+          MockPurchasesRepository(hasPurchasesForRestore: true)
             ..setScenario(MockScenario.success);
 
       when(repository.getConfig()).thenAnswer(
@@ -66,7 +66,7 @@ void main() {
         ProviderScope(
           overrides: [
             appRepositoryProvider.overrideWithValue(repository),
-            purchasesRepositoryProvider
+            proVersionRepositoryProvider
                 .overrideWithValue(mockPurchasesRepository),
             lobbyStateHolderProvider.overrideWithBuild(
               (_, __) async => mockLobbyState,
@@ -93,8 +93,8 @@ void main() {
       await onboaringPage.tapUpdateInfoButton();
       await onboaringPage.verifyUpdateDialogIsVisible();
 
-      await tester.binding.handlePopRoute();
-      await tester.binding.handlePopRoute();
+      await CommonTester.systemCloseDialog(tester);
+      await CommonTester.systemCloseDialog(tester);
 
       await onboaringPage.verifyAboutDialogIsVisible(isVisible: false);
       await onboaringPage.verifyUpdateDialogIsVisible(isVisible: false);
@@ -115,7 +115,7 @@ void main() {
       await homePage.tapContinueButton();
       await lobbyPage.verifyIsVisible();
 
-      await tester.binding.handlePopRoute();
+      await CommonTester.systemClosePage(tester);
 
       await homePage.verifyHomePageIsVisible();
       await lobbyPage.verifyIsVisible(isVisible: false);
@@ -129,8 +129,8 @@ void main() {
       await playerEditorPage.tapAvatar();
       await playerEditorPage.verifyAvatarSelectorIsVisible();
 
-      await tester.binding.handlePopRoute();
-      await tester.binding.handlePopRoute();
+      await CommonTester.systemCloseDialog(tester);
+      await CommonTester.systemCloseDialog(tester);
 
       await playerEditorPage.verifyIsVisible(isVisible: false);
       await playerEditorPage.verifyAvatarSelectorIsVisible(
@@ -145,7 +145,7 @@ void main() {
       await gamePage.tapSettingsButton();
       await gamePage.verifySettingsIsVisible();
 
-      await tester.binding.handlePopRoute();
+      await CommonTester.systemCloseDialog(tester);
 
       await gamePage.verifySettingsIsVisible(isVisible: false);
       await gamePage.verifyIsVisible();
@@ -160,8 +160,8 @@ void main() {
       await lobbyPage.toGame();
       await gamePage.verifyIsVisible();
 
-      await tester.binding.handlePopRoute();
-      await tester.binding.handlePopRoute();
+      await CommonTester.systemClosePage(tester);
+      await CommonTester.systemClosePage(tester);
       await tester.binding.handlePopRoute();
 
       await gamePage.verifyIsVisible(isVisible: false);

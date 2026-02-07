@@ -8,7 +8,7 @@ class HomePageTester {
   HomePageTester(this.tester);
 
   Future<void> verifyHomePageIsVisible() async {
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(Duration(seconds: 1));
 
     expect(find.byKey(HomeKeys.page), findsOneWidget);
   }
@@ -20,13 +20,13 @@ class HomePageTester {
   }
 
   Future<void> verifyIsProVersionScreen() async {
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(Duration(seconds: 1));
 
     expect(find.byKey(ProVersionKeys.proVersionBlockWrapper), findsNothing);
   }
 
   Future<void> verifyIsNotProVersionScreen() async {
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(Duration(seconds: 1));
 
     expect(find.byKey(ProVersionKeys.proVersionBlockWrapper), findsAtLeast(1));
   }

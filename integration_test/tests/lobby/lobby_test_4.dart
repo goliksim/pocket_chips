@@ -30,7 +30,6 @@ Future<void> runLobbyTest4(
   await lobbyPage.verifyIsVisible();
 
   await lobbyPage.deletePlayerByName(players.first.name);
-  await tester.pumpAndSettle();
   await tester.tap(find.byKey(CommonKeys.confirmButton));
 
   await tester.pumpAndSettle(Duration(seconds: 1));

@@ -42,7 +42,8 @@ class OnboardingViewModel extends AsyncNotifier<OnboardingViewState> {
     }
   }
 
-  Future<void> showUpdateInfo() => _navigationManager.showUpdateDialog();
+  Future<void> showUpdateInfo(String version) =>
+      _navigationManager.showUpdateDialog(version);
 
   Future<void> sendMail() async {
     final path = await localPath;

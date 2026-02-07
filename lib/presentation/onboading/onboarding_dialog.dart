@@ -67,11 +67,6 @@ class _OnboardingDialogState extends State<OnboardingDialog> {
         },
       );
 
-  void callBack() {
-    setState(() {});
-    //print('tutor setstate');
-  }
-
   @override
   Widget build(BuildContext context) => DialogWidget(
         child: Onboarding(

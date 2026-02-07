@@ -167,6 +167,9 @@ class OnboardingProVersionPage extends ConsumerWidget {
                         buttonColor: context.theme.hintColor,
                         textString: context
                             .strings.pro_version_offer_button_not_available,
+                        action: () => ref
+                            .read(proVersionManagerProvider.notifier)
+                            .debugEnablePro(),
                       ),
             loading: () => SizedBox(
               height: stdButtonHeight,

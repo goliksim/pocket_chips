@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:onboarding/onboarding.dart';
 
 import '../../../app/keys/keys.dart';
@@ -8,56 +7,48 @@ import '../../../utils/theme/ui_values.dart';
 //import 'package:in_app_review/in_app_review.dart';
 
 import '../onboarding_dialog.dart';
-import '../onboarding_view_model.dart';
 
 /// Screen with patchnote info
 class UpdateDialog extends StatelessWidget {
-  final OnboardingViewModel viewModel;
+  final String version;
 
   const UpdateDialog({
-    required this.viewModel,
+    required this.version,
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final version = viewModel.stateModel.maybeWhen(
-      data: (data) => data.version,
-      orElse: () => null,
-    );
-
-    return OnboardingDialog(
-      key: OnboardingKeys.updateDialog,
-      closeKey: OnboardingKeys.closeUpdateDialogButton,
-      onComplete: () => viewModel.onComplete(),
-      pages: [
-        PageModel(
-          widget: OnboardingPage(
-            title: '${context.strings.update_title} $version',
-            children: [
-              SizedBox(height: stdHorizontalOffset),
-              _PatchNoteItem(
-                text: context.strings.update_1,
-                icon: Icons.build,
-              ),
-              _PatchNoteItem(
-                text: context.strings.update_2,
-                icon: Icons.monetization_on,
-              ),
-              _PatchNoteItem(
-                text: context.strings.update_3,
-                icon: Icons.photo,
-              ),
-              _PatchNoteItem(
-                text: context.strings.update_4,
-                icon: Icons.restore,
-              ),
-            ],
+  Widget build(BuildContext context) => OnboardingDialog(
+        key: OnboardingKeys.updateDialog,
+        closeKey: OnboardingKeys.closeUpdateDialogButton,
+        onComplete: () {},
+        pages: [
+          PageModel(
+            widget: OnboardingPage(
+              title: '${context.strings.update_title} $version',
+              children: [
+                SizedBox(height: stdHorizontalOffset),
+                _PatchNoteItem(
+                  text: context.strings.update_1,
+                  icon: Icons.build,
+                ),
+                _PatchNoteItem(
+                  text: context.strings.update_2,
+                  icon: Icons.monetization_on,
+                ),
+                _PatchNoteItem(
+                  text: context.strings.update_3,
+                  icon: Icons.photo,
+                ),
+                _PatchNoteItem(
+                  text: context.strings.update_4,
+                  icon: Icons.restore,
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
-    );
-  }
+        ],
+      );
 }
 
 class _PatchNoteItem extends StatelessWidget {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 
@@ -19,5 +21,27 @@ abstract class CommonTester {
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(CommonKeys.closePageButton));
+  }
+
+  static Future<void> systemClosePage(WidgetTester tester) async {
+    await tester.pumpAndSettle();
+
+    if (Platform.isAndroid) {
+      await tester.binding.handlePopRoute();
+
+      return;
+    }
+    return closePage(tester);
+  }
+
+  static Future<void> systemCloseDialog(WidgetTester tester) async {
+    await tester.pumpAndSettle();
+
+    if (Platform.isAndroid) {
+      await tester.binding.handlePopRoute();
+
+      return;
+    }
+    return closeDialog(tester);
   }
 }

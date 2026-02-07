@@ -55,7 +55,7 @@ class InitializationManager with ChangeNotifier {
     if (currentVersion.compareTo(lastVersion) > 0) {
       _configModelHolder.updateVerion(currentVersion);
 
-      await showUpdateInfo();
+      await showUpdateInfo(currentVersion);
       return true;
     }
 
@@ -74,7 +74,8 @@ class InitializationManager with ChangeNotifier {
     return false;
   }
 
-  Future<void> showUpdateInfo() => _navigationManager.showUpdateDialog();
+  Future<void> showUpdateInfo(String version) =>
+      _navigationManager.showUpdateDialog(version);
 
   Future<void> showAboutInfo() => _navigationManager.showAboutDialog(
         canPop: false,

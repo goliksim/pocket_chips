@@ -40,7 +40,7 @@ Future<void> runGameTest2(
   await playerEditor.enterBank('5000');
   await playerEditor.tapConfirmButton();
 
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(Duration(seconds: 1));
   expect(find.byKey(GameTableKeys.playerCard('new_1')), findsOneWidget);
 
   // Add saved player

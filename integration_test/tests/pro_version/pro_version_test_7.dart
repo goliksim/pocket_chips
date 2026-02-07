@@ -61,9 +61,12 @@ Future<void> runProVersionTest7(
     ProviderScope(
       overrides: [
         appRepositoryProvider.overrideWithValue(repository),
-        proVersionRepository.overrideWithValue(mockPurchasesRepository),
+        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
         lobbyStateHolderProvider.overrideWith(
-          () => MockLobbyStateHolder(initialState: mockLobbyState),
+          () => MockLobbyStateHolder(
+            initialState: mockLobbyState,
+            keepStateOnNewGame: true,
+          ),
         )
       ],
       child: const MyApp(),
@@ -105,6 +108,10 @@ Future<void> runProVersionTest7(
   await proVersionPage.verifyOfferIsVisible();
   await proVersionPage.tapCloseButton();
 
+  await lobbyPage.savePlayerByName(players.first.name);
+  await proVersionPage.verifyOfferIsVisible();
+  await proVersionPage.tapCloseButton();
+
   final playerEditorPage = PlayerEditorTester(tester);
 
   // Add players feature (5th player free, 6th player unavailable)
@@ -116,16 +123,13 @@ Future<void> runProVersionTest7(
   await proVersionPage.verifyOfferIsVisible();
   await proVersionPage.tapCloseButton();
   await playerEditorPage.tapConfirmButton();
+
+  await tester.pumpAndSettle(Duration(seconds: 1));
   await playerEditorPage.verifyIsVisible(isVisible: false);
   await tester.pumpAndSettle(Duration(seconds: 1)); // Auto-scroll waiting
   await lobbyPage.findPlayerWithName(testName);
 
   await lobbyPage.tapAddPlayersButton();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
-
-  // Save player feature
-  await lobbyPage.savePlayerByName(testName);
   await proVersionPage.verifyOfferIsVisible();
   await proVersionPage.tapCloseButton();
 

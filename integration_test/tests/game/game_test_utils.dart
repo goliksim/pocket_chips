@@ -119,7 +119,7 @@ Future<void> pumpGameApp({
         lobbyStateHolderProvider.overrideWith(
           () => MockLobbyStateHolder(initialState: lobbyState),
         ),
-        proVersionRepository.overrideWithValue(mockPurchasesRepository),
+        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
       ],
       child: const MyApp(),
     ),

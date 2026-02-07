@@ -77,7 +77,7 @@ Future<void> runProVersionTest8(
     ProviderScope(
       overrides: [
         appRepositoryProvider.overrideWithValue(repository),
-        proVersionRepository.overrideWithValue(mockPurchasesRepository),
+        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
         lobbyStateHolderProvider.overrideWith(
           () => MockLobbyStateHolder(initialState: mockLobbyState),
         ),

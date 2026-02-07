@@ -45,7 +45,7 @@ Future<void> runMonitizationTest1(
       overrides: [
         appRepositoryProvider.overrideWithValue(repository),
         purchasesRepositoryProvider.overrideWithValue(mockPurchasesRepository),
-        proVersionRepository.overrideWithValue(mockPurchasesRepository),
+        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
         googleAdsManagerProvider.overrideWith(() => mockGoogleAdsManager),
       ],
       child: const MyApp(),

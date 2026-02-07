@@ -2,7 +2,7 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    id "com.google.gms.google-services"
+    id "com.google.gms.google-services" apply false
 }
 
 def localProperties = new Properties()
@@ -78,6 +78,12 @@ flutter {
     source '../..'
 }
 
+def googleServicesJsonFile = file("google-services.json")
+def hasGoogleServicesJson = googleServicesJsonFile.exists()
+
+if (hasGoogleServicesJson) {
+    apply plugin: "com.google.gms.google-services"
+}
 
 dependencies {
     implementation 'com.android.support:multidex:1.0.3'

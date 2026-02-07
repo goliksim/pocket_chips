@@ -106,15 +106,14 @@ class LobbyPageTester {
   Future<void> savePlayerByName(String name) async {
     await tester.pumpAndSettle();
 
+    final card = find.byKey(LobbyKeys.playerCard(name));
+    await tester.ensureVisible(card);
+
     final screenWidth =
         tester.view.physicalSize.width / tester.view.devicePixelRatio;
-    final offset = Offset(screenWidth * 0.95, 0);
-
-    await tester.timedDrag(
-      find.byKey(LobbyKeys.playerCard(name)),
-      offset,
-      Duration(seconds: 2),
-    );
+    final start = tester.getCenter(card);
+    await tester.dragFrom(start, Offset(screenWidth, 0));
+    await tester.pumpAndSettle();
   }
 
   Future<void> deletePlayerByName(String name) async {
@@ -122,7 +121,7 @@ class LobbyPageTester {
 
     final screenWidth =
         tester.view.physicalSize.width / tester.view.devicePixelRatio;
-    final offset = Offset(screenWidth * -0.95, 0);
+    final offset = Offset(screenWidth * -1, 0);
 
     await tester.timedDrag(
       find.byKey(LobbyKeys.playerCard(name)),

@@ -26,7 +26,7 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
   AppLocalizations get strings => ref.read(stringsProvider);
   @override
   // Important to use ProVersionRepository here
-  PurchasesRepository get repository => ref.read(proVersionRepository);
+  PurchasesRepository get repository => ref.read(proVersionRepositoryProvider);
 
   @override
   List<String> get kIds => [Constants.pocketChipsPROItemKey];
@@ -81,14 +81,13 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
   }
 
   Future<void> buyPro() async {
-    restorePurchases();
+    await super.restorePurchases();
 
     await Future.delayed(const Duration(seconds: 2));
 
-    if (state.value?.isPurchased == true) {
+    if (!ref.mounted || state.value?.isPurchased == true) {
       return;
     }
-
     final product = state.value?.availableProduct;
 
     if (product == null) {
@@ -140,6 +139,18 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
         ProVersionModel(
           isPurchased: false,
           forceDisable: true,
+          availableProduct: state.value?.availableProduct,
+        ),
+      );
+    }
+  }
+
+  void debugEnablePro() {
+    if (kDebugMode) {
+      state = AsyncData(
+        ProVersionModel(
+          isPurchased: true,
+          forceDisable: false,
           availableProduct: state.value?.availableProduct,
         ),
       );

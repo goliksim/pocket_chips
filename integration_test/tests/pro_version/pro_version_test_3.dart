@@ -40,7 +40,7 @@ Future<void> runProVersionTest3(
     ProviderScope(
       overrides: [
         appRepositoryProvider.overrideWithValue(repository),
-        proVersionRepository.overrideWithValue(mockPurchasesRepository),
+        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
       ],
       child: const MyApp(),
     ),

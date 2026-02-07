@@ -40,7 +40,7 @@ Future<void> runProVersionTest5(
     ProviderScope(
       overrides: [
         appRepositoryProvider.overrideWithValue(repository),
-        proVersionRepository.overrideWithValue(mockPurchasesRepository),
+        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
       ],
       child: const MyApp(),
     ),
@@ -53,7 +53,6 @@ Future<void> runProVersionTest5(
   await onboardingPage.verifyAboutDialogIsVisible();
   await onboardingPage.swipePage();
 
-  await tester.pumpAndSettle(Duration(seconds: 3));
   final proVerionOfferPage = ProVersionOfferPageTester(tester);
   await proVerionOfferPage.verifyProVersionIsAvailable();
 

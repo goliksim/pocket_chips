@@ -22,7 +22,7 @@ final purchasesRepositoryProvider = Provider<PurchasesRepository>(
   ),
 );
 
-final proVersionRepository = Provider<PurchasesRepository>(
+final proVersionRepositoryProvider = Provider<PurchasesRepository>(
   (ref) => ProVersionRepository(
     inAppPurchaseRepository: ref.read(inAppPurchaseRepositoryProvider),
   ),

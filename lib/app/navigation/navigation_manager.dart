@@ -59,12 +59,10 @@ class NavigationManager extends ChangeNotifier {
         builder: (_) => modal,
       );
 
-  Future<void> showUpdateDialog() => transitionDialog(
+  Future<void> showUpdateDialog(String version) => transitionDialog(
         context: context,
         child: Consumer(
-          builder: (_, ref, __) => UpdateDialog(
-            viewModel: ref.watch(onboardingViewModelProvider.notifier),
-          ),
+          builder: (_, ref, __) => UpdateDialog(version: version),
         ),
       );
 
@@ -133,6 +131,8 @@ class NavigationManager extends ChangeNotifier {
 
   Future<String?> openPlayerLogoEditor() => showGeneralDialog<String>(
         barrierColor: Colors.transparent,
+        barrierDismissible: true,
+        barrierLabel: 'PlayerLogoPicker',
         transitionDuration: const Duration(milliseconds: 400),
         context: context,
         pageBuilder: (_, __, ___) => PlayerLogoPicker(),

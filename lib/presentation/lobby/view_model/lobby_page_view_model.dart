@@ -168,7 +168,10 @@ class LobbyPageViewModel extends AsyncNotifier<LobbyPageState> {
               (oldLobby) {
                 if (newLobby.players.length > oldLobby.players.length) {
                   Future.delayed(Duration(milliseconds: 500)).then(
-                    (_) {
+                    (_) async {
+                      if (!ref.mounted) {
+                        return;
+                      }
                       final scrollController = ref
                           .read(lobbyScrollControllerProvider)
                           .scrollController;

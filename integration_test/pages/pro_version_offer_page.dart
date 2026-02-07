@@ -19,6 +19,7 @@ class ProVersionOfferPageTester {
   }
 
   Future<void> verifyOfferIsVisible({bool isVisible = true}) async {
+    await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
 
     expect(

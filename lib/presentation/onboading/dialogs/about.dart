@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../app/keys/keys.dart';
 import '../../../di/view_models.dart';
 import '../../../utils/extensions.dart';
+import '../../common/widgets/dialog_widget.dart';
 import '../onboarding_dialog.dart';
 import '../pages/onboarding_game_page.dart';
 import '../pages/onboarding_links_page.dart';
@@ -36,55 +37,54 @@ class AboutDialog extends StatelessWidget {
           final viewModel = ref.watch(onboardingViewModelProvider.notifier);
           final state = ref.watch(onboardingViewModelProvider);
 
-          final title = state.maybeWhen(
-            skipLoadingOnReload: true,
-            data: (data) => data.isFirstLaunch
-                ? '${context.strings.about_welc}\nPOCKET CHIPS'
-                : 'POCKET CHIPS',
-            orElse: () => '',
-          );
+          return state.maybeWhen(
+            data: (data) => OnboardingDialog(
+              key: OnboardingKeys.aboutDialog,
+              closeKey: OnboardingKeys.closeAboutDialogButton,
+              onComplete: () => viewModel.onComplete(),
+              pages: [
+                PageModel(
+                  widget: OnboardingWelcomePage(
+                    title: data.isFirstLaunch
+                        ? '${context.strings.about_welc}\nPOCKET CHIPS'
+                        : 'POCKET CHIPS',
+                    setLocale: viewModel.setLocale,
+                  ),
+                ),
+                PageModel(
+                  widget: OnboardingProVersionPage(),
+                ),
 
-          final version = state.maybeWhen(
-            data: (data) => data.version,
-            orElse: () => null,
-          );
-
-          return OnboardingDialog(
-            key: OnboardingKeys.aboutDialog,
-            closeKey: OnboardingKeys.closeAboutDialogButton,
-            onComplete: () => viewModel.onComplete(),
-            pages: [
-              PageModel(
-                widget: OnboardingWelcomePage(
-                  title: title,
-                  setLocale: viewModel.setLocale,
+                PageModel(
+                  widget: OnboardingLobbyPage(),
+                ),
+                // Settings
+                PageModel(
+                  widget: OnboardingSettingsPage(),
+                ),
+                // Game table
+                PageModel(
+                  widget: OnboardingGamePage(),
+                ),
+                // Helpful
+                PageModel(
+                  widget: OnboardingLinksPage(
+                    launchUrl: _launchUrl,
+                    sendMail: viewModel.sendMail,
+                    showUpdateInfo: () =>
+                        viewModel.showUpdateInfo(data.version),
+                    version: data.version,
+                  ),
+                ),
+              ],
+            ),
+            orElse: () => DialogWidget(
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: context.theme.primaryColor,
                 ),
               ),
-              PageModel(
-                widget: OnboardingProVersionPage(),
-              ),
-
-              PageModel(
-                widget: OnboardingLobbyPage(),
-              ),
-              // Settings
-              PageModel(
-                widget: OnboardingSettingsPage(),
-              ),
-              // Game table
-              PageModel(
-                widget: OnboardingGamePage(),
-              ),
-              // Helpful
-              PageModel(
-                widget: OnboardingLinksPage(
-                  launchUrl: _launchUrl,
-                  sendMail: viewModel.sendMail,
-                  showUpdateInfo: viewModel.showUpdateInfo,
-                  version: version,
-                ),
-              ),
-            ],
+            ),
           );
         },
       );

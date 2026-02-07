@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
 import '../../game_test.mocks.dart';
+import '../../pages/common_tester.dart';
 import '../../pages/game_page.dart';
 import 'game_test_utils.dart';
 
@@ -38,7 +39,7 @@ Future<void> runGameTest5(
   await gamePage.tapAllInButton();
   await gamePage.verifyWinnerChoiceDialogVisible();
 
-  await tester.binding.handlePopRoute();
+  await CommonTester.systemCloseDialog(tester);
   await tester.pumpAndSettle();
 
   await gamePage.verifyWinnerChoiceDialogVisible();

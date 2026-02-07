@@ -37,7 +37,7 @@ Future<void> pumpHomeApp({
         lobbyStateHolderProvider.overrideWith(
           () => MockLobbyStateHolder(initialState: LobbyStateModel.empty()),
         ),
-        proVersionRepository.overrideWithValue(mockPurchasesRepository),
+        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
       ],
       child: const MyApp(),
     ),

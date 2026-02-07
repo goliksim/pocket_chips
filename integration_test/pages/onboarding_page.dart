@@ -60,7 +60,7 @@ class OnboardingPageTester {
   }
 
   Future<void> closeOnboardingDialog() async {
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(Duration(seconds: 1));
 
     await tester.tap(find.byKey(OnboardingKeys.closeAboutDialogButton));
   }
