@@ -5,6 +5,7 @@ import '../../game_test.mocks.dart';
 import '../../pages/game_page.dart';
 import '../../pages/game_settings_dialog.dart';
 import '../../pages/lobby_page.dart';
+import '../../test_utils/test_action.dart';
 import 'game_test_utils.dart';
 
 /// [GameTest]
@@ -16,37 +17,47 @@ Future<void> runGameTest1(
   final players = buildPlayers(2);
   final savedPlayers = <PlayerModel>[];
 
-  await pumpGameApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(
-      players: players,
-      dealerId: players.first.uid,
+  final lobbyPage = LobbyPageTester(tester);
+  final gamePage = GamePageTester(tester);
+  final settingsDialog = GameSettingsDialogTester(tester);
+
+  TAction verifyPlayersBank() => runTestActions(
+        players.map(
+          (player) => gamePage.verifyPlayerBank(
+            name: player.name,
+            expectedBank: 2000,
+          ),
+        ),
+      );
+
+  await runAction(
+    pumpGameApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(
+        players: players,
+        dealerId: players.first.uid,
+      ),
+      savedPlayers: savedPlayers,
     ),
-    savedPlayers: savedPlayers,
   );
 
-  await openGamePage(tester);
-
-  final lobbyPage = LobbyPageTester(tester);
-  await lobbyPage.verifyIsVisible(isVisible: false);
-
-  final gamePage = GamePageTester(tester);
-  await gamePage.verifyIsVisible();
-
-  await gamePage.tapSettingsButton();
-  final settingsDialog = GameSettingsDialogTester(tester);
-  await settingsDialog.verifyIsVisible();
-  await settingsDialog.enterStartingStack('2000');
-  await settingsDialog.enterSmallBlind('50');
-  await settingsDialog.saveChanges();
-
-  for (final player in players) {
-    await gamePage.verifyPlayerBank(
-      name: player.name,
-      expectedBank: 2000,
-    );
-  }
-
-  await gamePage.verifySmallBlind(50);
+  // Run test actions
+  await runTestActions(
+    [
+      // Open game page
+      openGamePage(tester),
+      lobbyPage.verifyIsVisible(isVisible: false),
+      gamePage.verifyIsVisible(),
+      // Open settings and change stack and blinds
+      gamePage.tapSettingsButton(),
+      settingsDialog.verifyIsVisible(),
+      settingsDialog.enterStartingStack('2000'),
+      settingsDialog.enterSmallBlind('50'),
+      settingsDialog.saveChanges(),
+      // Verify changes applied
+      verifyPlayersBank(),
+      gamePage.verifySmallBlind(50),
+    ],
+  )();
 }

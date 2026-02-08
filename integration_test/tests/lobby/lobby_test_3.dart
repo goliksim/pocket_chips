@@ -6,6 +6,7 @@ import '../../pages/common_tester.dart';
 import '../../pages/home_page.dart';
 import '../../pages/lobby_page.dart';
 import '../../pages/saved_players_page.dart';
+import '../../test_utils/test_action.dart';
 import 'lobby_test_utils.dart';
 
 /// [LobbyTest]
@@ -17,25 +18,31 @@ Future<void> runLobbyTest3(
   final players = buildPlayers(2);
   final savedPlayers = <PlayerModel>[];
 
-  await pumpLobbyApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(players: players),
-    savedPlayers: savedPlayers,
+  final homePage = HomePageTester(tester);
+  final lobbyPage = LobbyPageTester(tester);
+  final savedPlayersPage = SavedPlayersPageTester(tester);
+
+  await runAction(
+    pumpLobbyApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(players: players),
+      savedPlayers: savedPlayers,
+    ),
   );
 
-  final homePage = HomePageTester(tester);
-  await homePage.tapContinueButton();
-
-  final lobbyPage = LobbyPageTester(tester);
-  await lobbyPage.verifyIsVisible();
-
-  await lobbyPage.savePlayerByName(players.first.name);
-  await lobbyPage.tapSavedPlayersButton();
-
-  final savedPlayersPage = SavedPlayersPageTester(tester);
-  await savedPlayersPage.verifyIsVisible();
-  await savedPlayersPage.findPlayerByName(players.first.name);
-
-  await CommonTester.closeDialog(tester);
+  // Run test actions
+  await runTestActions(
+    [
+      // Open lobby page
+      homePage.tapContinueButton(),
+      lobbyPage.verifyIsVisible(),
+      // Save player, verify it's in saved players list
+      lobbyPage.savePlayerByName(players.first.name),
+      lobbyPage.tapSavedPlayersButton(),
+      savedPlayersPage.verifyIsVisible(),
+      savedPlayersPage.findPlayerByName(players.first.name),
+      CommonTester.closeDialog(tester),
+    ],
+  )();
 }

@@ -5,6 +5,7 @@ import 'package:pocket_chips/domain/models/player/player_model.dart';
 import '../../lobby_test.mocks.dart';
 import '../../pages/home_page.dart';
 import '../../pages/lobby_page.dart';
+import '../../test_utils/test_action.dart';
 import 'lobby_test_utils.dart';
 
 /// [LobbyTest]
@@ -16,28 +17,38 @@ Future<void> runLobbyTest11(
   final players = buildPlayers(2);
   final savedPlayers = <PlayerModel>[];
 
-  await pumpLobbyApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(
-      players: players,
-      dealerId: players.first.uid,
+  final homePage = HomePageTester(tester);
+  final lobbyPage = LobbyPageTester(tester);
+
+  await runAction(
+    pumpLobbyApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(
+        players: players,
+        dealerId: players.first.uid,
+      ),
+      savedPlayers: savedPlayers,
     ),
-    savedPlayers: savedPlayers,
   );
 
-  final homePage = HomePageTester(tester);
-  await homePage.verifyHomePageIsVisible();
+  TAction verifyPlayersNotInLobby() => () async {
+        for (final player in players) {
+          expect(find.byKey(LobbyKeys.playerCard(player.name)), findsNothing);
+        }
+      };
 
-  await homePage.tapNewGameButton();
-  await homePage.verifyConfirmationWindowIsVisible();
-  await homePage.tapConfirmationButton();
-
-  final lobbyPage = LobbyPageTester(tester);
-  await lobbyPage.verifyIsVisible();
-  await lobbyPage.verifyAddPlayerButtonVisible(true);
-
-  for (final player in players) {
-    expect(find.byKey(LobbyKeys.playerCard(player.name)), findsNothing);
-  }
+  // Run test actions
+  await runTestActions(
+    [
+      // Create new game, verify lobby is empty
+      homePage.verifyHomePageIsVisible(),
+      homePage.tapNewGameButton(),
+      homePage.verifyConfirmationWindowIsVisible(),
+      homePage.tapConfirmationButton(),
+      lobbyPage.verifyIsVisible(),
+      lobbyPage.verifyAddPlayerButtonVisible(true),
+      verifyPlayersNotInLobby(),
+    ],
+  )();
 }

@@ -4,6 +4,7 @@ import 'package:pocket_chips/domain/models/player/player_model.dart';
 import '../../game_test.mocks.dart';
 import '../../pages/common_tester.dart';
 import '../../pages/game_page.dart';
+import '../../test_utils/test_action.dart';
 import 'game_test_utils.dart';
 
 /// [GameTest]
@@ -15,32 +16,34 @@ Future<void> runGameTest5(
   final players = buildPlayers(2);
   final savedPlayers = <PlayerModel>[];
 
-  await pumpGameApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(
-      players: players,
-      dealerId: players.first.uid,
-      bank: 200,
-    ),
-    savedPlayers: savedPlayers,
-  );
-
-  await openGamePage(tester);
   final gamePage = GamePageTester(tester);
 
-  await gamePage.startGame();
-  await gamePage.tapRaiseButton();
+  await runAction(
+    pumpGameApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(
+        players: players,
+        dealerId: players.first.uid,
+        bank: 200,
+      ),
+      savedPlayers: savedPlayers,
+    ),
+  );
 
-  await tester.pump(Duration(seconds: 1));
-  await gamePage.dragRaiseSliderToMax();
-  await gamePage.tapRaiseConfirm();
-
-  await gamePage.tapAllInButton();
-  await gamePage.verifyWinnerChoiceDialogVisible();
-
-  await CommonTester.systemCloseDialog(tester);
-  await tester.pumpAndSettle();
-
-  await gamePage.verifyWinnerChoiceDialogVisible();
+  await runTestActions(
+    [
+      openGamePage(tester),
+      gamePage.startGame(),
+      gamePage.tapRaiseButton(),
+      () => tester.pump(const Duration(seconds: 1)),
+      gamePage.dragRaiseSliderToMax(),
+      gamePage.tapRaiseConfirm(),
+      gamePage.tapAllInButton(),
+      gamePage.verifyWinnerChoiceDialogVisible(),
+      CommonTester.systemCloseDialog(tester),
+      () => tester.pumpAndSettle(),
+      gamePage.verifyWinnerChoiceDialogVisible()
+    ],
+  )();
 }

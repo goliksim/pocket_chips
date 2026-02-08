@@ -5,6 +5,7 @@ import '../../lobby_test.mocks.dart';
 import '../../pages/home_page.dart';
 import '../../pages/lobby_page.dart';
 import '../../pages/saved_players_page.dart';
+import '../../test_utils/test_action.dart';
 import 'lobby_test_utils.dart';
 
 /// [LobbyTest]
@@ -16,32 +17,36 @@ Future<void> runLobbyTest6(
   final players = buildPlayers(1);
   final savedPlayers = buildPlayers(2, startIndex: 100, namePrefix: 'saved');
 
-  await pumpLobbyApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(players: players),
-    savedPlayers: savedPlayers,
-  );
-
   final homePage = HomePageTester(tester);
-  await homePage.tapContinueButton();
-
   final lobbyPage = LobbyPageTester(tester);
-  await lobbyPage.verifyIsVisible();
-  await lobbyPage.tapSavedPlayersButton();
-
   final savedPlayersPage = SavedPlayersPageTester(tester);
-  await savedPlayersPage.verifyIsVisible();
-
   final nameToDelete = savedPlayers.first.name;
-  await savedPlayersPage.deletePlayerByName(nameToDelete);
-
-  await tester.pumpAndSettle();
-  await tester.tap(find.byKey(CommonKeys.confirmButton));
-  await tester.pumpAndSettle(Duration(seconds: 1));
-
-  expect(
-    find.byKey(SavedPlayersKeys.playerCard(nameToDelete)),
-    findsNothing,
+  await runAction(
+    pumpLobbyApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(players: players),
+      savedPlayers: savedPlayers,
+    ),
   );
+
+  // Run test actions
+  await runTestActions(
+    [
+      // Open lobby page
+      homePage.tapContinueButton(),
+      lobbyPage.verifyIsVisible(),
+      // Open saved players, delete player from saved players list, verify it's deleted
+      lobbyPage.tapSavedPlayersButton(),
+      savedPlayersPage.verifyIsVisible(),
+      savedPlayersPage.deletePlayerByName(nameToDelete),
+      () => tester.pumpAndSettle(),
+      () => tester.tap(find.byKey(CommonKeys.confirmButton)),
+      () => tester.pumpAndSettle(const Duration(seconds: 1)),
+      () async => expect(
+            find.byKey(SavedPlayersKeys.playerCard(nameToDelete)),
+            findsNothing,
+          ),
+    ],
+  )();
 }

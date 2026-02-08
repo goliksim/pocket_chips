@@ -12,6 +12,7 @@ import '../../mocks/purchases_repository_mock.dart';
 import '../../pages/common_tester.dart';
 import '../../pages/donation_page.dart';
 import '../../pages/home_page.dart';
+import '../../test_utils/test_action.dart';
 
 /// [MonitizationTest]
 /// Not cached PRO mode
@@ -41,37 +42,46 @@ Future<void> runMonitizationTest5(
     (_) async => false,
   );
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        appRepositoryProvider.overrideWithValue(repository),
-        purchasesRepositoryProvider.overrideWithValue(mockPurchasesRepository),
-        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
-        googleAdsManagerProvider.overrideWith(() => mockGoogleAdsManager),
-      ],
-      child: const MyApp(),
-    ),
-  );
-
-  await tester.pumpAndSettle();
-
   final homePage = HomePageTester(tester);
   final donationPage = DonationPageTester(tester);
 
-  mockPurchasesRepository.setScenario(MockScenario.success);
-  await homePage.tapDonationButton();
+  await runAction(
+    () => tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appRepositoryProvider.overrideWithValue(repository),
+          purchasesRepositoryProvider
+              .overrideWithValue(mockPurchasesRepository),
+          proVersionRepositoryProvider.overrideWithValue(
+            mockPurchasesRepository,
+          ),
+          googleAdsManagerProvider.overrideWith(() => mockGoogleAdsManager),
+        ],
+        child: const MyApp(),
+      ),
+    ),
+  );
 
-  await tester.pump(Duration(seconds: 1)); //Dialog opening
-  await donationPage.verifyIsVisible();
-  await donationPage.verifyProMode(isPurchased: false);
-  await donationPage.verifyVideoAd();
-
-  await donationPage.restorePurchases();
-
-  await tester.pumpAndSettle();
-  await donationPage.verifyVideoAd();
-  await donationPage.verifyProMode(isPurchased: true);
-
-  await CommonTester.closeDialog(tester);
-  await homePage.verifyIsProVersionScreen();
+  // Run test actions
+  await runTestActions(
+    [
+      // Open home page and tap donation button
+      () => tester.pumpAndSettle(),
+      () async => mockPurchasesRepository.setScenario(MockScenario.success),
+      homePage.tapDonationButton(),
+      () => tester.pump(const Duration(seconds: 1)), //Dialog opening
+      donationPage.verifyIsVisible(),
+      // Verify PRO mode is not purchased, video ad is visible
+      donationPage.verifyProMode(isPurchased: false),
+      donationPage.verifyVideoAd(),
+      // Tap restore purchases and verify PRO mode is purchased and video ad is visible
+      donationPage.restorePurchases(),
+      () => tester.pumpAndSettle(),
+      donationPage.verifyVideoAd(),
+      donationPage.verifyProMode(isPurchased: true),
+      // Close dialog and verify PRO version is applied on home page
+      CommonTester.closeDialog(tester),
+      homePage.verifyIsProVersionScreen(),
+    ],
+  )();
 }

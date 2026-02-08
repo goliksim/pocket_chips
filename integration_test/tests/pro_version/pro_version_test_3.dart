@@ -10,6 +10,7 @@ import '../../mocks/purchases_repository_mock.dart';
 import '../../pages/home_page.dart';
 import '../../pages/onboarding_page.dart';
 import '../../pages/pro_version_offer_page.dart';
+import '../../test_utils/test_action.dart';
 
 /// [ProVersionTest]
 /// Сached PRO mode, store not available
@@ -36,30 +37,37 @@ Future<void> runProVersionTest3(
     (_) async => true,
   );
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        appRepositoryProvider.overrideWithValue(repository),
-        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
-      ],
-      child: const MyApp(),
+  final onboardingPage = OnboardingPageTester(tester);
+  final proVerionOfferPage = ProVersionOfferPageTester(tester);
+  final homePage = HomePageTester(tester);
+
+  await runAction(
+    () => tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appRepositoryProvider.overrideWithValue(repository),
+          proVersionRepositoryProvider.overrideWithValue(
+            mockPurchasesRepository,
+          ),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 
-  await tester.pumpAndSettle();
-
-  final onboardingPage = OnboardingPageTester(tester);
-
-  await onboardingPage.verifyAboutDialogIsVisible();
-  await onboardingPage.swipePage();
-
-  final proVerionOfferPage = ProVersionOfferPageTester(tester);
-  await proVerionOfferPage.verifyProVersionIsPurchased();
-
-  await onboardingPage.tapSkipButton();
-  await onboardingPage.closeOnboardingDialog();
-
-  final homePage = HomePageTester(tester);
-
-  await homePage.verifyIsProVersionScreen();
+  // Run test actions
+  await runTestActions(
+    [
+      // Wait for onboarding to load
+      () => tester.pumpAndSettle(),
+      onboardingPage.verifyAboutDialogIsVisible(),
+      // Verify PRO MODE is purchased but store is offline, check PRO is applied at the HomePage
+      () => tester.pump(const Duration(seconds: 5)),
+      onboardingPage.swipePage(),
+      proVerionOfferPage.verifyProVersionIsPurchased(),
+      onboardingPage.tapSkipButton(),
+      onboardingPage.closeOnboardingDialog(),
+      homePage.verifyIsProVersionScreen(),
+    ],
+  )();
 }

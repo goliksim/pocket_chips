@@ -6,6 +6,7 @@ import '../../game_test.mocks.dart';
 import '../../pages/common_tester.dart';
 import '../../pages/game_page.dart';
 import '../../pages/lobby_page.dart';
+import '../../test_utils/test_action.dart';
 import 'game_test_utils.dart';
 
 /// [GameTest]
@@ -17,36 +18,42 @@ Future<void> runGameTest10(
   final players = buildPlayers(2);
   final savedPlayers = <PlayerModel>[];
 
-  await pumpGameApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(
-      players: players,
-      dealerId: players.first.uid,
+  final gamePage = GamePageTester(tester);
+  final lobbyPage = LobbyPageTester(tester);
+
+  await runAction(
+    pumpGameApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(
+        players: players,
+        dealerId: players.first.uid,
+      ),
+      savedPlayers: savedPlayers,
     ),
-    savedPlayers: savedPlayers,
   );
 
-  await openGamePage(tester);
-  final gamePage = GamePageTester(tester);
-
-  await gamePage.startGame();
-  await gamePage.tapCallButton();
-  await gamePage.verifyCurrentPlayer(players.last.name);
-
-  await CommonTester.closePage(tester);
-  final lobbyPage = LobbyPageTester(tester);
-  await lobbyPage.verifyIsVisible();
-
-  await tester.tap(find.byKey(LobbyKeys.resetLobbyButton));
-  await tester.pumpAndSettle();
-  await tester.tap(find.byKey(CommonKeys.confirmButton));
-  await tester.pumpAndSettle();
-
-  await lobbyPage.toGame();
-  await gamePage.verifyIsVisible();
-  await gamePage.verifyUndoButtonIsVisible();
-
-  await gamePage.tapUndoActionButton();
-  await gamePage.verifyCurrentPlayer(players.first.name);
+  // Run test actions
+  await runTestActions(
+    [
+      // Open game page and start game
+      openGamePage(tester),
+      gamePage.startGame(),
+      // Verify current player is second player
+      // And current player can be changed to first player after undo, even after lobby reset
+      gamePage.tapCallButton(),
+      gamePage.verifyCurrentPlayer(players.last.name),
+      CommonTester.closePage(tester),
+      lobbyPage.verifyIsVisible(),
+      () => tester.tap(find.byKey(LobbyKeys.resetLobbyButton)),
+      () => tester.pumpAndSettle(),
+      () => tester.tap(find.byKey(CommonKeys.confirmButton)),
+      () => tester.pumpAndSettle(),
+      lobbyPage.toGame(),
+      gamePage.verifyIsVisible(),
+      gamePage.verifyUndoButtonIsVisible(),
+      gamePage.tapUndoActionButton(),
+      gamePage.verifyCurrentPlayer(players.first.name),
+    ],
+  )();
 }

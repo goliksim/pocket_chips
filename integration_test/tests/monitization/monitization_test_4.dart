@@ -11,6 +11,7 @@ import '../../mocks/google_ads_manager_mock.dart' as ad;
 import '../../mocks/purchases_repository_mock.dart';
 import '../../pages/donation_page.dart';
 import '../../pages/home_page.dart';
+import '../../test_utils/test_action.dart';
 
 /// [MonitizationTest]
 /// Cached PRO mode
@@ -39,40 +40,50 @@ Future<void> runMonitizationTest4(
     (_) async => true,
   );
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        appRepositoryProvider.overrideWithValue(repository),
-        purchasesRepositoryProvider.overrideWithValue(mockPurchasesRepository),
-        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
-        googleAdsManagerProvider.overrideWith(() => mockGoogleAdsManager),
-      ],
-      child: const MyApp(),
-    ),
-  );
-
-  await tester.pumpAndSettle();
-
   final homePage = HomePageTester(tester);
   final donationPage = DonationPageTester(tester);
 
-  await homePage.tapDonationButton();
+  await runAction(
+    () => tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appRepositoryProvider.overrideWithValue(repository),
+          purchasesRepositoryProvider
+              .overrideWithValue(mockPurchasesRepository),
+          proVersionRepositoryProvider.overrideWithValue(
+            mockPurchasesRepository,
+          ),
+          googleAdsManagerProvider.overrideWith(() => mockGoogleAdsManager),
+        ],
+        child: const MyApp(),
+      ),
+    ),
+  );
 
-  await tester.pump(Duration(seconds: 1)); //Dialog opening
-  await donationPage.verifyIsVisible();
-  await donationPage.verifyUnavailable();
-
-  await donationPage.retry();
-
-  await tester.pump(Duration(seconds: 1));
-  await donationPage.verifyIsVisible();
-  await donationPage.verifyUnavailable();
-
-  mockPurchasesRepository.setScenario(MockScenario.success);
-  mockGoogleAdsManager.setScenario(ad.MockScenario.success);
-  await donationPage.retry();
-
-  await tester.pump(Duration(seconds: 4));
-  await donationPage.verifyProMode(isPurchased: true);
-  await donationPage.verifyVideoAd(isLoaded: true);
+  // Run test actions
+  await runTestActions(
+    [
+      // Open donation page and check error messages
+      () => tester.pumpAndSettle(),
+      homePage.tapDonationButton(),
+      () => tester.pump(const Duration(seconds: 1)), //Dialog opening
+      donationPage.verifyIsVisible(),
+      donationPage.verifyUnavailable(),
+      // Retry loading and verify error messages are still shown
+      donationPage.retry(),
+      () => tester.pump(const Duration(seconds: 1)),
+      donationPage.verifyIsVisible(),
+      donationPage.verifyUnavailable(),
+      () async {
+        // Set repositories to success scenario to simulate internet connection restoration
+        mockPurchasesRepository.setScenario(MockScenario.success);
+        mockGoogleAdsManager.setScenario(ad.MockScenario.success);
+      },
+      // Retry loading and verify PRO mode is active and video ad is loaded
+      donationPage.retry(),
+      () => tester.pump(const Duration(seconds: 4)),
+      donationPage.verifyProMode(isPurchased: true),
+      donationPage.verifyVideoAd(isLoaded: true),
+    ],
+  )();
 }

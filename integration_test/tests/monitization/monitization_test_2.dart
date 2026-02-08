@@ -11,6 +11,7 @@ import '../../mocks/google_ads_manager_mock.dart' hide MockScenario;
 import '../../mocks/purchases_repository_mock.dart';
 import '../../pages/donation_page.dart';
 import '../../pages/home_page.dart';
+import '../../test_utils/test_action.dart';
 
 /// [MonitizationTest]
 /// Cached PRO mode
@@ -40,33 +41,41 @@ Future<void> runMonitizationTest2(
     (_) async => true,
   );
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        appRepositoryProvider.overrideWithValue(repository),
-        purchasesRepositoryProvider.overrideWithValue(mockPurchasesRepository),
-        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
-        googleAdsManagerProvider.overrideWith(() => mockGoogleAdsManager),
-      ],
-      child: const MyApp(),
-    ),
-  );
-
-  await tester.pumpAndSettle();
-
   final homePage = HomePageTester(tester);
   final donationPage = DonationPageTester(tester);
 
-  await homePage.tapDonationButton();
+  await runAction(
+    () => tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appRepositoryProvider.overrideWithValue(repository),
+          purchasesRepositoryProvider
+              .overrideWithValue(mockPurchasesRepository),
+          proVersionRepositoryProvider.overrideWithValue(
+            mockPurchasesRepository,
+          ),
+          googleAdsManagerProvider.overrideWith(() => mockGoogleAdsManager),
+        ],
+        child: const MyApp(),
+      ),
+    ),
+  );
 
-  await tester.pump(Duration(seconds: 1)); //Dialog opening
-  await donationPage.verifyIsVisible();
-  await donationPage.verifyVideoAd(isLoaded: false);
-
-  await tester.pumpAndSettle();
-  await donationPage.verifyProMode(isPurchased: true);
-
-  await tester.pumpAndSettle();
-  await donationPage.verifyVideoAd(isLoaded: true);
-  await donationPage.verifyProMode(isPurchased: true);
+  // Run test actions
+  await runTestActions(
+    [
+      // Open donation page, verify PRO mode is active and video ad is loading
+      () => tester.pumpAndSettle(),
+      homePage.tapDonationButton(),
+      () => tester.pump(const Duration(seconds: 1)), //Dialog opening
+      donationPage.verifyIsVisible(),
+      donationPage.verifyVideoAd(isLoaded: false),
+      () => tester.pumpAndSettle(),
+      donationPage.verifyProMode(isPurchased: true),
+      () => tester.pumpAndSettle(),
+      // Verify video ad is loaded after loading time
+      donationPage.verifyVideoAd(isLoaded: true),
+      donationPage.verifyProMode(isPurchased: true),
+    ],
+  )();
 }

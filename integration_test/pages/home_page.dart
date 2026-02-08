@@ -2,80 +2,85 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 import 'package:pocket_chips/utils/theme/themes.dart';
 
+import '../test_utils/test_action.dart';
+
 class HomePageTester {
   final WidgetTester tester;
 
   HomePageTester(this.tester);
 
-  Future<void> verifyHomePageIsVisible() async {
-    await tester.pumpAndSettle(Duration(seconds: 1));
+  TAction verifyHomePageIsVisible() => () async {
+        await tester.pumpAndSettle(const Duration(seconds: 1));
 
-    expect(find.byKey(HomeKeys.page), findsOneWidget);
-  }
+        expect(find.byKey(HomeKeys.page), findsOneWidget);
+      };
 
-  Future<void> verifyTheme(Themes theme) async {
-    await tester.pumpAndSettle();
+  TAction verifyTheme(Themes theme) => () async {
+        await tester.pumpAndSettle();
 
-    expect(find.byKey(CommonKeys.themeKey(theme)), findsOneWidget);
-  }
+        expect(find.byKey(CommonKeys.themeKey(theme)), findsOneWidget);
+      };
 
-  Future<void> verifyIsProVersionScreen() async {
-    await tester.pumpAndSettle(Duration(seconds: 1));
+  TAction verifyIsProVersionScreen() => () async {
+        await tester.pumpAndSettle(const Duration(seconds: 1));
 
-    expect(find.byKey(ProVersionKeys.proVersionBlockWrapper), findsNothing);
-  }
+        expect(find.byKey(ProVersionKeys.proVersionBlockWrapper), findsNothing);
+      };
 
-  Future<void> verifyIsNotProVersionScreen() async {
-    await tester.pumpAndSettle(Duration(seconds: 1));
+  TAction verifyIsNotProVersionScreen() => () async {
+        await tester.pumpAndSettle(const Duration(seconds: 1));
 
-    expect(find.byKey(ProVersionKeys.proVersionBlockWrapper), findsAtLeast(1));
-  }
+        expect(
+          find.byKey(ProVersionKeys.proVersionBlockWrapper),
+          findsAtLeast(1),
+        );
+      };
 
-  Future<void> tapHelpButton() async {
-    await tester.pumpAndSettle();
+  TAction tapHelpButton() => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(HomeKeys.helpButton));
-  }
+        await tester.tap(find.byKey(HomeKeys.helpButton));
+      };
 
-  Future<void> verifyConfirmationWindowIsVisible() async {
-    await tester.pumpAndSettle();
+  TAction verifyConfirmationWindowIsVisible() => () async {
+        await tester.pumpAndSettle();
 
-    expect(find.byKey(CommonKeys.confirmationWindow), findsOneWidget);
-  }
+        expect(find.byKey(CommonKeys.confirmationWindow), findsOneWidget);
+      };
 
-  Future<void> tapChangeThemeButton() async {
-    await tester.pumpAndSettle();
+  TAction tapChangeThemeButton() => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(HomeKeys.themeSwapButton));
-  }
+        await tester.tap(find.byKey(HomeKeys.themeSwapButton));
+      };
 
-  Future<void> tapContinueButton() async {
-    await tester.pumpAndSettle();
+  TAction tapContinueButton() => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(HomeKeys.continueButton));
-  }
+        await tester.tap(find.byKey(HomeKeys.continueButton));
+      };
 
-  Future<void> tapNewGameButton() async {
-    await tester.pumpAndSettle();
+  TAction tapNewGameButton() => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(HomeKeys.newGameButton));
-  }
+        await tester.tap(find.byKey(HomeKeys.newGameButton));
+      };
 
-  Future<void> tapSolverButton() async {
-    await tester.pumpAndSettle();
+  TAction tapSolverButton() => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(HomeKeys.solverButton));
-  }
+        await tester.tap(find.byKey(HomeKeys.solverButton));
+      };
 
-  Future<void> tapDonationButton() async {
-    await tester.pumpAndSettle();
+  TAction tapDonationButton() => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(HomeKeys.donationButton));
-  }
+        await tester.tap(find.byKey(HomeKeys.donationButton));
+      };
 
-  Future<void> tapConfirmationButton() async {
-    await tester.pumpAndSettle();
+  TAction tapConfirmationButton() => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(CommonKeys.confirmButton));
-  }
+        await tester.tap(find.byKey(CommonKeys.confirmButton));
+      };
 }

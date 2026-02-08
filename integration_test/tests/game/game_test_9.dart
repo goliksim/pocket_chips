@@ -3,6 +3,7 @@ import 'package:pocket_chips/domain/models/player/player_model.dart';
 
 import '../../game_test.mocks.dart';
 import '../../pages/game_page.dart';
+import '../../test_utils/test_action.dart';
 import 'game_test_utils.dart';
 
 /// [GameTest]
@@ -19,36 +20,41 @@ Future<void> runGameTest9(
     players[2].uid: 20,
   };
 
-  await pumpGameApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(
-      players: players,
-      banks: banks,
-      bank: 20,
-      smallBlind: 10,
-      dealerId: players.first.uid,
-    ),
-    savedPlayers: savedPlayers,
-  );
-
-  await openGamePage(tester);
   final gamePage = GamePageTester(tester);
 
-  await gamePage.startGame();
-  await gamePage.tapAllInButton();
-  await gamePage.tapAllInButton();
+  await runAction(
+    pumpGameApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(
+        players: players,
+        banks: banks,
+        bank: 20,
+        smallBlind: 10,
+        dealerId: players.first.uid,
+      ),
+      savedPlayers: savedPlayers,
+    ),
+  );
 
-  await gamePage.verifyWinnerChoiceDialogVisible();
-  await gamePage.selectWinner(players.first.uid);
-  await gamePage.confirmWinnerChoice();
-
-  await gamePage.verifyWinnerChoiceDialogVisible();
-  await gamePage.selectWinner(players[1].uid);
-  await gamePage.confirmWinnerChoice();
-
-  await gamePage.verifyWinnerChoiceDialogVisible(isVisible: false);
-  await gamePage.tapUndoActionButton();
-
-  await gamePage.verifyWinnerChoiceDialogVisible(isVisible: false);
+  await runTestActions(
+    [
+      // Open game page and start game, all players go all in,
+      // Verify winner choice dialog appears for main pot and side pot
+      openGamePage(tester),
+      gamePage.startGame(),
+      gamePage.tapAllInButton(),
+      gamePage.tapAllInButton(),
+      gamePage.verifyWinnerChoiceDialogVisible(),
+      gamePage.selectWinner(players.first.uid),
+      gamePage.confirmWinnerChoice(),
+      gamePage.verifyWinnerChoiceDialogVisible(),
+      gamePage.selectWinner(players[1].uid),
+      gamePage.confirmWinnerChoice(),
+      // Verify winner choice dialog does not appear again after close and undo action
+      gamePage.verifyWinnerChoiceDialogVisible(isVisible: false),
+      gamePage.tapUndoActionButton(),
+      gamePage.verifyWinnerChoiceDialogVisible(isVisible: false),
+    ],
+  )();
 }

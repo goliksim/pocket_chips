@@ -1,73 +1,76 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 
+import '../test_utils/test_action.dart';
+
 class PlayerEditorTester {
   final WidgetTester tester;
 
   PlayerEditorTester(this.tester);
 
-  Future<void> verifyIsVisible({bool isVisible = true}) async {
-    await tester.pumpAndSettle();
+  TAction verifyIsVisible({bool isVisible = true}) => () async {
+        await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(PlayerEditorKeys.dialog),
-      isVisible ? findsOneWidget : findsNothing,
-    );
-  }
+        expect(
+          find.byKey(PlayerEditorKeys.dialog),
+          isVisible ? findsOneWidget : findsNothing,
+        );
+      };
 
-  Future<void> verifyAvatarSelectorIsVisible({bool isVisible = true}) async {
-    await tester.pumpAndSettle();
+  TAction verifyAvatarSelectorIsVisible({bool isVisible = true}) => () async {
+        await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(PlayerEditorKeys.avatarSelectorDialog),
-      isVisible ? findsOneWidget : findsNothing,
-    );
-  }
+        expect(
+          find.byKey(PlayerEditorKeys.avatarSelectorDialog),
+          isVisible ? findsOneWidget : findsNothing,
+        );
+      };
 
-  Future<void> enterName(String text) async {
-    await tester.pumpAndSettle();
+  TAction enterName(String text) => () async {
+        await tester.pumpAndSettle();
 
-    await tester.enterText(find.byKey(PlayerEditorKeys.usernameField), text);
-  }
+        await tester.enterText(
+            find.byKey(PlayerEditorKeys.usernameField), text);
+      };
 
-  Future<void> enterBank(String text) async {
-    await tester.pumpAndSettle();
+  TAction enterBank(String text) => () async {
+        await tester.pumpAndSettle();
 
-    await tester.enterText(find.byKey(PlayerEditorKeys.bankField), text);
-  }
+        await tester.enterText(find.byKey(PlayerEditorKeys.bankField), text);
+      };
 
-  Future<void> toggleDealer() async {
-    await tester.pumpAndSettle();
+  TAction toggleDealer() => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(PlayerEditorKeys.dealerCheckbox));
-  }
+        await tester.tap(find.byKey(PlayerEditorKeys.dealerCheckbox));
+      };
 
-  Future<void> tapConfirmButton() async {
-    await tester.pumpAndSettle();
+  TAction tapConfirmButton() => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(PlayerEditorKeys.confirmButton));
-  }
+        await tester.tap(find.byKey(PlayerEditorKeys.confirmButton));
+      };
 
-  Future<void> tapAvatar() async {
-    await tester.pumpAndSettle();
+  TAction tapAvatar() => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(PlayerEditorKeys.editorAvatar));
-    await tester.pumpAndSettle(Duration(seconds: 1));
-  }
+        await tester.tap(find.byKey(PlayerEditorKeys.editorAvatar));
+        await tester.pumpAndSettle(const Duration(seconds: 1));
+      };
 
-  Future<void> selectAvatar(int index) async {
-    await tester.pumpAndSettle();
+  TAction selectAvatar(int index) => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(PlayerEditorKeys.selectableAvatar(index)));
-    await tester.pumpAndSettle(Duration(seconds: 1));
-  }
+        await tester.tap(find.byKey(PlayerEditorKeys.selectableAvatar(index)));
+        await tester.pumpAndSettle(const Duration(seconds: 1));
+      };
 
-  Future<void> verifyAvatarByAssetUrl(String assetUrl) async {
-    await tester.pumpAndSettle();
+  TAction verifyAvatarByAssetUrl(String assetUrl) => () async {
+        await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(PlayerEditorKeys.avatarKeyByAsset(assetUrl)),
-      findsOneWidget,
-    );
-  }
+        expect(
+          find.byKey(PlayerEditorKeys.avatarKeyByAsset(assetUrl)),
+          findsOneWidget,
+        );
+      };
 }

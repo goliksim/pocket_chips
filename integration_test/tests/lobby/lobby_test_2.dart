@@ -5,6 +5,7 @@ import '../../lobby_test.mocks.dart';
 import '../../pages/home_page.dart';
 import '../../pages/lobby_page.dart';
 import '../../pages/player_editor_page.dart';
+import '../../test_utils/test_action.dart';
 import 'lobby_test_utils.dart';
 
 /// [LobbyTest]
@@ -16,26 +17,33 @@ Future<void> runLobbyTest2(
   final players = buildPlayers(1);
   final savedPlayers = <PlayerModel>[];
 
-  await pumpLobbyApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(players: players),
-    savedPlayers: savedPlayers,
+  final homePage = HomePageTester(tester);
+  final lobbyPage = LobbyPageTester(tester);
+  final playerEditor = PlayerEditorTester(tester);
+  const newName = 'new_player';
+
+  await runAction(
+    pumpLobbyApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(players: players),
+      savedPlayers: savedPlayers,
+    ),
   );
 
-  final homePage = HomePageTester(tester);
-  await homePage.tapContinueButton();
-
-  final lobbyPage = LobbyPageTester(tester);
-  await lobbyPage.verifyIsVisible();
-  await lobbyPage.tapAddPlayersButton();
-
-  final playerEditor = PlayerEditorTester(tester);
-  await playerEditor.verifyIsVisible();
-  const newName = 'new_player';
-  await playerEditor.enterName(newName);
-  await playerEditor.tapConfirmButton();
-
-  await tester.pumpAndSettle(Duration(seconds: 1));
-  await lobbyPage.findPlayerWithName(newName);
+  // Run test actions
+  await runTestActions(
+    [
+      // Open lobby page
+      homePage.tapContinueButton(),
+      lobbyPage.verifyIsVisible(),
+      // Add new player, verify it's added to the list
+      lobbyPage.tapAddPlayersButton(),
+      playerEditor.verifyIsVisible(),
+      playerEditor.enterName(newName),
+      playerEditor.tapConfirmButton(),
+      () => tester.pumpAndSettle(const Duration(seconds: 1)),
+      lobbyPage.findPlayerWithName(newName),
+    ],
+  )();
 }

@@ -20,6 +20,7 @@ import 'pages/home_page.dart';
 import 'pages/lobby_page.dart';
 import 'pages/onboarding_page.dart';
 import 'pages/player_editor_page.dart';
+import 'test_utils/test_action.dart';
 
 @GenerateMocks([AppRepository])
 void main() {
@@ -62,111 +63,95 @@ void main() {
         (_) async => true,
       );
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            appRepositoryProvider.overrideWithValue(repository),
-            proVersionRepositoryProvider
-                .overrideWithValue(mockPurchasesRepository),
-            lobbyStateHolderProvider.overrideWithBuild(
-              (_, __) async => mockLobbyState,
-            ),
-          ],
-          child: const MyApp(),
+      final homePage = HomePageTester(tester);
+      final onboaringPage = OnboardingPageTester(tester);
+      final lobbyPage = LobbyPageTester(tester);
+      final playerEditorPage = PlayerEditorTester(tester);
+      final gamePage = GamePageTester(tester);
+
+      await runAction(
+        () => tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              appRepositoryProvider.overrideWithValue(repository),
+              proVersionRepositoryProvider
+                  .overrideWithValue(mockPurchasesRepository),
+              lobbyStateHolderProvider.overrideWithBuild(
+                (_, __) async => mockLobbyState,
+              ),
+            ],
+            child: const MyApp(),
+          ),
         ),
       );
 
-      await tester.pumpAndSettle();
-
-      final homePage = HomePageTester(tester);
-
-      // NO hiding app at HomePage
-      await tester.binding.handlePopRoute();
-      await homePage.verifyHomePageIsVisible();
-
-      final onboaringPage = OnboardingPageTester(tester);
-
-      // Closing two dialogs at HomePage
-      await homePage.tapHelpButton();
-      await onboaringPage.verifyAboutDialogIsVisible();
-      await onboaringPage.tapSkipButton();
-      await onboaringPage.tapUpdateInfoButton();
-      await onboaringPage.verifyUpdateDialogIsVisible();
-
-      await CommonTester.systemCloseDialog(tester);
-      await CommonTester.systemCloseDialog(tester);
-
-      await onboaringPage.verifyAboutDialogIsVisible(isVisible: false);
-      await onboaringPage.verifyUpdateDialogIsVisible(isVisible: false);
-      await homePage.verifyHomePageIsVisible();
-
-      final lobbyPage = LobbyPageTester(tester);
-
-      // Check LobbyPage UI button
-      await homePage.tapContinueButton();
-      await lobbyPage.verifyIsVisible();
-
-      await CommonTester.closePage(tester);
-
-      await homePage.verifyHomePageIsVisible();
-      await lobbyPage.verifyIsVisible(isVisible: false);
-
-      // Check LobbyPage system button
-      await homePage.tapContinueButton();
-      await lobbyPage.verifyIsVisible();
-
-      await CommonTester.systemClosePage(tester);
-
-      await homePage.verifyHomePageIsVisible();
-      await lobbyPage.verifyIsVisible(isVisible: false);
-
-      //Closing two dialogs at LobbyPage
-      final playerEditorPage = PlayerEditorTester(tester);
-      await homePage.tapContinueButton();
-      await lobbyPage.verifyIsVisible();
-      await lobbyPage.tapAddPlayersButton();
-      await playerEditorPage.verifyIsVisible();
-      await playerEditorPage.tapAvatar();
-      await playerEditorPage.verifyAvatarSelectorIsVisible();
-
-      await CommonTester.systemCloseDialog(tester);
-      await CommonTester.systemCloseDialog(tester);
-
-      await playerEditorPage.verifyIsVisible(isVisible: false);
-      await playerEditorPage.verifyAvatarSelectorIsVisible(
-        isVisible: false,
-      );
-      await lobbyPage.verifyIsVisible();
-
-      //Closing dialog at GamePage
-      final gamePage = GamePageTester(tester);
-      await lobbyPage.toGame();
-      await gamePage.verifyIsVisible();
-      await gamePage.tapSettingsButton();
-      await gamePage.verifySettingsIsVisible();
-
-      await CommonTester.systemCloseDialog(tester);
-
-      await gamePage.verifySettingsIsVisible(isVisible: false);
-      await gamePage.verifyIsVisible();
-
-      //Closing dialog by UI button
-      await CommonTester.closePage(tester);
-
-      await gamePage.verifyIsVisible(isVisible: false);
-      await lobbyPage.verifyIsVisible();
-
-      //Closing all pages by system button
-      await lobbyPage.toGame();
-      await gamePage.verifyIsVisible();
-
-      await CommonTester.systemClosePage(tester);
-      await CommonTester.systemClosePage(tester);
-      await tester.binding.handlePopRoute();
-
-      await gamePage.verifyIsVisible(isVisible: false);
-      await lobbyPage.verifyIsVisible(isVisible: false);
-      await homePage.verifyHomePageIsVisible();
+      // Run test actions
+      await runTestActions(
+        [
+          // NO hiding app at HomePage
+          () => tester.pumpAndSettle(),
+          () => tester.binding.handlePopRoute(),
+          homePage.verifyHomePageIsVisible(),
+          // Closing two dialogs at HomePage
+          homePage.tapHelpButton(),
+          onboaringPage.verifyAboutDialogIsVisible(),
+          onboaringPage.tapSkipButton(),
+          onboaringPage.tapUpdateInfoButton(),
+          onboaringPage.verifyUpdateDialogIsVisible(),
+          CommonTester.systemCloseDialog(tester),
+          CommonTester.systemCloseDialog(tester),
+          onboaringPage.verifyAboutDialogIsVisible(isVisible: false),
+          onboaringPage.verifyUpdateDialogIsVisible(isVisible: false),
+          homePage.verifyHomePageIsVisible(),
+          // Check LobbyPage UI button
+          homePage.tapContinueButton(),
+          lobbyPage.verifyIsVisible(),
+          CommonTester.closePage(tester),
+          homePage.verifyHomePageIsVisible(),
+          lobbyPage.verifyIsVisible(isVisible: false),
+          // Check LobbyPage system button
+          homePage.tapContinueButton(),
+          lobbyPage.verifyIsVisible(),
+          CommonTester.systemClosePage(tester),
+          homePage.verifyHomePageIsVisible(),
+          lobbyPage.verifyIsVisible(isVisible: false),
+          //Closing two dialogs at LobbyPage
+          homePage.tapContinueButton(),
+          lobbyPage.verifyIsVisible(),
+          lobbyPage.tapAddPlayersButton(),
+          playerEditorPage.verifyIsVisible(),
+          playerEditorPage.tapAvatar(),
+          playerEditorPage.verifyAvatarSelectorIsVisible(),
+          CommonTester.systemCloseDialog(tester),
+          CommonTester.systemCloseDialog(tester),
+          playerEditorPage.verifyIsVisible(isVisible: false),
+          playerEditorPage.verifyAvatarSelectorIsVisible(
+            isVisible: false,
+          ),
+          lobbyPage.verifyIsVisible(),
+          //Closing dialog at GamePage
+          lobbyPage.toGame(),
+          gamePage.verifyIsVisible(),
+          gamePage.tapSettingsButton(),
+          gamePage.verifySettingsIsVisible(),
+          CommonTester.systemCloseDialog(tester),
+          gamePage.verifySettingsIsVisible(isVisible: false),
+          gamePage.verifyIsVisible(),
+          //Closing dialog by UI button
+          CommonTester.closePage(tester),
+          gamePage.verifyIsVisible(isVisible: false),
+          lobbyPage.verifyIsVisible(),
+          //Closing all pages by system button
+          lobbyPage.toGame(),
+          gamePage.verifyIsVisible(),
+          CommonTester.systemClosePage(tester),
+          CommonTester.systemClosePage(tester),
+          () => tester.binding.handlePopRoute(),
+          gamePage.verifyIsVisible(isVisible: false),
+          lobbyPage.verifyIsVisible(isVisible: false),
+          homePage.verifyHomePageIsVisible(),
+        ],
+      )();
     },
   );
 }

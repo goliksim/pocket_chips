@@ -10,6 +10,7 @@ import '../../mocks/purchases_repository_mock.dart';
 import '../../pages/home_page.dart';
 import '../../pages/onboarding_page.dart';
 import '../../pages/pro_version_offer_page.dart';
+import '../../test_utils/test_action.dart';
 
 /// [ProVersionTest]
 /// Сached PRO mode,  didn't restore from store - force disable
@@ -36,34 +37,38 @@ Future<void> runProVersionTest2(
     (_) async => true,
   );
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        appRepositoryProvider.overrideWithValue(repository),
-        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
-      ],
-      child: const MyApp(),
+  final onboardingPage = OnboardingPageTester(tester);
+  final proVerionOfferPage = ProVersionOfferPageTester(tester);
+  final homePage = HomePageTester(tester);
+
+  await runAction(
+    () => tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appRepositoryProvider.overrideWithValue(repository),
+          proVersionRepositoryProvider.overrideWithValue(
+            mockPurchasesRepository,
+          ),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 
-  await tester.pumpAndSettle();
-
-  final onboardingPage = OnboardingPageTester(tester);
-
-  await onboardingPage.verifyAboutDialogIsVisible();
-
-  // Waiting for force disable
-  await tester.pump(Duration(seconds: 5));
-  await onboardingPage.swipePage();
-
-  await tester.pumpAndSettle();
-  final proVerionOfferPage = ProVersionOfferPageTester(tester);
-  await proVerionOfferPage.verifyProVersionIsAvailable();
-
-  await onboardingPage.tapSkipButton();
-  await onboardingPage.closeOnboardingDialog();
-
-  final homePage = HomePageTester(tester);
-
-  await homePage.verifyIsNotProVersionScreen();
+  // Run test actions
+  await runTestActions(
+    [
+      // Wait for onboarding to load
+      () => tester.pumpAndSettle(),
+      onboardingPage.verifyAboutDialogIsVisible(),
+      () => tester.pump(const Duration(seconds: 5)),
+      // Verify that Pro Version is available to buy, and not applied at the HomePage
+      onboardingPage.swipePage(),
+      () => tester.pumpAndSettle(),
+      proVerionOfferPage.verifyProVersionIsAvailable(),
+      onboardingPage.tapSkipButton(),
+      onboardingPage.closeOnboardingDialog(),
+      homePage.verifyIsNotProVersionScreen(),
+    ],
+  )();
 }

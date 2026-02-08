@@ -7,6 +7,7 @@ import '../../lobby_test.mocks.dart';
 import '../../pages/home_page.dart';
 import '../../pages/lobby_page.dart';
 import '../../pages/player_editor_page.dart';
+import '../../test_utils/test_action.dart';
 import 'lobby_test_utils.dart';
 
 /// [LobbyTest]
@@ -19,49 +20,53 @@ Future<void> runLobbyTest9(
   final dealerId = players[1].uid;
   final savedPlayers = <PlayerModel>[];
 
-  await pumpLobbyApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(
-      players: players,
-      dealerId: dealerId,
-    ),
-    savedPlayers: savedPlayers,
-  );
-
   final homePage = HomePageTester(tester);
-  await homePage.tapContinueButton();
-
   final lobbyPage = LobbyPageTester(tester);
-  await lobbyPage.verifyIsVisible();
-
-  await tester.tap(find.byKey(LobbyKeys.playerCard(players.first.name)));
-
   final playerEditor = PlayerEditorTester(tester);
-  await playerEditor.verifyIsVisible();
   const newName = 'edit_name';
   const newBank = '1500';
   const avatarIndex = 1;
   final newAssetUrl = AssetsProvider.playerAssetByIndex(avatarIndex);
 
-  await playerEditor.enterName(newName);
-  await playerEditor.enterBank(newBank);
-  await playerEditor.tapAvatar();
-  await playerEditor.verifyAvatarSelectorIsVisible();
-  await playerEditor.selectAvatar(avatarIndex);
-  await playerEditor.verifyAvatarByAssetUrl(newAssetUrl);
-  await playerEditor.toggleDealer();
-  await playerEditor.tapConfirmButton();
-
-  await tester.pumpAndSettle(Duration(seconds: 2));
-  await lobbyPage.findPlayerWithName(newName);
-  await lobbyPage.verifyPlayerBank(name: newName, expectedBank: 1500);
-  await lobbyPage.findPlayerWithAssetUrl(newAssetUrl);
-  await lobbyPage.verifyDealerVisible(name: newName, isVisible: true);
-  await lobbyPage.verifyDealerVisible(
-    name: players[1].name,
-    isVisible: false,
+  await runAction(
+    pumpLobbyApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(
+        players: players,
+        dealerId: dealerId,
+      ),
+      savedPlayers: savedPlayers,
+    ),
   );
 
-  expect(find.text(players.first.name), findsNothing);
+  // Run test actions
+  await runTestActions(
+    [
+      // Open lobby page
+      homePage.tapContinueButton(),
+      lobbyPage.verifyIsVisible(),
+      // Edit player, verify it's edited
+      () => tester.tap(find.byKey(LobbyKeys.playerCard(players.first.name))),
+      playerEditor.verifyIsVisible(),
+      playerEditor.enterName(newName),
+      playerEditor.enterBank(newBank),
+      playerEditor.tapAvatar(),
+      playerEditor.verifyAvatarSelectorIsVisible(),
+      playerEditor.selectAvatar(avatarIndex),
+      playerEditor.verifyAvatarByAssetUrl(newAssetUrl),
+      playerEditor.toggleDealer(),
+      playerEditor.tapConfirmButton(),
+      () => tester.pumpAndSettle(const Duration(seconds: 2)),
+      lobbyPage.findPlayerWithName(newName),
+      lobbyPage.verifyPlayerBank(name: newName, expectedBank: 1500),
+      lobbyPage.findPlayerWithAssetUrl(newAssetUrl),
+      lobbyPage.verifyDealerVisible(name: newName, isVisible: true),
+      lobbyPage.verifyDealerVisible(
+        name: players[1].name,
+        isVisible: false,
+      ),
+      () async => expect(find.text(players.first.name), findsNothing),
+    ],
+  )();
 }

@@ -4,6 +4,7 @@ import 'package:pocket_chips/domain/models/player/player_model.dart';
 
 import '../../game_test.mocks.dart';
 import '../../pages/game_page.dart';
+import '../../test_utils/test_action.dart';
 import 'game_test_utils.dart';
 
 /// [GameTest]
@@ -15,23 +16,32 @@ Future<void> runGameTest8(
   final players = buildPlayers(2);
   final savedPlayers = <PlayerModel>[];
 
-  await pumpGameApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(
-      players: players,
-      dealerId: players.first.uid,
-    ),
-    savedPlayers: savedPlayers,
-  );
-
-  await openGamePage(tester);
   final gamePage = GamePageTester(tester);
 
-  await gamePage.startGame();
-  await gamePage.verifyUndoButtonIsVisible();
-  await gamePage.tapUndoActionButton();
+  await runAction(
+    pumpGameApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(
+        players: players,
+        dealerId: players.first.uid,
+      ),
+      savedPlayers: savedPlayers,
+    ),
+  );
 
-  await gamePage.verifyGameStatus(GameStatusEnum.notStarted);
-  await gamePage.verifyUndoButtonIsNotVisible();
+  // Run test actions
+  await runTestActions(
+    [
+      // Open game page and start game
+      openGamePage(tester),
+      gamePage.startGame(),
+      // Verify undo button appears after action and can be used to return to previous state
+      gamePage.verifyUndoButtonIsVisible(),
+      gamePage.tapUndoActionButton(),
+      // Verify game state returned to pre-action state
+      gamePage.verifyGameStatus(GameStatusEnum.notStarted),
+      gamePage.verifyUndoButtonIsNotVisible(),
+    ],
+  )();
 }

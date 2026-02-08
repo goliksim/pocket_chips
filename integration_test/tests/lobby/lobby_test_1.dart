@@ -7,6 +7,7 @@ import '../../pages/game_page.dart';
 import '../../pages/game_settings_dialog.dart';
 import '../../pages/home_page.dart';
 import '../../pages/lobby_page.dart';
+import '../../test_utils/test_action.dart';
 import 'lobby_test_utils.dart';
 
 /// [LobbyTest]
@@ -18,53 +19,51 @@ Future<void> runLobbyTest1(
   final players = buildPlayers(2);
   final savedPlayers = <PlayerModel>[];
 
-  await pumpLobbyApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(players: players),
-    savedPlayers: savedPlayers,
+  final homePage = HomePageTester(tester);
+  final lobbyPage = LobbyPageTester(tester);
+  final bankEditor = BankEditorDialogTester(tester);
+  final settingsDialog = GameSettingsDialogTester(tester);
+  final gamePage = GamePageTester(tester);
+
+  TAction verifyPlayersBank(int expectedBank) => () async {
+        for (final player in players) {
+          await lobbyPage.verifyPlayerBank(
+              name: player.name, expectedBank: expectedBank)();
+        }
+      };
+
+  await runAction(
+    pumpLobbyApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(players: players),
+      savedPlayers: savedPlayers,
+    ),
   );
 
-  final homePage = HomePageTester(tester);
-  await homePage.verifyHomePageIsVisible();
-  await homePage.tapContinueButton();
-
-  final lobbyPage = LobbyPageTester(tester);
-  await lobbyPage.verifyIsVisible();
-
-  // Change starting stack via bank editor
-  await lobbyPage.tapStartingStackButton();
-  final bankEditor = BankEditorDialogTester(tester);
-  await bankEditor.verifyIsVisible();
-  await bankEditor.enterStack('1000');
-  await bankEditor.confirm();
-
-  for (final player in players) {
-    await lobbyPage.verifyPlayerBank(
-      name: player.name,
-      expectedBank: 1000,
-    );
-  }
-
-  // Change stack and blinds via settings
-  await lobbyPage.tapSettingsButton();
-  final settingsDialog = GameSettingsDialogTester(tester);
-  await settingsDialog.verifyIsVisible();
-  await settingsDialog.enterStartingStack('2000');
-  await settingsDialog.enterSmallBlind('50');
-  await settingsDialog.saveChanges();
-
-  for (final player in players) {
-    await lobbyPage.verifyPlayerBank(
-      name: player.name,
-      expectedBank: 2000,
-    );
-  }
-
-  // Check blinds on game page
-  await lobbyPage.toGame();
-  final gamePage = GamePageTester(tester);
-  await gamePage.verifyIsVisible();
-
-  await gamePage.verifySmallBlind(50);
+  // Run test actions
+  await runTestActions(
+    [
+      // Open lobby page
+      homePage.verifyHomePageIsVisible(),
+      homePage.tapContinueButton(),
+      lobbyPage.verifyIsVisible(),
+      // Open editor and change stack, verify changes applied
+      lobbyPage.tapStartingStackButton(),
+      bankEditor.verifyIsVisible(),
+      bankEditor.enterStack('1000'),
+      bankEditor.confirm(),
+      verifyPlayersBank(1000),
+      // Open settings and change stack and blinds, verify changes applied
+      lobbyPage.tapSettingsButton(),
+      settingsDialog.verifyIsVisible(),
+      settingsDialog.enterStartingStack('2000'),
+      settingsDialog.enterSmallBlind('50'),
+      settingsDialog.saveChanges(),
+      verifyPlayersBank(2000),
+      lobbyPage.toGame(),
+      gamePage.verifyIsVisible(),
+      gamePage.verifySmallBlind(50),
+    ],
+  )();
 }

@@ -5,6 +5,7 @@ import 'package:pocket_chips/domain/models/player/player_model.dart';
 import '../../lobby_test.mocks.dart';
 import '../../pages/home_page.dart';
 import '../../pages/lobby_page.dart';
+import '../../test_utils/test_action.dart';
 import 'lobby_test_utils.dart';
 
 /// [LobbyTest]
@@ -16,24 +17,35 @@ Future<void> runLobbyTest12(
   final players = buildPlayers(3);
   final savedPlayers = <PlayerModel>[];
 
-  await pumpLobbyApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(
-      players: players,
-      dealerId: players.first.uid,
+  final homePage = HomePageTester(tester);
+  final lobbyPage = LobbyPageTester(tester);
+
+  await runAction(
+    pumpLobbyApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(
+        players: players,
+        dealerId: players.first.uid,
+      ),
+      savedPlayers: savedPlayers,
     ),
-    savedPlayers: savedPlayers,
   );
 
-  final homePage = HomePageTester(tester);
-  await homePage.verifyHomePageIsVisible();
-  await homePage.tapContinueButton();
+  TAction verifyPlayersInLobby() => () async {
+        for (final player in players) {
+          expect(find.byKey(LobbyKeys.playerCard(player.name)), findsOneWidget);
+        }
+      };
 
-  final lobbyPage = LobbyPageTester(tester);
-  await lobbyPage.verifyIsVisible();
-
-  for (final player in players) {
-    expect(find.byKey(LobbyKeys.playerCard(player.name)), findsOneWidget);
-  }
+  // Run test actions
+  await runTestActions(
+    [
+      // Continue game, verify players are still in lobby
+      homePage.verifyHomePageIsVisible(),
+      homePage.tapContinueButton(),
+      lobbyPage.verifyIsVisible(),
+      verifyPlayersInLobby(),
+    ],
+  )();
 }

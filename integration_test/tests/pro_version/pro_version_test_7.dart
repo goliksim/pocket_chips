@@ -18,6 +18,7 @@ import '../../pages/home_page.dart';
 import '../../pages/lobby_page.dart';
 import '../../pages/player_editor_page.dart';
 import '../../pages/pro_version_offer_page.dart';
+import '../../test_utils/test_action.dart';
 
 /// [ProVersionTest]
 /// No cached PRO mode, store is unavailable
@@ -40,6 +41,7 @@ Future<void> runProVersionTest7(
       assetUrl: AssetsProvider.emptyPlayerAsset,
     ),
   );
+  final testName = 'test_123';
 
   final mockLobbyState = LobbyStateModel(
     players: players,
@@ -57,91 +59,87 @@ Future<void> runProVersionTest7(
     (_) async => false,
   );
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        appRepositoryProvider.overrideWithValue(repository),
-        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
-        lobbyStateHolderProvider.overrideWith(
-          () => MockLobbyStateHolder(
-            initialState: mockLobbyState,
-            keepStateOnNewGame: true,
+  final homePage = HomePageTester(tester);
+  final proVersionPage = ProVersionOfferPageTester(tester);
+  final lobbyPage = LobbyPageTester(tester);
+  final playerEditorPage = PlayerEditorTester(tester);
+  final gamePage = GamePageTester(tester);
+
+  await runAction(
+    () => tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appRepositoryProvider.overrideWithValue(repository),
+          proVersionRepositoryProvider.overrideWithValue(
+            mockPurchasesRepository,
           ),
-        )
-      ],
-      child: const MyApp(),
+          lobbyStateHolderProvider.overrideWith(
+            () => MockLobbyStateHolder(
+              initialState: mockLobbyState,
+              keepStateOnNewGame: true,
+            ),
+          )
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 
-  await tester.pumpAndSettle();
-
-  final homePage = HomePageTester(tester);
-
-  await homePage.verifyIsNotProVersionScreen();
-
-  final proVersionPage = ProVersionOfferPageTester(tester);
-
-  // Change theme feature
-  await homePage.tapChangeThemeButton();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
-
-  // Continue game feature
-  await homePage.tapContinueButton();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
-
-  // Solver feature
-  await homePage.tapSolverButton();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
-
-  final lobbyPage = LobbyPageTester(tester);
-
-  await homePage.tapNewGameButton();
-  await homePage.verifyConfirmationWindowIsVisible();
-  await homePage.tapConfirmationButton();
-  await lobbyPage.verifyIsVisible();
-
-  // Saved players feature
-  await lobbyPage.tapSavedPlayersButton();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
-
-  await lobbyPage.savePlayerByName(players.first.name);
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
-
-  final playerEditorPage = PlayerEditorTester(tester);
-
-  // Add players feature (5th player free, 6th player unavailable)
-  await lobbyPage.tapAddPlayersButton();
-  final testName = 'test_123';
-  await playerEditorPage.verifyIsVisible();
-  await playerEditorPage.enterName(testName);
-  await playerEditorPage.tapAvatar();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
-  await playerEditorPage.tapConfirmButton();
-
-  await tester.pumpAndSettle(Duration(seconds: 1));
-  await playerEditorPage.verifyIsVisible(isVisible: false);
-  await tester.pumpAndSettle(Duration(seconds: 1)); // Auto-scroll waiting
-  await lobbyPage.findPlayerWithName(testName);
-
-  await lobbyPage.tapAddPlayersButton();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
-
-  final gamePage = GamePageTester(tester);
-
-  // Undo action feature
-  await lobbyPage.toGame();
-  await gamePage.verifyIsVisible();
-  await gamePage.verifyGameStatus(GameStatusEnum.notStarted);
-  await gamePage.startGame();
-  await gamePage.verifyGameStatus(GameStatusEnum.preFlop);
-  await gamePage.tapUndoActionButton();
-  await proVersionPage.verifyOfferIsVisible();
-  await proVersionPage.tapCloseButton();
+  // Run test actions
+  await runTestActions(
+    [
+      // Check no pro version on HomePage
+      () => tester.pumpAndSettle(),
+      homePage.verifyIsNotProVersionScreen(),
+      // Check theme change pro feature
+      homePage.tapChangeThemeButton(),
+      proVersionPage.verifyOfferIsVisible(),
+      proVersionPage.tapCloseButton(),
+      // Check continue game pro feature
+      homePage.tapContinueButton(),
+      proVersionPage.verifyOfferIsVisible(),
+      proVersionPage.tapCloseButton(),
+      // Check solver pro feature
+      homePage.tapSolverButton(),
+      proVersionPage.verifyOfferIsVisible(),
+      proVersionPage.tapCloseButton(),
+      //
+      homePage.tapNewGameButton(),
+      homePage.verifyConfirmationWindowIsVisible(),
+      homePage.tapConfirmationButton(),
+      lobbyPage.verifyIsVisible(),
+      // Check saved players pro feature
+      lobbyPage.tapSavedPlayersButton(),
+      proVersionPage.verifyOfferIsVisible(),
+      proVersionPage.tapCloseButton(),
+      lobbyPage.savePlayerByName(players.first.name),
+      proVersionPage.verifyOfferIsVisible(),
+      proVersionPage.tapCloseButton(),
+      // Check custom icons pro feature
+      lobbyPage.tapAddPlayersButton(),
+      playerEditorPage.verifyIsVisible(),
+      playerEditorPage.enterName(testName),
+      playerEditorPage.tapAvatar(),
+      proVersionPage.verifyOfferIsVisible(),
+      proVersionPage.tapCloseButton(),
+      playerEditorPage.tapConfirmButton(),
+      () => tester.pumpAndSettle(const Duration(seconds: 1)),
+      playerEditorPage.verifyIsVisible(isVisible: false),
+      () => tester.pumpAndSettle(const Duration(seconds: 1)),
+      lobbyPage.findPlayerWithName(testName),
+      // Check more players pro feature
+      lobbyPage.tapAddPlayersButton(),
+      proVersionPage.verifyOfferIsVisible(),
+      proVersionPage.tapCloseButton(),
+      // Check undo action pro feature
+      lobbyPage.toGame(),
+      gamePage.verifyIsVisible(),
+      gamePage.verifyGameStatus(GameStatusEnum.notStarted),
+      gamePage.startGame(),
+      gamePage.verifyGameStatus(GameStatusEnum.preFlop),
+      gamePage.tapUndoActionButton(),
+      proVersionPage.verifyOfferIsVisible(),
+      proVersionPage.tapCloseButton(),
+    ],
+  )();
 }

@@ -4,6 +4,7 @@ import 'package:pocket_chips/domain/models/player/player_model.dart';
 
 import '../../game_test.mocks.dart';
 import '../../pages/game_page.dart';
+import '../../test_utils/test_action.dart';
 import 'game_test_utils.dart';
 
 /// [GameTest]
@@ -19,21 +20,29 @@ Future<void> runGameTest6(
     players.last.uid: 20,
   };
 
-  await pumpGameApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(
-      players: players,
-      dealerId: players.first.uid,
-      gameState: GameStatusEnum.showdown,
-    ),
-    savedPlayers: savedPlayers,
-    sessionState: buildSessionState(bets: bets),
-  );
-
-  await openGamePage(tester);
   final gamePage = GamePageTester(tester);
 
-  await gamePage.verifyIsVisible();
-  await gamePage.verifyWinnerChoiceDialogVisible();
+  await runAction(
+    pumpGameApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(
+        players: players,
+        dealerId: players.first.uid,
+        gameState: GameStatusEnum.showdown,
+      ),
+      savedPlayers: savedPlayers,
+      sessionState: buildSessionState(bets: bets),
+    ),
+  );
+
+  // Run test actions
+  await runTestActions(
+    [
+      // Open game page and check winner choice dialog appears immediately
+      openGamePage(tester),
+      gamePage.verifyIsVisible(),
+      gamePage.verifyWinnerChoiceDialogVisible()
+    ],
+  )();
 }

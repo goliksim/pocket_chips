@@ -10,6 +10,7 @@ import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 import '../../mocks/lobby_state_holder_mock.dart';
 import '../../mocks/purchases_repository_mock.dart';
 import '../../solver_test.mocks.dart';
+import '../../test_utils/test_action.dart';
 
 ConfigModel defaultConfig() => ConfigModel(
       isDark: false,
@@ -18,30 +19,32 @@ ConfigModel defaultConfig() => ConfigModel(
       version: '2.0.0',
     );
 
-Future<void> pumpHomeApp({
+TAction pumpHomeApp({
   required WidgetTester tester,
   required MockAppRepository repository,
-}) async {
-  final mock = repository as dynamic;
+}) =>
+    () async {
+      final mock = repository as dynamic;
 
-  when(mock.getConfig()).thenAnswer((_) async => defaultConfig());
-  when(mock.isProVersion()).thenAnswer((_) async => true);
-  final mockPurchasesRepository =
-      MockPurchasesRepository(hasPurchasesForRestore: true)
-        ..setScenario(MockScenario.success);
+      when(mock.getConfig()).thenAnswer((_) async => defaultConfig());
+      when(mock.isProVersion()).thenAnswer((_) async => true);
+      final mockPurchasesRepository =
+          MockPurchasesRepository(hasPurchasesForRestore: true)
+            ..setScenario(MockScenario.success);
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        appRepositoryProvider.overrideWithValue(repository),
-        lobbyStateHolderProvider.overrideWith(
-          () => MockLobbyStateHolder(initialState: LobbyStateModel.empty()),
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            appRepositoryProvider.overrideWithValue(repository),
+            lobbyStateHolderProvider.overrideWith(
+              () => MockLobbyStateHolder(initialState: LobbyStateModel.empty()),
+            ),
+            proVersionRepositoryProvider
+                .overrideWithValue(mockPurchasesRepository),
+          ],
+          child: const MyApp(),
         ),
-        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
-      ],
-      child: const MyApp(),
-    ),
-  );
+      );
 
-  await tester.pumpAndSettle();
-}
+      await tester.pumpAndSettle();
+    };

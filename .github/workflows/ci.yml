@@ -32,12 +32,14 @@ jobs:
 
   test:
     name: Tests (Android)
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs:
       - analyze
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -74,17 +76,14 @@ jobs:
       - name: Integration Tests (Android Emulator)
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 26
-          target: google_apis
+          api-level: 29
+          target: playstore
           arch: x86_64
           profile: pixel_6
-          emulator-options: -no-window -no-boot-anim -no-audio -no-snapshot-load -gpu swiftshader_indirect
+          emulator-options: -no-window -no-boot-anim -no-audio -no-snapshot-load -gpu swiftshader_indirect -no-metrics -camera-back none -camera-front none
           emulator-boot-timeout: 600
           script: |
-            adb devices
-            adb shell getprop sys.boot_completed
-            flutter doctor -v
-            flutter test integration_test --timeout 30m
+            flutter test integration_test --timeout 45m
 
   test-ios:
     name: Tests (iOS)
@@ -94,6 +93,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Setup Dart
         uses: subosito/flutter-action@v2
@@ -127,6 +128,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Setup Java
         uses: actions/setup-java@v4

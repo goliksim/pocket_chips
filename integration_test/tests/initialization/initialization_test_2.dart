@@ -10,6 +10,7 @@ import 'package:pocket_chips/domain/models/pro_version/pro_version_model.dart';
 import '../../initialization_test.mocks.dart';
 import '../../pages/home_page.dart';
 import '../../pages/onboarding_page.dart';
+import '../../test_utils/test_action.dart';
 
 /// [InitializationTest]
 /// Checking the patch note display for launch
@@ -29,26 +30,30 @@ Future<void> runInitialization2(
     (_) async => mockConfig,
   );
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        appRepositoryProvider.overrideWithValue(repository),
-        proVersionManagerProvider.overrideWithBuild(
-          (_, __) async => ProVersionModel(),
-        )
-      ],
-      child: const MyApp(),
+  final onboardingPage = OnboardingPageTester(tester);
+  final homePage = HomePageTester(tester);
+  await runAction(
+    () => tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appRepositoryProvider.overrideWithValue(repository),
+          proVersionManagerProvider.overrideWithBuild(
+            (_, __) async => ProVersionModel(),
+          )
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 
-  await tester.pumpAndSettle();
-
-  final onboardingPage = OnboardingPageTester(tester);
-
-  await onboardingPage.verifyUpdateDialogIsVisible();
-
-  await onboardingPage.closeUpdateDialog();
-
-  final homePage = HomePageTester(tester);
-  await homePage.verifyHomePageIsVisible();
+  // Run test actions
+  await runTestActions(
+    [
+      // Wait for update patchnote to load
+      () => tester.pumpAndSettle(),
+      onboardingPage.verifyUpdateDialogIsVisible(),
+      onboardingPage.closeUpdateDialog(),
+      homePage.verifyHomePageIsVisible(),
+    ],
+  )();
 }

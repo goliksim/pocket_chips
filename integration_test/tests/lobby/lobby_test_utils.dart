@@ -12,6 +12,7 @@ import 'package:pocket_chips/services/assets_provider.dart';
 import '../../lobby_test.mocks.dart';
 import '../../mocks/lobby_state_holder_mock.dart';
 import '../../mocks/purchases_repository_mock.dart';
+import '../../test_utils/test_action.dart';
 
 ConfigModel defaultConfig() => ConfigModel(
       isDark: false,
@@ -48,58 +49,61 @@ LobbyStateModel buildLobbyState({
       dealerId: dealerId,
     );
 
-Future<void> pumpLobbyApp({
+TAction pumpLobbyApp({
   required WidgetTester tester,
   required MockAppRepository repository,
   required LobbyStateModel lobbyState,
   required List<PlayerModel> savedPlayers,
-}) async {
-  final mock = repository as dynamic;
+}) =>
+    () async {
+      final mock = repository as dynamic;
 
-  when(mock.getConfig()).thenAnswer((_) async => defaultConfig());
-  when(mock.isProVersion()).thenAnswer((_) async => true);
-  when(mock.getSavedPlayers()).thenAnswer(
-    (_) async => List<PlayerModel>.from(savedPlayers),
-  );
-  when(mock.updateLobbyState(any)).thenAnswer((_) async {});
-  when(mock.updateGameSessionState(any)).thenAnswer((_) async {});
-  when(mock.changeProVersion(any)).thenAnswer((_) async {});
-  when(mock.getGameSessionState()).thenAnswer((_) async => null);
+      when(mock.getConfig()).thenAnswer((_) async => defaultConfig());
+      when(mock.isProVersion()).thenAnswer((_) async => true);
+      when(mock.getSavedPlayers()).thenAnswer(
+        (_) async => List<PlayerModel>.from(savedPlayers),
+      );
+      when(mock.updateLobbyState(any)).thenAnswer((_) async {});
+      when(mock.updateGameSessionState(any)).thenAnswer((_) async {});
+      when(mock.changeProVersion(any)).thenAnswer((_) async {});
+      when(mock.getGameSessionState()).thenAnswer((_) async => null);
 
-  when(mock.addPlayer(any)).thenAnswer((invocation) async {
-    final player = invocation.positionalArguments.first as PlayerModel;
-    savedPlayers.add(player);
-  });
-  when(mock.removePlayer(any)).thenAnswer((invocation) async {
-    final uid = invocation.positionalArguments.first as String;
-    savedPlayers.removeWhere((player) => player.uid == uid);
-  });
-  when(mock.updatePlayer(any)).thenAnswer(
-    (invocation) async {
-      final player = invocation.positionalArguments.first as PlayerModel;
-      final index = savedPlayers.indexWhere((p) => p.uid == player.uid);
-      if (index != -1) {
-        savedPlayers[index] = player;
-      }
-    },
-  );
+      when(mock.addPlayer(any)).thenAnswer((invocation) async {
+        final player = invocation.positionalArguments.first as PlayerModel;
+        savedPlayers.add(player);
+      });
+      when(mock.removePlayer(any)).thenAnswer((invocation) async {
+        final uid = invocation.positionalArguments.first as String;
+        savedPlayers.removeWhere((player) => player.uid == uid);
+      });
+      when(mock.updatePlayer(any)).thenAnswer(
+        (invocation) async {
+          final player = invocation.positionalArguments.first as PlayerModel;
+          final index = savedPlayers.indexWhere((p) => p.uid == player.uid);
+          if (index != -1) {
+            savedPlayers[index] = player;
+          }
+        },
+      );
 
-  final mockPurchasesRepository =
-      MockPurchasesRepository(hasPurchasesForRestore: true)
-        ..setScenario(MockScenario.success);
+      final mockPurchasesRepository =
+          MockPurchasesRepository(hasPurchasesForRestore: true)
+            ..setScenario(MockScenario.success);
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        appRepositoryProvider.overrideWithValue(repository),
-        lobbyStateHolderProvider.overrideWith(
-          () => MockLobbyStateHolder(initialState: lobbyState),
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            appRepositoryProvider.overrideWithValue(repository),
+            lobbyStateHolderProvider.overrideWith(
+              () => MockLobbyStateHolder(initialState: lobbyState),
+            ),
+            proVersionRepositoryProvider.overrideWithValue(
+              mockPurchasesRepository,
+            ),
+          ],
+          child: const MyApp(),
         ),
-        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
-      ],
-      child: const MyApp(),
-    ),
-  );
+      );
 
-  await tester.pumpAndSettle();
-}
+      await tester.pumpAndSettle();
+    };

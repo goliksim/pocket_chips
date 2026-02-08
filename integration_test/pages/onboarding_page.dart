@@ -1,67 +1,69 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 
+import '../test_utils/test_action.dart';
+
 class OnboardingPageTester {
   final WidgetTester tester;
 
   OnboardingPageTester(this.tester);
 
-  Future<void> verifyAboutDialogIsVisible({bool isVisible = true}) async {
-    await tester.pumpAndSettle();
+  TAction verifyAboutDialogIsVisible({bool isVisible = true}) => () async {
+        await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(OnboardingKeys.aboutDialog),
-      isVisible ? findsOneWidget : findsNothing,
-    );
-  }
+        expect(
+          find.byKey(OnboardingKeys.aboutDialog),
+          isVisible ? findsOneWidget : findsNothing,
+        );
+      };
 
-  Future<void> tapSkipButton() async {
-    await tester.pumpAndSettle();
+  TAction tapSkipButton() => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(OnboardingKeys.skipButton));
-  }
+        await tester.tap(find.byKey(OnboardingKeys.skipButton));
+      };
 
-  Future<void> swipePage() async {
-    await tester.pumpAndSettle();
+  TAction swipePage() => () async {
+        await tester.pumpAndSettle();
 
-    final screen = Offset(
-      tester.view.physicalSize.width / tester.view.devicePixelRatio,
-      tester.view.physicalSize.height / tester.view.devicePixelRatio,
-    );
+        final screen = Offset(
+          tester.view.physicalSize.width / tester.view.devicePixelRatio,
+          tester.view.physicalSize.height / tester.view.devicePixelRatio,
+        );
 
-    final start = Offset(screen.dx * 0.85, screen.dy / 2);
-    final offset = Offset(screen.dx * -0.85, 0);
+        final start = Offset(screen.dx * 0.85, screen.dy / 2);
+        final offset = Offset(screen.dx * -0.85, 0);
 
-    await tester.dragFrom(
-      start,
-      offset,
-    );
-  }
+        await tester.dragFrom(
+          start,
+          offset,
+        );
+      };
 
-  Future<void> tapUpdateInfoButton() async {
-    await tester.pumpAndSettle();
+  TAction tapUpdateInfoButton() => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(OnboardingKeys.showUpdateDialogButton));
-  }
+        await tester.tap(find.byKey(OnboardingKeys.showUpdateDialogButton));
+      };
 
-  Future<void> verifyUpdateDialogIsVisible({bool isVisible = true}) async {
-    await tester.pumpAndSettle();
+  TAction verifyUpdateDialogIsVisible({bool isVisible = true}) => () async {
+        await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(OnboardingKeys.updateDialog),
-      isVisible ? findsOneWidget : findsNothing,
-    );
-  }
+        expect(
+          find.byKey(OnboardingKeys.updateDialog),
+          isVisible ? findsOneWidget : findsNothing,
+        );
+      };
 
-  Future<void> closeUpdateDialog() async {
-    await tester.pumpAndSettle();
+  TAction closeUpdateDialog() => () async {
+        await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(OnboardingKeys.closeUpdateDialogButton));
-  }
+        await tester.tap(find.byKey(OnboardingKeys.closeUpdateDialogButton));
+      };
 
-  Future<void> closeOnboardingDialog() async {
-    await tester.pumpAndSettle(Duration(seconds: 1));
+  TAction closeOnboardingDialog() => () async {
+        await tester.pumpAndSettle(const Duration(seconds: 1));
 
-    await tester.tap(find.byKey(OnboardingKeys.closeAboutDialogButton));
-  }
+        await tester.tap(find.byKey(OnboardingKeys.closeAboutDialogButton));
+      };
 }

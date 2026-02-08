@@ -10,6 +10,7 @@ import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import '../../pages/home_page.dart';
 import '../../pages/onboarding_page.dart';
+import '../../test_utils/test_action.dart';
 
 /// [InitializationTest]
 /// Checking the onboarding display for the first launch
@@ -29,31 +30,35 @@ Future<void> runInitialization1(
     (_) async => mockConfig,
   );
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        appRepositoryProvider.overrideWithValue(repository),
-        proVersionManagerProvider.overrideWithBuild(
-          (_, __) async => ProVersionModel(),
-        )
-      ],
-      child: const MyApp(),
+  final onboardingPage = OnboardingPageTester(tester);
+  final homePage = HomePageTester(tester);
+
+  await runAction(
+    () => tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appRepositoryProvider.overrideWithValue(repository),
+          proVersionManagerProvider.overrideWithBuild(
+            (_, __) async => ProVersionModel(),
+          )
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 
-  await tester.pumpAndSettle();
-
-  final onboardingPage = OnboardingPageTester(tester);
-
-  await onboardingPage.verifyAboutDialogIsVisible();
-  await onboardingPage.tapSkipButton();
-
-  await onboardingPage.tapUpdateInfoButton();
-  await onboardingPage.verifyUpdateDialogIsVisible();
-
-  await onboardingPage.closeUpdateDialog();
-  await onboardingPage.closeOnboardingDialog();
-
-  final homePage = HomePageTester(tester);
-  await homePage.verifyHomePageIsVisible();
+  // Run test actions
+  await runTestActions(
+    [
+      // Wait for onboarding to load
+      () => tester.pumpAndSettle(),
+      onboardingPage.verifyAboutDialogIsVisible(),
+      onboardingPage.tapSkipButton(),
+      onboardingPage.tapUpdateInfoButton(),
+      onboardingPage.verifyUpdateDialogIsVisible(),
+      onboardingPage.closeUpdateDialog(),
+      onboardingPage.closeOnboardingDialog(),
+      homePage.verifyHomePageIsVisible(),
+    ],
+  )();
 }

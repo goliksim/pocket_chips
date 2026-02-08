@@ -5,6 +5,7 @@ import '../../game_test.mocks.dart';
 import '../../pages/common_tester.dart';
 import '../../pages/game_page.dart';
 import '../../pages/lobby_page.dart';
+import '../../test_utils/test_action.dart';
 import 'game_test_utils.dart';
 
 /// [GameTest]
@@ -16,33 +17,40 @@ Future<void> runGameTest4(
   final players = buildPlayers(2);
   final savedPlayers = <PlayerModel>[];
 
-  await pumpGameApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(
-      players: players,
-      dealerId: players.first.uid,
+  final gamePage = GamePageTester(tester);
+  final lobbyPage = LobbyPageTester(tester);
+
+  await runAction(
+    pumpGameApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(
+        players: players,
+        dealerId: players.first.uid,
+      ),
+      savedPlayers: savedPlayers,
     ),
-    savedPlayers: savedPlayers,
   );
 
-  await openGamePage(tester);
-  final gamePage = GamePageTester(tester);
-
-  await gamePage.startGame();
-  await gamePage.tapFoldButton();
-  await gamePage.verifyWinnerDialogVisible();
-  await gamePage.tapWinnerDialog();
-  await gamePage.verifyWinnerDialogVisible(isVisible: false);
-
-  await CommonTester.closePage(tester);
-  final lobbyPage = LobbyPageTester(tester);
-  await lobbyPage.verifyIsVisible();
-
-  await lobbyPage.toGame();
-  await gamePage.verifyIsVisible();
-  await gamePage.verifyWinnerDialogVisible(isVisible: false);
-
-  await gamePage.startGame();
-  await gamePage.verifyWinnerDialogVisible(isVisible: false);
+  // Run test actions
+  await runTestActions(
+    [
+      // Open game page and start game
+      openGamePage(tester),
+      gamePage.startGame(),
+      // Verify winner dialog appears after fold and can be closed
+      gamePage.tapFoldButton(),
+      gamePage.verifyWinnerDialogVisible(),
+      gamePage.tapWinnerDialog(),
+      gamePage.verifyWinnerDialogVisible(isVisible: false),
+      // Verify winner dialog does not appear again after close and new game
+      CommonTester.closePage(tester),
+      lobbyPage.verifyIsVisible(),
+      lobbyPage.toGame(),
+      gamePage.verifyIsVisible(),
+      gamePage.verifyWinnerDialogVisible(isVisible: false),
+      gamePage.startGame(),
+      gamePage.verifyWinnerDialogVisible(isVisible: false),
+    ],
+  )();
 }

@@ -10,6 +10,7 @@ import '../../mocks/purchases_repository_mock.dart';
 import '../../pages/home_page.dart';
 import '../../pages/onboarding_page.dart';
 import '../../pages/pro_version_offer_page.dart';
+import '../../test_utils/test_action.dart';
 
 /// [ProVersionTest]
 /// No cached PRO mode, store is unavailable
@@ -36,48 +37,50 @@ Future<void> runProVersionTest6(
     (_) async => false,
   );
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        appRepositoryProvider.overrideWithValue(repository),
-        proVersionRepositoryProvider.overrideWithValue(mockPurchasesRepository),
-      ],
-      child: const MyApp(),
+  final onboardingPage = OnboardingPageTester(tester);
+  final proVerionOfferPage = ProVersionOfferPageTester(tester);
+  final homePage = HomePageTester(tester);
+
+  await runAction(
+    () => tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appRepositoryProvider.overrideWithValue(repository),
+          proVersionRepositoryProvider.overrideWithValue(
+            mockPurchasesRepository,
+          ),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 
-  await tester.pumpAndSettle();
-
-  final onboardingPage = OnboardingPageTester(tester);
-
-  await onboardingPage.verifyAboutDialogIsVisible();
-  await onboardingPage.swipePage();
-
-  await tester.pumpAndSettle();
-
-  final proVerionOfferPage = ProVersionOfferPageTester(tester);
-  await proVerionOfferPage.verifyProVersionIsNotAvailable();
-
-  await onboardingPage.tapSkipButton();
-  await onboardingPage.closeOnboardingDialog();
-
-  final homePage = HomePageTester(tester);
-
-  await homePage.verifyIsNotProVersionScreen();
-
-  // Turning on connection
-  mockPurchasesRepository.setScenario(MockScenario.success);
-
-  await homePage.tapHelpButton();
-  await onboardingPage.verifyAboutDialogIsVisible();
-  await onboardingPage.swipePage();
-
-  await tester.pumpAndSettle();
-  await proVerionOfferPage.verifyProVersionIsAvailable();
-  await proVerionOfferPage.tapBuyPROButton();
-
-  await onboardingPage.tapSkipButton();
-  await onboardingPage.closeOnboardingDialog();
-
-  await homePage.verifyIsProVersionScreen();
+  // Run test actions
+  await runTestActions(
+    [
+      // Verify onboarding is shown
+      () => tester.pumpAndSettle(),
+      onboardingPage.verifyAboutDialogIsVisible(),
+      // Verify PRO MODE is not available, store is offline, check PRO is not applied at the HomePage
+      onboardingPage.swipePage(),
+      () => tester.pumpAndSettle(),
+      proVerionOfferPage.verifyProVersionIsNotAvailable(),
+      onboardingPage.tapSkipButton(),
+      onboardingPage.closeOnboardingDialog(),
+      homePage.verifyIsNotProVersionScreen(),
+      // Connecting to internet
+      () async => mockPurchasesRepository.setScenario(MockScenario.success),
+      // Returning to onboarding, verifying that PRO MODE is available to buy
+      homePage.tapHelpButton(),
+      onboardingPage.verifyAboutDialogIsVisible(),
+      onboardingPage.swipePage(),
+      () => tester.pumpAndSettle(),
+      proVerionOfferPage.verifyProVersionIsAvailable(),
+      // Buying PRO version, verifying that PRO MODE is applied on the HomePage
+      proVerionOfferPage.tapBuyPROButton(),
+      onboardingPage.tapSkipButton(),
+      onboardingPage.closeOnboardingDialog(),
+      homePage.verifyIsProVersionScreen(),
+    ],
+  )();
 }

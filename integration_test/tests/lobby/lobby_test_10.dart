@@ -7,6 +7,7 @@ import '../../pages/common_tester.dart';
 import '../../pages/game_page.dart';
 import '../../pages/home_page.dart';
 import '../../pages/lobby_page.dart';
+import '../../test_utils/test_action.dart';
 import 'lobby_test_utils.dart';
 
 /// [LobbyTest]
@@ -18,29 +19,36 @@ Future<void> runLobbyTest10(
   final players = buildPlayers(2);
   final savedPlayers = <PlayerModel>[];
 
-  await pumpLobbyApp(
-    tester: tester,
-    repository: repository,
-    lobbyState: buildLobbyState(players: players),
-    savedPlayers: savedPlayers,
+  final homePage = HomePageTester(tester);
+  final lobbyPage = LobbyPageTester(tester);
+  final gamePage = GamePageTester(tester);
+  await runAction(
+    pumpLobbyApp(
+      tester: tester,
+      repository: repository,
+      lobbyState: buildLobbyState(players: players),
+      savedPlayers: savedPlayers,
+    ),
   );
 
-  final homePage = HomePageTester(tester);
-  await homePage.tapContinueButton();
-
-  final lobbyPage = LobbyPageTester(tester);
-  await lobbyPage.verifyIsVisible();
-  await lobbyPage.toGame();
-
-  final gamePage = GamePageTester(tester);
-  await gamePage.verifyIsVisible();
-  await gamePage.startGame();
-
-  await CommonTester.closePage(tester);
-  await lobbyPage.verifyIsVisible();
-
-  expect(find.byKey(LobbyKeys.resetLobbyButton), findsOneWidget);
-  expect(find.byKey(LobbyKeys.startingStackButton), findsNothing);
-  expect(find.byKey(LobbyKeys.settingsButton), findsNothing);
-  await lobbyPage.verifyAddPlayerButtonVisible(false);
+  // Run test actions
+  await runTestActions(
+    [
+      // Open lobby page
+      homePage.tapContinueButton(),
+      lobbyPage.verifyIsVisible(),
+      // Start game, verify lobby state is updated after game ends
+      lobbyPage.toGame(),
+      gamePage.verifyIsVisible(),
+      gamePage.startGame(),
+      CommonTester.closePage(tester),
+      lobbyPage.verifyIsVisible(),
+      lobbyPage.verifyAddPlayerButtonVisible(false),
+      () async =>
+          expect(find.byKey(LobbyKeys.resetLobbyButton), findsOneWidget),
+      () async =>
+          expect(find.byKey(LobbyKeys.startingStackButton), findsNothing),
+      () async => expect(find.byKey(LobbyKeys.settingsButton), findsNothing),
+    ],
+  )();
 }
