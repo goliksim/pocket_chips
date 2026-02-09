@@ -49,7 +49,7 @@ To build android release app you need to add:
 
 ## Usage
 ```bash
-flutter run
+fvm flutter run
 ```
 
 ## Stack
@@ -58,8 +58,26 @@ flutter run
 - **State Management**: Riverpod + ChangeNotifier.
 - **API Integration**: Offline app.
 - **Database**: Shared preferences + FlutterSecureStorage.
-- **Testing**: Unit/Integration tests with flutter_test/integration_test and mockito.
+- **Testing**: Unit/Integration tests with flutter_test/patrol and mockito.
 
+## Testing 
+To run unit test just run
+```bash
+fvm flutter test
+```
+
+To run patrol integration-test
+```bash
+fvm dart pub global activate patrol_cli 3.11.0
+
+export PATH="$PATH:$HOME/.pub-cache/bin"
+
+fvm flutter build ios --config-only --debug --simulator
+
+cd ios && pod install --repo-update && cd ..
+
+patrol test
+```
 
 ## Contributing
 If you want to contribute to the development of this application, please follow the instructions below:
