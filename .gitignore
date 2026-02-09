@@ -45,6 +45,7 @@ migrate_working_dir/
 .pub/
 /build/
 ios/build
+integration_test/test_bundle.dart
 
 # Symbolication related
 app.*.symbols

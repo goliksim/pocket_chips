@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/domain_managers.dart';
 import 'package:pocket_chips/di/repositories.dart';
@@ -19,7 +19,7 @@ import '../../test_utils/test_action.dart';
 /// Loading video ad and items at the same time
 /// Buying PRO
 Future<void> runMonitizationTest1(
-  WidgetTester tester,
+  PatrolTester tester,
   AppRepository repository,
 ) async {
   final mockConfig = ConfigModel(
@@ -45,7 +45,7 @@ Future<void> runMonitizationTest1(
   final donationPage = DonationPageTester(tester);
 
   await runAction(
-    () => tester.pumpWidget(
+    () => tester.pumpWidgetAndSettle(
       ProviderScope(
         overrides: [
           appRepositoryProvider.overrideWithValue(repository),
@@ -64,21 +64,19 @@ Future<void> runMonitizationTest1(
   await runTestActions(
     [
       // Open home page and tap donation button
-      () => tester.pumpAndSettle(),
-      homePage.tapDonationButton(),
+      homePage.openDonationPage(),
       () => tester.pump(const Duration(seconds: 1)), //Dialog opening
-      donationPage.verifyIsVisible(),
+      donationPage.verifyVisibility(),
       // Verify PRO mode is not purchased, video ad is visible
-      donationPage.verifyProMode(isPurchased: false),
-      donationPage.verifyVideoAd(),
+      donationPage.verifyProModeItemExist(isPurchased: false),
+      donationPage.verifyVideoAdItemExist(),
       // Tap buy PRO and verify PRO mode is purchased and video ad is visible
       donationPage.buyProMode(),
-      () => tester.pumpAndSettle(),
-      donationPage.verifyVideoAd(),
-      donationPage.verifyProMode(isPurchased: true),
+      donationPage.verifyVideoAdItemExist(),
+      donationPage.verifyProModeItemExist(isPurchased: true),
       CommonTester.closeDialog(tester),
       // Verify PRO version is applied on home page
-      homePage.verifyIsProVersionScreen(),
+      homePage.verifyProVersionScreen(),
     ],
   )();
 }

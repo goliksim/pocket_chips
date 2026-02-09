@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 import 'package:pocket_chips/services/assets_provider.dart';
@@ -13,7 +14,7 @@ import 'lobby_test_utils.dart';
 /// [LobbyTest]
 /// Edit player (avatar, name, bank, dealer)
 Future<void> runLobbyTest9(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(2);
@@ -44,28 +45,25 @@ Future<void> runLobbyTest9(
   await runTestActions(
     [
       // Open lobby page
-      homePage.tapContinueButton(),
-      lobbyPage.verifyIsVisible(),
+      homePage.continueGame(),
+      lobbyPage.verifyVisibility(),
       // Edit player, verify it's edited
-      () => tester.tap(find.byKey(LobbyKeys.playerCard(players.first.name))),
-      playerEditor.verifyIsVisible(),
+      () => tester(LobbyKeys.playerCard(players.first.name)).tap(),
+      playerEditor.verifyVisibility(),
       playerEditor.enterName(newName),
       playerEditor.enterBank(newBank),
-      playerEditor.tapAvatar(),
-      playerEditor.verifyAvatarSelectorIsVisible(),
-      playerEditor.selectAvatar(avatarIndex),
+      playerEditor.openAvatarPicker(),
+      playerEditor.verifyAvatarPickerVisibility(),
+      playerEditor.selectAvatarByIndex(avatarIndex),
       playerEditor.verifyAvatarByAssetUrl(newAssetUrl),
       playerEditor.toggleDealer(),
-      playerEditor.tapConfirmButton(),
-      () => tester.pumpAndSettle(const Duration(seconds: 2)),
+      playerEditor.confirmEditingAndExit(),
+      () => tester.pumpAndSettle(duration: const Duration(seconds: 2)),
       lobbyPage.findPlayerWithName(newName),
-      lobbyPage.verifyPlayerBank(name: newName, expectedBank: 1500),
+      lobbyPage.verifyPlayerBankValue(name: newName, expectedBank: 1500),
       lobbyPage.findPlayerWithAssetUrl(newAssetUrl),
-      lobbyPage.verifyDealerVisible(name: newName, isVisible: true),
-      lobbyPage.verifyDealerVisible(
-        name: players[1].name,
-        isVisible: false,
-      ),
+      lobbyPage.verifyDealerVisibility(name: newName, isVisible: true),
+      lobbyPage.verifyDealerVisibility(name: players[1].name, isVisible: false),
       () async => expect(find.text(players.first.name), findsNothing),
     ],
   )();

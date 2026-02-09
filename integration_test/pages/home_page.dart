@@ -1,86 +1,58 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 import 'package:pocket_chips/utils/theme/themes.dart';
 
 import '../test_utils/test_action.dart';
+import 'common_tester.dart';
 
 class HomePageTester {
-  final WidgetTester tester;
+  final PatrolTester $;
 
-  HomePageTester(this.tester);
+  HomePageTester(this.$);
 
-  TAction verifyHomePageIsVisible() => () async {
-        await tester.pumpAndSettle(const Duration(seconds: 1));
+  TAction verifyHomePageVisibility() => () async {
+        await $.tester.pumpAndSettle(const Duration(seconds: 1));
 
         expect(find.byKey(HomeKeys.page), findsOneWidget);
       };
 
   TAction verifyTheme(Themes theme) => () async {
-        await tester.pumpAndSettle();
+        await $.tester.pumpAndSettle();
 
         expect(find.byKey(CommonKeys.themeKey(theme)), findsOneWidget);
       };
 
-  TAction verifyIsProVersionScreen() => () async {
-        await tester.pumpAndSettle(const Duration(seconds: 1));
-
-        expect(find.byKey(ProVersionKeys.proVersionBlockWrapper), findsNothing);
-      };
-
-  TAction verifyIsNotProVersionScreen() => () async {
-        await tester.pumpAndSettle(const Duration(seconds: 1));
+  TAction verifyProVersionScreen({bool isPro = true}) => () async {
+        await $.tester.pumpAndSettle(const Duration(seconds: 1));
 
         expect(
           find.byKey(ProVersionKeys.proVersionBlockWrapper),
-          findsAtLeast(1),
+          isPro ? findsNothing : findsAtLeast(1),
         );
       };
 
-  TAction tapHelpButton() => () async {
-        await tester.pumpAndSettle();
+  TAction openOnboarding() => () => $(HomeKeys.helpButton).tap();
 
-        await tester.tap(find.byKey(HomeKeys.helpButton));
-      };
-
-  TAction verifyConfirmationWindowIsVisible() => () async {
-        await tester.pumpAndSettle();
+  TAction verifyConfirmationWindowVisibility() => () async {
+        await $.tester.pumpAndSettle();
 
         expect(find.byKey(CommonKeys.confirmationWindow), findsOneWidget);
       };
 
-  TAction tapChangeThemeButton() => () async {
-        await tester.pumpAndSettle();
+  TAction changeTheme() =>
+      () => $(find.byKey(HomeKeys.themeSwapButton)).tapPROWidget();
 
-        await tester.tap(find.byKey(HomeKeys.themeSwapButton));
-      };
+  TAction continueGame() => () => $(HomeKeys.continueButton).tapPROWidget();
 
-  TAction tapContinueButton() => () async {
-        await tester.pumpAndSettle();
+  TAction newGame() => () => $(HomeKeys.newGameButton).tapAnimated();
 
-        await tester.tap(find.byKey(HomeKeys.continueButton));
-      };
+  TAction openSolver() => () => $(HomeKeys.solverButton).tapPROWidget();
 
-  TAction tapNewGameButton() => () async {
-        await tester.pumpAndSettle();
+  TAction openDonationPage() => () => $(HomeKeys.donationButton).tap(
+        settlePolicy: SettlePolicy.noSettle,
+      );
 
-        await tester.tap(find.byKey(HomeKeys.newGameButton));
-      };
-
-  TAction tapSolverButton() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(HomeKeys.solverButton));
-      };
-
-  TAction tapDonationButton() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(HomeKeys.donationButton));
-      };
-
-  TAction tapConfirmationButton() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(CommonKeys.confirmButton));
-      };
+  TAction confirmConfirmationDialog() =>
+      () => $(CommonKeys.confirmButton).tap();
 }

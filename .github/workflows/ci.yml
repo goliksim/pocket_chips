@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Setup Dart
         uses: subosito/flutter-action@v2
@@ -76,14 +78,21 @@ jobs:
       - name: Integration Tests (Android Emulator)
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
-          target: playstore
+          api-level: 30
+          target: google_apis
           arch: x86_64
           profile: pixel_6
           emulator-options: -no-window -no-boot-anim -no-audio -no-snapshot-load -gpu swiftshader_indirect -no-metrics -camera-back none -camera-front none
           emulator-boot-timeout: 600
           script: |
-            flutter test integration_test --timeout 45m
+            adb devices
+            adb wait-for-device
+            adb shell getprop sys.boot_completed
+            flutter doctor -v
+            flutter pub global activate patrol_cli
+            export PATH="$PATH:$HOME/.pub-cache/bin"
+            echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+            patrol test --device emulator-5554
 
   test-ios:
     name: Tests (iOS)

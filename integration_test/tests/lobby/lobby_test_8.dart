@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
 import '../../lobby_test.mocks.dart';
@@ -10,7 +11,7 @@ import 'lobby_test_utils.dart';
 /// [LobbyTest]
 /// Reorder players
 Future<void> runLobbyTest8(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(2);
@@ -32,8 +33,8 @@ Future<void> runLobbyTest8(
   await runTestActions(
     [
       // Open lobby page
-      homePage.tapContinueButton(),
-      lobbyPage.verifyIsVisible(),
+      homePage.continueGame(),
+      lobbyPage.verifyVisibility(),
       // Move last player to the top, verify it's moved
       lobbyPage.movePlayerUpByName(players.last.name),
       () async {

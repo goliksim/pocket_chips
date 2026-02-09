@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
 import '../../game_test.mocks.dart';
@@ -11,7 +11,7 @@ import 'game_test_utils.dart';
 /// [GameTest]
 /// WinnerPage appears once and not again after reopen/new game
 Future<void> runGameTest4(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(2);
@@ -39,18 +39,18 @@ Future<void> runGameTest4(
       openGamePage(tester),
       gamePage.startGame(),
       // Verify winner dialog appears after fold and can be closed
-      gamePage.tapFoldButton(),
-      gamePage.verifyWinnerDialogVisible(),
+      gamePage.fold(),
+      gamePage.verifyWinnerDialogVisibility(),
       gamePage.tapWinnerDialog(),
-      gamePage.verifyWinnerDialogVisible(isVisible: false),
+      gamePage.verifyWinnerDialogVisibility(isVisible: false),
       // Verify winner dialog does not appear again after close and new game
       CommonTester.closePage(tester),
-      lobbyPage.verifyIsVisible(),
+      lobbyPage.verifyVisibility(),
       lobbyPage.toGame(),
-      gamePage.verifyIsVisible(),
-      gamePage.verifyWinnerDialogVisible(isVisible: false),
+      gamePage.verifyVisibility(),
+      gamePage.verifyWinnerDialogVisibility(isVisible: false),
       gamePage.startGame(),
-      gamePage.verifyWinnerDialogVisible(isVisible: false),
+      gamePage.verifyWinnerDialogVisibility(isVisible: false),
     ],
   )();
 }

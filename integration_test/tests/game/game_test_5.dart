@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
 import '../../game_test.mocks.dart';
@@ -10,7 +10,7 @@ import 'game_test_utils.dart';
 /// [GameTest]
 /// WinnerChoiceWindow does not close by system back button
 Future<void> runGameTest5(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(2);
@@ -35,15 +35,15 @@ Future<void> runGameTest5(
     [
       openGamePage(tester),
       gamePage.startGame(),
-      gamePage.tapRaiseButton(),
+      gamePage.raise(),
       () => tester.pump(const Duration(seconds: 1)),
       gamePage.dragRaiseSliderToMax(),
-      gamePage.tapRaiseConfirm(),
-      gamePage.tapAllInButton(),
-      gamePage.verifyWinnerChoiceDialogVisible(),
+      gamePage.confirmRaise(),
+      gamePage.allIn(),
+      gamePage.verifyWinnerChoiceDialogVisibility(),
       CommonTester.systemCloseDialog(tester),
       () => tester.pumpAndSettle(),
-      gamePage.verifyWinnerChoiceDialogVisible()
+      gamePage.verifyWinnerChoiceDialogVisibility()
     ],
   )();
 }

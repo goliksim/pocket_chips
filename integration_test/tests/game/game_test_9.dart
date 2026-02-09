@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
 import '../../game_test.mocks.dart';
@@ -9,7 +9,7 @@ import 'game_test_utils.dart';
 /// [GameTest]
 /// Undo after winner selection with side pot
 Future<void> runGameTest9(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(3);
@@ -43,18 +43,18 @@ Future<void> runGameTest9(
       // Verify winner choice dialog appears for main pot and side pot
       openGamePage(tester),
       gamePage.startGame(),
-      gamePage.tapAllInButton(),
-      gamePage.tapAllInButton(),
-      gamePage.verifyWinnerChoiceDialogVisible(),
+      gamePage.allIn(),
+      gamePage.allIn(),
+      gamePage.verifyWinnerChoiceDialogVisibility(),
       gamePage.selectWinner(players.first.uid),
       gamePage.confirmWinnerChoice(),
-      gamePage.verifyWinnerChoiceDialogVisible(),
+      gamePage.verifyWinnerChoiceDialogVisibility(),
       gamePage.selectWinner(players[1].uid),
       gamePage.confirmWinnerChoice(),
       // Verify winner choice dialog does not appear again after close and undo action
-      gamePage.verifyWinnerChoiceDialogVisible(isVisible: false),
-      gamePage.tapUndoActionButton(),
-      gamePage.verifyWinnerChoiceDialogVisible(isVisible: false),
+      gamePage.verifyWinnerChoiceDialogVisibility(isVisible: false),
+      gamePage.undoLastAction(),
+      gamePage.verifyWinnerChoiceDialogVisibility(isVisible: false),
     ],
   )();
 }

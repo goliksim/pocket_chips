@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
@@ -16,7 +16,7 @@ import '../../test_utils/test_action.dart';
 /// Сached PRO mode, store not available
 /// Checking Pro Mode during onboarding and on HomePage
 Future<void> runProVersionTest3(
-  WidgetTester tester,
+  PatrolTester tester,
   AppRepository repository,
 ) async {
   final mockConfig = ConfigModel(
@@ -42,7 +42,7 @@ Future<void> runProVersionTest3(
   final homePage = HomePageTester(tester);
 
   await runAction(
-    () => tester.pumpWidget(
+    () => tester.pumpWidgetAndSettle(
       ProviderScope(
         overrides: [
           appRepositoryProvider.overrideWithValue(repository),
@@ -60,14 +60,14 @@ Future<void> runProVersionTest3(
     [
       // Wait for onboarding to load
       () => tester.pumpAndSettle(),
-      onboardingPage.verifyAboutDialogIsVisible(),
+      onboardingPage.verifyAboutDialogVisibility(),
       // Verify PRO MODE is purchased but store is offline, check PRO is applied at the HomePage
       () => tester.pump(const Duration(seconds: 5)),
-      onboardingPage.swipePage(),
+      onboardingPage.swipeOnePage(),
       proVerionOfferPage.verifyProVersionIsPurchased(),
-      onboardingPage.tapSkipButton(),
+      onboardingPage.skipPages(),
       onboardingPage.closeOnboardingDialog(),
-      homePage.verifyIsProVersionScreen(),
+      homePage.verifyProVersionScreen(),
     ],
   )();
 }

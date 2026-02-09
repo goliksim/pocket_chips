@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/di/repositories.dart';
@@ -50,7 +50,7 @@ LobbyStateModel buildLobbyState({
     );
 
 TAction pumpLobbyApp({
-  required WidgetTester tester,
+  required PatrolTester tester,
   required MockAppRepository repository,
   required LobbyStateModel lobbyState,
   required List<PlayerModel> savedPlayers,
@@ -90,7 +90,7 @@ TAction pumpLobbyApp({
           MockPurchasesRepository(hasPurchasesForRestore: true)
             ..setScenario(MockScenario.success);
 
-      await tester.pumpWidget(
+      await tester.pumpWidgetAndSettle(
         ProviderScope(
           overrides: [
             appRepositoryProvider.overrideWithValue(repository),
@@ -104,6 +104,4 @@ TAction pumpLobbyApp({
           child: const MyApp(),
         ),
       );
-
-      await tester.pumpAndSettle();
     };

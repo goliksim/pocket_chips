@@ -178,7 +178,7 @@ class DonationKeys {
   static const Key dialog = Key('donationDialog');
   static const Key itemsUnavailable = Key('itemsUnavailable');
   static const Key restoreButton = Key('restoreButton');
-  static const Key retryButton = Key('retryButtin');
+  static const Key retryButton = Key('retryButton');
 
   static Key item({
     required String id,

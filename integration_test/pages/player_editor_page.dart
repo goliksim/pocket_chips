@@ -1,15 +1,17 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 
 import '../test_utils/test_action.dart';
+import 'common_tester.dart';
 
 class PlayerEditorTester {
-  final WidgetTester tester;
+  final PatrolTester $;
 
-  PlayerEditorTester(this.tester);
+  PlayerEditorTester(this.$);
 
-  TAction verifyIsVisible({bool isVisible = true}) => () async {
-        await tester.pumpAndSettle();
+  TAction verifyVisibility({bool isVisible = true}) => () async {
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(PlayerEditorKeys.dialog),
@@ -17,8 +19,8 @@ class PlayerEditorTester {
         );
       };
 
-  TAction verifyAvatarSelectorIsVisible({bool isVisible = true}) => () async {
-        await tester.pumpAndSettle();
+  TAction verifyAvatarPickerVisibility({bool isVisible = true}) => () async {
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(PlayerEditorKeys.avatarSelectorDialog),
@@ -26,47 +28,30 @@ class PlayerEditorTester {
         );
       };
 
-  TAction enterName(String text) => () async {
-        await tester.pumpAndSettle();
+  TAction enterName(String text) =>
+      () => $(PlayerEditorKeys.usernameField).enterText(text);
 
-        await tester.enterText(
-            find.byKey(PlayerEditorKeys.usernameField), text);
-      };
+  TAction enterBank(String text) =>
+      () => $(PlayerEditorKeys.bankField).enterText(text);
 
-  TAction enterBank(String text) => () async {
-        await tester.pumpAndSettle();
+  TAction toggleDealer() => () => $(PlayerEditorKeys.dealerCheckbox).tap();
 
-        await tester.enterText(find.byKey(PlayerEditorKeys.bankField), text);
-      };
+  TAction confirmEditingAndExit() =>
+      () => $(PlayerEditorKeys.confirmButton).tap();
 
-  TAction toggleDealer() => () async {
-        await tester.pumpAndSettle();
+  TAction openAvatarPicker() =>
+      () => $(PlayerEditorKeys.editorAvatar).tapPROWidget(
+            settleTimeout: Duration(seconds: 1),
+          );
 
-        await tester.tap(find.byKey(PlayerEditorKeys.dealerCheckbox));
-      };
+  TAction selectAvatarByIndex(int index) => () async {
+        await $(PlayerEditorKeys.selectableAvatar(index)).tap();
 
-  TAction tapConfirmButton() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(PlayerEditorKeys.confirmButton));
-      };
-
-  TAction tapAvatar() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(PlayerEditorKeys.editorAvatar));
-        await tester.pumpAndSettle(const Duration(seconds: 1));
-      };
-
-  TAction selectAvatar(int index) => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(PlayerEditorKeys.selectableAvatar(index)));
-        await tester.pumpAndSettle(const Duration(seconds: 1));
+        await $.tester.pump(Duration(seconds: 1));
       };
 
   TAction verifyAvatarByAssetUrl(String assetUrl) => () async {
-        await tester.pumpAndSettle();
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(PlayerEditorKeys.avatarKeyByAsset(assetUrl)),

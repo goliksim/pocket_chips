@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/di/repositories.dart';
@@ -28,7 +28,7 @@ import '../../test_utils/test_action.dart';
 /// Cached PRO mode, store is unavailable
 /// Checking all pro features available
 Future<void> runProVersionTest8(
-  WidgetTester tester,
+  PatrolTester tester,
   AppRepository repository,
 ) async {
   final mockConfig = ConfigModel(
@@ -86,7 +86,7 @@ Future<void> runProVersionTest8(
   final gamePage = GamePageTester(tester);
 
   await runAction(
-    () => tester.pumpWidget(
+    () => tester.pumpWidgetAndSettle(
       ProviderScope(
         overrides: [
           appRepositoryProvider.overrideWithValue(repository),
@@ -106,50 +106,49 @@ Future<void> runProVersionTest8(
   await runTestActions(
     [
       // Check pro version on HomePage
-      () => tester.pumpAndSettle(),
-      homePage.verifyIsProVersionScreen(),
+      homePage.verifyProVersionScreen(),
       // Check theme change pro feature
-      homePage.tapChangeThemeButton(),
+      homePage.changeTheme(),
       homePage.verifyTheme(Themes.dark()),
       // Check solver pro feature
-      homePage.tapSolverButton(),
-      solverPage.verifyIsVisible(),
+      homePage.openSolver(),
+      solverPage.verifyVisibility(),
       CommonTester.closeDialog(tester),
       // Check continue game pro feature
-      homePage.tapContinueButton(),
-      lobbyPage.verifyIsVisible(),
+      homePage.continueGame(),
+      lobbyPage.verifyVisibility(),
       // Check saved players pro feature
-      lobbyPage.tapSavedPlayersButton(),
-      savedPlayersPage.verifyIsVisible(),
+      lobbyPage.openSavedPlayersDialog(),
+      savedPlayersPage.verifyVisibility(),
       savedPlayersPage.usePlayerByName(restoredName),
       CommonTester.closeDialog(tester),
-      () => tester.pumpAndSettle(const Duration(seconds: 1)),
+      () => tester.pumpAndSettle(duration: const Duration(seconds: 1)),
       lobbyPage.findPlayerWithName(restoredName),
       // Check more players pro feature
       // Check custom icons pro feature
-      lobbyPage.tapAddPlayersButton(),
-      playerEditorPage.verifyIsVisible(),
+      lobbyPage.addPlayer(),
+      playerEditorPage.verifyVisibility(),
       playerEditorPage.enterName(testName),
-      playerEditorPage.tapAvatar(),
-      playerEditorPage.verifyAvatarSelectorIsVisible(),
-      playerEditorPage.selectAvatar(assetIndex),
+      playerEditorPage.openAvatarPicker(),
+      playerEditorPage.verifyAvatarPickerVisibility(),
+      playerEditorPage.selectAvatarByIndex(assetIndex),
       playerEditorPage.verifyAvatarByAssetUrl(assetUrl),
-      playerEditorPage.tapConfirmButton(),
-      playerEditorPage.verifyIsVisible(isVisible: false),
-      () => tester.pumpAndSettle(const Duration(seconds: 1)),
+      playerEditorPage.confirmEditingAndExit(),
+      playerEditorPage.verifyVisibility(isVisible: false),
+      () => tester.pumpAndSettle(duration: const Duration(seconds: 1)),
       lobbyPage.findPlayerWithName(testName),
       lobbyPage.findPlayerWithAssetUrl(assetUrl),
       // Check saving player pro feature
       lobbyPage.savePlayerByName(testName),
-      proVersionPage.verifyOfferIsVisible(isVisible: false),
+      proVersionPage.verifyOfferVisibility(isVisible: false),
       // Check undo action pro feature
       lobbyPage.toGame(),
-      gamePage.verifyIsVisible(),
+      gamePage.verifyVisibility(),
       gamePage.verifyGameStatus(GameStatusEnum.notStarted),
       gamePage.startGame(),
       gamePage.verifyGameStatus(GameStatusEnum.preFlop),
-      gamePage.tapUndoActionButton(),
-      gamePage.verifyUndoButtonIsNotVisible(),
+      gamePage.undoLastAction(),
+      gamePage.verifyUndoButtonVisibility(isVisible: false),
       gamePage.verifyGameStatus(GameStatusEnum.notStarted),
     ],
   )();

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
@@ -13,7 +14,7 @@ import 'lobby_test_utils.dart';
 /// [LobbyTest]
 /// Update state after game starts
 Future<void> runLobbyTest10(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(2);
@@ -35,15 +36,15 @@ Future<void> runLobbyTest10(
   await runTestActions(
     [
       // Open lobby page
-      homePage.tapContinueButton(),
-      lobbyPage.verifyIsVisible(),
+      homePage.continueGame(),
+      lobbyPage.verifyVisibility(),
       // Start game, verify lobby state is updated after game ends
       lobbyPage.toGame(),
-      gamePage.verifyIsVisible(),
+      gamePage.verifyVisibility(),
       gamePage.startGame(),
       CommonTester.closePage(tester),
-      lobbyPage.verifyIsVisible(),
-      lobbyPage.verifyAddPlayerButtonVisible(false),
+      lobbyPage.verifyVisibility(),
+      lobbyPage.verifyAddPlayerButtonVisibility(false),
       () async =>
           expect(find.byKey(LobbyKeys.resetLobbyButton), findsOneWidget),
       () async =>

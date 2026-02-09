@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/di/repositories.dart';
@@ -72,7 +72,7 @@ GameSessionState buildSessionState({
     );
 
 TAction pumpGameApp({
-  required WidgetTester tester,
+  required PatrolTester tester,
   required MockAppRepository repository,
   required LobbyStateModel lobbyState,
   required List<PlayerModel> savedPlayers,
@@ -114,7 +114,7 @@ TAction pumpGameApp({
           MockPurchasesRepository(hasPurchasesForRestore: true)
             ..setScenario(MockScenario.success);
 
-      await tester.pumpWidget(
+      await tester.pumpWidgetAndSettle(
         ProviderScope(
           overrides: [
             appRepositoryProvider.overrideWithValue(repository),
@@ -127,21 +127,19 @@ TAction pumpGameApp({
           child: const MyApp(),
         ),
       );
-
-      await tester.pumpAndSettle();
     };
 
 TAction openGamePage(
-  WidgetTester tester,
+  PatrolTester tester,
 ) {
   final homePage = HomePageTester(tester);
   final lobbyPage = LobbyPageTester(tester);
 
   return runTestActions(
     [
-      homePage.verifyHomePageIsVisible(),
-      homePage.tapContinueButton(),
-      lobbyPage.verifyIsVisible(),
+      homePage.verifyHomePageVisibility(),
+      homePage.continueGame(),
+      lobbyPage.verifyVisibility(),
       lobbyPage.toGame(),
     ],
   );

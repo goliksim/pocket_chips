@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
@@ -16,7 +16,7 @@ import '../../test_utils/test_action.dart';
 /// Cached PRO mode, store is available and returned PRO MODE
 /// Restored from store
 Future<void> runProVersionTest1(
-  WidgetTester tester,
+  PatrolTester tester,
   AppRepository repository,
 ) async {
   final mockConfig = ConfigModel(
@@ -42,7 +42,7 @@ Future<void> runProVersionTest1(
   final homePage = HomePageTester(tester);
 
   await runAction(
-    () => tester.pumpWidget(
+    () => tester.pumpWidgetAndSettle(
       ProviderScope(
         overrides: [
           appRepositoryProvider.overrideWithValue(repository),
@@ -59,15 +59,14 @@ Future<void> runProVersionTest1(
   await runTestActions(
     [
       // Wait for onboarding to load
-      () => tester.pumpAndSettle(),
-      onboardingPage.verifyAboutDialogIsVisible(),
+      onboardingPage.verifyAboutDialogVisibility(),
       // Verify PRO version is purchased and applyed on the HomePage
-      onboardingPage.swipePage(),
-      () => tester.pumpAndSettle(const Duration(seconds: 3)),
+      onboardingPage.swipeOnePage(),
+      () => tester.pumpAndSettle(duration: const Duration(seconds: 3)),
       proVerionOfferPage.verifyProVersionIsPurchased(),
-      onboardingPage.tapSkipButton(),
+      onboardingPage.skipPages(),
       onboardingPage.closeOnboardingDialog(),
-      homePage.verifyIsProVersionScreen(),
+      homePage.verifyProVersionScreen(),
     ],
   )();
 }

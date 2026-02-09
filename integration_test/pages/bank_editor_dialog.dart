@@ -1,15 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 
 import '../test_utils/test_action.dart';
 
 class BankEditorDialogTester {
-  final WidgetTester tester;
+  final PatrolTester $;
 
-  BankEditorDialogTester(this.tester);
+  BankEditorDialogTester(this.$);
 
-  TAction verifyIsVisible({bool isVisible = true}) => () async {
-        await tester.pumpAndSettle();
+  TAction verifyVisibility({bool isVisible = true}) => () async {
+        await $.pumpAndSettle();
 
         expect(
           find.byKey(BankEditorKeys.dialog),
@@ -17,15 +18,8 @@ class BankEditorDialogTester {
         );
       };
 
-  TAction enterStack(String text) => () async {
-        await tester.pumpAndSettle();
+  TAction enterInitialStack(String text) =>
+      () => $(BankEditorKeys.textField).enterText(text);
 
-        await tester.enterText(find.byKey(BankEditorKeys.textField), text);
-      };
-
-  TAction confirm() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(BankEditorKeys.confirmButton));
-      };
+  TAction confirmAndExit() => () => $(BankEditorKeys.confirmButton).tap();
 }

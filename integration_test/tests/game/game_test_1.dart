@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
 import '../../game_test.mocks.dart';
@@ -11,7 +11,7 @@ import 'game_test_utils.dart';
 /// [GameTest]
 /// Change stack and blinds via settings on GamePage
 Future<void> runGameTest1(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(2);
@@ -23,7 +23,7 @@ Future<void> runGameTest1(
 
   TAction verifyPlayersBank() => runTestActions(
         players.map(
-          (player) => gamePage.verifyPlayerBank(
+          (player) => gamePage.verifyPlayerBankValue(
             name: player.name,
             expectedBank: 2000,
           ),
@@ -47,17 +47,17 @@ Future<void> runGameTest1(
     [
       // Open game page
       openGamePage(tester),
-      lobbyPage.verifyIsVisible(isVisible: false),
-      gamePage.verifyIsVisible(),
+      lobbyPage.verifyVisibility(isVisible: false),
+      gamePage.verifyVisibility(),
       // Open settings and change stack and blinds
-      gamePage.tapSettingsButton(),
-      settingsDialog.verifyIsVisible(),
+      gamePage.openSettins(),
+      settingsDialog.verifyVisibility(),
       settingsDialog.enterStartingStack('2000'),
       settingsDialog.enterSmallBlind('50'),
-      settingsDialog.saveChanges(),
+      settingsDialog.saveChangesAndExit(),
       // Verify changes applied
       verifyPlayersBank(),
-      gamePage.verifySmallBlind(50),
+      gamePage.verifySmallBlindValues(50),
     ],
   )();
 }

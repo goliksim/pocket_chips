@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 
 import '../../pages/home_page.dart';
 import '../../pages/solver_page.dart';
@@ -9,7 +9,7 @@ import 'solver_test_utils.dart';
 /// [SolverTest]
 /// Add card, remove card, and prevent duplicate card
 Future<void> runSolverTest1(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final homePage = HomePageTester(tester);
@@ -26,29 +26,29 @@ Future<void> runSolverTest1(
   await runTestActions(
     [
       // Open solver page
-      homePage.verifyHomePageIsVisible(),
-      homePage.tapSolverButton(),
-      solverPage.verifyIsVisible(),
+      homePage.verifyHomePageVisibility(),
+      homePage.openSolver(),
+      solverPage.verifyVisibility(),
       // Add card to table
       solverPage.selectTableCard(index: 0, value: 14, suit: 's'),
-      solverPage.verifyTableCardFrontVisible(
+      solverPage.verifyTableCardFrontVisibility(
         index: 0,
         value: 14,
         suit: 's',
       ),
       // Add another card to table
       solverPage.selectTableCard(index: 1, value: 13, suit: 'c'),
-      solverPage.verifyTableCardFrontVisible(
+      solverPage.verifyTableCardFrontVisibility(
         index: 1,
         value: 13,
         suit: 'c',
       ),
       // Try to add duplicate card to table
       solverPage.selectTableCard(index: 2, value: 14, suit: 's'),
-      solverPage.verifyTableCardBackVisible(2),
+      solverPage.verifyTableCardBackVisibility(2),
       // Remove card from table
       solverPage.longPressTableCardSlot(0),
-      solverPage.verifyTableCardBackVisible(0),
+      solverPage.verifyTableCardBackVisibility(0),
     ],
   )();
 }

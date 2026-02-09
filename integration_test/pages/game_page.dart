@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 import 'package:pocket_chips/domain/models/game/game_state_enum.dart';
 
 import '../test_utils/test_action.dart';
+import 'common_tester.dart';
 
 class GamePageTester {
-  final WidgetTester tester;
+  final PatrolTester $;
 
-  GamePageTester(this.tester);
+  GamePageTester(this.$);
 
-  TAction verifyIsVisible({bool isVisible = true}) => () async {
-        await tester.pumpAndSettle();
+  TAction verifyVisibility({bool isVisible = true}) => () async {
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(GameKeys.page),
@@ -19,8 +21,8 @@ class GamePageTester {
         );
       };
 
-  TAction verifySettingsIsVisible({bool isVisible = true}) => () async {
-        await tester.pumpAndSettle();
+  TAction verifySettingsVisibility({bool isVisible = true}) => () async {
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(GameSettingsKeys.dialog),
@@ -28,18 +30,18 @@ class GamePageTester {
         );
       };
 
-  TAction verifySmallBlind(int smallBlind) => () async {
-        await tester.pumpAndSettle();
+  TAction verifySmallBlindValues(int smallBlind) => () async {
+        await $.tester.pumpAndSettle();
 
         expect(find.byKey(GameKeys.blinds(smallBlind)), findsOneWidget);
       };
 
-  TAction verifyPlayerBank({
+  TAction verifyPlayerBankValue({
     required String name,
     required int expectedBank,
   }) =>
       () async {
-        await tester.pumpAndSettle();
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(GameTableKeys.playerBank(name, expectedBank)),
@@ -47,8 +49,8 @@ class GamePageTester {
         );
       };
 
-  TAction findPlayerCard(String name, {bool isVisible = true}) => () async {
-        await tester.pumpAndSettle();
+  TAction verifyPlayerCard(String name, {bool isVisible = true}) => () async {
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(GameTableKeys.playerCard(name)),
@@ -56,12 +58,12 @@ class GamePageTester {
         );
       };
 
-  TAction verifyPlayerBet({
+  TAction verifyPlayerBetValue({
     required String name,
     required int expectedBet,
   }) =>
       () async {
-        await tester.pumpAndSettle();
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(GameTableKeys.playerBet(name, expectedBet)),
@@ -74,7 +76,7 @@ class GamePageTester {
     bool isVisible = true,
   }) =>
       () async {
-        await tester.pumpAndSettle();
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(GameTableKeys.currentPlayerMarker(name)),
@@ -83,7 +85,7 @@ class GamePageTester {
       };
 
   TAction verifyGameStatus(GameStatusEnum status) => () async {
-        await tester.pumpAndSettle();
+        await $.tester.pumpAndSettle();
 
         switch (status) {
           case GameStatusEnum.notStarted:
@@ -100,96 +102,52 @@ class GamePageTester {
         }
       };
 
-  TAction tapUndoActionButton() => () async {
-        await tester.pumpAndSettle();
+  TAction undoLastAction() => () => $(GameKeys.undoButton).tapPROWidget();
 
-        await tester.tap(find.byKey(GameKeys.undoButton));
+  TAction verifyUndoButtonVisibility({bool isVisible = true}) => () async {
+        await $.tester.pumpAndSettle();
+
+        expect(find.byKey(GameKeys.undoButton),
+            isVisible ? findsOneWidget : findsNothing);
       };
 
-  TAction verifyUndoButtonIsVisible() => () async {
-        await tester.pumpAndSettle();
+  TAction startGame() => () => $(GameKeys.startGameButton).tap();
 
-        expect(find.byKey(GameKeys.undoButton), findsOneWidget);
-      };
+  TAction openSettins() => () => $(GameKeys.settingsButton).tap();
 
-  TAction verifyUndoButtonIsNotVisible() => () async {
-        await tester.pumpAndSettle();
+  TAction raise() => () => $(GameControlKeys.raiseButton).tap();
 
-        expect(find.byKey(GameKeys.undoButton), findsNothing);
-      };
+  TAction call() => () => $(GameControlKeys.callButton).tap();
 
-  TAction startGame() => () async {
-        await tester.pumpAndSettle();
+  TAction allIn() => () => $(GameControlKeys.allInButton).tap();
 
-        await tester.tap(find.byKey(GameKeys.startGameButton));
-      };
+  TAction fold() => () => $(GameControlKeys.foldButton).tap();
 
-  TAction tapSettingsButton() => () async {
-        await tester.pumpAndSettle();
+  TAction cancelRaise() => () => $(GameControlKeys.raiseCancelButton).tap();
 
-        await tester.tap(find.byKey(GameKeys.settingsButton));
-      };
+  TAction confirmRaise() => () => $(GameControlKeys.raiseConfirmButton).tap();
 
-  TAction tapRaiseButton() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(GameControlKeys.raiseButton));
-      };
-
-  TAction tapCallButton() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(GameControlKeys.callButton));
-      };
-
-  TAction tapAllInButton() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(GameControlKeys.allInButton));
-      };
-
-  TAction tapFoldButton() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(GameControlKeys.foldButton));
-      };
-
-  TAction tapRaiseCancel() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(GameControlKeys.raiseCancelButton));
-      };
-
-  TAction tapRaiseConfirm() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(GameControlKeys.raiseConfirmButton));
-      };
-
-  TAction tapRaiseChip(int value) => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(GameControlKeys.raiseChip(value)));
-      };
+  TAction tapRaiseChip(int value) =>
+      () => $(GameControlKeys.raiseChip(value)).tap();
 
   Future<int> getRaiseSliderValue() async {
-    await tester.pumpAndSettle();
+    await $.tester.pumpAndSettle();
 
     final slider =
-        tester.widget<Slider>(find.byKey(GameControlKeys.raiseSlider));
+        $.tester.widget<Slider>(find.byKey(GameControlKeys.raiseSlider));
     return slider.value.toInt();
   }
 
   TAction dragRaiseSliderToMax() => () async {
-        await tester.pumpAndSettle();
+        await $.tester.pumpAndSettle();
 
         final sliderFinder = find.byKey(GameControlKeys.raiseSlider);
-        await tester.drag(sliderFinder, const Offset(300, 0));
-        await tester.pumpAndSettle();
+        await $.tester.drag(sliderFinder, const Offset(300, 0));
+        await $.tester.pumpAndSettle();
       };
 
-  TAction verifyRaiseFieldVisible({bool isVisible = true}) => () async {
-        await tester.pumpAndSettle();
+  TAction verifyRaiseFieldVisibility({bool isVisible = true}) => () async {
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(GameControlKeys.raiseField),
@@ -197,18 +155,18 @@ class GamePageTester {
         );
       };
 
-  TAction verifyRaiseMinMax({
+  TAction verifyRaiseMinMaxValues({
     required String minValue,
     required String maxValue,
   }) =>
       () async {
-        await tester.pumpAndSettle();
+        await $.tester.pumpAndSettle();
 
-        final minText = tester
+        final minText = $.tester
                 .widget<Text>(find.byKey(GameControlKeys.raiseMinLabel))
                 .data ??
             '';
-        final maxText = tester
+        final maxText = $.tester
                 .widget<Text>(find.byKey(GameControlKeys.raiseMaxLabel))
                 .data ??
             '';
@@ -217,8 +175,8 @@ class GamePageTester {
         expect(maxText, maxValue);
       };
 
-  TAction verifyAddMainButtonVisible(bool isVisible) => () async {
-        await tester.pumpAndSettle();
+  TAction verifyAddMainButtonVisibility(bool isVisible) => () async {
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(GameTableKeys.addMainButton),
@@ -226,42 +184,32 @@ class GamePageTester {
         );
       };
 
-  TAction _openAddMenu() => () async {
-        await tester.pumpAndSettle();
+  TAction _openAddMenu() => () => $(GameTableKeys.addMainButton).tap();
 
-        await tester.tap(find.byKey(GameTableKeys.addMainButton));
-      };
-
-  TAction tapAddNewPlayerButton() => () async {
-        await tester.pumpAndSettle();
-
+  TAction addNewPlayer() => () async {
         var finder = find.byKey(GameTableKeys.addNewPlayerButton);
 
         if (!finder.hasFound) {
           await _openAddMenu()();
 
-          await tester.pumpAndSettle();
           finder = find.byKey(GameTableKeys.addNewPlayerButton);
         }
-        await tester.tap(finder);
+        await $(finder).tap();
       };
 
-  TAction tapAddSavedPlayerButton() => () async {
-        await tester.pumpAndSettle();
-
+  TAction openSavedList() => () async {
         var finder = find.byKey(GameTableKeys.addSavedPlayerButton);
         if (!finder.hasFound) {
           await _openAddMenu()();
 
-          await tester.pumpAndSettle();
           finder = find.byKey(GameTableKeys.addSavedPlayerButton);
         }
 
-        await tester.tap(finder);
+        await $(finder).tap();
       };
 
-  TAction verifyWinnerDialogVisible({bool isVisible = true}) => () async {
-        await tester.pumpAndSettle();
+  TAction verifyWinnerDialogVisibility({bool isVisible = true}) => () async {
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(WinnerKeys.winnerDialog),
@@ -269,8 +217,9 @@ class GamePageTester {
         );
       };
 
-  TAction verifyWinnerChoiceDialogVisible({bool isVisible = true}) => () async {
-        await tester.pumpAndSettle();
+  TAction verifyWinnerChoiceDialogVisibility({bool isVisible = true}) =>
+      () async {
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(WinnerKeys.winnerChoiceDialog),
@@ -278,23 +227,13 @@ class GamePageTester {
         );
       };
 
-  TAction selectWinner(String uid) => () async {
-        await tester.pumpAndSettle();
+  TAction selectWinner(String uid) =>
+      () => $(WinnerKeys.winnerChoiceCheckbox(uid)).tap();
 
-        await tester.tap(find.byKey(WinnerKeys.winnerChoiceCheckbox(uid)));
-      };
+  TAction confirmWinnerChoice() =>
+      () => $(WinnerKeys.winnerChoiceConfirmButton).tap();
 
-  TAction confirmWinnerChoice() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(WinnerKeys.winnerChoiceConfirmButton));
-      };
-
-  TAction tapWinnerDialog() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(WinnerKeys.winnerDialog));
-      };
+  TAction tapWinnerDialog() => () => $(WinnerKeys.winnerDialog).tap();
 
   void _verifyGameStatusNotStarted() {
     expect(find.byKey(GameKeys.startGameButton), findsOneWidget);

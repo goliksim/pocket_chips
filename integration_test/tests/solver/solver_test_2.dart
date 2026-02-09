@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 
 import '../../pages/home_page.dart';
 import '../../pages/solver_page.dart';
@@ -9,7 +9,7 @@ import 'solver_test_utils.dart';
 /// [SolverTest]
 /// Winner rendering in solver
 Future<void> runSolverTest2(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final homePage = HomePageTester(tester);
@@ -26,9 +26,9 @@ Future<void> runSolverTest2(
   await runTestActions(
     [
       // Open solver page
-      homePage.verifyHomePageIsVisible(),
-      homePage.tapSolverButton(),
-      solverPage.verifyIsVisible(),
+      homePage.verifyHomePageVisibility(),
+      homePage.openSolver(),
+      solverPage.verifyVisibility(),
       // Add cards to table and players
       solverPage.selectTableCard(index: 0, value: 2, suit: 'c'),
       solverPage.selectTableCard(index: 1, value: 3, suit: 'd'),
@@ -61,8 +61,8 @@ Future<void> runSolverTest2(
       ),
       // Verify winner badge is shown for player 1
       () => tester.pump(const Duration(seconds: 1)),
-      solverPage.verifyWinnerBadgeVisible(0),
-      solverPage.verifyWinnerBadgeVisible(1, isVisible: false),
+      solverPage.verifyWinnerBadgeVisibility(0),
+      solverPage.verifyWinnerBadgeVisibility(1, isVisible: false),
     ],
   )();
 }

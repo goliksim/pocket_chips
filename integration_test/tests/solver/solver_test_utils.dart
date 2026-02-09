@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/di/repositories.dart';
@@ -20,7 +20,7 @@ ConfigModel defaultConfig() => ConfigModel(
     );
 
 TAction pumpHomeApp({
-  required WidgetTester tester,
+  required PatrolTester tester,
   required MockAppRepository repository,
 }) =>
     () async {
@@ -32,7 +32,7 @@ TAction pumpHomeApp({
           MockPurchasesRepository(hasPurchasesForRestore: true)
             ..setScenario(MockScenario.success);
 
-      await tester.pumpWidget(
+      await tester.pumpWidgetAndSettle(
         ProviderScope(
           overrides: [
             appRepositoryProvider.overrideWithValue(repository),
@@ -45,6 +45,4 @@ TAction pumpHomeApp({
           child: const MyApp(),
         ),
       );
-
-      await tester.pumpAndSettle();
     };

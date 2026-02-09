@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
 import '../../lobby_test.mocks.dart';
@@ -11,7 +11,7 @@ import 'lobby_test_utils.dart';
 /// [LobbyTest]
 /// Add player
 Future<void> runLobbyTest2(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(1);
@@ -35,14 +35,14 @@ Future<void> runLobbyTest2(
   await runTestActions(
     [
       // Open lobby page
-      homePage.tapContinueButton(),
-      lobbyPage.verifyIsVisible(),
+      homePage.continueGame(),
+      lobbyPage.verifyVisibility(),
       // Add new player, verify it's added to the list
-      lobbyPage.tapAddPlayersButton(),
-      playerEditor.verifyIsVisible(),
+      lobbyPage.addPlayer(),
+      playerEditor.verifyVisibility(),
       playerEditor.enterName(newName),
-      playerEditor.tapConfirmButton(),
-      () => tester.pumpAndSettle(const Duration(seconds: 1)),
+      playerEditor.confirmEditingAndExit(),
+      () => tester.pumpAndSettle(duration: const Duration(seconds: 1)),
       lobbyPage.findPlayerWithName(newName),
     ],
   )();

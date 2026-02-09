@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
@@ -11,7 +11,7 @@ import 'lobby_test_utils.dart';
 /// [LobbyTest]
 /// Max players
 Future<void> runLobbyTest7(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(maxPlayerCount);
@@ -33,10 +33,10 @@ Future<void> runLobbyTest7(
   await runTestActions(
     [
       // Open lobby page
-      homePage.tapContinueButton(),
-      lobbyPage.verifyIsVisible(),
+      homePage.continueGame(),
+      lobbyPage.verifyVisibility(),
       // Verify max players reached and add player button is not visible
-      lobbyPage.verifyAddPlayerButtonVisible(false),
+      lobbyPage.verifyAddPlayerButtonVisibility(false),
     ],
   )();
 }

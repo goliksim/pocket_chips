@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
 import '../../lobby_test.mocks.dart';
@@ -13,7 +13,7 @@ import 'lobby_test_utils.dart';
 /// [LobbyTest]
 /// Change stack via editor and settings + change blinds
 Future<void> runLobbyTest1(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(2);
@@ -27,7 +27,7 @@ Future<void> runLobbyTest1(
 
   TAction verifyPlayersBank(int expectedBank) => () async {
         for (final player in players) {
-          await lobbyPage.verifyPlayerBank(
+          await lobbyPage.verifyPlayerBankValue(
               name: player.name, expectedBank: expectedBank)();
         }
       };
@@ -45,25 +45,25 @@ Future<void> runLobbyTest1(
   await runTestActions(
     [
       // Open lobby page
-      homePage.verifyHomePageIsVisible(),
-      homePage.tapContinueButton(),
-      lobbyPage.verifyIsVisible(),
+      homePage.verifyHomePageVisibility(),
+      homePage.continueGame(),
+      lobbyPage.verifyVisibility(),
       // Open editor and change stack, verify changes applied
-      lobbyPage.tapStartingStackButton(),
-      bankEditor.verifyIsVisible(),
-      bankEditor.enterStack('1000'),
-      bankEditor.confirm(),
+      lobbyPage.openInitialStackEditor(),
+      bankEditor.verifyVisibility(),
+      bankEditor.enterInitialStack('1000'),
+      bankEditor.confirmAndExit(),
       verifyPlayersBank(1000),
       // Open settings and change stack and blinds, verify changes applied
-      lobbyPage.tapSettingsButton(),
-      settingsDialog.verifyIsVisible(),
+      lobbyPage.openSettings(),
+      settingsDialog.verifyVisibility(),
       settingsDialog.enterStartingStack('2000'),
       settingsDialog.enterSmallBlind('50'),
-      settingsDialog.saveChanges(),
+      settingsDialog.saveChangesAndExit(),
       verifyPlayersBank(2000),
       lobbyPage.toGame(),
-      gamePage.verifyIsVisible(),
-      gamePage.verifySmallBlind(50),
+      gamePage.verifyVisibility(),
+      gamePage.verifySmallBlindValues(50),
     ],
   )();
 }

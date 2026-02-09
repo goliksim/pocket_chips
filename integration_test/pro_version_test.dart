@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
 import 'package:mockito/annotations.dart';
+import 'package:patrol/patrol.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import 'pro_version_test.mocks.dart';
@@ -15,8 +15,6 @@ import 'tests/pro_version/pro_version_test_8.dart';
 
 @GenerateMocks([AppRepository])
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
   group(
     'Pro Version tests',
     () {
@@ -26,66 +24,66 @@ void main() {
         mockAppRepository = MockAppRepository();
       });
 
-      testWidgets(
+      patrolTest(
         'Pro Version Test 1',
-        (WidgetTester tester) => runProVersionTest1(
-          tester,
+        ($) => runProVersionTest1(
+          $,
           mockAppRepository,
         ),
       );
 
-      testWidgets(
+      patrolTest(
         'Pro Version Test 2',
-        (WidgetTester tester) => runProVersionTest2(
-          tester,
+        ($) => runProVersionTest2(
+          $,
           mockAppRepository,
         ),
       );
 
-      testWidgets(
+      patrolTest(
         'Pro Version Test 3',
-        (WidgetTester tester) => runProVersionTest3(
-          tester,
+        ($) => runProVersionTest3(
+          $,
           mockAppRepository,
         ),
       );
 
-      testWidgets(
+      patrolTest(
         'Pro Version Test 4',
-        (WidgetTester tester) => runProVersionTest4(
-          tester,
+        ($) => runProVersionTest4(
+          $,
           mockAppRepository,
         ),
       );
 
-      testWidgets(
+      patrolTest(
         'Pro Version Test 5',
-        (WidgetTester tester) => runProVersionTest5(
-          tester,
+        ($) => runProVersionTest5(
+          $,
           mockAppRepository,
         ),
       );
 
-      testWidgets(
+      patrolTest(
         'Pro Version Test 6',
-        (WidgetTester tester) => runProVersionTest6(
-          tester,
+        ($) => runProVersionTest6(
+          $,
           mockAppRepository,
         ),
       );
 
-      testWidgets(
+      patrolTest(
         'Pro Version Test 7',
-        (WidgetTester tester) => runProVersionTest7(
-          tester,
+        ($) => runProVersionTest7(
+          $,
           mockAppRepository,
         ),
       );
 
-      testWidgets(
+      patrolTest(
         'Pro Version Test 8',
-        (WidgetTester tester) => runProVersionTest8(
-          tester,
+        ($) => runProVersionTest8(
+          $,
           mockAppRepository,
         ),
       );

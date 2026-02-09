@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
@@ -11,7 +12,7 @@ import 'lobby_test_utils.dart';
 /// [LobbyTest]
 /// Continue game preserves lobby players
 Future<void> runLobbyTest12(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(3);
@@ -42,9 +43,9 @@ Future<void> runLobbyTest12(
   await runTestActions(
     [
       // Continue game, verify players are still in lobby
-      homePage.verifyHomePageIsVisible(),
-      homePage.tapContinueButton(),
-      lobbyPage.verifyIsVisible(),
+      homePage.verifyHomePageVisibility(),
+      homePage.continueGame(),
+      lobbyPage.verifyVisibility(),
       verifyPlayersInLobby(),
     ],
   )();

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
 import 'package:mockito/annotations.dart';
+import 'package:patrol/patrol.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import 'solver_test.mocks.dart';
@@ -9,8 +9,6 @@ import 'tests/solver/solver_test_2.dart';
 
 @GenerateMocks([AppRepository])
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
   group(
     'Solver tests',
     () {
@@ -20,14 +18,14 @@ void main() {
         mockAppRepository = MockAppRepository();
       });
 
-      testWidgets(
+      patrolTest(
         'Solver Test 1',
-        (WidgetTester tester) => runSolverTest1(tester, mockAppRepository),
+        ($) => runSolverTest1($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Solver Test 2',
-        (WidgetTester tester) => runSolverTest2(tester, mockAppRepository),
+        ($) => runSolverTest2($, mockAppRepository),
       );
     },
   );

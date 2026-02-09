@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/domain/models/game/game_state_enum.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 import 'package:pocket_chips/utils/extensions.dart';
@@ -11,7 +12,7 @@ import 'game_test_utils.dart';
 /// [GameTest]
 /// Raise flow: chips, slider, min/max, selected value, next player
 Future<void> runGameTest3(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(2);
@@ -41,9 +42,9 @@ Future<void> runGameTest3(
       gamePage.verifyGameStatus(GameStatusEnum.preFlop),
       gamePage.verifyCurrentPlayer(players.first.name),
       // Open raise dialog and verify min/max values
-      gamePage.tapRaiseButton(),
-      gamePage.verifyRaiseFieldVisible(),
-      gamePage.verifyRaiseMinMax(
+      gamePage.raise(),
+      gamePage.verifyRaiseFieldVisibility(),
+      gamePage.verifyRaiseMinMaxValues(
         minValue: minTotal,
         maxValue: maxTotal,
       ),
@@ -59,8 +60,8 @@ Future<void> runGameTest3(
       },
       // Drag slider to max and verify value
       gamePage.dragRaiseSliderToMax(),
-      gamePage.tapRaiseConfirm(),
-      gamePage.verifyPlayerBet(
+      gamePage.confirmRaise(),
+      gamePage.verifyPlayerBetValue(
         name: players.first.name,
         expectedBet: 5000,
       ),

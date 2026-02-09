@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
@@ -12,7 +12,7 @@ import 'game_test_utils.dart';
 /// [GameTest]
 /// Undo after Lobby reset returns previous state
 Future<void> runGameTest10(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(2);
@@ -41,18 +41,18 @@ Future<void> runGameTest10(
       gamePage.startGame(),
       // Verify current player is second player
       // And current player can be changed to first player after undo, even after lobby reset
-      gamePage.tapCallButton(),
+      gamePage.call(),
       gamePage.verifyCurrentPlayer(players.last.name),
       CommonTester.closePage(tester),
-      lobbyPage.verifyIsVisible(),
-      () => tester.tap(find.byKey(LobbyKeys.resetLobbyButton)),
+      lobbyPage.verifyVisibility(),
+      () => tester(LobbyKeys.resetLobbyButton).tap(),
       () => tester.pumpAndSettle(),
-      () => tester.tap(find.byKey(CommonKeys.confirmButton)),
+      () => tester(CommonKeys.confirmButton).tap(),
       () => tester.pumpAndSettle(),
       lobbyPage.toGame(),
-      gamePage.verifyIsVisible(),
-      gamePage.verifyUndoButtonIsVisible(),
-      gamePage.tapUndoActionButton(),
+      gamePage.verifyVisibility(),
+      gamePage.verifyUndoButtonVisibility(),
+      gamePage.undoLastAction(),
       gamePage.verifyCurrentPlayer(players.first.name),
     ],
   )();

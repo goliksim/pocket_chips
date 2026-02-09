@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
@@ -17,7 +17,7 @@ import '../../test_utils/test_action.dart';
 /// Closing onboarding, returning with connection, restore PRO MODE
 /// Checking Pro Mode during onboarding and on HomePage
 Future<void> runProVersionTest6(
-  WidgetTester tester,
+  PatrolTester tester,
   AppRepository repository,
 ) async {
   final mockConfig = ConfigModel(
@@ -42,7 +42,7 @@ Future<void> runProVersionTest6(
   final homePage = HomePageTester(tester);
 
   await runAction(
-    () => tester.pumpWidget(
+    () => tester.pumpWidgetAndSettle(
       ProviderScope(
         overrides: [
           appRepositoryProvider.overrideWithValue(repository),
@@ -59,28 +59,27 @@ Future<void> runProVersionTest6(
   await runTestActions(
     [
       // Verify onboarding is shown
-      () => tester.pumpAndSettle(),
-      onboardingPage.verifyAboutDialogIsVisible(),
+      onboardingPage.verifyAboutDialogVisibility(),
       // Verify PRO MODE is not available, store is offline, check PRO is not applied at the HomePage
-      onboardingPage.swipePage(),
+      onboardingPage.swipeOnePage(),
       () => tester.pumpAndSettle(),
       proVerionOfferPage.verifyProVersionIsNotAvailable(),
-      onboardingPage.tapSkipButton(),
+      onboardingPage.skipPages(),
       onboardingPage.closeOnboardingDialog(),
-      homePage.verifyIsNotProVersionScreen(),
+      homePage.verifyProVersionScreen(isPro: false),
       // Connecting to internet
       () async => mockPurchasesRepository.setScenario(MockScenario.success),
       // Returning to onboarding, verifying that PRO MODE is available to buy
-      homePage.tapHelpButton(),
-      onboardingPage.verifyAboutDialogIsVisible(),
-      onboardingPage.swipePage(),
+      homePage.openOnboarding(),
+      onboardingPage.verifyAboutDialogVisibility(),
+      onboardingPage.swipeOnePage(),
       () => tester.pumpAndSettle(),
       proVerionOfferPage.verifyProVersionIsAvailable(),
       // Buying PRO version, verifying that PRO MODE is applied on the HomePage
-      proVerionOfferPage.tapBuyPROButton(),
-      onboardingPage.tapSkipButton(),
+      proVerionOfferPage.buyPRO(),
+      onboardingPage.skipPages(),
       onboardingPage.closeOnboardingDialog(),
-      homePage.verifyIsProVersionScreen(),
+      homePage.verifyProVersionScreen(),
     ],
   )();
 }

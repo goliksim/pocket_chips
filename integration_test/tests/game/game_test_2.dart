@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 
 import '../../game_test.mocks.dart';
 import '../../pages/common_tester.dart';
@@ -11,7 +11,7 @@ import 'game_test_utils.dart';
 /// [GameTest]
 /// Add new player and saved player from table + max players checks
 Future<void> runGameTest2(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(8);
@@ -38,27 +38,27 @@ Future<void> runGameTest2(
     [
       // Open game page
       openGamePage(tester),
-      gamePage.verifyIsVisible(),
+      gamePage.verifyVisibility(),
       // Add new player
-      gamePage.tapAddNewPlayerButton(),
-      playerEditor.verifyIsVisible(),
+      gamePage.addNewPlayer(),
+      playerEditor.verifyVisibility(),
       playerEditor.enterName('new_1'),
       playerEditor.enterBank('5000'),
-      playerEditor.tapConfirmButton(),
+      playerEditor.confirmEditingAndExit(),
       // Verify new player added to table
-      () => tester.pumpAndSettle(const Duration(seconds: 1)),
-      gamePage.findPlayerCard('new_1'),
+      () => tester.pumpAndSettle(duration: const Duration(seconds: 1)),
+      gamePage.verifyPlayerCard('new_1'),
       // Add saved player
-      gamePage.tapAddSavedPlayerButton(),
-      savedPage.verifyIsVisible(),
+      gamePage.openSavedList(),
+      savedPage.verifyVisibility(),
       savedPage.usePlayerByName(savedPlayers.first.name),
       savedPage.usePlayerByName(savedPlayers.last.name),
       CommonTester.closeDialog(tester),
       // Verify only 1 saved players added to table
       () => tester.pumpAndSettle(),
-      gamePage.findPlayerCard(savedPlayers.first.name),
-      gamePage.findPlayerCard(savedPlayers.last.name, isVisible: false),
-      gamePage.verifyAddMainButtonVisible(false)
+      gamePage.verifyPlayerCard(savedPlayers.first.name),
+      gamePage.verifyPlayerCard(savedPlayers.last.name, isVisible: false),
+      gamePage.verifyAddMainButtonVisibility(false)
     ],
   )();
 }

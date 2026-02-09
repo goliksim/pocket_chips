@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/domain_managers.dart';
 import 'package:pocket_chips/di/repositories.dart';
@@ -17,7 +17,7 @@ import '../../test_utils/test_action.dart';
 /// Cached PRO mode
 /// No internet connection
 Future<void> runMonitizationTest4(
-  WidgetTester tester,
+  PatrolTester tester,
   AppRepository repository,
 ) async {
   final mockConfig = ConfigModel(
@@ -44,7 +44,7 @@ Future<void> runMonitizationTest4(
   final donationPage = DonationPageTester(tester);
 
   await runAction(
-    () => tester.pumpWidget(
+    () => tester.pumpWidgetAndSettle(
       ProviderScope(
         overrides: [
           appRepositoryProvider.overrideWithValue(repository),
@@ -64,16 +64,15 @@ Future<void> runMonitizationTest4(
   await runTestActions(
     [
       // Open donation page and check error messages
-      () => tester.pumpAndSettle(),
-      homePage.tapDonationButton(),
+      homePage.openDonationPage(),
       () => tester.pump(const Duration(seconds: 1)), //Dialog opening
-      donationPage.verifyIsVisible(),
-      donationPage.verifyUnavailable(),
+      donationPage.verifyVisibility(),
+      donationPage.verifyUnavailableState(),
       // Retry loading and verify error messages are still shown
       donationPage.retry(),
       () => tester.pump(const Duration(seconds: 1)),
-      donationPage.verifyIsVisible(),
-      donationPage.verifyUnavailable(),
+      donationPage.verifyVisibility(),
+      donationPage.verifyUnavailableState(),
       () async {
         // Set repositories to success scenario to simulate internet connection restoration
         mockPurchasesRepository.setScenario(MockScenario.success);
@@ -82,8 +81,8 @@ Future<void> runMonitizationTest4(
       // Retry loading and verify PRO mode is active and video ad is loaded
       donationPage.retry(),
       () => tester.pump(const Duration(seconds: 4)),
-      donationPage.verifyProMode(isPurchased: true),
-      donationPage.verifyVideoAd(isLoaded: true),
+      donationPage.verifyProModeItemExist(isPurchased: true),
+      donationPage.verifyVideoAdItemExist(isLoaded: true),
     ],
   )();
 }

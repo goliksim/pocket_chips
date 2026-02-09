@@ -1,15 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 
 import '../test_utils/test_action.dart';
 
 class GameSettingsDialogTester {
-  final WidgetTester tester;
+  final PatrolTester $;
 
-  GameSettingsDialogTester(this.tester);
+  GameSettingsDialogTester(this.$);
 
-  TAction verifyIsVisible({bool isVisible = true}) => () async {
-        await tester.pumpAndSettle();
+  TAction verifyVisibility({bool isVisible = true}) => () async {
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(GameSettingsKeys.dialog),
@@ -17,22 +18,11 @@ class GameSettingsDialogTester {
         );
       };
 
-  TAction enterStartingStack(String text) => () async {
-        await tester.pumpAndSettle();
+  TAction enterStartingStack(String text) =>
+      () => $(GameSettingsKeys.stackField).enterText(text);
 
-        await tester.enterText(find.byKey(GameSettingsKeys.stackField), text);
-      };
+  TAction enterSmallBlind(String text) =>
+      () => $(GameSettingsKeys.smallBlindField).enterText(text);
 
-  TAction enterSmallBlind(String text) => () async {
-        await tester.pumpAndSettle();
-
-        await tester.enterText(
-            find.byKey(GameSettingsKeys.smallBlindField), text);
-      };
-
-  TAction saveChanges() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(GameSettingsKeys.confirmButton));
-      };
+  TAction saveChangesAndExit() => () => $(GameSettingsKeys.confirmButton).tap();
 }

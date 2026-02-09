@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
 import 'package:mockito/annotations.dart';
+import 'package:patrol/patrol.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import 'game_test.mocks.dart';
@@ -17,8 +17,6 @@ import 'tests/game/game_test_9.dart';
 
 @GenerateMocks([AppRepository])
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
   group(
     'Game tests',
     () {
@@ -28,54 +26,54 @@ void main() {
         mockAppRepository = MockAppRepository();
       });
 
-      testWidgets(
+      patrolTest(
         'Game Test 1',
-        (WidgetTester tester) => runGameTest1(tester, mockAppRepository),
+        ($) => runGameTest1($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Game Test 2',
-        (WidgetTester tester) => runGameTest2(tester, mockAppRepository),
+        ($) => runGameTest2($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Game Test 3',
-        (WidgetTester tester) => runGameTest3(tester, mockAppRepository),
+        ($) => runGameTest3($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Game Test 4',
-        (WidgetTester tester) => runGameTest4(tester, mockAppRepository),
+        ($) => runGameTest4($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Game Test 5',
-        (WidgetTester tester) => runGameTest5(tester, mockAppRepository),
+        ($) => runGameTest5($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Game Test 6',
-        (WidgetTester tester) => runGameTest6(tester, mockAppRepository),
+        ($) => runGameTest6($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Game Test 7',
-        (WidgetTester tester) => runGameTest7(tester, mockAppRepository),
+        ($) => runGameTest7($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Game Test 8',
-        (WidgetTester tester) => runGameTest8(tester, mockAppRepository),
+        ($) => runGameTest8($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Game Test 9',
-        (WidgetTester tester) => runGameTest9(tester, mockAppRepository),
+        ($) => runGameTest9($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Game Test 10',
-        (WidgetTester tester) => runGameTest10(tester, mockAppRepository),
+        ($) => runGameTest10($, mockAppRepository),
       );
     },
   );

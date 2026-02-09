@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol/patrol.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/di/repositories.dart';
@@ -24,13 +23,11 @@ import 'test_utils/test_action.dart';
 
 @GenerateMocks([AppRepository])
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
   final repository = MockAppRepository();
 
-  testWidgets(
+  patrolTest(
     'Navigation Test 1',
-    (WidgetTester tester) async {
+    ($) async {
       final mockConfig = ConfigModel(
         isDark: false,
         firstLaunch: false,
@@ -63,14 +60,14 @@ void main() {
         (_) async => true,
       );
 
-      final homePage = HomePageTester(tester);
-      final onboaringPage = OnboardingPageTester(tester);
-      final lobbyPage = LobbyPageTester(tester);
-      final playerEditorPage = PlayerEditorTester(tester);
-      final gamePage = GamePageTester(tester);
+      final homePage = HomePageTester($);
+      final onboaringPage = OnboardingPageTester($);
+      final lobbyPage = LobbyPageTester($);
+      final playerEditorPage = PlayerEditorTester($);
+      final gamePage = GamePageTester($);
 
       await runAction(
-        () => tester.pumpWidget(
+        () => $.pumpWidgetAndSettle(
           ProviderScope(
             overrides: [
               appRepositoryProvider.overrideWithValue(repository),
@@ -85,71 +82,69 @@ void main() {
         ),
       );
 
-      // Run test actions
       await runTestActions(
         [
           // NO hiding app at HomePage
-          () => tester.pumpAndSettle(),
-          () => tester.binding.handlePopRoute(),
-          homePage.verifyHomePageIsVisible(),
+          () => $.tester.binding.handlePopRoute(),
+          homePage.verifyHomePageVisibility(),
           // Closing two dialogs at HomePage
-          homePage.tapHelpButton(),
-          onboaringPage.verifyAboutDialogIsVisible(),
-          onboaringPage.tapSkipButton(),
-          onboaringPage.tapUpdateInfoButton(),
-          onboaringPage.verifyUpdateDialogIsVisible(),
-          CommonTester.systemCloseDialog(tester),
-          CommonTester.systemCloseDialog(tester),
-          onboaringPage.verifyAboutDialogIsVisible(isVisible: false),
-          onboaringPage.verifyUpdateDialogIsVisible(isVisible: false),
-          homePage.verifyHomePageIsVisible(),
+          homePage.openOnboarding(),
+          onboaringPage.verifyAboutDialogVisibility(),
+          onboaringPage.skipPages(),
+          onboaringPage.openUpdateInfoDialog(),
+          onboaringPage.verifyUpdateDialogVisibility(),
+          CommonTester.systemCloseDialog($),
+          CommonTester.systemCloseDialog($),
+          onboaringPage.verifyAboutDialogVisibility(isVisible: false),
+          onboaringPage.verifyUpdateDialogVisibility(isVisible: false),
+          homePage.verifyHomePageVisibility(),
           // Check LobbyPage UI button
-          homePage.tapContinueButton(),
-          lobbyPage.verifyIsVisible(),
-          CommonTester.closePage(tester),
-          homePage.verifyHomePageIsVisible(),
-          lobbyPage.verifyIsVisible(isVisible: false),
+          homePage.continueGame(),
+          lobbyPage.verifyVisibility(),
+          CommonTester.closePage($),
+          homePage.verifyHomePageVisibility(),
+          lobbyPage.verifyVisibility(isVisible: false),
           // Check LobbyPage system button
-          homePage.tapContinueButton(),
-          lobbyPage.verifyIsVisible(),
-          CommonTester.systemClosePage(tester),
-          homePage.verifyHomePageIsVisible(),
-          lobbyPage.verifyIsVisible(isVisible: false),
+          homePage.continueGame(),
+          lobbyPage.verifyVisibility(),
+          CommonTester.systemClosePage($),
+          homePage.verifyHomePageVisibility(),
+          lobbyPage.verifyVisibility(isVisible: false),
           //Closing two dialogs at LobbyPage
-          homePage.tapContinueButton(),
-          lobbyPage.verifyIsVisible(),
-          lobbyPage.tapAddPlayersButton(),
-          playerEditorPage.verifyIsVisible(),
-          playerEditorPage.tapAvatar(),
-          playerEditorPage.verifyAvatarSelectorIsVisible(),
-          CommonTester.systemCloseDialog(tester),
-          CommonTester.systemCloseDialog(tester),
-          playerEditorPage.verifyIsVisible(isVisible: false),
-          playerEditorPage.verifyAvatarSelectorIsVisible(
+          homePage.continueGame(),
+          lobbyPage.verifyVisibility(),
+          lobbyPage.addPlayer(),
+          playerEditorPage.verifyVisibility(),
+          playerEditorPage.openAvatarPicker(),
+          playerEditorPage.verifyAvatarPickerVisibility(),
+          CommonTester.systemCloseDialog($),
+          CommonTester.systemCloseDialog($),
+          playerEditorPage.verifyVisibility(isVisible: false),
+          playerEditorPage.verifyAvatarPickerVisibility(
             isVisible: false,
           ),
-          lobbyPage.verifyIsVisible(),
+          lobbyPage.verifyVisibility(),
           //Closing dialog at GamePage
           lobbyPage.toGame(),
-          gamePage.verifyIsVisible(),
-          gamePage.tapSettingsButton(),
-          gamePage.verifySettingsIsVisible(),
-          CommonTester.systemCloseDialog(tester),
-          gamePage.verifySettingsIsVisible(isVisible: false),
-          gamePage.verifyIsVisible(),
+          gamePage.verifyVisibility(),
+          gamePage.openSettins(),
+          gamePage.verifySettingsVisibility(),
+          CommonTester.systemCloseDialog($),
+          gamePage.verifySettingsVisibility(isVisible: false),
+          gamePage.verifyVisibility(),
           //Closing dialog by UI button
-          CommonTester.closePage(tester),
-          gamePage.verifyIsVisible(isVisible: false),
-          lobbyPage.verifyIsVisible(),
+          CommonTester.closePage($),
+          gamePage.verifyVisibility(isVisible: false),
+          lobbyPage.verifyVisibility(),
           //Closing all pages by system button
           lobbyPage.toGame(),
-          gamePage.verifyIsVisible(),
-          CommonTester.systemClosePage(tester),
-          CommonTester.systemClosePage(tester),
-          () => tester.binding.handlePopRoute(),
-          gamePage.verifyIsVisible(isVisible: false),
-          lobbyPage.verifyIsVisible(isVisible: false),
-          homePage.verifyHomePageIsVisible(),
+          gamePage.verifyVisibility(),
+          CommonTester.systemClosePage($),
+          CommonTester.systemClosePage($),
+          () => $.tester.binding.handlePopRoute(),
+          gamePage.verifyVisibility(isVisible: false),
+          lobbyPage.verifyVisibility(isVisible: false),
+          homePage.verifyHomePageVisibility(),
         ],
       )();
     },

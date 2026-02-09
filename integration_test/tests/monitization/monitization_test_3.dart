@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/domain_managers.dart';
 import 'package:pocket_chips/di/repositories.dart';
@@ -17,7 +17,7 @@ import '../../test_utils/test_action.dart';
 /// Cached PRO mode
 /// Loading video ad before items
 Future<void> runMonitizationTest3(
-  WidgetTester tester,
+  PatrolTester tester,
   AppRepository repository,
 ) async {
   final mockConfig = ConfigModel(
@@ -44,7 +44,7 @@ Future<void> runMonitizationTest3(
   final donationPage = DonationPageTester(tester);
 
   await runAction(
-    () => tester.pumpWidget(
+    () => tester.pumpWidgetAndSettle(
       ProviderScope(
         overrides: [
           appRepositoryProvider.overrideWithValue(repository),
@@ -64,16 +64,15 @@ Future<void> runMonitizationTest3(
   await runTestActions(
     [
       // Open donation page and check video ad is loaded immediately and PRO mode is not loaded
-      () => tester.pumpAndSettle(),
-      homePage.tapDonationButton(),
+      homePage.openDonationPage(),
       () => tester.pump(const Duration(seconds: 1)), //Dialog opening
-      donationPage.verifyIsVisible(),
-      donationPage.verifyVideoAd(isLoaded: true),
-      donationPage.verifyNoProMode(isPurchased: true),
+      donationPage.verifyVisibility(),
+      donationPage.verifyVideoAdItemExist(isLoaded: true),
+      donationPage.verifyProModeItemExist(isPurchased: true, exist: false),
       // Verify video ad is loaded and PRO mode is active after loading time
       () => tester.pump(const Duration(seconds: 3)),
-      donationPage.verifyVideoAd(isLoaded: true),
-      donationPage.verifyProMode(isPurchased: true),
+      donationPage.verifyVideoAdItemExist(isLoaded: true),
+      donationPage.verifyProModeItemExist(isPurchased: true),
     ],
   )();
 }

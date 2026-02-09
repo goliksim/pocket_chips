@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/domain_managers.dart';
 import 'package:pocket_chips/di/repositories.dart';
@@ -17,7 +17,7 @@ import '../../test_utils/test_action.dart';
 /// Cached PRO mode
 /// Loading video ad after and items
 Future<void> runMonitizationTest2(
-  WidgetTester tester,
+  PatrolTester tester,
   AppRepository repository,
 ) async {
   final mockConfig = ConfigModel(
@@ -31,7 +31,7 @@ Future<void> runMonitizationTest2(
       MockPurchasesRepository(hasPurchasesForRestore: true)
         ..setScenario(MockScenario.success);
   final mockGoogleAdsManager = MockGoogleAdsManager(
-    loadingTime: Duration(seconds: 2),
+    loadingTime: Duration(seconds: 3),
   );
 
   when(repository.getConfig()).thenAnswer(
@@ -45,7 +45,7 @@ Future<void> runMonitizationTest2(
   final donationPage = DonationPageTester(tester);
 
   await runAction(
-    () => tester.pumpWidget(
+    () => tester.pumpWidgetAndSettle(
       ProviderScope(
         overrides: [
           appRepositoryProvider.overrideWithValue(repository),
@@ -65,17 +65,15 @@ Future<void> runMonitizationTest2(
   await runTestActions(
     [
       // Open donation page, verify PRO mode is active and video ad is loading
-      () => tester.pumpAndSettle(),
-      homePage.tapDonationButton(),
-      () => tester.pump(const Duration(seconds: 1)), //Dialog opening
-      donationPage.verifyIsVisible(),
-      donationPage.verifyVideoAd(isLoaded: false),
-      () => tester.pumpAndSettle(),
-      donationPage.verifyProMode(isPurchased: true),
-      () => tester.pumpAndSettle(),
+      homePage.openDonationPage(),
+      () => tester.pump(const Duration(milliseconds: 500)), //Dialog opening
+      donationPage.verifyVisibility(),
+      donationPage.verifyVideoAdItemExist(isLoaded: false),
+      donationPage.verifyProModeItemExist(isPurchased: true),
       // Verify video ad is loaded after loading time
-      donationPage.verifyVideoAd(isLoaded: true),
-      donationPage.verifyProMode(isPurchased: true),
+      () => tester.pump(const Duration(seconds: 3)),
+      donationPage.verifyVideoAdItemExist(isLoaded: true),
+      donationPage.verifyProModeItemExist(isPurchased: true),
     ],
   )();
 }

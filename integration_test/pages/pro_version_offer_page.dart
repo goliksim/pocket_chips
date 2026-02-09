@@ -1,28 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 
 import '../test_utils/test_action.dart';
 
 class ProVersionOfferPageTester {
-  final WidgetTester tester;
+  final PatrolTester $;
 
-  ProVersionOfferPageTester(this.tester);
+  ProVersionOfferPageTester(this.$);
 
-  TAction tapBuyPROButton() => () async {
-        await tester.pumpAndSettle();
+  TAction buyPRO() => () => $(ProVersionKeys.proVersionAvailableButton).tap();
 
-        await tester.tap(find.byKey(ProVersionKeys.proVersionAvailableButton));
-      };
+  TAction closeOfferDialog() =>
+      () => $(ProVersionKeys.proVersionCloseButton).tap();
 
-  TAction tapCloseButton() => () async {
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(ProVersionKeys.proVersionCloseButton));
-      };
-
-  TAction verifyOfferIsVisible({bool isVisible = true}) => () async {
-        await tester.pump(const Duration(seconds: 1));
-        await tester.pumpAndSettle();
+  TAction verifyOfferVisibility({bool isVisible = true}) => () async {
+        await $.tester.pump(const Duration(seconds: 1));
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(ProVersionKeys.proVersionOfferDialog),
@@ -31,7 +25,7 @@ class ProVersionOfferPageTester {
       };
 
   TAction verifyProVersionIsPurchased() => () async {
-        await tester.pumpAndSettle();
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(ProVersionKeys.proVersionPurshasedButton),
@@ -40,7 +34,7 @@ class ProVersionOfferPageTester {
       };
 
   TAction verifyProVersionIsAvailable() => () async {
-        await tester.pumpAndSettle();
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(ProVersionKeys.proVersionAvailableButton),
@@ -49,7 +43,7 @@ class ProVersionOfferPageTester {
       };
 
   TAction verifyProVersionIsNotAvailable() => () async {
-        await tester.pumpAndSettle();
+        await $.tester.pumpAndSettle();
 
         expect(
           find.byKey(ProVersionKeys.proVersionNotAvailableButton),

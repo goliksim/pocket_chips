@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 
 import '../../lobby_test.mocks.dart';
@@ -11,7 +12,7 @@ import 'lobby_test_utils.dart';
 /// [LobbyTest]
 /// Delete saved player
 Future<void> runLobbyTest6(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(1);
@@ -34,15 +35,13 @@ Future<void> runLobbyTest6(
   await runTestActions(
     [
       // Open lobby page
-      homePage.tapContinueButton(),
-      lobbyPage.verifyIsVisible(),
+      homePage.continueGame(),
+      lobbyPage.verifyVisibility(),
       // Open saved players, delete player from saved players list, verify it's deleted
-      lobbyPage.tapSavedPlayersButton(),
-      savedPlayersPage.verifyIsVisible(),
+      lobbyPage.openSavedPlayersDialog(),
+      savedPlayersPage.verifyVisibility(),
       savedPlayersPage.deletePlayerByName(nameToDelete),
-      () => tester.pumpAndSettle(),
-      () => tester.tap(find.byKey(CommonKeys.confirmButton)),
-      () => tester.pumpAndSettle(const Duration(seconds: 1)),
+      () => tester(CommonKeys.confirmButton).tap(),
       () async => expect(
             find.byKey(SavedPlayersKeys.playerCard(nameToDelete)),
             findsNothing,

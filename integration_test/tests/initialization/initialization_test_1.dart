@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/domain_managers.dart';
 import 'package:pocket_chips/di/repositories.dart';
@@ -16,7 +16,7 @@ import '../../test_utils/test_action.dart';
 /// Checking the onboarding display for the first launch
 /// Skip pages, check the patch notes, and close
 Future<void> runInitialization1(
-  WidgetTester tester,
+  PatrolTester tester,
   AppRepository repository,
 ) async {
   final mockConfig = ConfigModel(
@@ -34,7 +34,7 @@ Future<void> runInitialization1(
   final homePage = HomePageTester(tester);
 
   await runAction(
-    () => tester.pumpWidget(
+    () => tester.pumpWidgetAndSettle(
       ProviderScope(
         overrides: [
           appRepositoryProvider.overrideWithValue(repository),
@@ -51,14 +51,13 @@ Future<void> runInitialization1(
   await runTestActions(
     [
       // Wait for onboarding to load
-      () => tester.pumpAndSettle(),
-      onboardingPage.verifyAboutDialogIsVisible(),
-      onboardingPage.tapSkipButton(),
-      onboardingPage.tapUpdateInfoButton(),
-      onboardingPage.verifyUpdateDialogIsVisible(),
-      onboardingPage.closeUpdateDialog(),
+      onboardingPage.verifyAboutDialogVisibility(),
+      onboardingPage.skipPages(),
+      onboardingPage.openUpdateInfoDialog(),
+      onboardingPage.verifyUpdateDialogVisibility(),
+      onboardingPage.closeUpdateInfoDialog(),
       onboardingPage.closeOnboardingDialog(),
-      homePage.verifyHomePageIsVisible(),
+      homePage.verifyHomePageVisibility(),
     ],
   )();
 }

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
 import 'package:mockito/annotations.dart';
+import 'package:patrol/patrol.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import 'initialization_test.mocks.dart';
@@ -9,8 +9,6 @@ import 'tests/initialization/initialization_test_2.dart';
 
 @GenerateMocks([AppRepository])
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
   group(
     'Initialization tests',
     () {
@@ -20,18 +18,18 @@ void main() {
         mockAppRepository = MockAppRepository();
       });
 
-      testWidgets(
+      patrolTest(
         'Initialization Test 1',
-        (WidgetTester tester) => runInitialization1(
-          tester,
+        ($) => runInitialization1(
+          $,
           mockAppRepository,
         ),
       );
 
-      testWidgets(
+      patrolTest(
         'Initialization Test 2',
-        (WidgetTester tester) => runInitialization2(
-          tester,
+        ($) => runInitialization2(
+          $,
           mockAppRepository,
         ),
       );

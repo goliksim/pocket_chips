@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
@@ -11,7 +12,7 @@ import 'lobby_test_utils.dart';
 /// [LobbyTest]
 /// New game creates empty lobby
 Future<void> runLobbyTest11(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(2);
@@ -42,12 +43,12 @@ Future<void> runLobbyTest11(
   await runTestActions(
     [
       // Create new game, verify lobby is empty
-      homePage.verifyHomePageIsVisible(),
-      homePage.tapNewGameButton(),
-      homePage.verifyConfirmationWindowIsVisible(),
-      homePage.tapConfirmationButton(),
-      lobbyPage.verifyIsVisible(),
-      lobbyPage.verifyAddPlayerButtonVisible(true),
+      homePage.verifyHomePageVisibility(),
+      homePage.newGame(),
+      homePage.verifyConfirmationWindowVisibility(),
+      homePage.confirmConfirmationDialog(),
+      lobbyPage.verifyVisibility(),
+      lobbyPage.verifyAddPlayerButtonVisibility(true),
       verifyPlayersNotInLobby(),
     ],
   )();

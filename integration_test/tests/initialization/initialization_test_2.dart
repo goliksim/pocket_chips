@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/domain_managers.dart';
 import 'package:pocket_chips/di/repositories.dart';
@@ -16,7 +16,7 @@ import '../../test_utils/test_action.dart';
 /// Checking the patch note display for launch
 /// Closing
 Future<void> runInitialization2(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final mockConfig = ConfigModel(
@@ -33,7 +33,7 @@ Future<void> runInitialization2(
   final onboardingPage = OnboardingPageTester(tester);
   final homePage = HomePageTester(tester);
   await runAction(
-    () => tester.pumpWidget(
+    () => tester.pumpWidgetAndSettle(
       ProviderScope(
         overrides: [
           appRepositoryProvider.overrideWithValue(repository),
@@ -50,10 +50,9 @@ Future<void> runInitialization2(
   await runTestActions(
     [
       // Wait for update patchnote to load
-      () => tester.pumpAndSettle(),
-      onboardingPage.verifyUpdateDialogIsVisible(),
-      onboardingPage.closeUpdateDialog(),
-      homePage.verifyHomePageIsVisible(),
+      onboardingPage.verifyUpdateDialogVisibility(),
+      onboardingPage.closeUpdateInfoDialog(),
+      homePage.verifyHomePageVisibility(),
     ],
   )();
 }

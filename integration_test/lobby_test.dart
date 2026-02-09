@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
 import 'package:mockito/annotations.dart';
+import 'package:patrol/patrol.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import 'lobby_test.mocks.dart';
@@ -19,8 +19,6 @@ import 'tests/lobby/lobby_test_9.dart';
 
 @GenerateMocks([AppRepository])
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
   group(
     'Lobby tests',
     () {
@@ -30,64 +28,64 @@ void main() {
         mockAppRepository = MockAppRepository();
       });
 
-      testWidgets(
+      patrolTest(
         'Lobby Test 1',
-        (WidgetTester tester) => runLobbyTest1(tester, mockAppRepository),
+        ($) => runLobbyTest1($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Lobby Test 2',
-        (WidgetTester tester) => runLobbyTest2(tester, mockAppRepository),
+        ($) => runLobbyTest2($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Lobby Test 3',
-        (WidgetTester tester) => runLobbyTest3(tester, mockAppRepository),
+        ($) => runLobbyTest3($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Lobby Test 4',
-        (WidgetTester tester) => runLobbyTest4(tester, mockAppRepository),
+        ($) => runLobbyTest4($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Lobby Test 5',
-        (WidgetTester tester) => runLobbyTest5(tester, mockAppRepository),
+        ($) => runLobbyTest5($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Lobby Test 6',
-        (WidgetTester tester) => runLobbyTest6(tester, mockAppRepository),
+        ($) => runLobbyTest6($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Lobby Test 7',
-        (WidgetTester tester) => runLobbyTest7(tester, mockAppRepository),
+        ($) => runLobbyTest7($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Lobby Test 8',
-        (WidgetTester tester) => runLobbyTest8(tester, mockAppRepository),
+        ($) => runLobbyTest8($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Lobby Test 9',
-        (WidgetTester tester) => runLobbyTest9(tester, mockAppRepository),
+        ($) => runLobbyTest9($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Lobby Test 10',
-        (WidgetTester tester) => runLobbyTest10(tester, mockAppRepository),
+        ($) => runLobbyTest10($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Lobby Test 11',
-        (WidgetTester tester) => runLobbyTest11(tester, mockAppRepository),
+        ($) => runLobbyTest11($, mockAppRepository),
       );
 
-      testWidgets(
+      patrolTest(
         'Lobby Test 12',
-        (WidgetTester tester) => runLobbyTest12(tester, mockAppRepository),
+        ($) => runLobbyTest12($, mockAppRepository),
       );
     },
   );

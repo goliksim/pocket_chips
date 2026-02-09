@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/domain/models/game/game_state_enum.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
@@ -10,7 +10,7 @@ import 'game_test_utils.dart';
 /// [GameTest]
 /// WinnerChoiceWindow appears immediately on GamePage at showdown
 Future<void> runGameTest6(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(2);
@@ -41,8 +41,8 @@ Future<void> runGameTest6(
     [
       // Open game page and check winner choice dialog appears immediately
       openGamePage(tester),
-      gamePage.verifyIsVisible(),
-      gamePage.verifyWinnerChoiceDialogVisible()
+      gamePage.verifyVisibility(),
+      gamePage.verifyWinnerChoiceDialogVisibility()
     ],
   )();
 }

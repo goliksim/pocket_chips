@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/domain/models/game/game_state_enum.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
@@ -10,7 +10,7 @@ import 'game_test_utils.dart';
 /// [GameTest]
 /// Undo action returns to previous state
 Future<void> runGameTest8(
-  WidgetTester tester,
+  PatrolTester tester,
   MockAppRepository repository,
 ) async {
   final players = buildPlayers(2);
@@ -37,11 +37,11 @@ Future<void> runGameTest8(
       openGamePage(tester),
       gamePage.startGame(),
       // Verify undo button appears after action and can be used to return to previous state
-      gamePage.verifyUndoButtonIsVisible(),
-      gamePage.tapUndoActionButton(),
+      gamePage.verifyUndoButtonVisibility(),
+      gamePage.undoLastAction(),
       // Verify game state returned to pre-action state
       gamePage.verifyGameStatus(GameStatusEnum.notStarted),
-      gamePage.verifyUndoButtonIsNotVisible(),
+      gamePage.verifyUndoButtonVisibility(isVisible: false),
     ],
   )();
 }
