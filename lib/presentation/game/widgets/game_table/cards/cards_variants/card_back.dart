@@ -23,6 +23,7 @@ class CardBack extends StatelessWidget {
           child: Image(
             fit: BoxFit.cover,
             image: AssetsProvider.cardBack(context.theme.isDark),
+            errorBuilder: (context, error, stackTrace) => SizedBox.shrink(),
           ),
         ),
       );

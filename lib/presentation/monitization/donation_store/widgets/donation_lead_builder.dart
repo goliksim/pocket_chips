@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../../../../services/assets_provider.dart';
 import '../../../../utils/extensions.dart';
@@ -29,7 +30,15 @@ class DonationLeadBuilder extends StatelessWidget {
             size: stdIconSize * 3.25,
           ),
         ),
-        chips: (item) => AssetsProvider.chipsByValue(item.chipsValue),
+        chips: (item) => Image(
+          image: AssetsProvider.chipsByValue(item.chipsValue).image,
+          errorBuilder: (_, __, ___) => CircleAvatar(
+            child: Icon(
+              MdiIcons.pokerChip,
+              size: stdIconSize,
+            ),
+          ),
+        ),
         loading: (_) => Icon(
           Icons.shopping_basket,
           color: context.theme.hintColor,

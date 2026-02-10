@@ -142,10 +142,15 @@ class _PickIconState extends State<PlayerLogoPicker> {
                                 : context.theme.bgrColor,
                           ),
                           shape: BoxShape.circle,
-                          image: DecorationImage(
+                        ),
+                        child: ClipOval(
+                          child: Image(
                             filterQuality: FilterQuality.medium,
                             fit: BoxFit.cover,
                             image: AssetsProvider.playerIconByIndex(index),
+                            errorBuilder: (_, __, ___) => CircleAvatar(
+                              child: Text((index + 1).toString()),
+                            ),
                           ),
                         ),
                       ),

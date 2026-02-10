@@ -97,25 +97,32 @@ class GameTable extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         // Table
-        Container(
-          margin: EdgeInsets.only(
+        Padding(
+          padding: EdgeInsets.only(
             top: stdButtonHeight / 3,
             bottom: stdButtonHeight / 3,
           ),
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              filterQuality: FilterQuality.high,
-              colorFilter: ColorFilter.mode(
-                context.theme.primaryColor.withAlpha(
-                  context.theme.name == 'light' ? 20 : 0,
-                ),
-                BlendMode.srcATop,
+          child: ColorFiltered(
+            colorFilter: ColorFilter.mode(
+              context.theme.primaryColor.withAlpha(
+                context.theme.name == 'light' ? 20 : 0,
               ),
+              BlendMode.srcATop,
+            ),
+            child: Image(
+              filterQuality: FilterQuality.high,
               fit: BoxFit.contain,
               image: AssetsProvider.table(context.theme.isDark),
+              errorBuilder: (context, error, stackTrace) => Container(
+                decoration: ShapeDecoration(
+                  shape: CircleBorder(),
+                  color: context.theme.secondaryColor.withAlpha(25),
+                ),
+              ),
             ),
           ),
         ),
+
         // Pre-flop 3 cards
         Positioned(
           bottom: tableHeight * 0.295,

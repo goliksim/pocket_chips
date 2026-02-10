@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../../../../app/keys/keys.dart';
 import '../../../../services/assets_provider.dart';
@@ -67,20 +68,21 @@ List<Widget> _reversablePlayerWidgetList(
                   : null,
             ),
           ),
-          player.isDealer
-              ? Container(
-                  width: stdHeight,
-                  height: stdHeight,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      filterQuality: FilterQuality.medium,
-                      image: AssetsProvider.dealerAsset,
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                )
-              : Container(),
+          if (player.isDealer)
+            SizedBox(
+              width: stdHeight,
+              height: stdHeight,
+              child: Image(
+                filterQuality: FilterQuality.medium,
+                image: AssetsProvider.dealerAsset,
+                errorBuilder: (context, error, stackTrace) => Icon(
+                  MdiIcons.crown,
+                  size: stdIconSize,
+                  color: context.theme.onPrimary,
+                ),
+                fit: BoxFit.fill,
+              ),
+            ),
         ],
       ),
       Expanded(

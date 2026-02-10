@@ -98,10 +98,19 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                                   : context.theme.bgrColor,
                             ),
                             shape: BoxShape.circle,
-                            image: DecorationImage(
+                          ),
+                          child: ClipOval(
+                            child: Image(
                               filterQuality: FilterQuality.medium,
                               image: AssetsProvider.playerIconEditFrame,
                               fit: BoxFit.fill,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  CircleAvatar(
+                                child: Icon(
+                                  Icons.person,
+                                  size: stdIconSize,
+                                ),
+                              ),
                             ),
                           ),
                         ),

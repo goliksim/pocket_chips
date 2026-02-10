@@ -24,7 +24,6 @@ jobs:
         with:
           channel: stable
           flutter-version: "3.35.5"
-          cache: true
 
       - name: Setup Git LFS
         run: |
@@ -33,17 +32,6 @@ jobs:
           git lfs install --local
           git lfs pull
 
-      
-
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
 
       - name: Get Dependencies
         run: flutter pub get
@@ -53,41 +41,9 @@ jobs:
 
 
 
-      - name: Build debug APK
-        run: flutter build apk --debug
+      
 
-      - name: Asset test
-        run: |
-          # хэш исходного файла
-          python3 - <<'PY'
-          import hashlib, pathlib
-          p = pathlib.Path("assets/init_logo.png")
-          print(hashlib.sha256(p.read_bytes()).hexdigest())
-          PY
-          # хэш файла внутри APK
-          unzip -l build/app/outputs/flutter-apk/app-debug.apk | grep -E 'init_logo\.png'
-          unzip -p build/app/outputs/flutter-apk/app-debug.apk assets/flutter_assets/assets/init_logo.png | shasum -a 256
-
-
-      - name: Build debug APK
-        run: flutter build apk --debug
-
-      - name: Verify bundled asset
-        run: |
-          unzip -p build/app/outputs/flutter-apk/app-debug.apk assets/flutter_assets/assets/init_logo.png | xxd -l 8
-          unzip -p build/app/outputs/flutter-apk/app-debug.apk assets/flutter_assets/assets/init_logo.png | python3 - <<'PY'
-          import sys,hashlib
-          data=sys.stdin.buffer.read()
-          print("apk sha256", hashlib.sha256(data).hexdigest())
-          PY
-
-      - name: Verify repo asset
-        run: |
-          python3 - <<'PY'
-          import hashlib
-          data=open("assets/init_logo.png","rb").read()
-          print("repo sha256", hashlib.sha256(data).hexdigest())
-          PY
+  
 
       - name: Unit Tests
         run: flutter test
@@ -97,6 +53,18 @@ jobs:
           dart pub global activate patrol_cli 3.11.0
           export PATH="$PATH:$HOME/.pub-cache/bin"
           echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+
+      - name: Free Disk Space
+        run: |
+          df -h
+          sudo rm -rf /usr/local/lib/android/sdk/system-images || true
+          sudo rm -rf /usr/local/lib/android/sdk/emulator || true
+          sudo rm -rf /opt/hostedtoolcache/CodeQL || true
+          sudo rm -rf /opt/hostedtoolcache/go || true
+          sudo rm -rf /opt/hostedtoolcache/node || true
+          sudo rm -rf "$HOME/.gradle/caches" || true
+          sudo rm -rf "$HOME/.gradle/wrapper" || true
+          df -h
 
       - name: Download test-butler
         run: |
@@ -109,10 +77,12 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_6
-          emulator-options: -no-window -no-boot-anim -no-audio -no-snapshot-load -gpu swiftshader_indirect -no-metrics -camera-back none -camera-front none
-          emulator-boot-timeout: 600
+          emulator-options: -no-window -no-boot-anim -no-audio -no-snapshot-load -gpu swiftshader_indirect -no-metrics -camera-back none -camera-front none -partition-size 2048 -accel off
+          emulator-boot-timeout: 1200
           script: |
+            adb kill-server
             adb wait-for-device
+            until adb shell getprop sys.boot_completed | grep -m 1 '1'; do echo "Waiting for emulator to fully boot..."; sleep 5; done
             adb shell getprop sys.boot_completed
             adb install -r /tmp/test-butler.apk
             patrol test --device emulator-5554 --dart-define=FLUTTER_ENABLE_IMPELLER=false

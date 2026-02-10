@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../app/keys/keys.dart';
 import '../../../services/assets_provider.dart';
 import '../../../utils/extensions.dart';
+import '../../../utils/logs.dart';
 import '../../../utils/theme/ui_values.dart';
 
 class ConfirmationWindow extends StatelessWidget {
@@ -200,6 +201,11 @@ class PatternBackground extends StatelessWidget {
             filterQuality: FilterQuality.high,
             opacity: 0.3 * opacity,
             image: AssetsProvider.backgroundPattern,
+            onError: (_, __) {
+              logs.writeLog(
+                'Cannot load pattern asset ${AssetsProvider.backgroundPattern}',
+              );
+            },
             fit: BoxFit.cover,
           ),
         ),

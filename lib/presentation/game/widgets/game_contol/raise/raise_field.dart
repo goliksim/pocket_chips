@@ -139,7 +139,23 @@ class _CoinsRow extends StatelessWidget {
                       ),
                     ),
                   ),
-                  child: AssetsProvider.chipsByValue(coin),
+                  child: Image(
+                    image: AssetsProvider.chipsByValue(coin).image,
+                    errorBuilder: (_, __, ___) => Container(
+                      padding: EdgeInsets.all(stdHorizontalOffset),
+                      decoration: BoxDecoration(
+                        color: context.theme.secondaryColor,
+                        borderRadius: BorderRadius.circular(stdBorderRadius),
+                      ),
+                      child: FittedBox(
+                        child: Text(
+                          coin.toCompactBank,
+                          style: context.theme.stdTextStyle
+                              .copyWith(color: context.theme.onPrimary),
+                        ),
+                      ),
+                    ),
+                  ),
                   onPressed: () => onTap(coin),
                 ),
               ),

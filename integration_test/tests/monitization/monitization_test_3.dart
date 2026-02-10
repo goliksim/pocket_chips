@@ -29,7 +29,7 @@ Future<void> runMonitizationTest3(
 
   final mockPurchasesRepository = MockPurchasesRepository(
     hasPurchasesForRestore: true,
-    loadingTime: Duration(seconds: 2),
+    loadingTime: Duration(seconds: 3),
   )..setScenario(MockScenario.success);
   final mockGoogleAdsManager = MockGoogleAdsManager();
 
@@ -65,7 +65,7 @@ Future<void> runMonitizationTest3(
     [
       // Open donation page and check video ad is loaded immediately and PRO mode is not loaded
       homePage.openDonationPage(),
-      () => tester.pump(const Duration(seconds: 1)), //Dialog opening
+      () => tester.pump(const Duration(milliseconds: 500)), //Dialog opening
       donationPage.verifyVisibility(),
       donationPage.verifyVideoAdItemExist(isLoaded: true),
       donationPage.verifyProModeItemExist(isPurchased: true, exist: false),

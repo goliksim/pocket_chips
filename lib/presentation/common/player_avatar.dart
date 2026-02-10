@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../../services/assets_provider.dart';
+import '../../utils/logs.dart';
 
 class PlayerAvatar extends StatelessWidget {
   final String assetUrl;
@@ -40,8 +41,9 @@ class PlayerAvatar extends StatelessWidget {
           fit: BoxFit.cover,
           colorFilter: colorFilter,
           filterQuality: filterQuality ?? FilterQuality.medium,
-          onError: (exception, stackTrace) =>
-              AssetImage(AssetsProvider.emptyPlayerAsset),
+          onError: (_, __) {
+            logs.writeLog('Cannot load asset $assetUrl');
+          },
         ),
       ),
     );
