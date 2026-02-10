@@ -2,7 +2,6 @@ name: CI
 
 on:
   pull_request:
-  push:
 
 jobs:
   test:
@@ -34,10 +33,7 @@ jobs:
           git lfs install --local
           git lfs pull
 
-      - name: Verify LFS Assets
-        run: |
-          ls -lh assets/chips/dealer.png
-          head -n 2 assets/chips/dealer.png
+      
 
       - name: Cache Gradle
         uses: actions/cache@v4
@@ -54,6 +50,44 @@ jobs:
 
       - name: Run Codegen
         run: dart run build_runner build --delete-conflicting-outputs
+
+
+
+      - name: Build debug APK
+        run: flutter build apk --debug
+
+      - name: Asset test
+        run: |
+          # хэш исходного файла
+          python3 - <<'PY'
+          import hashlib, pathlib
+          p = pathlib.Path("assets/init_logo.png")
+          print(hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+          # хэш файла внутри APK
+          unzip -l build/app/outputs/flutter-apk/app-debug.apk | grep -E 'init_logo\.png'
+          unzip -p build/app/outputs/flutter-apk/app-debug.apk assets/flutter_assets/assets/init_logo.png | shasum -a 256
+
+
+      - name: Build debug APK
+        run: flutter build apk --debug
+
+      - name: Verify bundled asset
+        run: |
+          unzip -p build/app/outputs/flutter-apk/app-debug.apk assets/flutter_assets/assets/init_logo.png | xxd -l 8
+          unzip -p build/app/outputs/flutter-apk/app-debug.apk assets/flutter_assets/assets/init_logo.png | python3 - <<'PY'
+          import sys,hashlib
+          data=sys.stdin.buffer.read()
+          print("apk sha256", hashlib.sha256(data).hexdigest())
+          PY
+
+      - name: Verify repo asset
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          data=open("assets/init_logo.png","rb").read()
+          print("repo sha256", hashlib.sha256(data).hexdigest())
+          PY
 
       - name: Unit Tests
         run: flutter test
@@ -118,30 +152,13 @@ jobs:
           os: "iOS"
           os_version: "18.5"
 
-      - name: Xcodebuild (raw) for diagnostics
-        run: |
-          set -o pipefail
-          cd ios
-          xcodebuild \
-            -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.5' \
-            test \
-            -resultBundlePath ../build/ios_diagnostic.xcresult \
-            | tee ../build/xcodebuild.log
+      - name: Build app to create config and install pods
+        run: flutter build ios --debug --no-codesign
 
-      - name: Upload iOS diagnostic artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-diagnostics
-          path: |
-            build/ios_diagnostic.xcresult
-            build/xcodebuild.log
+   
 
       - name: Integration Tests (iOS Simulator - Patrol)
         run: |
-          flutter build ios --config-only --debug --simulator
+          ls -la ios/Flutter/Generated.xcconfig
           cd ios && pod install --repo-update && cd ..
           patrol test --device "iPhone 16 Pro" --ios 18.5
