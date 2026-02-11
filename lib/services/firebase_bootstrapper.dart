@@ -3,9 +3,14 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 
 import '../firebase_options.dart';
+import '../utils/firebase_flags.dart';
 
 class FirebaseBootstrapper {
   Future<void> initialize() async {
+    if (!kEnableFirebase) {
+      return;
+    }
+
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );

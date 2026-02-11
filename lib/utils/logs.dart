@@ -6,6 +6,8 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'firebase_flags.dart';
+
 final Logs logs = Logs();
 
 class Logs {
@@ -21,7 +23,7 @@ class Logs {
 
   Future<void> writeLog(String text) async {
     log(text);
-    if (Firebase.apps.isNotEmpty) {
+    if (kEnableFirebase && Firebase.apps.isNotEmpty) {
       await FirebaseCrashlytics.instance.log(text);
     }
     //!kDebugMode &&

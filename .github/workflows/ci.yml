@@ -113,7 +113,7 @@ jobs:
           echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
 
       - name: Build APKs (Patrol)
-        run: patrol build android --target integration_test/test_bundle.dart
+        run: make build_test_apk
 
       - name: Auth to Google Cloud
         uses: google-github-actions/auth@v2

@@ -7,6 +7,7 @@ import '../domain/model_holders/config_model_holder.dart';
 import '../domain/model_holders/remote_config_links_holder.dart';
 import '../domain/models/config_model.dart';
 import '../services/crash_reporting_service.dart';
+import '../utils/firebase_flags.dart';
 import 'monitization/purchases/pro_version_manager.dart';
 
 class InitializationManager with ChangeNotifier {
@@ -51,6 +52,10 @@ class InitializationManager with ChangeNotifier {
   }
 
   Future<void> _initFirebaseConfig() async {
+    if (!kEnableFirebase) {
+      return;
+    }
+
     await _remoteConfigLinksHolder.refresh();
   }
 

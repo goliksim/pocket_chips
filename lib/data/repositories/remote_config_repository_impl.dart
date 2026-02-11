@@ -29,7 +29,9 @@ class RemoteConfigRepositoryImpl implements RemoteConfigRepository {
       logs.writeLog('RemoteConfig fetchAndActivate: $activated');
 
       final json = remoteConfig.getValue(LinksConfigEntity.name).asString();
-      final entity = LinksConfigEntity.fromJson(jsonDecode(json));
+      final entity = json.isEmpty
+          ? LinksConfigEntity.defaults
+          : LinksConfigEntity.fromJson(jsonDecode(json));
 
       logs.writeLog('RemoteConfig get config: $json');
 
@@ -37,9 +39,7 @@ class RemoteConfigRepositoryImpl implements RemoteConfigRepository {
     } catch (error) {
       logs.writeLog('RemoteConfig fetch error: $error');
 
-      return RemoteConfigLinksBuilder.fromEntity(
-        LinksConfigEntity.defaultConfig(),
-      );
+      return RemoteConfigLinksBuilder.fromEntity(LinksConfigEntity.defaults);
     }
   }
 
@@ -51,10 +51,9 @@ class RemoteConfigRepositoryImpl implements RemoteConfigRepository {
       ),
     );
 
-    /*await remoteConfig.setDefaults(
+    /* await remoteConfig.setDefaults(
       {
-        LinksConfigEntity.name:
-            jsonEncode(LinksConfigEntity.defaultConfig().toJson()),
+        LinksConfigEntity.name: jsonEncode(LinksConfigEntity.defaults.toJson()),
       },
     );*/
   }

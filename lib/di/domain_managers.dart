@@ -11,17 +11,18 @@ import '../domain/models/pro_version/pro_version_model.dart';
 import '../domain/models/purchases/purchasable_product.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/localization.dart';
+import '../services/analytics_service.dart';
+import '../services/crash_reporting_service.dart';
 import '../services/event_push_service/handlers/ads_handler.dart';
 import '../services/event_push_service/handlers/donation_handler.dart';
 import '../services/event_push_service/promotion_service.dart';
 import '../services/initialization_manager.dart';
-import '../services/analytics_service.dart';
-import '../services/crash_reporting_service.dart';
 import '../services/monitization/purchases/pro_version_manager.dart';
 import '../services/monitization/purchases/purchases_manager.dart';
 import '../services/monitization/video_ads/google_ads_manager.dart';
 import '../services/monitization/video_ads/models/iterstitial_ad_state.dart';
 import '../services/toast_manager.dart';
+import '../utils/firebase_flags.dart';
 import '../utils/theme/theme_manager.dart';
 import 'model_holders.dart';
 
@@ -72,7 +73,7 @@ final routeDelegateProvider = Provider<AppRouterDelegate>(
     navigationManager: ref.read(navigationManagerProvider),
     navigatorKey: ref.read(navigationKeyProvider),
     observers: [
-      ref.read(firebaseAnalyticsObserverProvider),
+      if (kEnableFirebase) ref.read(firebaseAnalyticsObserverProvider),
     ],
   ),
 );

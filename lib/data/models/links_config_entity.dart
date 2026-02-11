@@ -7,50 +7,21 @@ part 'links_config_entity.g.dart';
 abstract class LinksConfigEntity with _$LinksConfigEntity {
   static const String name = 'links_config';
 
+  @JsonSerializable(fieldRename: FieldRename.snake)
   const factory LinksConfigEntity({
-    @JsonKey(
-      name: 'android_store_url',
-      defaultValue: DefaultLinksConfig.androidStoreUrlDefault,
-    )
-    required String androidStoreUrl,
-    @JsonKey(
-      name: 'ios_store_url',
-      defaultValue: DefaultLinksConfig.iosStoreUrlDefault,
-    )
-    required String iosStoreUrl,
-    @JsonKey(
-      name: 'privacy_policy_url',
-      defaultValue: DefaultLinksConfig.privacyPolicyUrlDefault,
-    )
-    required String privacyPolicyUrl,
-    @JsonKey(
-      name: 'github_url',
-      defaultValue: DefaultLinksConfig.githubUrlDefault,
-    )
-    required String githubUrl,
-    @JsonKey(
-      name: 'telegram_url',
-      defaultValue: DefaultLinksConfig.telegramUrlDefault,
-    )
-    required String telegramUrl,
-    @JsonKey(
-      name: 'support_email',
-      defaultValue: DefaultLinksConfig.supportEmailDefault,
-    )
-    required String supportEmail,
+    @Default(DefaultLinksConfig.androidStoreUrlDefault) String androidStoreUrl,
+    @Default(DefaultLinksConfig.iosStoreUrlDefault) String iosStoreUrl,
+    @Default(DefaultLinksConfig.privacyPolicyUrlDefault)
+    String privacyPolicyUrl,
+    @Default(DefaultLinksConfig.githubUrlDefault) String githubUrl,
+    @Default(DefaultLinksConfig.telegramUrlDefault) String telegramUrl,
+    @Default(DefaultLinksConfig.supportEmailDefault) String supportEmail,
   }) = _LinksConfigEntity;
 
   factory LinksConfigEntity.fromJson(Map<String, dynamic> json) =>
       _$LinksConfigEntityFromJson(json);
 
-  static LinksConfigEntity defaultConfig() => LinksConfigEntity(
-        androidStoreUrl: DefaultLinksConfig.androidStoreUrlDefault,
-        iosStoreUrl: DefaultLinksConfig.iosStoreUrlDefault,
-        privacyPolicyUrl: DefaultLinksConfig.privacyPolicyUrlDefault,
-        githubUrl: DefaultLinksConfig.githubUrlDefault,
-        telegramUrl: DefaultLinksConfig.telegramUrlDefault,
-        supportEmail: DefaultLinksConfig.supportEmailDefault,
-      );
+  static const LinksConfigEntity defaults = LinksConfigEntity();
 }
 
 class DefaultLinksConfig {

@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
+import '../utils/firebase_flags.dart';
+
 class CrashReportingService {
   Future<void> recordError({
     required Object error,
@@ -8,7 +10,7 @@ class CrashReportingService {
     String? reason,
     bool fatal = false,
   }) async {
-    if (Firebase.apps.isEmpty) {
+    if (!kEnableFirebase || Firebase.apps.isEmpty) {
       return;
     }
 
@@ -21,7 +23,7 @@ class CrashReportingService {
   }
 
   Future<void> log(String message) async {
-    if (Firebase.apps.isEmpty) {
+    if (!kEnableFirebase || Firebase.apps.isEmpty) {
       return;
     }
 
