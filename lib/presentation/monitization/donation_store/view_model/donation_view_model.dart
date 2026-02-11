@@ -8,6 +8,9 @@ import '../../../../di/model_holders.dart';
 import '../../../../domain/models/purchases/purchasable_product.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../l10n/localization_extension.dart';
+import '../../../../services/analytics_event.dart';
+import '../../../../services/analytics_service.dart';
+import '../../../../services/crash_reporting_service.dart';
 import '../../../../services/monitization/purchases/purchases_manager.dart';
 import '../../../../services/monitization/video_ads/google_ads_manager.dart';
 import '../../../../services/monitization/video_ads/models/iterstitial_ad_state.dart';
@@ -24,6 +27,9 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
       ref.read(navigationManagerProvider);
   ToastManager get _toastManager => ref.read(toastManagerProvider);
   AppLocalizations get _strings => ref.read(stringsProvider);
+  AnalyticsService get _analytics => ref.read(analyticsServiceProvider);
+  CrashReportingService get _crashReporting =>
+      ref.read(crashReportingServiceProvider);
 
   PurchasesManager get _purchasesManager =>
       ref.read(purchasesManagerProvider.notifier);
@@ -68,10 +74,14 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
   Future<void> restorePurchases() async {
     try {
       await _purchasesManager.restorePurchases();
-    } on Exception catch (e) {
-      // TODO configure error reporting
+    } catch (error, trace) {
+      await _crashReporting.recordError(
+        error: error,
+        trace: trace,
+        reason: 'DonationViewModel.restorePurchases',
+      );
       _toastManager.showToast(_strings.toast_unav);
-      logs.writeLog(e.toString());
+      logs.writeLog(error.toString());
     }
   }
 
@@ -84,11 +94,18 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
 
   Future<void> _purchaseItem(String itemKey) async {
     try {
+      await _analytics.logEvent(
+        AnalyticsEvent.purchaseAttempt(itemKey),
+      );
       await _purchasesManager.buyProduct(itemKey);
-    } on Exception catch (e) {
-      // TODO configure error reporting
+    } catch (error, trace) {
+      await _crashReporting.recordError(
+        error: error,
+        trace: trace,
+        reason: 'DonationViewModel._purchaseItem',
+      );
       _toastManager.showToast(_strings.toast_unav);
-      logs.writeLog(e.toString());
+      logs.writeLog(error.toString());
     }
   }
 

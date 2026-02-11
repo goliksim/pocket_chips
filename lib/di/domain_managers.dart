@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,6 +15,8 @@ import '../services/event_push_service/handlers/ads_handler.dart';
 import '../services/event_push_service/handlers/donation_handler.dart';
 import '../services/event_push_service/promotion_service.dart';
 import '../services/initialization_manager.dart';
+import '../services/analytics_service.dart';
+import '../services/crash_reporting_service.dart';
 import '../services/monitization/purchases/pro_version_manager.dart';
 import '../services/monitization/purchases/purchases_manager.dart';
 import '../services/monitization/video_ads/google_ads_manager.dart';
@@ -27,6 +30,22 @@ final initializationManagerProvider = Provider<InitializationManager>(
     configModelHolder: ref.read(configModelHolderProvider.notifier),
     navigationManager: ref.read(navigationManagerProvider),
     proVersionManager: ref.read(proVersionManagerProvider.notifier),
+    remoteConfigLinksHolder: ref.read(remoteConfigLinksHolderProvider.notifier),
+    crashReportingService: ref.read(crashReportingServiceProvider),
+  ),
+);
+
+final crashReportingServiceProvider = Provider<CrashReportingService>(
+  (_) => CrashReportingService(),
+);
+
+final analyticsServiceProvider = Provider<AnalyticsService>(
+  (_) => AnalyticsService(),
+);
+
+final firebaseAnalyticsObserverProvider = Provider<FirebaseAnalyticsObserver>(
+  (ref) => FirebaseAnalyticsObserver(
+    analytics: ref.read(analyticsServiceProvider).analytics,
   ),
 );
 
@@ -52,6 +71,9 @@ final routeDelegateProvider = Provider<AppRouterDelegate>(
   (ref) => AppRouterDelegate(
     navigationManager: ref.read(navigationManagerProvider),
     navigatorKey: ref.read(navigationKeyProvider),
+    observers: [
+      ref.read(firebaseAnalyticsObserverProvider),
+    ],
   ),
 );
 

@@ -52,6 +52,12 @@ dependencies:
   flutter_secure_storage: ^10.0.0
   package_info_plus: ^9.0.0
   collection: ^1.19.1
+  
+  #Firebase
+  firebase_core: ^4.4.0
+  firebase_crashlytics: ^5.0.7
+  firebase_remote_config: ^6.1.4
+  firebase_analytics: ^12.1.2
 
   
   #window_size:

@@ -10,6 +10,7 @@ import '../../di/domain_managers.dart';
 import '../../di/model_holders.dart';
 import '../../domain/model_holders/config_model_holder.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/analytics_event.dart';
 import '../../utils/local_path.dart';
 import 'view_state/onboarding_view_state.dart';
 
@@ -25,12 +26,14 @@ class OnboardingViewModel extends AsyncNotifier<OnboardingViewState> {
   @override
   FutureOr<OnboardingViewState> build() async {
     final config = await ref.watch(configModelHolderProvider.future);
+    final links = await ref.watch(remoteConfigLinksHolderProvider.future);
 
     log('OnboardingViewState');
 
     return OnboardingViewState(
       isFirstLaunch: config.firstLaunch,
       version: config.version,
+      links: links,
     );
   }
 
@@ -47,11 +50,12 @@ class OnboardingViewModel extends AsyncNotifier<OnboardingViewState> {
 
   Future<void> sendMail() async {
     final path = await localPath;
+    final links = stateModel.requireValue.links;
 
     final MailOptions mailOptions = MailOptions(
       body: _strings.about_link_6,
       subject: 'PC: problem or advice ',
-      recipients: ['goliksim@gmail.com'],
+      recipients: [links.supportEmail],
       isHTML: true,
       attachments: [
         '$path/pocketchips/poker_chips.log',
@@ -59,6 +63,14 @@ class OnboardingViewModel extends AsyncNotifier<OnboardingViewState> {
     );
 
     await FlutterMailer.send(mailOptions);
+  }
+
+  void reportLinkClick(String url) {
+    unawaited(
+      ref.read(analyticsServiceProvider).logEvent(
+            AnalyticsEvent.launchUrl(url),
+          ),
+    );
   }
 
   void setLocale(Locale locale) {

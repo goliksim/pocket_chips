@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -19,6 +21,9 @@ class Logs {
 
   Future<void> writeLog(String text) async {
     log(text);
+    if (Firebase.apps.isNotEmpty) {
+      await FirebaseCrashlytics.instance.log(text);
+    }
     //!kDebugMode &&
     if ((Platform.isAndroid || Platform.isIOS)) {
       DateTime date = DateTime.now();

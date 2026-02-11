@@ -51,6 +51,10 @@ integration_test/test_bundle.dart
 app.*.symbols
 
 # Firebase
+.firebaserc
+firebase.json
+lib/firebase_options.dart
+ios/Runner/GoogleService-Info.plist
 /android/app/google-services.json
 
 # Obfuscation related

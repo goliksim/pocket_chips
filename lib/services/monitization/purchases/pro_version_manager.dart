@@ -7,11 +7,12 @@ import '../../../di/domain_managers.dart';
 import '../../../di/repositories.dart';
 import '../../../domain/models/pro_version/pro_version_model.dart';
 import '../../../domain/models/purchases/purchase_details.dart';
-import '../../../domain/models/purchases/purchase_status.dart';
 import '../../../domain/repositories/purchases_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/logs.dart';
+import '../../analytics_service.dart';
+import '../../crash_reporting_service.dart';
 import '../../toast_manager.dart';
 import 'purchases_mixin.dart';
 
@@ -27,6 +28,11 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
   @override
   // Important to use ProVersionRepository here
   PurchasesRepository get repository => ref.read(proVersionRepositoryProvider);
+  @override
+  AnalyticsService get analytics => ref.read(analyticsServiceProvider);
+  @override
+  CrashReportingService get crashReporting =>
+      ref.read(crashReportingServiceProvider);
 
   @override
   List<String> get kIds => [Constants.pocketChipsPROItemKey];
@@ -58,8 +64,13 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
   Future<void> restorePurchases() async {
     try {
       await super.restorePurchases();
-    } on Exception catch (e) {
-      logs.writeLog('$logName: ${e.toString()}');
+    } catch (error, trace) {
+      logs.writeLog('$logName: ${error.toString()}');
+      await crashReporting.recordError(
+        error: error,
+        trace: trace,
+        reason: 'ProVersionManager.restorePurchases',
+      );
 
       return;
     }
@@ -97,40 +108,21 @@ class ProVersionManager extends AsyncNotifier<ProVersionModel>
     return buyProduct(product.id);
   }
 
-  /// Receive a purchase update and apply the purchase to the app logic.
   @override
-  Future<void> handlePurchase(PurchaseDetails purchaseDetails) async {
-    if (purchaseDetails.status == PurchaseStatus.purchased ||
-        purchaseDetails.status == PurchaseStatus.restored) {
-      // Validating the purchase
-      var validPurchase =
-          await repository.verifyPurchase(purchaseDetails.purchaseId);
+  Future<void> applyPurchase(PurchaseDetails purchaseDetails) async {
+    //TODO make a dialog and add tests
 
-      logs.writeLog('ProVersionManager restore valid $validPurchase');
+    proConfirmedByRestore = true;
+    // Enable PRO
+    state = AsyncData(
+      ProVersionModel(
+        isPurchased: true,
+        forceDisable: false,
+        availableProduct: state.value?.availableProduct,
+      ),
+    );
 
-      if (validPurchase) {
-        // Applying the purchase
-        //TODO make a dialog and add tests
-        proConfirmedByRestore = true;
-        // Enable PRO
-        state = AsyncData(
-          ProVersionModel(
-            isPurchased: true,
-            forceDisable: false,
-            availableProduct: state.value?.availableProduct,
-          ),
-        );
-
-        logs.writeLog('Pro version purchased/restored');
-      } else {
-        //TODO Handle invalid purchase
-      }
-    }
-
-    // Confirm that the purchase has been processed correctly.
-    if (purchaseDetails.pendingCompletePurchase) {
-      await repository.completePurchase(purchaseDetails.purchaseId);
-    }
+    await super.applyPurchase(purchaseDetails);
   }
 
   void debugDisablePro() {

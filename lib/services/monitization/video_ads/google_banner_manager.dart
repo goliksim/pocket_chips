@@ -25,6 +25,7 @@ class GoogleBannersManager with ChangeNotifier {
     if (Platform.isAndroid) {
       return 'ca-app-pub-2217402774042534/4056700357';
     } else if (Platform.isIOS) {
+      //TODO add iOS ad ID
       return '<Your_IOS_BANNER_AD_ID>';
     } else {
       throw UnsupportedError('Unsupported platform');

@@ -7,12 +7,14 @@ Pocket poker chips for your phone. Play poker with only cards.
 
 ## Content
 
-0. [Description](#description)
-1. [Installation](#installation)
-2. [Usage](#usage)
+1. [Description](#description)
+2. [Installation](#installation)
 3. [Stack](#features)
-4. [Contributing](#contributing)
-5. [License](#license)
+4. [Firebase setup](#firebase-setup)
+5. [Usage](#usage)
+6. [Testing](#testing)
+7. [Contributing](#contributing)
+8. [License](#license)
 
 ## Description
 
@@ -28,6 +30,17 @@ The application stores players' chips, and also allows you to place bets and div
 - Distribution of the final pot by side-pot
 - Choose the funny avatar of the player that best suits you!
 - Unique interface design
+- Auto-decide who is the winner on showdown with Solver feature
+
+## Stack
+
+- **Flutter/Dart**: My app is built with Flutter on Dart.
+- **State Management**: Riverpod + ChangeNotifier.
+- **API Integration**: Offline app.
+- **Database**: Shared preferences + FlutterSecureStorage.
+- **Testing**: Unit/Integration tests with flutter_test/patrol and mockito. Run at GitHub Actions and Firebase Test Lab
+- **Firebase**: Crashlytics, Analytics, Remote Config, Test Lab
+
 
 ## Installation
 
@@ -45,20 +58,38 @@ To build android release app you need to add:
 * google-services.json
 * key.properties
 * keystore.jks
+* firebase.json
 
+
+## Google Cloud setup
+Download CLI if you don't have it
+```bash
+curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-darwin-arm.tar.gz 
+tar -xf google-cloud-cli-darwin-arm.tar.gz 
+./google-cloud-sdk/install.sh
+
+```
+
+## Firebase setup
+Install firebase if you don't have it
+```bash
+curl -sL https://firebase.tools | bash
+dart pub global activate flutterfire_cli
+export PATH="$PATH":"$HOME/.pub-cache/bin"
+```
+
+Login in and init project
+```bash
+firebase login
+firebase init
+
+flutterfire configure
+```
 
 ## Usage
 ```bash
 fvm flutter run
 ```
-
-## Stack
-
-- **Flutter/Dart**: My app is built with Flutter on Dart.
-- **State Management**: Riverpod + ChangeNotifier.
-- **API Integration**: Offline app.
-- **Database**: Shared preferences + FlutterSecureStorage.
-- **Testing**: Unit/Integration tests with flutter_test/patrol and mockito.
 
 ## Testing 
 To run unit test just run
