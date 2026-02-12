@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../../../app/keys/keys.dart';
+import '../../../domain/models/remote_config_links.dart';
 import '../../../services/assets_provider.dart';
 import '../../../utils/extensions.dart';
 import '../../../utils/theme/ui_values.dart';
@@ -16,28 +17,20 @@ class OnboardingLinksPage extends StatelessWidget {
   final VoidCallback sendMail;
   final VoidCallback showUpdateInfo;
 
+  final RemoteConfigLinks links;
+
   final String? version;
 
   const OnboardingLinksPage({
     required this.launchUrl,
     required this.sendMail,
     required this.showUpdateInfo,
+    required this.links,
     this.version,
     super.key,
   });
 
   bool get canSendMail => !kIsWeb && Platform.isAndroid;
-
-  //TODO Remote config
-  String get _appId =>
-      Platform.isAndroid ? 'com.goliksim.pocketchips' : 'YOUR_IOS_APP_ID';
-  String get _appUrl => Platform.isAndroid
-      ? 'https://play.google.com/store/apps/details?id=$_appId'
-      : 'https://apps.apple.com/app/id$_appId';
-  String get _policyUrl =>
-      'https://github.com/goliksim/pocket_chips/blob/main/privacy_policy.md';
-  String get _gitUrl => 'https://github.com/goliksim';
-  String get _telegramUrl => 'https://t.me/goliksim';
 
   @override
   Widget build(BuildContext context) => OnboardingPage(
@@ -92,7 +85,9 @@ class OnboardingLinksPage extends StatelessWidget {
                   ),
                 ],
               ),
-              action: () async => launchUrl(_appUrl),
+              action: () => launchUrl(
+                Platform.isAndroid ? links.androidStoreUrl : links.iosStoreUrl,
+              ),
             ),
             SizedBox(height: stdHorizontalOffset / 2),
           ],
@@ -115,14 +110,14 @@ class OnboardingLinksPage extends StatelessWidget {
                 width: stdButtonHeight / 2,
                 buttonColor: context.theme.bgrColor,
                 child: AssetsProvider.socialTelegramIcon,
-                action: () => launchUrl(_telegramUrl),
+                action: () => launchUrl(links.telegramUrl),
               ),
               MyButton(
                 height: stdButtonHeight / 2,
                 width: stdButtonHeight / 2,
                 buttonColor: context.theme.bgrColor,
                 child: AssetsProvider.socialGitIcon,
-                action: () => launchUrl(_gitUrl),
+                action: () => launchUrl(links.githubUrl),
               ),
               if (canSendMail)
                 MyButton(
@@ -130,7 +125,7 @@ class OnboardingLinksPage extends StatelessWidget {
                   width: stdButtonHeight / 2,
                   buttonColor: context.theme.bgrColor,
                   child: AssetsProvider.socialMailIcon,
-                  action: () async => sendMail(),
+                  action: () => sendMail(),
                 ),
             ],
           ),
@@ -138,7 +133,7 @@ class OnboardingLinksPage extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: Text(
-              '© 2025 GOLIKSIM (Alexander Golev)',
+              '© 2026 GOLIKSIM (Alexander Golev)',
               style: TextStyle(
                 height: 1.5,
                 color: context.theme.onBackground,
@@ -190,7 +185,7 @@ class OnboardingLinksPage extends StatelessWidget {
                 ),
               ),
             ),
-            action: () => launchUrl(_policyUrl),
+            action: () => launchUrl(links.privacyPolicyUrl),
           ),
         ],
       );

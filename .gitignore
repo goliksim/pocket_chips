@@ -51,8 +51,8 @@ integration_test/test_bundle.dart
 app.*.symbols
 
 # Firebase
+.firebaserc
 /android/app/google-services.json
-lib/firebase_options.dart
 firebase.json
 ios/Runner/GoogleService-Info.plist
 

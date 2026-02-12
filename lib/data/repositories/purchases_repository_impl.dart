@@ -2,6 +2,7 @@ import '../../domain/models/purchases/purchasable_product.dart';
 import '../../domain/models/purchases/purchase_details.dart';
 import '../../domain/repositories/in_app_purchase_repository.dart';
 import '../../domain/repositories/purchases_repository.dart';
+import '../../utils/constants.dart';
 import '../builders/purchases_builder.dart';
 
 class PurchasesRepositoryImpl implements PurchasesRepository {
@@ -32,6 +33,7 @@ class PurchasesRepositoryImpl implements PurchasesRepository {
       _inAppPurchaseRepository.watchPurchases().map(
             (purchases) => purchases
                 .map(PurchasesModelBuilder.toDomainPurchaseDetails)
+                .where((e) => e.productID != Constants.pocketChipsPROItemKey)
                 .toList(),
           );
 

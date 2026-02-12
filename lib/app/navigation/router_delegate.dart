@@ -16,10 +16,12 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
   @override
   final GlobalKey<NavigatorState> navigatorKey;
   final NavigationManager navigationManager;
+  final List<NavigatorObserver> observers;
 
   AppRouterDelegate({
     required this.navigationManager,
     required this.navigatorKey,
+    required this.observers,
   }) {
     navigationManager.addListener(notifyListeners);
   }
@@ -53,6 +55,7 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
       builder: (context, theme) => Navigator(
         key: navigatorKey,
         pages: pages,
+        observers: observers,
         // TODO: refactor to use onDidRemovePage
         //ignore: deprecated_member_use
         onPopPage: (route, result) {

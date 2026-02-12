@@ -69,11 +69,15 @@ class AboutDialog extends StatelessWidget {
                 // Helpful
                 PageModel(
                   widget: OnboardingLinksPage(
-                    launchUrl: _launchUrl,
+                    launchUrl: (url) {
+                      _launchUrl(url);
+                      viewModel.reportLinkClick(url);
+                    },
                     sendMail: viewModel.sendMail,
                     showUpdateInfo: () =>
                         viewModel.showUpdateInfo(data.version),
                     version: data.version,
+                    links: data.links,
                   ),
                 ),
               ],

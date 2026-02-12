@@ -90,7 +90,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get support_tittle_triggered => 'Нравится приложение? Поддержи меня!';
 
   @override
-  String get support_methods_unavailable => 'Не удалось загрузить способы поддержки. Проверьте наличие интернета.';
+  String get support_methods_unavailable =>
+      'Не удалось загрузить способы поддержки. Проверьте наличие интернета.';
 
   @override
   String get support_methods_unavailable_retry => 'Повторить';
@@ -123,7 +124,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get about_welc => 'Добро пожаловать в';
 
   @override
-  String get about_welc_1 => 'Это приложение предназначено для замены материальных фишек.';
+  String get about_welc_1 =>
+      'Это приложение предназначено для замены материальных фишек.';
 
   @override
   String get about_welc_2 => 'Все что вам нужно для игры: карты и телефон!';
@@ -141,31 +143,38 @@ class AppLocalizationsRu extends AppLocalizations {
   String get about_welc_6 => 'делить итоговый банк между игроками';
 
   @override
-  String get about_welc_7 => 'Это приложение основано на правилах безлимитного Техасского холдема.';
+  String get about_welc_7 =>
+      'Это приложение основано на правилах безлимитного Техасского холдема.';
 
   @override
   String get about_hom_1 => 'Начальный экран';
 
   @override
-  String get about_hom_2 => '[ПРО-функция] На главном экране вы можете выбрать светлую или темную тему интерфейса.';
+  String get about_hom_2 =>
+      '[ПРО-функция] На главном экране вы можете выбрать светлую или темную тему интерфейса.';
 
   @override
-  String get about_hom_3 => '[ПРО-функция] Приложение хранит информацию о вашей последней игре. Вы можете выйти в любой момент, все будет сохранено.';
+  String get about_hom_3 =>
+      '[ПРО-функция] Приложение хранит информацию о вашей последней игре. Вы можете выйти в любой момент, все будет сохранено.';
 
   @override
-  String get about_hom_4 => 'Кнопка НОВАЯ ИГРА удаляет всю информацию о последней игре!';
+  String get about_hom_4 =>
+      'Кнопка НОВАЯ ИГРА удаляет всю информацию о последней игре!';
 
   @override
   String get about_plme_1 => 'Меню игрока';
 
   @override
-  String get about_plme_2 => 'Кнопка НАЧАЛЬНОГО СТЕКА позволяет вам изменить начальный стек для всех игроков.';
+  String get about_plme_2 =>
+      'Кнопка НАЧАЛЬНОГО СТЕКА позволяет вам изменить начальный стек для всех игроков.';
 
   @override
-  String get about_plme_3 => 'Проведите пальцем по игроку влево, чтобы удалить его.';
+  String get about_plme_3 =>
+      'Проведите пальцем по игроку влево, чтобы удалить его.';
 
   @override
-  String get about_plme_4 => '[ПРО-функция] Проведите пальцем по игроку вправо, чтобы добавить его в хранилище.';
+  String get about_plme_4 =>
+      '[ПРО-функция] Проведите пальцем по игроку вправо, чтобы добавить его в хранилище.';
 
   @override
   String get about_plme_5 => 'Они будут храниться там вечно.';
@@ -180,10 +189,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get about_set_1 => 'Настройки';
 
   @override
-  String get about_set_2 => 'Во вкладке настройки вы также можете настроить начальный стек, а также малый блайнд.';
+  String get about_set_2 =>
+      'Во вкладке настройки вы также можете настроить начальный стек, а также малый блайнд.';
 
   @override
-  String get about_set_3 => 'Перед началом ставок вы можете внести любые изменения:';
+  String get about_set_3 =>
+      'Перед началом ставок вы можете внести любые изменения:';
 
   @override
   String get about_set_4 => 'добавлять, удалять игроков';
@@ -204,31 +215,38 @@ class AppLocalizationsRu extends AppLocalizations {
   String get about_tab_1 => 'Игровой стол';
 
   @override
-  String get about_tab_2 => 'В верхней части экрана вы можете изменить положение игрока за игровым столом.';
+  String get about_tab_2 =>
+      'В верхней части экрана вы можете изменить положение игрока за игровым столом.';
 
   @override
-  String get about_tab_3 => 'Размер вашей ставки или рейза можно выбрать с помощью ползунка или нажав на фишки.';
+  String get about_tab_3 =>
+      'Размер вашей ставки или рейза можно выбрать с помощью ползунка или нажав на фишки.';
 
   @override
-  String get about_tab_4 => 'После вскрытия (окончания ставок) вам необходимо выбрать победителя или победителей.';
+  String get about_tab_4 =>
+      'После вскрытия (окончания ставок) вам необходимо выбрать победителя или победителей.';
 
   @override
-  String get about_tab_5 => 'Если в игре были созданы побочные банки (кто-то пошел олл-ин), то сначала выберите победителя основного банка.';
+  String get about_tab_5 =>
+      'Если в игре были созданы побочные банки (кто-то пошел олл-ин), то сначала выберите победителя основного банка.';
 
   @override
   String get about_link_1 => 'Полезные ссылки';
 
   @override
-  String get about_link_2 => 'Нравится мое приложение? Оцените его и оставьте комментарий! Не забудьте поделиться с друзьями!';
+  String get about_link_2 =>
+      'Нравится мое приложение? Оцените его и оставьте комментарий! Не забудьте поделиться с друзьями!';
 
   @override
   String get about_link_3 => 'Оценить';
 
   @override
-  String get about_link_4 => 'Вы также можете поддержать меня, если хотите. Смотрите способы во вкладке на главном экране.';
+  String get about_link_4 =>
+      'Вы также можете поддержать меня, если хотите. Смотрите способы во вкладке на главном экране.';
 
   @override
-  String get about_link_5 => 'У вас проблемы с приложением, хотите задать вопрос? Отправить отзыв или совет:';
+  String get about_link_5 =>
+      'У вас проблемы с приложением, хотите задать вопрос? Отправить отзыв или совет:';
 
   @override
   String get about_link_6 => 'Во вложениях есть файл с логами приложения...';
@@ -411,7 +429,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get toast_moreplay2 => 'Вы не можете начать игру без игроков';
 
   @override
-  String get toast_bank1 => 'Рекомендуем значение стека не менее большого блайнда';
+  String get toast_bank1 =>
+      'Рекомендуем значение стека не менее большого блайнда';
 
   @override
   String get toast_bank2 => 'В вашем случае';
@@ -420,7 +439,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get toast_bank3 => 'Стек не может быть равен нулю';
 
   @override
-  String get toast_bank4 => 'Рекомендуем использовать значение большого блайнда меньше стека';
+  String get toast_bank4 =>
+      'Рекомендуем использовать значение большого блайнда меньше стека';
 
   @override
   String get toast_bank5 => 'Нелья играть без блайндов';
@@ -441,7 +461,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get toast_playp_edit_no_icon => 'Выберите аватар игрока';
 
   @override
-  String get toast_game_error_state_editing => 'Сейчас нельзя редактировать игроков';
+  String get toast_game_error_state_editing =>
+      'Сейчас нельзя редактировать игроков';
 
   @override
   String get toast_purchases_updating_error => 'Ошибка обновления покупок';
@@ -456,7 +477,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get toast_purchase_error_named => 'Произошла ошибка с покупкой:';
 
   @override
-  String get toast_purchase_pending_state_named => 'Ваша покупка обрабатывается:';
+  String get toast_purchase_pending_state_named =>
+      'Ваша покупка обрабатывается:';
 
   @override
   String get purchases_restore_button => 'Восстановить покупки';
@@ -510,16 +532,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get update_title => 'Обзор версии';
 
   @override
-  String get update_1 => 'Исправлены многие проблемы приложения, улучшен пользовательский опыт';
+  String get update_1 =>
+      'Исправлены многие проблемы приложения, улучшен пользовательский опыт';
 
   @override
-  String get update_2 => 'Добавлена страница для поддержки автора, буду рад любой помощи!';
+  String get update_2 =>
+      'Добавлена страница для поддержки автора, буду рад любой помощи!';
 
   @override
-  String get update_3 => 'ПРО пользователи теперь могут ставить игрокам свои фото из галереи';
+  String get update_3 =>
+      'ПРО пользователи теперь могут ставить игрокам свои фото из галереи';
 
   @override
-  String get update_4 => 'ПРО пользователи теперь могут отменять последнее действие игры';
+  String get update_4 =>
+      'ПРО пользователи теперь могут отменять последнее действие игры';
 
   @override
   String get pro_version_offer_title => 'Максимум возможностей в PRO версии';
@@ -543,7 +569,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pro_version_offer_option_4 => 'До 10 игроков в лобби';
 
   @override
-  String get pro_version_offer_option_5 => 'Сохранение прогресса игры и частых игроков';
+  String get pro_version_offer_option_5 =>
+      'Сохранение прогресса игры и частых игроков';
 
   @override
   String get pro_version_offer_option_6 => 'Кастомные аватары игроков';
