@@ -22,27 +22,20 @@ class PlayerField extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => AnimatedContainer(
+  Widget build(BuildContext context) => Opacity(
         key: GameTableKeys.playerCard(player.name),
-        duration: const Duration(milliseconds: 300),
-        height: stdHeight,
-        width: stdHeight * 2.2,
-        child: Opacity(
-          opacity: player.isFolded ? 0.4 : 1.0,
-          child: MyButton(
-            borderRadius: BorderRadius.circular(stdBorderRadius * 2),
-            height: stdHeight,
-            buttonColor: player.isCurrent
-                ? context.theme.primaryColor
-                : context.theme.bankColor,
-            //longAction: () async {},
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: shouldReverse
-                  ? List.from(
-                      _reversablePlayerWidgetList(player, context).reversed)
-                  : _reversablePlayerWidgetList(player, context),
-            ),
+        opacity: player.isFolded ? 0.4 : 1.0,
+        child: MyButton(
+          buttonColor: player.isCurrent
+              ? context.theme.primaryColor
+              : context.theme.bankColor,
+          //longAction: () async {},
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: shouldReverse
+                ? List.from(
+                    _reversablePlayerWidgetList(player, context).reversed)
+                : _reversablePlayerWidgetList(player, context),
           ),
         ),
       );
@@ -53,26 +46,22 @@ List<Widget> _reversablePlayerWidgetList(
   BuildContext context,
 ) =>
     [
-      Stack(
-        key: player.isCurrent
-            ? GameTableKeys.currentPlayerMarker(player.name)
-            : null,
-        children: [
-          SizedBox(
-            width: stdHeight,
-            height: stdHeight,
-            child: PlayerAvatar(
+      AspectRatio(
+        aspectRatio: 1.0,
+        child: Stack(
+          fit: StackFit.expand,
+          key: player.isCurrent
+              ? GameTableKeys.currentPlayerMarker(player.name)
+              : null,
+          children: [
+            PlayerAvatar(
               assetUrl: player.assetUrl,
               colorFilter: (player.assetUrl == AssetsProvider.emptyPlayerAsset)
-                  ? EmptyAssetFilter(player.uid)
+                  ? EmptyAssetFilter.filter(player.uid)
                   : null,
             ),
-          ),
-          if (player.isDealer)
-            SizedBox(
-              width: stdHeight,
-              height: stdHeight,
-              child: Image(
+            if (player.isDealer)
+              Image(
                 filterQuality: FilterQuality.medium,
                 image: AssetsProvider.dealerAsset,
                 errorBuilder: (context, error, stackTrace) => Icon(
@@ -82,8 +71,8 @@ List<Widget> _reversablePlayerWidgetList(
                 ),
                 fit: BoxFit.fill,
               ),
-            ),
-        ],
+          ],
+        ),
       ),
       Expanded(
         child: Container(

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../app/keys/keys.dart';
 import '../../../utils/extensions.dart';
@@ -8,12 +9,10 @@ import '../../../utils/theme/ui_values.dart';
 import '../../monitization/pro_version/widgets/pro_version_wrapper.dart';
 
 class AddPlayerButton extends StatefulWidget {
-  final bool canEditPlayers;
   final VoidCallback? addPlayerCallback;
   final VoidCallback? openPlayersListCallback;
 
   const AddPlayerButton({
-    required this.canEditPlayers,
     this.addPlayerCallback,
     this.openPlayersListCallback,
     super.key,
@@ -60,116 +59,103 @@ class _AddPlayerButtonState extends State<AddPlayerButton> {
   }
 
   @override
-  Widget build(BuildContext context) => widget.canEditPlayers
-      ? SizedBox(
-          height: stdButtonHeight * 0.75 * 0.8,
-          width: stdButtonHeight * 0.75 * 2,
-          child: Center(
-            child: AnimatedSwitcher(
-              switchInCurve: Curves.easeInOutBack,
-              switchOutCurve: Curves.easeInOutBack,
-              duration: const Duration(milliseconds: 200),
-              transitionBuilder: (Widget widget, Animation<double> animation) =>
-                  AnimatedBuilder(
-                animation: animation,
-                child: widget,
-                builder: (context, widget) => Transform(
-                  transform: Matrix4.diagonal3Values(
-                    animation.value,
-                    1.0,
-                    1.0,
-                  ),
-                  alignment: Alignment.center,
-                  child: widget,
-                ),
-              ),
-              child: !addButtonPressed
-                  ? Container(
-                      key: const ValueKey('1'),
-                      height: stdButtonHeight * 0.75 * 0.8,
-                      width: stdButtonHeight * 0.75 * 0.8,
-                      decoration: BoxDecoration(
-                        color: context.theme.primaryColor,
-                        borderRadius:
-                            BorderRadius.circular(stdBorderRadius * 2),
-                      ),
-                      child: FittedBox(
-                        child: IconButton(
-                          key: GameTableKeys.addMainButton,
-                          tooltip: context.strings.tooltip_add_main,
-                          splashRadius: stdButtonHeight * 0.75 * 0.45,
-                          icon: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                          ),
-                          onPressed: () => _onMainButtonPressed(),
-                        ),
-                      ),
-                    )
-                  : Row(
-                      key: const ValueKey('2'),
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: stdButtonHeight * 0.75 * 0.8,
-                          width: stdButtonHeight * 0.75 * 0.8,
-                          decoration: BoxDecoration(
-                            color: context.theme.primaryColor,
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(stdBorderRadius * 2),
-                              topLeft: Radius.circular(stdBorderRadius * 2),
-                            ),
-                          ),
-                          child: FittedBox(
-                            fit: BoxFit.fitWidth,
-                            child: IconButton(
-                              key: GameTableKeys.addNewPlayerButton,
-                              splashRadius: stdButtonHeight * 0.75 * 0.45,
-                              icon: const Icon(
-                                Icons.person_add,
-                                color: Colors.white,
-                              ),
-                              tooltip: context.strings.tooltip_add_new,
-                              onPressed: () {
-                                _forceClose();
-                                widget.addPlayerCallback?.call();
-                              },
-                            ),
-                          ),
-                        ),
-                        Container(
-                          height: stdButtonHeight * 0.75 * 0.8,
-                          width: stdButtonHeight * 0.75 * 0.8,
-                          decoration: BoxDecoration(
-                            color: context.theme.primaryColor,
-                            borderRadius: BorderRadius.only(
-                              bottomRight: Radius.circular(stdBorderRadius),
-                              topRight: Radius.circular(stdBorderRadius),
-                            ),
-                          ),
-                          child: ProVersionWrapper(
-                            offset: -5,
-                            child: FittedBox(
-                              child: IconButton(
-                                key: GameTableKeys.addSavedPlayerButton,
-                                splashRadius: stdButtonHeight * 0.75 * 0.45,
-                                icon: const Icon(
-                                  Icons.folder_shared,
-                                  color: Colors.white,
-                                ),
-                                tooltip: context.strings.tooltip_add_stor,
-                                onPressed: () {
-                                  _forceClose();
-                                  widget.openPlayersListCallback?.call();
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+  Widget build(BuildContext context) => AnimatedSwitcher(
+        switchInCurve: Curves.easeInOutBack,
+        switchOutCurve: Curves.easeInOutBack,
+        duration: const Duration(milliseconds: 200),
+        transitionBuilder: (Widget widget, Animation<double> animation) =>
+            AnimatedBuilder(
+          animation: animation,
+          child: widget,
+          builder: (context, widget) => Transform(
+            transform: Matrix4.diagonal3Values(
+              animation.value,
+              1.0,
+              1.0,
             ),
+            alignment: Alignment.center,
+            child: widget,
           ),
-        )
-      : const SizedBox();
+        ),
+        child: !addButtonPressed
+            ? Container(
+                key: const ValueKey('1'),
+                decoration: BoxDecoration(
+                  color: context.theme.primaryColor,
+                  borderRadius: BorderRadius.circular(stdBorderRadius * 2),
+                ),
+                child: FittedBox(
+                  child: IconButton(
+                    key: GameTableKeys.addMainButton,
+                    tooltip: context.strings.tooltip_add_main,
+                    splashRadius: stdButtonHeight * 0.75 * 0.45,
+                    icon: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: stdIconSize * 1.5,
+                    ),
+                    onPressed: () => _onMainButtonPressed(),
+                  ),
+                ),
+              )
+            : Row(
+                key: const ValueKey('2'),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: context.theme.primaryColor,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(stdBorderRadius * 2),
+                        topLeft: Radius.circular(stdBorderRadius * 2),
+                      ),
+                    ),
+                    child: FittedBox(
+                      child: IconButton(
+                        key: GameTableKeys.addNewPlayerButton,
+                        splashRadius: stdButtonHeight * 0.75 * 0.45,
+                        icon: Icon(
+                          Icons.person_add,
+                          color: Colors.white,
+                          size: stdIconSize * 1.5,
+                        ),
+                        tooltip: context.strings.tooltip_add_new,
+                        onPressed: () {
+                          _forceClose();
+                          widget.addPlayerCallback?.call();
+                        },
+                      ),
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: context.theme.primaryColor,
+                      borderRadius: BorderRadius.only(
+                        bottomRight: Radius.circular(stdBorderRadius),
+                        topRight: Radius.circular(stdBorderRadius),
+                      ),
+                    ),
+                    child: FittedBox(
+                      child: ProVersionWrapper(
+                        offset: -10.h,
+                        child: IconButton(
+                          key: GameTableKeys.addSavedPlayerButton,
+                          splashRadius: stdButtonHeight * 0.75 * 0.45,
+                          icon: Icon(
+                            Icons.folder_shared,
+                            color: Colors.white,
+                            size: stdIconSize * 1.5,
+                          ),
+                          tooltip: context.strings.tooltip_add_stor,
+                          onPressed: () {
+                            _forceClose();
+                            widget.openPlayersListCallback?.call();
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+      );
 }

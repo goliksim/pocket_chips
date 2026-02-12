@@ -137,7 +137,7 @@ class PlayerCard extends StatelessWidget {
                               assetUrl: player.assetUrl,
                               colorFilter: (player.assetUrl ==
                                       AssetsProvider.emptyPlayerAsset)
-                                  ? EmptyAssetFilter(player.uid)
+                                  ? EmptyAssetFilter.filter(player.uid)
                                   : null,
                             ),
                           ),

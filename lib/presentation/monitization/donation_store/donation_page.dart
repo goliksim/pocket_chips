@@ -30,7 +30,7 @@ class _DonateWindowState extends ConsumerState<DonateWindow> {
 
     // Placeholder loading items
     final placeholderProducts =
-        List.generate(10, (_) => PurchaseItemState.loading());
+        List.generate(6, (_) => PurchaseItemState.loading());
     var storeProducts = <PurchaseItemState>[];
 
     viewState.maybeWhen(

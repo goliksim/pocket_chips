@@ -88,6 +88,8 @@ class PurchaseItemWidget extends StatelessWidget {
                                 child: CircularProgressIndicator(
                                   strokeWidth: 3,
                                   color: context.theme.onPrimary,
+                                  padding:
+                                      EdgeInsets.all(stdHorizontalOffset / 2),
                                 ),
                               ),
                             ),

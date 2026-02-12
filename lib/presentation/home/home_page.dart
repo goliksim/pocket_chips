@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../app/keys/keys.dart';
 import '../../app/theme_provider.dart';
@@ -32,8 +31,6 @@ class _AnimatedHomePageState extends ConsumerState<AnimatedHomePage>
   Themes? _oldTheme;
 
   bool _isAnimating = false;
-
-  BannerAd? banner;
 
   @override
   void initState() {
@@ -211,108 +208,102 @@ class _HomePage extends ConsumerWidget {
             ],
           ),
           backgroundColor: Colors.transparent,
-          body: Center(
-            child: Container(
-              width: stdButtonWidth,
-              margin: EdgeInsets.only(
-                bottom: adaptiveOffset,
-                left: adaptiveOffset,
-                right: adaptiveOffset,
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          body: Padding(
+            padding: EdgeInsets.all(adaptiveOffset),
+            child: Center(
+              child: SizedBox(
+                width: stdButtonWidth,
+                child: Stack(
+                  alignment: AlignmentGeometry.center,
                   children: [
-                    AspectRatio(
-                      aspectRatio: 0.8,
+                    Align(
+                      alignment: Alignment.topCenter,
                       child: ChipsImage(),
                     ),
-                    Expanded(
-                      child: isLoading
-                          ? Center(child: CircularProgressIndicator())
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                // New Game
-                                AttentionButton(
-                                  key: HomeKeys.newGameButton,
-                                  onTap: () => viewModel.createNewGame(),
-                                  needToAnimate: () => !shouldDrawContinue,
-                                  bgColor: shouldDrawContinue
-                                      ? context.theme.secondaryColor
-                                      : context.theme.primaryColor,
-                                  textColor: context.theme.onBackground,
-                                  textWidget: Text(
-                                    context.strings.home_new,
-                                    style: context.theme.stdTextStyle.copyWith(
-                                      fontSize: stdFontSize,
-                                    ),
+                    isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              // New Game
+                              AttentionButton(
+                                key: HomeKeys.newGameButton,
+                                onTap: () => viewModel.createNewGame(),
+                                needToAnimate: () => !shouldDrawContinue,
+                                bgColor: shouldDrawContinue
+                                    ? context.theme.secondaryColor
+                                    : context.theme.primaryColor,
+                                textColor: context.theme.onBackground,
+                                textWidget: Text(
+                                  context.strings.home_new,
+                                  style: context.theme.stdTextStyle.copyWith(
+                                    fontSize: stdFontSize,
                                   ),
                                 ),
-                                // Continue Button
-                                if (shouldDrawContinue) ...[
-                                  SizedBox(height: stdHorizontalOffset),
-                                  ProVersionWrapper(
-                                    offset: -5,
+                              ),
+                              // Continue Button
+                              if (shouldDrawContinue) ...[
+                                SizedBox(height: stdHorizontalOffset),
+                                ProVersionWrapper(
+                                  offset: 0,
+                                  child: MyButton(
+                                    key: HomeKeys.continueButton,
+                                    height: stdButtonHeight,
+                                    width: double.infinity,
+                                    borderRadius:
+                                        BorderRadius.circular(stdBorderRadius),
+                                    buttonColor: context.theme.primaryColor,
+                                    textString: context.strings.home_cont,
+                                    action: () {
+                                      if (shouldDrawContinue) {
+                                        viewModel.continueGame();
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
+                              SizedBox(height: stdHorizontalOffset),
+                              Row(
+                                children: [
+                                  Expanded(
                                     child: MyButton(
-                                      key: HomeKeys.continueButton,
+                                      key: HomeKeys.donationButton,
                                       height: stdButtonHeight,
-                                      width: double.infinity,
                                       borderRadius: BorderRadius.circular(
                                           stdBorderRadius),
-                                      buttonColor: context.theme.primaryColor,
-                                      textString: context.strings.home_cont,
-                                      action: () {
-                                        if (shouldDrawContinue) {
-                                          viewModel.continueGame();
-                                        }
-                                      },
+                                      buttonColor:
+                                          context.theme.additionButtonColor,
+                                      textString: context.strings.home_sup,
+                                      action: () => viewModel.showDonation(),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        left: stdHorizontalOffset,
+                                      ),
+                                      child: ProVersionWrapper(
+                                        offset: 0,
+                                        child: MyButton(
+                                          key: HomeKeys.solverButton,
+                                          height: stdButtonHeight,
+                                          borderRadius: BorderRadius.circular(
+                                            stdBorderRadius,
+                                          ),
+                                          buttonColor:
+                                              context.theme.additionButtonColor,
+                                          textString:
+                                              context.strings.home_win_check,
+                                          action: () =>
+                                              viewModel.showWinnerSolver(),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
-                                SizedBox(height: stdHorizontalOffset),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: MyButton(
-                                        key: HomeKeys.donationButton,
-                                        height: stdButtonHeight,
-                                        borderRadius: BorderRadius.circular(
-                                            stdBorderRadius),
-                                        buttonColor:
-                                            context.theme.additionButtonColor,
-                                        textString: context.strings.home_sup,
-                                        action: () => viewModel.showDonation(),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                          left: stdHorizontalOffset,
-                                        ),
-                                        child: ProVersionWrapper(
-                                          offset: -5,
-                                          child: MyButton(
-                                            key: HomeKeys.solverButton,
-                                            height: stdButtonHeight,
-                                            borderRadius: BorderRadius.circular(
-                                              stdBorderRadius,
-                                            ),
-                                            buttonColor: context
-                                                .theme.additionButtonColor,
-                                            textString:
-                                                context.strings.home_win_check,
-                                            action: () =>
-                                                viewModel.showWinnerSolver(),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                    ),
+                              ),
+                            ],
+                          ),
                   ],
                 ),
               ),

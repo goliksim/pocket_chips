@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart' as iap;
 
@@ -19,6 +20,8 @@ class InAppPurchaseRepositoryImpl implements InAppPurchaseRepository {
 
   @override
   Future<bool> isStoreAvailable() async {
+    if (kIsWeb) return false;
+
     try {
       logs.writeLog('$_logName: check store availability');
       final bool available = await iap.InAppPurchase.instance.isAvailable();
@@ -100,6 +103,8 @@ class InAppPurchaseRepositoryImpl implements InAppPurchaseRepository {
 
   @override
   Stream<List<iap.PurchaseDetails>> watchPurchases() {
+    if (kIsWeb) return Stream<List<iap.PurchaseDetails>>.empty();
+
     if (_purchaseStreamController != null) {
       return _purchaseStreamController!.stream;
     }

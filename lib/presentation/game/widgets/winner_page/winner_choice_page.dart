@@ -101,7 +101,9 @@ class WinnerChoiceWindow extends StatelessWidget {
                                             colorFilter: (winner.assetUrl ==
                                                     AssetsProvider
                                                         .emptyPlayerAsset)
-                                                ? EmptyAssetFilter(winner.uid)
+                                                ? EmptyAssetFilter.filter(
+                                                    winner.uid,
+                                                  )
                                                 : null,
                                           ),
                                           Expanded(

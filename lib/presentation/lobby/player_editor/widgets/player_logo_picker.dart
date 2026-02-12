@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
@@ -101,7 +102,7 @@ class _PickIconState extends State<PlayerLogoPicker> {
                   mainAxisSpacing: 0,
                   crossAxisCount: 4,
                 ),
-                itemCount: _totalLogosCount + 1,
+                itemCount: _totalLogosCount + (kIsWeb ? 0 : 1),
                 itemBuilder: (context, index) {
                   if (index == _totalLogosCount) {
                     return GestureDetector(

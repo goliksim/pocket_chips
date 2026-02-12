@@ -215,21 +215,18 @@ class _RaiseSliderState extends State<_RaiseSlider> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.max,
             children: [
-              Flexible(
-                child: Text(
-                  totalBetMin.toCompact,
-                  key: GameControlKeys.raiseMinLabel,
-                  textAlign: TextAlign.right,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: stdFontSize,
-                    color: context.theme.onBackground,
-                  ),
+              Text(
+                totalBetMin.toCompact,
+                key: GameControlKeys.raiseMinLabel,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: stdFontSize,
+                  color: context.theme.onBackground,
                 ),
               ),
-              Expanded(
-                flex: 3,
+              Flexible(
                 child: Slider(
                   key: GameControlKeys.raiseSlider,
                   label: '$tmpBid',
@@ -245,17 +242,15 @@ class _RaiseSliderState extends State<_RaiseSlider> {
                   max: widget.maxBet.toDouble(),
                 ),
               ),
-              Flexible(
-                child: Text(
-                  totalBetMax.toCompact,
-                  key: GameControlKeys.raiseMaxLabel,
-                  textAlign: TextAlign.left,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: stdFontSize,
-                    color: context.theme.onBackground,
-                  ),
+              Text(
+                totalBetMax.toCompact,
+                key: GameControlKeys.raiseMaxLabel,
+                textAlign: TextAlign.left,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: stdFontSize,
+                  color: context.theme.onBackground,
                 ),
               ),
             ],

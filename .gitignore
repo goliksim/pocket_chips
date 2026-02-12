@@ -52,6 +52,9 @@ app.*.symbols
 
 # Firebase
 /android/app/google-services.json
+lib/firebase_options.dart
+firebase.json
+ios/Runner/GoogleService-Info.plist
 
 # Obfuscation related
 app.*.map.json

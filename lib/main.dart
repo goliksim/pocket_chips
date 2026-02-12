@@ -18,13 +18,14 @@ void _runApp() async {
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  MobileAds.instance.initialize();
 
   if (kIsWeb) {
     // Web applications may require their own initialization logic.
     // Now it as it is, but with the possibility of expansion.
     _runApp();
   } else if (Platform.isAndroid || Platform.isIOS) {
+    MobileAds.instance.initialize();
+
     if (Platform.isAndroid) {
       SystemChrome.setEnabledSystemUIMode(
         SystemUiMode.immersiveSticky,

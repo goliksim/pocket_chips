@@ -85,7 +85,7 @@ class _WinnerWindowState extends State<WinnerWindow> {
                       filterQuality: FilterQuality.high,
                       colorFilter: (widget.winner.assetUrl ==
                               AssetsProvider.emptyPlayerAsset)
-                          ? EmptyAssetFilter(widget.winner.uid)
+                          ? EmptyAssetFilter.filter(widget.winner.uid)
                           : null,
                     ),
                   ),

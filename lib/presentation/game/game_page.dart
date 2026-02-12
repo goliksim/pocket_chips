@@ -104,9 +104,13 @@ class GamePage extends ConsumerWidget {
                 Expanded(
                   child: Align(
                     alignment: Alignment.topCenter,
-                    child: GameTable(
-                      viewModel: viewModel,
-                      tableRotationOffset: tableRotationOffset,
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: stdHorizontalOffset),
+                      child: GameTable(
+                        viewModel: viewModel,
+                        tableRotationOffset: tableRotationOffset,
+                      ),
                     ),
                   ),
                 ),

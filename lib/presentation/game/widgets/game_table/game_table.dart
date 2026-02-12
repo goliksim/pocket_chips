@@ -1,13 +1,15 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../app/keys/keys.dart';
 import '../../../../domain/models/lobby/lobby_state_model.dart';
 import '../../../../services/assets_provider.dart';
 import '../../../../utils/extensions.dart';
-import '../../../../utils/theme/ui_values.dart';
+import '../../../monitization/pro_version/widgets/pro_version_wrapper.dart';
 import '../../view_model/game_page_view_model.dart';
 import '../add_player_button.dart';
 import 'cards/table_cards.dart';
@@ -23,40 +25,51 @@ class GameTable extends StatelessWidget {
     super.key,
   });
 
-  double _playerLeftOffset(
-    double tableButtonWidth,
+  double _playerXCoords(
+    double height,
+    double width,
     int index,
     int totalAmount,
-  ) =>
-      adaptiveOffset +
-      tableButtonWidth / 3 -
-      (stdButtonHeight * 1.7 * _getSin(index, totalAmount, multiply: -0.5));
+  ) {
+    final x0 = width / 2;
+    final x = -height / 3.3 * _getSin(index, totalAmount, multiply: -0.1);
 
-  double _playerBottomOffset(
+    return x0 + x;
+  }
+
+  double _playerYCoords(
+    double height,
     int index,
     int totalAmount,
-    double tableHeight,
-  ) =>
-      tableHeight / 3.8 - 2.9 * stdButtonHeight * _getCos(index, totalAmount);
+  ) {
+    final y0 = height / 2;
+    final y = height / 2 * _getCos(index, totalAmount);
 
-  double _chipBottomOffset(
+    return y0 + y * 0.9;
+  }
+
+  double _beyXCoords(
+    double height,
+    double width,
     int index,
     int totalAmount,
-  ) =>
-      -2.9 * stdButtonHeight * _getCos(index, totalAmount) +
-      3.1 * stdButtonHeight -
-      (_getCos(index, totalAmount) > 0.01
-          ? -stdButtonHeight * 0.5
-          : stdButtonHeight * 0.5);
+  ) {
+    final x0 = width / 2;
+    final x = -height / 3.3 * _getSin(index, totalAmount, multiply: -0.1);
 
-  double _chipsLeftOffset(
-    double tableButtonWidth,
-    int a,
-    int addButton,
-  ) =>
-      adaptiveOffset +
-      (tableButtonWidth) / 3.6 -
-      (stdButtonHeight * 1.3 * _getSin(a, addButton, multiply: -1));
+    return x0 + x;
+  }
+
+  double _betYCoords(
+    double height,
+    int index,
+    int totalAmount,
+  ) {
+    final y0 = height / 2;
+    final y = height / 2 * _getCos(index, totalAmount);
+
+    return y0 + y * 0.9;
+  }
 
   double _getCos(int index, int totalAmount) {
     double randomOffset = 0;
@@ -82,164 +95,211 @@ class GameTable extends StatelessWidget {
     final players = tableState.players;
 
     bool showAddButton = (players.length >= maxPlayerCount ? false : true);
-    final playersOffset = showAddButton ? 1 : 0;
-    final totalElementCount = players.length + playersOffset;
+    final addButtonOffset = showAddButton ? 1 : 0;
+    final totalElementCount = players.length + addButtonOffset;
 
     final bets = players.map((e) => e.bet).whereType<int>();
     final totalBets = bets.sum;
 
-    double tableButtonWidth =
-        MediaQuery.of(context).size.width - adaptiveOffset;
-    double tableHeight = MediaQuery.of(context).size.height;
+    return LayoutBuilder(
+      builder: (context, contrains) {
+        double height = contrains.maxHeight;
+        double width = contrains.maxWidth;
 
-    return Stack(
-      fit: StackFit.expand,
-      alignment: Alignment.center,
-      children: [
-        // Table
-        Padding(
-          padding: EdgeInsets.only(
-            top: stdButtonHeight / 3,
-            bottom: stdButtonHeight / 3,
-          ),
-          child: ColorFiltered(
-            colorFilter: ColorFilter.mode(
-              context.theme.primaryColor.withAlpha(
-                context.theme.name == 'light' ? 20 : 0,
-              ),
-              BlendMode.srcATop,
-            ),
-            child: Image(
-              filterQuality: FilterQuality.high,
-              fit: BoxFit.contain,
-              image: AssetsProvider.table(context.theme.isDark),
-              errorBuilder: (context, error, stackTrace) => Container(
-                decoration: ShapeDecoration(
-                  shape: CircleBorder(),
-                  color: context.theme.secondaryColor.withAlpha(25),
-                ),
-              ),
-            ),
-          ),
-        ),
+        final int tableHeight = (height * 0.9).toInt();
+        final int cardsHeight = (height / 4).toInt();
+        final double betHeight = height * 0.04;
 
-        // Pre-flop 3 cards
-        Positioned(
-          bottom: tableHeight * 0.295,
-          child: TableCards.firstRow(
-            stateEnum: viewState.gameStatus,
-          ),
-        ),
-        // Turn and River cards
-        Positioned(
-          bottom: tableHeight * 0.220,
-          child: TableCards.secondRow(
-            stateEnum: viewState.gameStatus,
-          ),
-        ),
-        // Small/Big Blinds
-        Positioned(
-          bottom: tableHeight * 0.155,
-          child: Text(
-            key: GameKeys.blinds(tableState.smallBlindValue),
-            '${tableState.smallBlindValue.toSeparated} / ${(tableState.smallBlindValue * 2).toSeparated}',
-            style: TextStyle(
-              color: context.theme.onBackground.withAlpha(200),
-              fontSize: stdFontSize * 0.6,
-            ),
-          ),
-        ),
-        // Total bets
-        Positioned(
-          bottom: tableHeight * 0.125,
-          child: FittedBox(
-            child: Container(
-              height: stdHeight / 2.5,
-              padding: EdgeInsets.symmetric(
-                horizontal: stdHorizontalOffset / 2,
-              ),
-              decoration: BoxDecoration(
-                color: context.theme.primaryColor,
-                borderRadius: BorderRadius.circular(
-                  stdBorderRadius,
-                ),
-              ),
+        final double playerHeight = height * 0.085;
+        final double playerWidth = height / 5;
+
+        final borderRadius = betHeight;
+
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            // Table
+            Positioned(
               child: Center(
-                child: Text(
-                  totalBets.toSeparatedBank,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: stdFontSize * 0.75,
+                child: SizedBox(
+                  height: tableHeight.toDouble(),
+                  child: ColorFiltered(
+                    colorFilter: ColorFilter.mode(
+                      context.theme.primaryColor.withAlpha(
+                        context.theme.name == 'light' ? 20 : 0,
+                      ),
+                      BlendMode.srcATop,
+                    ),
+                    child: Image(
+                      filterQuality: FilterQuality.high,
+                      fit: BoxFit.contain,
+                      image: AssetsProvider.table(context.theme.isDark),
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        decoration: ShapeDecoration(
+                          shape: CircleBorder(),
+                          color: context.theme.secondaryColor.withAlpha(25),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ),
-        // Iteration throw players
-        ...List.generate(totalElementCount, (index) => index).expand(
-          (int index) {
-            final finalIndex =
-                (index - playersOffset - tableRotationOffset) % players.length;
-            final player = players[finalIndex];
-
-            return [
-              // Players cards
-              Positioned(
-                bottom: _playerBottomOffset(
-                  index,
-                  totalElementCount,
-                  tableHeight,
-                ),
-                left: _playerLeftOffset(
-                  tableButtonWidth,
-                  index,
-                  totalElementCount,
-                ),
-                child: ((index == 0) && showAddButton)
-                    ? AddPlayerButton(
-                        canEditPlayers: viewModel.viewState.canEditPlayer,
-                        addPlayerCallback: () =>
-                            viewModel.openPlayerEditor(null),
-                        openPlayersListCallback: () =>
-                            viewModel.showSavedPlayers(),
-                      )
-                    : PlayerField(
-                        player: player,
-                        shouldReverse: sin(
-                              2 *
-                                  pi *
-                                  (index / (players.length - playersOffset)),
-                            ) <
-                            0,
+            // Pre-flop 3 cards
+            Positioned(
+              top: height * 0.5 - (cardsHeight) / 2,
+              child: SizedBox(
+                height: cardsHeight.toDouble(),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: TableCards.firstRow(
+                        stateEnum: viewState.gameStatus,
                       ),
+                    ),
+                    SizedBox(height: height / 100),
+                    Expanded(
+                      child: TableCards.secondRow(
+                        stateEnum: viewState.gameStatus,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              // Players bets
-              if ((player.bet != 0) && (!showAddButton || index != 0))
-                Positioned(
-                  bottom: _chipBottomOffset(index, totalElementCount),
-                  left: _chipsLeftOffset(
-                    tableButtonWidth,
-                    index,
-                    totalElementCount,
-                  ),
-                  child: _BetWidget(
-                    key: GameTableKeys.playerBet(player.name, player.bet),
-                    bet: player.bet,
+            ),
+            // Small/Big Blinds
+            Positioned(
+              top: height * 0.75,
+              child: SizedBox(
+                height: height / 25,
+                child: FittedBox(
+                  child: Text(
+                    key: GameKeys.blinds(tableState.smallBlindValue),
+                    '${tableState.smallBlindValue.toSeparated} / ${(tableState.smallBlindValue * 2).toSeparated}',
+                    style: TextStyle(
+                      color: context.theme.onBackground.withAlpha(200),
+                    ),
                   ),
                 ),
-            ];
-          },
-        )
-      ],
+              ),
+            ),
+            // Total bets
+            Positioned(
+              top: height * 0.7,
+              child: SizedBox(
+                height: height / 20,
+                child: FittedBox(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: borderRadius / 4),
+                    decoration: BoxDecoration(
+                      color: context.theme.primaryColor,
+                      borderRadius: BorderRadius.circular(borderRadius),
+                    ),
+                    child: Center(
+                      child: Text(
+                        totalBets.toSeparatedBank,
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Iteration throw players
+            ...List.generate(totalElementCount, (index) => index).expand(
+              (int index) {
+                final finalIndex =
+                    (index - addButtonOffset - tableRotationOffset) %
+                        players.length;
+                final player = players[finalIndex];
+
+                final yCoord = _playerYCoords(height, index, totalElementCount);
+                final xCoord =
+                    _playerXCoords(height, width, index, totalElementCount);
+
+                final xCoordClamp = clampDouble(
+                    xCoord - playerWidth / 2, 0, width - playerWidth);
+
+                final reversePlayer = xCoordClamp <= width / 2;
+
+                final yBetCoord = _betYCoords(height, index, totalElementCount);
+                final xBetCoord =
+                    _beyXCoords(height, width, index, totalElementCount);
+                final xBetCoordClamp = clampDouble(
+                    xBetCoord - playerWidth / 2, 0, width - playerWidth);
+
+                final reverseBet = yCoord <= height * 0.7;
+
+                return [
+                  // Players cards
+                  Positioned(
+                    top: yCoord - playerHeight / 2,
+                    left: xCoordClamp,
+                    child: SizedBox(
+                      height: playerHeight,
+                      width: playerWidth,
+                      child: (index == 0) && showAddButton
+                          ? viewModel.viewState.canEditPlayer
+                              ? Center(
+                                  child: ProVersionWrapper(
+                                    offset: -5.w,
+                                    conditionToEnable:
+                                        players.length < noProPlayerCount,
+                                    child: AddPlayerButton(
+                                      addPlayerCallback: () =>
+                                          viewModel.openPlayerEditor(null),
+                                      openPlayersListCallback: () =>
+                                          viewModel.showSavedPlayers(),
+                                    ),
+                                  ),
+                                )
+                              : SizedBox.shrink()
+                          : ClipRRect(
+                              borderRadius:
+                                  BorderRadius.circular(playerWidth / 2),
+                              child: PlayerField(
+                                player: player,
+                                shouldReverse: reversePlayer,
+                              ),
+                            ),
+                    ),
+                  ),
+                  // Players bets
+                  if ((player.bet != 0) && (!showAddButton || index != 0))
+                    Positioned(
+                      top: yBetCoord -
+                          betHeight / 2 +
+                          playerHeight * (reverseBet ? 0.8 : -0.8),
+                      left: xBetCoordClamp,
+                      child: SizedBox(
+                        height: betHeight,
+                        width: playerWidth,
+                        child: _BetWidget(
+                          key: GameTableKeys.playerBet(player.name, player.bet),
+                          borderRadius: borderRadius,
+                          bet: player.bet,
+                        ),
+                      ),
+                    ),
+                ];
+              },
+            )
+          ],
+        );
+      },
     );
   }
 }
 
 class _BetWidget extends StatelessWidget {
+  final double borderRadius;
   final int bet;
 
   const _BetWidget({
+    required this.borderRadius,
     required this.bet,
     super.key,
   });
@@ -247,23 +307,17 @@ class _BetWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => FittedBox(
         child: Container(
-          width: stdHeight * 3,
-          alignment: Alignment.center,
-          child: Container(
-            height: stdHeight / 2.5,
-            padding: const EdgeInsets.symmetric(horizontal: 5),
-            decoration: BoxDecoration(
-              color: context.theme.playerColor,
-              borderRadius: BorderRadius.circular(stdBorderRadius),
-            ),
-            child: Text(
-              bet.toSeparatedBank,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: context.theme.onBackground.withAlpha(200),
-                fontSize: stdFontSize * 0.75,
-              ),
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+            color: context.theme.playerColor,
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
+          child: Text(
+            bet.toSeparatedBank,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: context.theme.onBackground.withAlpha(200),
             ),
           ),
         ),

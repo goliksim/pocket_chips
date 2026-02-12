@@ -7,7 +7,7 @@ part 'donation_view_state.freezed.dart';
 @freezed
 abstract class DonationViewState with _$DonationViewState {
   const factory DonationViewState({
-    required List<LoadedPurchaseItemState> availableItems,
+    required List<PurchaseItemState> availableItems,
     PurchaseItemState? videoAdItem,
   }) = _DonationViewState;
 }

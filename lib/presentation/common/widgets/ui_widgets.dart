@@ -36,7 +36,7 @@ class ConfirmationWindow extends StatelessWidget {
             stdHorizontalOffset,
           ),
           width: stdButtonWidth,
-          height: stdDialogHeight / 1.3,
+          height: stdDialogHeight / 1.2,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -65,42 +65,46 @@ class ConfirmationWindow extends StatelessWidget {
                   ),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Expanded(
-                    child: MyButton(
-                      key: CommonKeys.confirmButton,
-                      height: stdButtonHeight * 0.75,
-                      width: double.infinity,
-                      buttonColor: context.theme.bgrColor,
-                      textString: actionTitle,
-                      textStyle: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: context.theme.alertColor,
-                        fontSize: stdFontSize,
+              SizedBox(height: stdHorizontalOffset),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      child: MyButton(
+                        key: CommonKeys.confirmButton,
+                        height: stdButtonHeight * 0.75,
+                        width: double.infinity,
+                        buttonColor: context.theme.bgrColor,
+                        textString: actionTitle,
+                        textStyle: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          color: context.theme.alertColor,
+                          fontSize: stdFontSize,
+                        ),
+                        action: () async {
+                          Navigator.of(context).pop(true);
+                          action();
+                        },
                       ),
-                      action: () async {
-                        Navigator.of(context).pop(true);
-                        action();
-                      },
                     ),
-                  ),
-                  Expanded(
-                    child: MyButton(
-                      height: stdButtonHeight * 0.75,
-                      width: double.infinity,
-                      buttonColor: context.theme.bgrColor,
-                      textString: context.strings.conf_canc,
-                      textStyle: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: context.theme.primaryColor,
-                        fontSize: stdFontSize,
+                    SizedBox(width: stdHorizontalOffset),
+                    Expanded(
+                      child: MyButton(
+                        height: stdButtonHeight * 0.75,
+                        width: double.infinity,
+                        buttonColor: context.theme.bgrColor,
+                        textString: context.strings.conf_canc,
+                        textStyle: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          color: context.theme.primaryColor,
+                          fontSize: stdFontSize,
+                        ),
+                        action: () => Navigator.of(context).pop(false),
                       ),
-                      action: () => Navigator.of(context).pop(false),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

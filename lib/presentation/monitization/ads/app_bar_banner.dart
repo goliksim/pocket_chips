@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,36 +13,40 @@ class AppBarBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final isPro = ref.watch(proVersionProvider);
+    if (kIsWeb) {
+      // Todo add ad to web
+      return SizedBox.shrink();
+    }
 
+    final isPro = ref.watch(proVersionProvider);
     final manager = GoogleBannersManager(isPro: isPro);
 
     return Builder(
-      builder: (context) => _AppBarBanner(
+      builder: (context) => _GoogleBanner(
         manager: manager,
       ),
     );
   }
 }
 
-class _AppBarBanner extends StatefulWidget {
+class _GoogleBanner extends StatefulWidget {
   final GoogleBannersManager manager;
 
-  const _AppBarBanner({
+  const _GoogleBanner({
     required this.manager,
   });
 
   @override
-  State<_AppBarBanner> createState() => _AppBarBannerState();
+  State<_GoogleBanner> createState() => _GoogleBannerState();
 }
 
-class _AppBarBannerState extends State<_AppBarBanner> {
+class _GoogleBannerState extends State<_GoogleBanner> {
   BannerAd? banner;
 
   late GoogleBannersManager manager;
 
   @override
-  void didUpdateWidget(covariant _AppBarBanner oldWidget) {
+  void didUpdateWidget(covariant _GoogleBanner oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.manager != oldWidget.manager) {
       _dispose();

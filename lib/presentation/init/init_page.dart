@@ -119,45 +119,48 @@ class _InitPageState extends State<InitPage>
                     ),
                     child: Container(
                       width: stdButtonWidth,
-                      margin: EdgeInsets.only(
-                        bottom: adaptiveOffset,
-                        left: adaptiveOffset,
-                        right: adaptiveOffset,
-                      ),
+                      margin: EdgeInsets.all(adaptiveOffset),
                       child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            AspectRatio(
-                              aspectRatio: 0.8,
-                              child: ChipsImage(),
-                            ),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  FittedBox(
-                                    child: Text(
-                                      'POCKET CHIPS',
-                                      textAlign: TextAlign.center,
-                                      style: context.theme.appBarStyle.copyWith(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: stdFontSize * 2.35,
-                                        color: context.theme.primaryColor,
+                        child: SizedBox(
+                          width: stdButtonWidth,
+                          child: Stack(
+                            alignment: AlignmentGeometry.center,
+                            children: [
+                              Align(
+                                alignment: Alignment.topCenter,
+                                child: ChipsImage(),
+                              ),
+                              Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    FittedBox(
+                                      child: Text(
+                                        'POCKET CHIPS',
+                                        textAlign: TextAlign.center,
+                                        style:
+                                            context.theme.appBarStyle.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: stdFontSize * 2.35,
+                                          color: context.theme.primaryColor,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Text(
-                                    'created by goliksim',
-                                    style: context.theme.appBarStyle.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: stdFontSize,
+                                    Text(
+                                      'created by goliksim',
+                                      textAlign: TextAlign.center,
+                                      style: context.theme.appBarStyle.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: stdFontSize,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(height: stdButtonHeight)
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),

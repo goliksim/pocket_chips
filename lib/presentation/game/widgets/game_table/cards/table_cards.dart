@@ -43,20 +43,15 @@ class TableCards extends StatelessWidget {
     final cardCount = firstRow ? 3 : 2;
     final cardIndexAddition = firstRow ? 0 : 3;
 
-    return SizedBox(
-      height: stdButtonHeight * 0.75,
-      width: stdButtonHeight * 0.75 * cardCount * 0.75,
-      child: Center(
-        child: RotationCard(
-          count: cardCount,
-          conditionByIndex: (int index) => (index + cardIndexAddition >=
-              state % 5 + (state % 5 > 0 ? 2 : 0)),
-          durationByIndex: (int index) =>
-              500 + (index + cardIndexAddition) * 100,
-          firstSide: (int index) => CardBack(),
-          secondSide: (int index) => CardFrontSample(),
-          padding: EdgeInsets.symmetric(horizontal: stdHorizontalOffset / 6),
-        ),
+    return Center(
+      child: RotationCard(
+        count: cardCount,
+        conditionByIndex: (int index) =>
+            (index + cardIndexAddition >= state % 5 + (state % 5 > 0 ? 2 : 0)),
+        durationByIndex: (int index) => 500 + (index + cardIndexAddition) * 100,
+        firstSide: (int index) => CardBack(),
+        secondSide: (int index) => CardFrontSample(),
+        padding: EdgeInsets.symmetric(horizontal: stdHorizontalOffset / 6),
       ),
     );
   }

@@ -49,7 +49,7 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
 
     return DonationViewState(
       videoAdItem: videoAdItem,
-      availableItems: manager.value?.map(_buildItem).toList() ?? [],
+      availableItems: _getItemsFromAsync(manager),
     );
   }
 
@@ -140,31 +140,24 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
   void _listenPurchases(Ref ref) => ref.listen(
         purchasesManagerProvider,
         (prev, next) {
-          next.maybeWhen(
-            data: (products) {
-              final oldProducts = state.value?.availableItems ?? [];
-              final oldProductsSet = oldProducts.map((e) => e.id).toSet();
-
-              final availableItems = [
-                ...oldProducts,
-                ...products
-                    .where((e) => !oldProductsSet.contains(e.id))
-                    .map(_buildItem)
-                    .toSet(),
-              ];
-
-              Future.microtask(() {
-                state = AsyncValue.data(
-                  DonationViewState(
-                    availableItems: availableItems,
-                    videoAdItem: state.value?.videoAdItem,
-                  ),
-                );
-              });
-            },
-            orElse: () {},
+          state = AsyncValue.data(
+            DonationViewState(
+              availableItems: _getItemsFromAsync(next),
+              videoAdItem: state.value?.videoAdItem,
+            ),
           );
         },
+      );
+
+  List<PurchaseItemState> _getItemsFromAsync(
+          AsyncValue<List<PurchasableProduct>> asyncList) =>
+      asyncList.when(
+        data: (products) => products.map(_buildItem).toList(),
+        loading: () => List<PurchaseItemState>.generate(
+          5,
+          (_) => PurchaseItemState.loading(),
+        ),
+        error: (_, __) => [],
       );
 
   void _listenVideoAd(Ref ref) => ref.listen(

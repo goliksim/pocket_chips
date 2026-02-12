@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -25,6 +25,10 @@ class GoogleAdsManager extends Notifier<IterstitialAdState> {
       _interstitialAd?.dispose();
     });
 
+    if (kIsWeb) {
+      return IterstitialAdState.unavailable;
+    }
+
     _createInterstitialAd();
 
     return IterstitialAdState.loading;
@@ -41,6 +45,8 @@ class GoogleAdsManager extends Notifier<IterstitialAdState> {
   }
 
   void reload() {
+    if (kIsWeb) return;
+
     logs.writeLog('GoogleAdsManager reload');
 
     _createInterstitialAd();
