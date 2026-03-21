@@ -65,12 +65,13 @@ Future<void> runMonitizationTest4(
     [
       // Open donation page and check error messages
       homePage.openDonationPage(),
-      () => tester.pump(const Duration(seconds: 1)), //Dialog opening
+      () => tester.pumpAndSettle(
+          duration: const Duration(seconds: 1)), //Dialog opening
       donationPage.verifyVisibility(),
       donationPage.verifyUnavailableState(),
       // Retry loading and verify error messages are still shown
       donationPage.retry(),
-      () => tester.pump(const Duration(seconds: 1)),
+      () => tester.pumpAndSettle(duration: const Duration(seconds: 1)),
       donationPage.verifyVisibility(),
       donationPage.verifyUnavailableState(),
       () async {
@@ -80,9 +81,9 @@ Future<void> runMonitizationTest4(
       },
       // Retry loading and verify PRO mode is active and video ad is loaded
       donationPage.retry(),
-      () => tester.pump(const Duration(seconds: 4)),
-      donationPage.verifyProModeItemExist(isPurchased: true),
-      donationPage.verifyVideoAdItemExist(isLoaded: true),
+      () => tester.pumpAndSettle(duration: const Duration(seconds: 3)),
+      donationPage.verifyProModeItemLoaded(isPurchased: true),
+      donationPage.verifyVideoAdItemLoaded(isLoaded: true),
     ],
   )();
 }

@@ -25,3 +25,4 @@ firebase_test_lab_android:
           --results-dir=test_results \
           --results-history-name=e2e_pocket_chips \
 		  --project=pocket-chips \
+		  --log-http

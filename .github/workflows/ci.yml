@@ -5,7 +5,7 @@ on:
 
 jobs:
   analyze:
-    name: Analyze
+    name: Analyze & Unit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,9 +32,13 @@ jobs:
       - name: Analyze
         run: flutter analyze --no-fatal-infos .
 
+      - name: Unit tests
+        run: flutter test
+
   test:
     name: Tests (Android)
     runs-on: ubuntu-latest
+    environment: android-tests-approval
     needs:
       - analyze
     steps:
@@ -114,14 +118,18 @@ jobs:
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: ${{ secrets.FIREBASE_PROJECT_ID }}
+          project_id: ${{secrets.GCP_PROJECT_ID}}
+
+      - name: Check gcloud access
+        run: gcloud auth list && gcloud config list project && gcloud projects get-iam-policy ${{ secrets.GCP_PROJECT_ID }} --flatten="bindings[].members" --format="table(bindings.role,bindings.members)" --filter="bindings.members:${{secrets.GCP_SERVICE_ACCOUNT}}"
 
       - name: Integration Tests (Firebase Test Lab - Android)
         run: make firebase_test_lab_android
 
   test-ios:
     name: Tests (iOS)
-    runs-on: macos-latest
+    runs-on: macos-14
+    environment: ios-tests-approval
     needs:
       - analyze
     steps:
@@ -177,9 +185,9 @@ jobs:
       - name: Boot iOS Simulator
         uses: futureware-tech/simulator-action@v3
         with:
-          model: "iPhone 16 Pro"
+          model: "iPhone 15 Pro"
           os: "iOS"
-          os_version: "18.5"
+          os_version: "17.5"
 
       - name: Build app to create config and install pods
         run: flutter build ios --debug --no-codesign
@@ -188,7 +196,36 @@ jobs:
         run: |
           ls -la ios/Flutter/Generated.xcconfig
           cd ios && pod install --repo-update && cd ..
-          patrol test --device "iPhone 16 Pro" --ios 18.5 --dart-define=ENABLE_FIREBASE=false
+          patrol test --verbose --device "iPhone 15 Pro" --ios 17.5 --dart-define=ENABLE_FIREBASE=false
+
+      - name: Dump xcresult on failure
+        if: failure()
+        run: |
+          RESULT_PATH=$(find build -maxdepth 1 -name 'ios_results_*.xcresult' | sort | tail -n 1)
+          if [ -n "$RESULT_PATH" ]; then
+            echo "xcresult path: $RESULT_PATH"
+            xcrun xcresulttool get --legacy --path "$RESULT_PATH" --format json > /tmp/xcresult.json || true
+            ruby -rjson -e '
+              data = JSON.parse(File.read("/tmp/xcresult.json"))
+              issues = data.dig("issues") || {}
+              puts JSON.pretty_generate(issues)
+            ' || true
+          else
+            echo "No xcresult found"
+          fi
+
+      - name: Dump simulator logs on failure
+        if: failure()
+        run: |
+          xcrun simctl spawn booted log show --style compact --last 15m || true
+
+      - name: Upload xcresult artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-xcresult
+          path: build/*.xcresult
+          retention-days: 14
 
   build-android:
     name: Build Android
@@ -258,7 +295,7 @@ jobs:
           storePassword=$ANDROID_KEYSTORE_PASSWORD
           keyPassword=$ANDROID_KEY_PASSWORD
           keyAlias=$ANDROID_KEY_ALIAS
-          storeFile=app/keystore.jks
+          storeFile=keystore.jks
           EOF
 
       - name: Build APK (Release)

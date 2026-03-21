@@ -66,14 +66,15 @@ Future<void> runMonitizationTest2(
     [
       // Open donation page, verify PRO mode is active and video ad is loading
       homePage.openDonationPage(),
-      () => tester.pump(const Duration(milliseconds: 500)), //Dialog opening
+      () => tester.pump(const Duration(seconds: 1)), //Dialog opening
       donationPage.verifyVisibility(),
-      donationPage.verifyVideoAdItemExist(isLoaded: false),
-      donationPage.verifyProModeItemExist(isPurchased: true),
+      donationPage.verifyVideoAdItemLoaded(isLoaded: false),
+      donationPage.verifyProModeItemLoaded(isPurchased: true),
+
       // Verify video ad is loaded after loading time
-      () => tester.pump(const Duration(seconds: 3)),
-      donationPage.verifyVideoAdItemExist(isLoaded: true),
-      donationPage.verifyProModeItemExist(isPurchased: true),
+      () => tester.pumpAndSettle(duration: const Duration(seconds: 3)),
+      donationPage.verifyVideoAdItemLoaded(isLoaded: true),
+      donationPage.verifyProModeItemLoaded(isPurchased: true),
     ],
   )();
 }

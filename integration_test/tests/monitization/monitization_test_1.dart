@@ -68,12 +68,13 @@ Future<void> runMonitizationTest1(
       () => tester.pump(const Duration(seconds: 1)), //Dialog opening
       donationPage.verifyVisibility(),
       // Verify PRO mode is not purchased, video ad is visible
-      donationPage.verifyProModeItemExist(isPurchased: false),
-      donationPage.verifyVideoAdItemExist(),
+      () => tester.pumpAndSettle(),
+      donationPage.verifyProModeItemLoaded(isPurchased: false),
+      donationPage.verifyVideoAdItemLoaded(),
       // Tap buy PRO and verify PRO mode is purchased and video ad is visible
       donationPage.buyProMode(),
-      donationPage.verifyVideoAdItemExist(),
-      donationPage.verifyProModeItemExist(isPurchased: true),
+      donationPage.verifyVideoAdItemLoaded(),
+      donationPage.verifyProModeItemLoaded(isPurchased: true),
       CommonTester.closeDialog(tester),
       // Verify PRO version is applied on home page
       homePage.verifyProVersionScreen(),

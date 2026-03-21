@@ -10,25 +10,38 @@ import '../../../utils/logs.dart';
 import '../../analytics_event.dart';
 import '../../analytics_service.dart';
 import '../../crash_reporting_service.dart';
+import 'app_resume_listener_mixin.dart';
 import 'models/iterstitial_ad_state.dart';
+import 'retry_policy_mixin.dart';
 
-class GoogleAdsManager extends Notifier<IterstitialAdState> {
+class GoogleAdsManager extends Notifier<IterstitialAdState>
+    with RetryPolicyMixin, AppResumeListenerMixin {
   static const int _maxFailedLoadAttempts = 3;
 
   int _numInterstitialLoadAttempts = 0;
   InterstitialAd? _interstitialAd;
 
-  bool get isReady => state == IterstitialAdState.ready;
   AnalyticsService get _analytics => ref.read(analyticsServiceProvider);
   CrashReportingService get _crashReporting =>
       ref.read(crashReportingServiceProvider);
+
+  bool get isReady => state == IterstitialAdState.ready;
+
+  @override
+  Duration get retryCooldown => const Duration(seconds: 30);
+  @override
+  void Function() get onAppResumed => _handleAppResumed;
 
   //RewardedAd? _rewardedAd;
   //final int _numRewardedLoadAttempts = 0;
 
   @override
   IterstitialAdState build() {
+    initAppResumeListener();
+
     ref.onDispose(() {
+      cancelScheduledRetry();
+      disposeAppResumeListener();
       _interstitialAd?.dispose();
     });
 
@@ -52,12 +65,22 @@ class GoogleAdsManager extends Notifier<IterstitialAdState> {
     }
   }
 
-  void reload() {
-    if (kIsWeb) return;
+  void reload() => _reloadInternal(
+        reason: 'manual',
+        ignoreCooldown: true,
+      );
 
-    logs.writeLog('GoogleAdsManager reload');
+  void reloadIfUnavailable({
+    String reason = 'automatic',
+  }) {
+    if (state != IterstitialAdState.unavailable) {
+      return;
+    }
 
-    _createInterstitialAd();
+    _reloadInternal(
+      reason: reason,
+      ignoreCooldown: false,
+    );
   }
 
   Future<void> showInterstitialAd({VoidCallback? onAdDismissed}) async {
@@ -104,7 +127,40 @@ class GoogleAdsManager extends Notifier<IterstitialAdState> {
     state = IterstitialAdState.loading;
   }
 
+  void _reloadInternal({
+    required String reason,
+    required bool ignoreCooldown,
+  }) {
+    if (kIsWeb) return;
+    // Skip reload while ad is loading
+    if (state == IterstitialAdState.loading) {
+      logs.writeLog('GoogleAdsManager skip reload while ad is loading');
+      return;
+    }
+
+    // Skip retry if it is on cooldown
+    final onCooldown = isRetryOnCooldown(
+      logName: 'GoogleAdsManager',
+      reason: reason,
+    );
+
+    if (!ignoreCooldown && onCooldown) {
+      return;
+    }
+
+    logs.writeLog('GoogleAdsManager reload, reason: $reason');
+
+    markRetryStarted();
+    cancelScheduledRetry();
+
+    _createInterstitialAd();
+  }
+
   void _createInterstitialAd() {
+    _interstitialAd?.dispose();
+    _interstitialAd = null;
+    state = IterstitialAdState.loading;
+
     try {
       InterstitialAd.load(
         adUnitId: _interstitialAdUnitId,
@@ -114,6 +170,7 @@ class GoogleAdsManager extends Notifier<IterstitialAdState> {
             logs.writeLog(
               'InterstitialAd loaded: ${ad.responseInfo?.responseId}',
             );
+            resetRetryPolicy();
             _numInterstitialLoadAttempts = 0;
             ad.setImmersiveMode(true);
             _interstitialAd = ad;
@@ -136,11 +193,14 @@ class GoogleAdsManager extends Notifier<IterstitialAdState> {
               _createInterstitialAd();
             } else {
               state = IterstitialAdState.unavailable;
+              _startBackoffRetry();
             }
           },
         ),
       );
     } catch (error, trace) {
+      state = IterstitialAdState.unavailable;
+      _startBackoffRetry();
       unawaited(
         _crashReporting.recordError(
           error: error,
@@ -149,6 +209,15 @@ class GoogleAdsManager extends Notifier<IterstitialAdState> {
         ),
       );
     }
+  }
+
+  void _startBackoffRetry() => scheduleRetry(
+        logName: 'GoogleAdsManager',
+        action: () => reloadIfUnavailable(reason: 'backoff'),
+      );
+
+  void _handleAppResumed() {
+    reloadIfUnavailable(reason: 'app_resumed');
   }
 
   /*void _createRewardedAd() {

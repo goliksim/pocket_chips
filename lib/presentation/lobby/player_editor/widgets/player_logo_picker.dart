@@ -6,7 +6,6 @@ import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../app/keys/keys.dart';
 import '../../../../services/assets_provider.dart';
@@ -40,34 +39,31 @@ class _PickIconState extends State<PlayerLogoPicker> {
   }
 
   Future<void> _pickImageFromGallery() async {
-    if (await Permission.photos.request().isGranted) {
-      final picker = ImagePicker();
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final appDir = await getApplicationDocumentsDirectory();
 
-      if (pickedFile != null) {
-        final appDir = await getApplicationDocumentsDirectory();
+      final fileName = path.basename(pickedFile.path);
+      final savedImageFile = File('${appDir.path}/$fileName');
 
-        final fileName = path.basename(pickedFile.path);
-        final savedImageFile = File('${appDir.path}/$fileName');
+      // Decode, resize and save image
+      final image = img.decodeImage(await pickedFile.readAsBytes());
 
-        // Decode, resize and save image
-        final image = img.decodeImage(await pickedFile.readAsBytes());
+      if (image != null) {
+        final resizedImage = img.copyResize(
+          image,
+          height: 512,
+          maintainAspect: true,
+        );
 
-        if (image != null) {
-          final resizedImage = img.copyResize(
-            image,
-            height: 512,
-            maintainAspect: true,
-          );
-
-          await savedImageFile.writeAsBytes(img.encodeJpg(resizedImage));
-        } else {
-          await File(pickedFile.path).copy(savedImageFile.path);
-        }
-
-        _pop(savedImageFile.path);
+        await savedImageFile.writeAsBytes(img.encodeJpg(resizedImage));
+      } else {
+        await File(pickedFile.path).copy(savedImageFile.path);
       }
+
+      _pop(savedImageFile.path);
     }
   }
 

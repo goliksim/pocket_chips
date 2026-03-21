@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'app/application.dart';
+import 'services/firebase_bootstrapper.dart';
 
 void _runApp() async {
   runApp(
@@ -19,9 +20,12 @@ void _runApp() async {
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await FirebaseBootstrapper().initialize();
+
   if (kIsWeb) {
     // Web applications may require their own initialization logic.
     // Now it as it is, but with the possibility of expansion.
+
     _runApp();
   } else if (Platform.isAndroid || Platform.isIOS) {
     MobileAds.instance.initialize();

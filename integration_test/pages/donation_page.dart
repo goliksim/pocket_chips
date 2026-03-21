@@ -13,41 +13,37 @@ class DonationPageTester {
   TAction verifyVisibility() =>
       () async => expect(find.byKey(DonationKeys.dialog), findsOneWidget);
 
-  TAction verifyProModeItemExist({
+  TAction verifyProModeItemLoaded({
     bool isPurchased = false,
-    bool exist = true,
+    bool isLoaded = true,
   }) =>
       () async {
-        await $.tester.pumpAndSettle();
-
         expect(
-          find.byKey(DonationKeys.item(
-            id: Constants.pocketChipsPROItemKey,
-            isBuyed: isPurchased,
-            loaded: true,
-          )),
-          exist ? findsOneWidget : findsNothing,
+          find.byKey(
+            DonationKeys.item(
+              id: Constants.pocketChipsPROItemKey,
+              isBuyed: isPurchased,
+              loaded: true,
+            ),
+          ),
+          isLoaded ? findsOneWidget : findsNothing,
         );
       };
 
-  TAction verifyVideoAdItemExist({bool isLoaded = true}) => () async {
-        if (isLoaded) {
-          await $.tester.pumpAndSettle();
-        }
-
+  TAction verifyVideoAdItemLoaded({bool isLoaded = true}) => () async {
         expect(
-          find.byKey(DonationKeys.item(
-            id: Constants.videoAdItemKey,
-            loaded: isLoaded,
-            isBuyed: false,
-          )),
+          find.byKey(
+            DonationKeys.item(
+              id: Constants.videoAdItemKey,
+              loaded: isLoaded,
+              isBuyed: false,
+            ),
+          ),
           findsOneWidget,
         );
       };
 
   TAction verifyUnavailableState() => () async {
-        await $.tester.pumpAndSettle();
-
         expect(
           find.byKey(DonationKeys.itemsUnavailable),
           findsOneWidget,

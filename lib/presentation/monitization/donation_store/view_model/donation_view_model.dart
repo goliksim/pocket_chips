@@ -23,6 +23,8 @@ import '../view_state/donation_view_state.dart';
 import '../view_state/purchase_item_state.dart';
 
 class DonationViewModel extends AsyncNotifier<DonationViewState> {
+  bool _didHandleInitialAdReload = false;
+
   NavigationManager get _navigationManager =>
       ref.read(navigationManagerProvider);
   ToastManager get _toastManager => ref.read(toastManagerProvider);
@@ -39,23 +41,28 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
 
   @override
   FutureOr<DonationViewState> build() async {
-    final videoAdState = ref.read(googleAdsManagerProvider);
+    final videoAdState = ref.watch(googleAdsManagerProvider);
     logs.writeLog('DonationVM: build $videoAdState');
     final videoAdItem = _getAdItemState(videoAdState);
 
-    final manager = ref.read(purchasesManagerProvider);
+    final purchasesState = ref.watch(purchasesManagerProvider);
 
-    //Refreshing
-    if (videoAdState == IterstitialAdState.unavailable) {
-      _googleAdsManager.reload();
+    // Handle initial ad reload
+    if (!_didHandleInitialAdReload) {
+      _didHandleInitialAdReload = true;
+
+      if (videoAdState == IterstitialAdState.unavailable) {
+        Future.microtask(
+          () => _googleAdsManager.reloadIfUnavailable(
+            reason: 'donation_page_opened',
+          ),
+        );
+      }
     }
-
-    _listenPurchases(ref);
-    _listenVideoAd(ref);
 
     return DonationViewState(
       videoAdItem: videoAdItem,
-      availableItems: _getItemsFromAsync(manager),
+      availableItems: _getItemsFromAsync(purchasesState),
     );
   }
 
@@ -154,18 +161,6 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
         alreadyPurchased: _checkPurchased(product.id),
       );
 
-  void _listenPurchases(Ref ref) => ref.listen(
-        purchasesManagerProvider,
-        (prev, next) {
-          state = AsyncValue.data(
-            DonationViewState(
-              availableItems: _getItemsFromAsync(next),
-              videoAdItem: state.value?.videoAdItem,
-            ),
-          );
-        },
-      );
-
   List<PurchaseItemState> _getItemsFromAsync(
           AsyncValue<List<PurchasableProduct>> asyncList) =>
       asyncList.when(
@@ -175,20 +170,6 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
           (_) => PurchaseItemState.loading(),
         ),
         error: (_, __) => [],
-      );
-
-  void _listenVideoAd(Ref ref) => ref.listen(
-        googleAdsManagerProvider,
-        (prev, next) {
-          final newVideoItem = _getAdItemState(next);
-
-          state = AsyncValue.data(
-            DonationViewState(
-              availableItems: state.value?.availableItems ?? [],
-              videoAdItem: newVideoItem,
-            ),
-          );
-        },
       );
 
   PurchaseItemState? _getAdItemState(IterstitialAdState adState) {

@@ -85,11 +85,14 @@ class PurchaseItemWidget extends StatelessWidget {
                               width: double.infinity,
                               height: stdButtonHeight * 0.5,
                               child: Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 3,
-                                  color: context.theme.onPrimary,
-                                  padding:
-                                      EdgeInsets.all(stdHorizontalOffset / 2),
+                                child: AspectRatio(
+                                  aspectRatio: 1.0,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                    color: context.theme.onPrimary,
+                                    padding:
+                                        EdgeInsets.all(stdHorizontalOffset / 2),
+                                  ),
                                 ),
                               ),
                             ),

@@ -33,15 +33,18 @@ class _DonateWindowState extends ConsumerState<DonateWindow> {
         List.generate(6, (_) => PurchaseItemState.loading());
     var storeProducts = <PurchaseItemState>[];
 
-    viewState.maybeWhen(
+    viewState.when(
       data: (data) {
         storeProducts = [
           if (data.videoAdItem != null) data.videoAdItem!,
           ...data.availableItems
         ];
       },
-      orElse: () {
+      loading: () {
         storeProducts = placeholderProducts;
+      },
+      error: (_, __) {
+        storeProducts = [];
       },
       skipLoadingOnReload: true,
     );

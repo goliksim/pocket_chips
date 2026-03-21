@@ -68,16 +68,17 @@ Future<void> runMonitizationTest5(
       // Open home page and tap donation button
       () async => mockPurchasesRepository.setScenario(MockScenario.success),
       homePage.openDonationPage(),
-      () => tester.pump(const Duration(seconds: 1)), //Dialog opening
+      () =>
+          tester.pumpAndSettle(duration: Duration(seconds: 1)), //Dialog opening
       donationPage.verifyVisibility(),
       // Verify PRO mode is not purchased, video ad is visible
-      donationPage.verifyProModeItemExist(isPurchased: false),
-      donationPage.verifyVideoAdItemExist(),
+      donationPage.verifyProModeItemLoaded(isPurchased: false),
+      donationPage.verifyVideoAdItemLoaded(),
       // Tap restore purchases and verify PRO mode is purchased and video ad is visible
       donationPage.restorePurchases(),
       () => tester.pumpAndSettle(),
-      donationPage.verifyVideoAdItemExist(),
-      donationPage.verifyProModeItemExist(isPurchased: true),
+      donationPage.verifyVideoAdItemLoaded(),
+      donationPage.verifyProModeItemLoaded(isPurchased: true),
       // Close dialog and verify PRO version is applied on home page
       CommonTester.closeDialog(tester),
       homePage.verifyProVersionScreen(),

@@ -31,7 +31,7 @@ class AdvertisementHandler implements EventHandler {
       return false;
     }
 
-    if (_googleAdsManager.isReady) {
+    if (!_googleAdsManager.isReady) {
       logs.writeLog('AdvertisementHandler: Ads not ready');
       return false;
     }

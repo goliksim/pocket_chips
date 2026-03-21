@@ -76,6 +76,7 @@ class MockPurchasesRepository implements PurchasesRepository {
         throw Exception('Failed to fetch products');
       case MockScenario.success:
         await Future.delayed(_loadingTime);
+
         return [
           PurchasableProduct(
             id: Constants.pocketChipsPROItemKey,
