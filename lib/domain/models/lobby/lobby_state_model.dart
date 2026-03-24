@@ -17,6 +17,7 @@ abstract class LobbyStateModel with _$LobbyStateModel {
     required List<PlayerModel> players,
     required Map<String, int> banks,
     @Default(defaultSmallBlindValue) int smallBlindValue,
+    @Default(false) bool allowCustomBets,
     @Default(GameStatusEnum.notStarted) GameStatusEnum gameState,
     @Default(defaultLobbyBank) int defaultBank,
     String? dealerId,

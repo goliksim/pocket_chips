@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -330,6 +331,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sett_win3 => 'Большой блайнд';
 
   @override
+  String get sett_custom_bets => 'Разрешить свои ставки/повышения';
+
+  @override
   String get sett_conf => 'Сохранить';
 
   @override
@@ -444,6 +448,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get toast_bank5 => 'Нелья играть без блайндов';
+
+  @override
+  String get toast_custom_bet_warning =>
+      'Такая ставка возможна, но противоречит правилам минимального рейза';
 
   @override
   String get toast_unav => 'Недоступно';

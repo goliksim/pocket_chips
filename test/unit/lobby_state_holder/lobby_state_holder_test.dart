@@ -153,6 +153,10 @@ void main() {
         'Saving settings no editing test',
         () => runSaveSettingsNoEditingTest(container, mockAppRepository),
       );
+      test(
+        'Saving settings allow custom bets test',
+        () => runSaveSettingsAllowCustomBetsTest(container, mockAppRepository),
+      );
     },
   );
 }

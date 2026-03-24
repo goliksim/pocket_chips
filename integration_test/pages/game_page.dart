@@ -125,7 +125,26 @@ class GamePageTester {
 
   TAction cancelRaise() => () => $(GameControlKeys.raiseCancelButton).tap();
 
-  TAction confirmRaise() => () => $(GameControlKeys.raiseConfirmButton).tap();
+  TAction confirmRaise() => () async {
+        await $.tester.pumpAndSettle();
+
+        final normalButtonKey = find.byKey(
+          GameControlKeys.raiseConfirmButton(),
+        );
+        final alertButtonKey = find.byKey(
+          GameControlKeys.raiseConfirmButton(hasAlert: true),
+        );
+
+        final buttonKeyFinder = alertButtonKey.evaluate().isNotEmpty
+            ? alertButtonKey
+            : normalButtonKey;
+        final buttonFinder = find.descendant(
+          of: buttonKeyFinder,
+          matching: find.byType(ElevatedButton),
+        );
+
+        await $(buttonFinder).tap();
+      };
 
   TAction tapRaiseChip(int value) =>
       () => $(GameControlKeys.raiseChip(value)).tap();
@@ -138,12 +157,49 @@ class GamePageTester {
     return slider.value.toInt();
   }
 
+  TAction verifyRaiseSliderValue(int expectedValue) => () async {
+        expect(await getRaiseSliderValue(), expectedValue);
+      };
+
   TAction dragRaiseSliderToMax() => () async {
         await $.tester.pumpAndSettle();
 
         final sliderFinder = find.byKey(GameControlKeys.raiseSlider);
-        await $.tester.drag(sliderFinder, const Offset(300, 0));
+        await $.tester.timedDrag(
+          sliderFinder,
+          const Offset(300, 0),
+          Duration(seconds: 1),
+        );
         await $.tester.pumpAndSettle();
+      };
+
+  TAction dragRaiseSliderToMin() => () async {
+        await $.tester.pumpAndSettle();
+
+        final sliderFinder = find.byKey(GameControlKeys.raiseSlider);
+        await $.tester.timedDrag(
+          sliderFinder,
+          const Offset(-300, 0),
+          Duration(seconds: 1),
+        );
+        await $.tester.pumpAndSettle();
+      };
+
+  TAction verifyRaiseConfirmButtonAlertState({
+    required bool hasAlert,
+  }) =>
+      () async {
+        await $.tester.pumpAndSettle();
+
+        expect(
+          find.byKey(GameControlKeys.raiseConfirmButton(hasAlert: hasAlert)),
+          findsOneWidget,
+        );
+
+        expect(
+          find.byKey(GameControlKeys.raiseConfirmButton(hasAlert: !hasAlert)),
+          findsNothing,
+        );
       };
 
   TAction verifyRaiseFieldVisibility({bool isVisible = true}) => () async {

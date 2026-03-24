@@ -58,6 +58,7 @@ class OnboardingGamePage extends StatelessWidget {
               builder: (context) => RaiseFieldWidget(
                 maxPossibleBet: 500,
                 minPossibleBet: 0,
+                minRuleBet: 100,
                 currentBet: 0,
               ),
             ),

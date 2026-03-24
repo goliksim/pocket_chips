@@ -8,12 +8,14 @@ abstract class GameSettingsModel with _$GameSettingsModel {
     required int startingStack,
     required bool canEditStack,
     required int smallBlind,
+    required bool allowCustomBets,
     // TODO: add ante
   }) = GameSettingsModelArgs;
 
   const factory GameSettingsModel.result({
     required int? startingStack,
     required int? smallBlind,
+    required bool? allowCustomBets,
     // TODO: add ante
   }) = GameSettingsModelResult;
 }

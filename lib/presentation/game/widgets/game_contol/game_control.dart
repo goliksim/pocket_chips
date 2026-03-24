@@ -83,6 +83,7 @@ class _GameControlState extends State<GameControl> {
                                   activeState.raiseState.maxPossibleBet,
                               minPossibleBet:
                                   activeState.raiseState.minPossibleBet,
+                              minRuleBet: activeState.raiseState.minRuleBet,
                               currentBet: activeState.raiseState.currentBet,
                             )
                           : null,
@@ -135,7 +136,7 @@ class _InheritedWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) => state.map(
         active: (activeState) => RaiseProviderScope(
-          additionalBet: activeState.raiseState.minPossibleBet,
+          additionalBet: activeState.raiseState.minRuleBet,
           child: child,
         ),
         breakdown: (_) => child,

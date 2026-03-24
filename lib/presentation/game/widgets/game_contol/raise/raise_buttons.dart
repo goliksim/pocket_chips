@@ -5,6 +5,7 @@ import '../../../../../app/keys/keys.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../utils/extensions.dart';
 import '../../../../../utils/theme/ui_values.dart';
+import '../../../../common/widgets/ui_widgets.dart';
 import '../control_buttons.dart';
 import '../view_state/game_control_result.dart';
 import '../view_state/game_page_control_state.dart';
@@ -53,6 +54,7 @@ class _RaiseButtonsState extends State<RaiseButtons> {
   @override
   Widget build(BuildContext context) {
     final additionalBet = NewBetValueProvider.of(context).additionalBet;
+    final isBelowMinRuleBet = additionalBet < widget.state.minRuleBet;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -73,14 +75,24 @@ class _RaiseButtonsState extends State<RaiseButtons> {
         Flexible(
           flex: 31,
           fit: FlexFit.tight,
-          child: ControlButtonWrapper(
-            key: GameControlKeys.raiseConfirmButton,
-            title: _raiseBetConfirmationText(
+          child: MyButton(
+            key: GameControlKeys.raiseConfirmButton(
+              hasAlert: isBelowMinRuleBet,
+            ),
+            height: stdButtonHeight,
+            width: double.infinity,
+            side: isBelowMinRuleBet
+                ? BorderSide(
+                    color: context.theme.alertColor,
+                    width: 4,
+                  )
+                : null,
+            textString: _raiseBetConfirmationText(
               strings: context.strings,
               additionalBet: additionalBet,
               currentBet: widget.state.currentBet,
             ),
-            color: context.theme.secondaryColor,
+            buttonColor: context.theme.secondaryColor,
             action: () => widget.onConfirm(
               GameControlRaiseResult(raiseValue: additionalBet),
             ),

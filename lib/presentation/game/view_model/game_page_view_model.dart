@@ -175,13 +175,16 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
       final betBool = gameModel.checkBidsEqual();
 
       final currentPlayerCanSkip = (currentBet == maxBet);
-      final canRaise =
-          !callIsAllIn && (currentBank > raiseBank || raiseIsAllIn);
+      final allowCustomBets = gameModel.lobbyState.allowCustomBets;
+
+      final canRaise = allowCustomBets
+          ? !callIsAllIn && currentBank > callValue
+          : !callIsAllIn && (currentBank > raiseBank || raiseIsAllIn);
 
       final isFirstBet = betBool && gameState != GameStatusEnum.preFlop;
 
       final maxPossibleBet = currentBank;
-      final minPossibleBet = raiseBank;
+      final minPossibleBet = allowCustomBets ? callValue : raiseBank;
 
       return GamePageControlState.active(
         raiseState: RaiseControlState(
@@ -190,6 +193,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
           isFirstBet: isFirstBet,
           maxPossibleBet: maxPossibleBet,
           minPossibleBet: minPossibleBet,
+          minRuleBet: raiseBank,
           currentBet: currentBet,
         ),
         mainState: currentPlayerCanSkip

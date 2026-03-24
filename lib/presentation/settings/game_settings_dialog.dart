@@ -25,6 +25,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
     with ToastsMixin {
   int? tmpBank;
   int? smallBlind;
+  late bool allowCustomBets;
   //bool useAutoIncrease = fulse;
   //bool useAnte = false;
   //bool autoIncreaseEveryLap = false;
@@ -49,6 +50,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
   void initState() {
     super.initState();
     logs.writeLog('Settings is opened');
+    allowCustomBets = state.allowCustomBets;
     focusNode1 = FocusNode();
     focusNode2 = FocusNode();
     focusNode3 = FocusNode();
@@ -104,6 +106,16 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
     }
   }
 
+  void _onCustomRaisesChanged(bool? value) {
+    if (value == null) {
+      return;
+    }
+
+    setState(() {
+      allowCustomBets = value;
+    });
+  }
+
   void _checkController(TextEditingController controller) {
     final text = controller.text;
     final filteredText = RegExp(r'(\d+)').stringMatch(text) ?? '';
@@ -155,157 +167,202 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                   ),
                 ),
               ),
-
-              // Bank
-              if (state.canEditStack)
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: stdHorizontalOffset,
-                  ),
-                  height: stdHeight * 0.8,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              SizedBox(height: stdHorizontalOffset),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    spacing: stdHorizontalOffset,
                     children: [
-                      Text(
-                        context.strings.sett_win1,
-                        overflow: TextOverflow.fade,
-                        softWrap: false,
-                        style: TextStyle(
-                          color: context.theme.onBackground,
-                          fontSize: stdFontSize,
-                          fontWeight: FontWeight.normal,
+                      // Bank
+                      if (state.canEditStack)
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: stdHorizontalOffset,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                context.strings.sett_win1,
+                                overflow: TextOverflow.fade,
+                                softWrap: false,
+                                style: TextStyle(
+                                  color: context.theme.onBackground,
+                                  fontSize: stdFontSize,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                              SizedBox(width: stdHorizontalOffset),
+                              Expanded(
+                                child: Container(
+                                  height: stdButtonHeight / 2,
+                                  alignment: Alignment.centerRight,
+                                  child: Form(
+                                    key: _formKey,
+                                    child: TextFormField(
+                                      key: GameSettingsKeys.stackField,
+                                      focusNode: focusNode1,
+                                      controller: _bankController,
+                                      keyboardType: TextInputType.number,
+                                      textAlign: TextAlign.right,
+                                      style: TextStyle(
+                                        color: context.theme.onBackground,
+                                        fontSize: stdFontSize,
+                                      ),
+                                      maxLength: 8,
+                                      textAlignVertical:
+                                          TextAlignVertical.bottom,
+                                      decoration: InputDecoration(
+                                        hintStyle: TextStyle(
+                                          fontSize: stdFontSize,
+                                          color: context.theme.hintColor,
+                                        ),
+                                        hintText: '${state.startingStack}',
+                                        enabledBorder: InputBorder.none,
+                                        focusedBorder: InputBorder.none,
+                                        counterText: '',
+                                      ),
+                                      onChanged: _onBankChanged,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(width: stdHorizontalOffset),
-                      Expanded(
-                        child: Container(
-                          height: stdButtonHeight / 2,
-                          alignment: Alignment.centerRight,
-                          child: Form(
-                            key: _formKey,
-                            child: TextFormField(
-                              key: GameSettingsKeys.stackField,
-                              focusNode: focusNode1,
-                              controller: _bankController,
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.right,
+
+                      // Small Blind
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: stdHorizontalOffset,
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              context.strings.sett_win2,
+                              overflow: TextOverflow.fade,
+                              softWrap: false,
                               style: TextStyle(
                                 color: context.theme.onBackground,
                                 fontSize: stdFontSize,
+                                fontWeight: FontWeight.normal,
                               ),
-                              maxLength: 8,
-                              textAlignVertical: TextAlignVertical.bottom,
-                              decoration: InputDecoration(
-                                hintStyle: TextStyle(
-                                  fontSize: stdFontSize,
-                                  color: context.theme.hintColor,
-                                ),
-                                hintText: '${state.startingStack}',
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                counterText: '',
-                              ),
-                              onChanged: _onBankChanged,
                             ),
-                          ),
+                            SizedBox(width: stdHorizontalOffset),
+                            Expanded(
+                              child: SizedBox(
+                                height: stdButtonHeight / 2,
+                                child: TextFormField(
+                                  key: GameSettingsKeys.smallBlindField,
+                                  focusNode: focusNode2,
+                                  controller: _sbController,
+                                  maxLines: 1,
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.right,
+                                  style: TextStyle(
+                                    color: context.theme.onBackground,
+                                    fontSize: stdFontSize,
+                                  ),
+                                  maxLength: 5,
+                                  textAlignVertical: TextAlignVertical.bottom,
+                                  decoration: InputDecoration(
+                                    hintStyle: TextStyle(
+                                      fontSize: stdFontSize,
+                                      color: context.theme.hintColor,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    hintText: state.smallBlind.toString(),
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    counterText: '',
+                                  ),
+                                  onChanged: _smallBlindChanged,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Big Blind
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: stdHorizontalOffset,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              context.strings.sett_win3,
+                              overflow: TextOverflow.fade,
+                              softWrap: false,
+                              style: TextStyle(
+                                color: context.theme.hintColor,
+                                fontSize: stdFontSize,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            SizedBox(width: stdHorizontalOffset),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                '${(smallBlind ?? state.smallBlind) * 2}',
+                                textAlign: TextAlign.right,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: context.theme.hintColor,
+                                  fontSize: stdFontSize,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Allow custom bets checkbox
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: stdHorizontalOffset,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                context.strings.sett_custom_bets,
+                                style: TextStyle(
+                                  color: context.theme.onBackground,
+                                  fontSize: stdFontSize,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                            Transform.scale(
+                              scale: 1.25,
+                              child: Checkbox(
+                                key: GameSettingsKeys.allowCustomBetsCheckbox,
+                                value: allowCustomBets,
+                                checkColor: Colors.white,
+                                fillColor: WidgetStateProperty.all<Color>(
+                                  allowCustomBets
+                                      ? context.theme.primaryColor
+                                      : context.theme.bgrColor,
+                                ),
+                                onChanged: _onCustomRaisesChanged,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              // Small Blind
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: stdHorizontalOffset,
-                ),
-                height: stdHeight * 0.8,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      context.strings.sett_win2,
-                      overflow: TextOverflow.fade,
-                      softWrap: false,
-                      style: TextStyle(
-                        color: context.theme.onBackground,
-                        fontSize: stdFontSize,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                    SizedBox(width: stdHorizontalOffset),
-                    Expanded(
-                      child: SizedBox(
-                        height: stdButtonHeight / 2,
-                        child: TextFormField(
-                          key: GameSettingsKeys.smallBlindField,
-                          focusNode: focusNode2,
-                          controller: _sbController,
-                          maxLines: 1,
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            color: context.theme.onBackground,
-                            fontSize: stdFontSize,
-                          ),
-                          maxLength: 5,
-                          textAlignVertical: TextAlignVertical.bottom,
-                          decoration: InputDecoration(
-                            hintStyle: TextStyle(
-                              fontSize: stdFontSize,
-                              color: context.theme.hintColor,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            hintText: state.smallBlind.toString(),
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            counterText: '',
-                          ),
-                          onChanged: _smallBlindChanged,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
-              // Big Blind
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: stdHorizontalOffset,
-                ),
-                height: stdHeight * 0.8,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      context.strings.sett_win3,
-                      overflow: TextOverflow.fade,
-                      softWrap: false,
-                      style: TextStyle(
-                        color: context.theme.hintColor,
-                        fontSize: stdFontSize,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                    SizedBox(width: stdHorizontalOffset),
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        '${(smallBlind ?? state.smallBlind) * 2}',
-                        textAlign: TextAlign.right,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: context.theme.hintColor,
-                          fontSize: stdFontSize,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+
               // Auto Rise
               /*SizedBox(
 
@@ -816,6 +873,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                   final newSettings = GameSettingsModelResult(
                     startingStack: tmpBank,
                     smallBlind: smallBlind,
+                    allowCustomBets: allowCustomBets,
                   );
 
                   logs.writeLog('GameSettings: save $newSettings');

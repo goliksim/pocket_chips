@@ -11,6 +11,7 @@ class LobbyStateEntityBuilder {
             List<PlayerModel>.empty(),
         banks: entity.banks ?? <String, int>{},
         smallBlindValue: entity.smallBlindValue,
+        allowCustomBets: entity.allowCustomBets,
         dealerId: entity.dealerId,
         defaultBank: entity.defaultBank,
         gameState: entity.gameState,
@@ -23,6 +24,7 @@ class LobbyStateEntityBuilder {
             )
             .toList(),
         smallBlindValue: model.smallBlindValue,
+        allowCustomBets: model.allowCustomBets,
         banks: model.banks,
         dealerId: model.dealerId,
         defaultBank: model.defaultBank,

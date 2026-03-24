@@ -17,6 +17,7 @@ LobbyStateModel createLobbyState(
   List<PlayerModel> players, {
   String? dealerId,
   int smallBlindValue = 10,
+  bool allowCustomBets = false,
   Map<String, int>? banks,
   int? defaultBank,
   GameStatusEnum? gameState,
@@ -26,6 +27,7 @@ LobbyStateModel createLobbyState(
       gameState: gameState ?? GameStatusEnum.notStarted,
       dealerId: dealerId ?? players.first.uid,
       smallBlindValue: smallBlindValue,
+      allowCustomBets: allowCustomBets,
       banks: banks ??
           Map.fromEntries(
             players.map((p) => MapEntry(p.uid, defaultBank ?? 1000)),
