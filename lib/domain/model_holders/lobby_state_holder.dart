@@ -8,8 +8,9 @@ import '../../di/repositories.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/toast_manager.dart';
 import '../../utils/logs.dart';
+import '../models/game/game_settings_model.dart';
 import '../models/game/game_state_enum.dart';
-import '../models/game_settings_model.dart';
+import '../models/lobby/lobby_game_settings_model.dart';
 import '../models/lobby/lobby_state_model.dart';
 import '../models/player/player_model.dart';
 import 'game_settings_provider.dart';
@@ -246,22 +247,23 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
 
     return GameSettingsModelArgs(
       startingStack: lobby.defaultBank,
-      canEditStack: lobby.gameState.canEditPlayers,
-      smallBlind: lobby.smallBlindValue,
-      allowCustomBets: lobby.allowCustomBets,
+      allowCustomBets: lobby.settings.allowCustomBets,
+      progression: lobby.settings.progression,
     );
   }
 
   @override
   Future<void> saveSettings(GameSettingsModelResult settings) => updateLobby(
         activeLobby.copyWith(
-          defaultBank: settings.startingStack ?? activeLobby.defaultBank,
-          smallBlindValue: settings.smallBlind ?? activeLobby.smallBlindValue,
-          allowCustomBets:
-              settings.allowCustomBets ?? activeLobby.allowCustomBets,
-          banks: (settings.startingStack != null)
+          defaultBank: settings.newStartingStack ?? activeLobby.defaultBank,
+          settings: LobbyGameSettingsModel(
+            allowCustomBets: settings.allowCustomBets ??
+                activeLobby.settings.allowCustomBets,
+            progression: settings.newProgression,
+          ),
+          banks: (settings.newStartingStack != null)
               ? (Map.of(activeLobby.banks)
-                ..updateAll((_, __) => settings.startingStack!))
+                ..updateAll((_, __) => settings.newStartingStack!))
               : activeLobby.banks,
         ),
       );

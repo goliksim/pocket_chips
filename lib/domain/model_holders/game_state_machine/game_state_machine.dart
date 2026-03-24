@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,7 @@ import '../../../di/model_holders.dart';
 import '../../../di/repositories.dart';
 import '../../../services/game_logic_service.dart';
 import '../../../utils/logs.dart';
+import '../../models/game/blind_level_model.dart';
 import '../../models/game/game_session_state.dart';
 import '../../models/game/game_state_effect.dart';
 import '../../models/game/game_state_enum.dart';
@@ -612,72 +614,120 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     LobbyStateModel currentLobby() => editableModel.lobbyState;
     GameSessionState currentSession() => editableModel.sessionState;
 
+    int findNextActivePosition({
+      required GameStateModel model,
+      required int fromPosition,
+      int initialOffset = 1,
+    }) {
+      final players = model.lobbyState.players;
+
+      for (int i = initialOffset; i <= players.length; i++) {
+        final localIndex = (fromPosition + i) % players.length;
+        final player = players[localIndex];
+
+        if (model.isPlayerActive(player.uid)) {
+          return localIndex;
+        }
+      }
+
+      return fromPosition;
+    }
+
     GameStateModel processBetOrAllIn({
       required GameStateModel modelToProcess,
       required PlayerModel player,
       required int value,
     }) {
-      final currentLobby = modelToProcess.lobbyState;
+      final bank = modelToProcess.lobbyState.banks[player.uid] ?? 0;
+      final actualBid = min(bank, value);
 
-      final bank = currentLobby.banks[player.uid] ?? 0;
+      if (actualBid <= 0) {
+        return modelToProcess;
+      }
 
       return _processBet(
         model: modelToProcess,
         playerId: player.uid,
-        // Bet only real amount of money
-        bid: bank < value ? bank : value,
+        bid: actualBid,
       );
+    }
+
+    GameStateModel processAntes({
+      required GameStateModel model,
+      required int dealerPosition,
+      required int bigBlindPosition,
+    }) {
+      final anteType = model.lobbyState.anteType;
+      final anteValue = model.lobbyState.anteValue;
+
+      var updatedModel = model;
+
+      if (anteType == AnteType.none || anteValue <= 0) {
+        return updatedModel;
+      } else if (anteType == AnteType.bigBlindAnte) {
+        final bigBlindPlayer =
+            updatedModel.lobbyState.players[bigBlindPosition];
+
+        return processBetOrAllIn(
+          modelToProcess: updatedModel,
+          player: bigBlindPlayer,
+          value: anteValue,
+        );
+      } else {
+        // AnteType.traditional
+        for (int i = 1; i <= updatedModel.lobbyState.players.length; i++) {
+          final localIndex =
+              (dealerPosition + i) % updatedModel.lobbyState.players.length;
+          final player = updatedModel.lobbyState.players[localIndex];
+
+          if (!updatedModel.isPlayerActive(player.uid)) {
+            continue;
+          }
+
+          updatedModel = processBetOrAllIn(
+            modelToProcess: updatedModel,
+            player: player,
+            value: anteValue,
+          );
+        }
+      }
+
+      return updatedModel;
     }
 
     final dealerPosition = currentLobby()
         .players
         .indexWhere((p) => p.uid == currentLobby().dealerId);
 
-    int bigBlindPosition = dealerPosition;
-
-    (GameStateModel, int) makeBetByCondition({
-      required GameStateModel model,
-      required bool Function(PlayerId) condition,
-      required int value,
-      int initialOffset = 1,
-    }) {
-      final currentLobby = model.lobbyState;
-
-      for (int i = initialOffset; i < currentLobby.players.length; i++) {
-        int localIndex = (i + dealerPosition) % currentLobby.players.length;
-
-        final localPlayer = currentLobby.players[localIndex];
-
-        if (condition(localPlayer.uid)) {
-          model = processBetOrAllIn(
-            modelToProcess: editableModel,
-            player: localPlayer,
-            value: value,
-          );
-
-          return (model, localIndex);
-        }
-      }
-
-      return (model, bigBlindPosition);
-    }
-
-    //HEAD UP case
+    // HEAD UP case
     final isHandsUp = editableModel.activePlayersWithMoney.length == 2;
+    final smallBlindPosition = findNextActivePosition(
+      model: editableModel,
+      fromPosition: dealerPosition,
+      initialOffset: isHandsUp ? 0 : 1,
+    );
+    final bigBlindPosition = findNextActivePosition(
+      model: editableModel,
+      fromPosition: smallBlindPosition,
+    );
+
+    editableModel = processAntes(
+      model: editableModel,
+      dealerPosition: dealerPosition,
+      bigBlindPosition: bigBlindPosition,
+    );
 
     // Small blind bet
-    (editableModel, _) = makeBetByCondition(
-      model: model,
-      condition: (uid) => editableModel.isPlayerActive(uid),
+    editableModel = processBetOrAllIn(
+      modelToProcess: editableModel,
+      player: currentLobby().players[smallBlindPosition],
       value: currentLobby().smallBlindValue,
-      initialOffset: isHandsUp ? 0 : 1,
     );
 
     // Big blind bet
-    (editableModel, bigBlindPosition) = makeBetByCondition(
-      model: model,
-      condition: (uid) => (editableModel.isPlayerActive(uid) &&
-          (currentSession().bets[uid] ?? 0) == 0),
+    editableModel = processBetOrAllIn(
+      modelToProcess: editableModel,
+      player: currentLobby().players[bigBlindPosition],
       value: currentLobby().bigBlindValue,
     );
 
@@ -698,7 +748,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
       final localPlayer = currentLobby().players[localIndex];
 
-      if (editableModel.isPlayerActive(localPlayer.uid)) {
+      if (editableModel.isPlayerActiveWithMoney(localPlayer.uid)) {
         editableModel = editableModel.copyWith(
           sessionState: editableModel.sessionState.copyWith(
             currentPlayerUid: localPlayer.uid,

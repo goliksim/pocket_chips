@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 
 import '../../app/keys/keys.dart';
-import '../../domain/models/game_settings_model.dart';
-import '../../services/toast_manager.dart';
+import '../../domain/models/game/blind_level_model.dart';
+import '../../domain/models/game/blind_progression_model.dart';
+import '../../domain/models/game/game_settings_model.dart';
+import '../../domain/models/lobby/lobby_state_model.dart';
 import '../../utils/extensions.dart';
 import '../../utils/logs.dart';
 import '../../utils/theme/ui_values.dart';
 import '../common/widgets/ui_widgets.dart';
+import '../monitization/pro_version/widgets/pro_version_wrapper.dart';
 import 'view_model/game_settings_view_model.dart';
+import 'view_state/game_settings_mode_state.dart';
+
+part 'widgets/settings_fields.dart';
+part 'widgets/settings_level_card.dart';
+part 'widgets/settings_mode_selector.dart';
+part 'widgets/settings_pro_section.dart';
+part 'widgets/settings_simple_section.dart';
 
 class GameSettingsDialog extends StatefulWidget {
   final GameSettingsViewModel viewModel;
@@ -21,28 +31,16 @@ class GameSettingsDialog extends StatefulWidget {
   State<GameSettingsDialog> createState() => _GameSettingsDialogState();
 }
 
-class _GameSettingsDialogState extends State<GameSettingsDialog>
-    with ToastsMixin {
-  int? tmpBank;
-  int? smallBlind;
+class _GameSettingsDialogState extends State<GameSettingsDialog> {
+  late final TextEditingController bankController;
+  late final TextEditingController progressionIntervalController;
+  late final TextEditingController levelsCountController;
+
+  late GameSettingsModeState settingsMode;
+  late BlindProgressionType progressionType;
+  late List<BlindLevelModel> levels;
   late bool allowCustomBets;
-  //bool useAutoIncrease = fulse;
-  //bool useAnte = false;
-  //bool autoIncreaseEveryLap = false;
-  //double autoIncreaseMultiplier = 0;
-  int anteBlind = 0;
-  //int firstLap = 0;
-  //int autoTime = 0;
-  final TextEditingController _bankController = TextEditingController();
-  final TextEditingController _sbController = TextEditingController();
-  //final TextEditingController _anteBlindController = TextEditingController();
-  late FocusNode focusNode1;
-  late FocusNode focusNode2;
-  late FocusNode focusNode3;
-
-  final _formKey = GlobalKey<FormState>();
-
-  var msgController = TextEditingController();
+  int? expandedLevelIndex;
 
   GameSettingsModelArgs get state => widget.viewModel.state;
 
@@ -50,63 +48,62 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
   void initState() {
     super.initState();
     logs.writeLog('Settings is opened');
+
     allowCustomBets = state.allowCustomBets;
-    focusNode1 = FocusNode();
-    focusNode2 = FocusNode();
-    focusNode3 = FocusNode();
+    final progression = state.progression;
 
-    //useAnte = widget.thisLobby.lobbyAnteBool;
-    //useAutoIncrease = widget.thisLobby.lobbyAutoBool;
+    settingsMode = state.progression.map(
+      (_) => GameSettingsModeState.simple,
+      pro: (_) => GameSettingsModeState.pro,
+    );
 
-    //anteBlind = widget.thisLobby.lobbyAnte;
-    //firstLap = widget.thisLobby.lobbyFirstAnte;
+    progressionType = progression.progressionType;
+    levels = progression.levels;
 
-    //autoIncreaseMultiplier = widget.thisLobby.lobbyFactor;
-    //autoTime = widget.thisLobby.lobbyAutoTime;
-    //autoIncreaseEveryLap = widget.thisLobby.lobbyEveryLapBool;
+    bankController = TextEditingController();
+    progressionIntervalController = TextEditingController(
+      text: progression.progressionInterval?.toString() ?? '',
+    );
+    levelsCountController = TextEditingController(
+      text: levels.length.toString(),
+    );
   }
 
-  void _onBankChanged(String value) {
-    _checkController(_bankController);
-    final text = _bankController.text;
-    if (text.isEmpty) {
-      tmpBank = null;
-    } else {
-      int parsedValue = int.parse(text);
-      if (parsedValue < 1) {
-        _bankController.value = _bankController.value.copyWith(text: '1');
-        tmpBank = 1;
-        showToast(context.strings.toast_bank3);
-      } else {
-        tmpBank = parsedValue;
-      }
+  @override
+  void dispose() {
+    bankController.dispose();
+    progressionIntervalController.dispose();
+    levelsCountController.dispose();
+    super.dispose();
+  }
+
+  int get startingStack => parseControllerValue(
+        bankController,
+        fallback: state.startingStack,
+      );
+
+  bool validateLevels() => levels.every(validateLevel);
+
+  bool validateLevel(BlindLevelModel level) {
+    if (startingStack < level.smallBlind * 2) {
+      widget.viewModel.showInvalidStackToast();
+      return false;
     }
-    setState(() {});
+
+    return true;
   }
 
-  void _smallBlindChanged(String value) {
-    _checkController(_sbController);
-    if (_sbController.text.isEmpty) {
-      _sbController.clear();
-      smallBlind = null;
-      //smallBlind= widget.bank;
-    } else {
-      final parsedValue = int.parse(_sbController.text);
-
-      if (parsedValue < 1) {
-        _sbController.value = _sbController.value.copyWith(text: '1');
-        smallBlind = 1;
-        showToast(context.strings.toast_bank5);
-      } else {
-        smallBlind = parsedValue;
-      }
-
-      setState(() {});
-      //autoIntBlind = smallBlind * 2;
+  void validateCurrentModeIfNeeded() {
+    if (settingsMode == GameSettingsModeState.simple) {
+      //TODO
+      validateLevel(levels.first);
+      return;
     }
+    //TODO
+    validateLevels();
   }
 
-  void _onCustomRaisesChanged(bool? value) {
+  void onCustomRaisesChanged(bool? value) {
     if (value == null) {
       return;
     }
@@ -116,17 +113,107 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
     });
   }
 
-  void _checkController(TextEditingController controller) {
-    final text = controller.text;
-    final filteredText = RegExp(r'(\d+)').stringMatch(text) ?? '';
-    if (text != filteredText) {
+  int parseControllerValue(
+    TextEditingController controller, {
+    required int fallback,
+  }) {
+    final filtered = digitsOnly(controller.text);
+    if (filtered != controller.text) {
       controller.value = controller.value.copyWith(
-        text: filteredText,
-        selection: TextSelection.fromPosition(
-          TextPosition(offset: filteredText.length),
-        ),
+        text: filtered,
+        selection: TextSelection.collapsed(offset: filtered.length),
       );
     }
+
+    return int.tryParse(filtered) ?? fallback;
+  }
+
+  String digitsOnly(String value) => value.replaceAll(RegExp(r'[^0-9]'), '');
+
+  void syncLevelsCount(int count) {
+    final normalizedCount = count < 1 ? 1 : count;
+    final currentLevels = List<BlindLevelModel>.from(levels);
+
+    if (normalizedCount > currentLevels.length) {
+      final seedLevel = currentLevels.isNotEmpty
+          ? currentLevels.last
+          : BlindLevelModel(smallBlind: defaultSmallBlindValue);
+
+      for (int i = currentLevels.length; i < normalizedCount; i++) {
+        currentLevels.add(seedLevel);
+      }
+    } else if (normalizedCount < currentLevels.length) {
+      currentLevels.removeRange(normalizedCount, currentLevels.length);
+    }
+
+    setState(() {
+      levels = currentLevels;
+      levelsCountController.text = normalizedCount.toString();
+      levelsCountController.selection = TextSelection.collapsed(
+        offset: levelsCountController.text.length,
+      );
+    });
+  }
+
+  void updateLevel(int index, BlindLevelModel level) {
+    final updatedLevels = List<BlindLevelModel>.from(levels);
+    updatedLevels[index] = level;
+
+    setState(() {
+      levels = updatedLevels;
+    });
+
+    validateLevels();
+  }
+
+  void onLevelExpansionChanged(int index, bool isExpanded) {
+    setState(() {
+      expandedLevelIndex = isExpanded ? index : null;
+    });
+  }
+
+  String anteTypeLabel(AnteType anteType) {
+    switch (anteType) {
+      case AnteType.none:
+        return 'None';
+      case AnteType.traditional:
+        return 'Traditional';
+      case AnteType.bigBlindAnte:
+        return 'Big Blind Ante';
+    }
+  }
+
+  Future<void> saveSettings() async {
+    final isValid = settingsMode == GameSettingsModeState.simple
+        ? validateLevel(levels.first)
+        : validateLevels();
+
+    if (!isValid) {
+      return;
+    }
+
+    final progressionInterval = progressionType == BlindProgressionType.manual
+        ? null
+        : int.tryParse(digitsOnly(progressionIntervalController.text));
+
+    final newSettings = GameSettingsModelResult(
+      allowCustomBets: allowCustomBets,
+      newStartingStack: startingStack,
+      newProgression: settingsMode == GameSettingsModeState.simple
+          ? BlindProgressionModel(
+              progressionType: progressionType,
+              progressionInterval: progressionInterval,
+              blinds: levels.first,
+            )
+          : BlindProgressionModel.pro(
+              progressionType: progressionType,
+              progressionInterval: progressionInterval,
+              levels: levels,
+            ),
+    );
+
+    logs.writeLog('GameSettings: save $newSettings');
+    await widget.viewModel.saveSettings(newSettings);
   }
 
   @override
@@ -134,753 +221,157 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
         key: GameSettingsKeys.dialog,
         elevation: 0,
         backgroundColor: context.theme.bgrColor,
-        insetPadding: EdgeInsets.symmetric(
-          horizontal: adaptiveOffset,
-        ),
+        insetPadding: EdgeInsets.symmetric(horizontal: adaptiveOffset),
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+          borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
-        child: AnimatedContainer(
-          width: stdButtonWidth,
-          padding: EdgeInsets.all(
-            stdHorizontalOffset,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
           ),
-          duration: Duration(milliseconds: 200),
-          //Duration(milliseconds: (useAutoIncrease || useAnte) ? 100 : 200),
-          height: stdDialogHeight * 1.5,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Tittle
-              SizedBox(
-                height: stdButtonHeight * 0.5,
-                child: Center(
-                  child: FittedBox(
-                    child: Text(
-                      context.strings.sett_title,
-                      style: TextStyle(
-                        color: context.theme.onBackground,
-                        fontSize: stdFontSize,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: stdHorizontalOffset),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    spacing: stdHorizontalOffset,
-                    children: [
-                      // Bank
-                      if (state.canEditStack)
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: stdHorizontalOffset,
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                context.strings.sett_win1,
-                                overflow: TextOverflow.fade,
-                                softWrap: false,
-                                style: TextStyle(
-                                  color: context.theme.onBackground,
-                                  fontSize: stdFontSize,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                              SizedBox(width: stdHorizontalOffset),
-                              Expanded(
-                                child: Container(
-                                  height: stdButtonHeight / 2,
-                                  alignment: Alignment.centerRight,
-                                  child: Form(
-                                    key: _formKey,
-                                    child: TextFormField(
-                                      key: GameSettingsKeys.stackField,
-                                      focusNode: focusNode1,
-                                      controller: _bankController,
-                                      keyboardType: TextInputType.number,
-                                      textAlign: TextAlign.right,
-                                      style: TextStyle(
-                                        color: context.theme.onBackground,
-                                        fontSize: stdFontSize,
-                                      ),
-                                      maxLength: 8,
-                                      textAlignVertical:
-                                          TextAlignVertical.bottom,
-                                      decoration: InputDecoration(
-                                        hintStyle: TextStyle(
-                                          fontSize: stdFontSize,
-                                          color: context.theme.hintColor,
-                                        ),
-                                        hintText: '${state.startingStack}',
-                                        enabledBorder: InputBorder.none,
-                                        focusedBorder: InputBorder.none,
-                                        counterText: '',
-                                      ),
-                                      onChanged: _onBankChanged,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                      // Small Blind
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: stdHorizontalOffset,
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              context.strings.sett_win2,
-                              overflow: TextOverflow.fade,
-                              softWrap: false,
-                              style: TextStyle(
-                                color: context.theme.onBackground,
-                                fontSize: stdFontSize,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            SizedBox(width: stdHorizontalOffset),
-                            Expanded(
-                              child: SizedBox(
-                                height: stdButtonHeight / 2,
-                                child: TextFormField(
-                                  key: GameSettingsKeys.smallBlindField,
-                                  focusNode: focusNode2,
-                                  controller: _sbController,
-                                  maxLines: 1,
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.right,
-                                  style: TextStyle(
-                                    color: context.theme.onBackground,
-                                    fontSize: stdFontSize,
-                                  ),
-                                  maxLength: 5,
-                                  textAlignVertical: TextAlignVertical.bottom,
-                                  decoration: InputDecoration(
-                                    hintStyle: TextStyle(
-                                      fontSize: stdFontSize,
-                                      color: context.theme.hintColor,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    hintText: state.smallBlind.toString(),
-                                    enabledBorder: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    counterText: '',
-                                  ),
-                                  onChanged: _smallBlindChanged,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Big Blind
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: stdHorizontalOffset,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              context.strings.sett_win3,
-                              overflow: TextOverflow.fade,
-                              softWrap: false,
-                              style: TextStyle(
-                                color: context.theme.hintColor,
-                                fontSize: stdFontSize,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            SizedBox(width: stdHorizontalOffset),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                '${(smallBlind ?? state.smallBlind) * 2}',
-                                textAlign: TextAlign.right,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: context.theme.hintColor,
-                                  fontSize: stdFontSize,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Allow custom bets checkbox
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: stdHorizontalOffset,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                context.strings.sett_custom_bets,
-                                style: TextStyle(
-                                  color: context.theme.onBackground,
-                                  fontSize: stdFontSize,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                            Transform.scale(
-                              scale: 1.25,
-                              child: Checkbox(
-                                key: GameSettingsKeys.allowCustomBetsCheckbox,
-                                value: allowCustomBets,
-                                checkColor: Colors.white,
-                                fillColor: WidgetStateProperty.all<Color>(
-                                  allowCustomBets
-                                      ? context.theme.primaryColor
-                                      : context.theme.bgrColor,
-                                ),
-                                onChanged: _onCustomRaisesChanged,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Auto Rise
-              /*SizedBox(
-
-                //color: Colors.red,
-                height: stdHeight * 0.75,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      flex: 7,
-                      child: Text('Auto Rise',
+          child: SizedBox(
+            width: stdButtonWidth,
+            child: Padding(
+              padding: EdgeInsets.all(stdHorizontalOffset),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                spacing: stdHorizontalOffset / 2,
+                children: [
+                  // Title
+                  SizedBox(
+                    height: stdButtonHeight * 0.5,
+                    child: Center(
+                      child: FittedBox(
+                        child: Text(
+                          context.strings.sett_title,
                           style: TextStyle(
-                              color: context.theme.textColor,
-                              fontSize: stdFontSize * 0.8,
-                              fontWeight: FontWeight.normal)),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: SizedBox(
-                        height: stdHeight * 0.8,
-                        child: Checkbox(
-                          checkColor: Colors.white,
-                          fillColor: MaterialStateProperty.all<Color>(useAutoIncrease
-                              ? context.theme.primaryColor
-                              : context.theme.bankColor),
-                          value: useAutoIncrease,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              useAutoIncrease = value!;
-                            });
-                          },
+                            color: context.theme.onBackground,
+                            fontSize: stdFontSize,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    )
-                  ],
-                )),
-            // Ante
-            ExpansionPanelList(
-                expandedHeaderPadding: const EdgeInsets.all(0),
-                elevation: 0,
-                expansionCallback: (i, autolind) {
-                  setState(() {
-                    useAnte = !useAnte;
-                  });
-                },
-                children: [
-                  ExpansionPanel(
-                    //hasIcon: false,
-                    canTapOnHeader: false,
-                    isExpanded: useAnte,
-                    backgroundColor: context.theme.bgrColor,
-                    headerBuilder: (BuildContext context, bool isExpanded) {
-                      return Column(
-                        children: [
-                          SizedBox(
-
-                              //color: Colors.red,
-                              height: stdHeight * 0.75,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  if (useAnte)
-                                    const Expanded(flex: 3, child: SizedBox()),
-                                  Flexible(
-                                    flex: useAnte ? 8 : 7,
-                                    child: Text('Ante',
-                                        style: TextStyle(
-                                            color: context.theme.textColor,
-                                            fontSize: stdFontSize * 0.8,
-                                            fontWeight: FontWeight.normal)),
-                                  ),
-                                  Expanded(
-                                    flex: useAnte ? 3 : 2,
-                                    child: SizedBox(
-                                      height: stdHeight * 0.75,
-                                      child: Checkbox(
-                                        checkColor: Colors.white,
-                                        fillColor:
-                                            MaterialStateProperty.all<Color>(
-                                                useAnte
-                                                    ? context.theme.primaryColor
-                                                    : context.theme.bankColor),
-                                        value: useAnte,
-                                        onChanged: (bool? value) {
-                                          setState(() {
-                                            anteBlind = !(3*smallBlind>tmpBank)? smallBlind :0;
-                                            _anteBlindController.clear();
-
-                                            useAnte = value!;
-                                            
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              )),
-                          SizedBox(
-                            //width: double.infinity,
-                            height: 1,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              //margin: const EdgeInsets.symmetric(horizontal: stdEdgeOffset),
-                              color: context.theme.textColor,
-                              width: useAnte ? 250 : 0,
-                              height: 1,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                    body: Container(
-                      margin: const EdgeInsets.symmetric(
-                          vertical: stdEdgeOffset / 3),
-                      padding:
-                          const EdgeInsets.only(left: stdEdgeOffset),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Column(
-                        children: [
-                          SizedBox(
-                              height: stdHeight * 0.75,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    flex: 4,
-                                    child: Text('1st value',
-                                        style: TextStyle(
-                                            color: context.theme.textColor,
-                                            fontSize: stdFontSize * 0.8,
-                                            fontWeight: FontWeight.normal)),
-                                  ),
-                                  const Flexible(flex: 3, child: SizedBox()),
-                                  Expanded(
-                                    flex: 2,
-                                    child: TextFormField(
-                                        focusNode: focusNode3,
-                                        controller: _anteBlindController,
-                                        keyboardType: TextInputType.number,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: context.theme.textColor,
-                                          fontSize: stdFontSize * 0.8,
-                                        ),
-                                        maxLength: 5,
-                                        textAlignVertical:
-                                            TextAlignVertical.bottom,
-                                        decoration: InputDecoration(
-                                            hintStyle: TextStyle(
-                                              fontSize: stdFontSize * 0.8,
-                                              color: context.theme.bankColor,
-                                            ),
-                                            hintText: "$anteBlind",
-                                            enabledBorder: InputBorder.none,
-                                            focusedBorder: InputBorder.none,
-                                            counterText: ''),
-                                        //initialValue: newName,
-                                        onChanged: (String value) async {
-                                          _checkInt(_anteBlindController);
-                                          if (_anteBlindController.text == "") {
-                                            _anteBlindController.clear();
-                                            anteBlind = (!(3*smallBlind>tmpBank))? smallBlind :0; 
-                                            //smallBlind= widget.bank;
-                                          } else {
-                                              if ((int.parse(
-                                                  _anteBlindController.text)+smallBlind*2 >
-                                              tmpBank ~/ 2) && ( int.parse(
-                                                  _anteBlindController.text) + 0 > tmpBank~/2))  
-                                                  {
-                                            _anteBlindController.value =
-                                                _anteBlindController.value
-                                                    .copyWith(
-                                              text: "${(tmpBank-smallBlind*2)}",
-                                              selection: TextSelection.fromPosition(
-              TextPosition(offset: "${(tmpBank-smallBlind*2)}".length),
-            )
-                                            );
-                                            
-                                            //print("first");
-                                            anteBlind = (tmpBank-smallBlind*2);
-
-                                            await toastWarning(
-                                                "Ante + Big Blind <= Bank");
-                                                  } 
-                                                  else if (smallBlind * 2 >
-                                              (tmpBank -
-                                                  int.parse(_anteBlindController
-                                                      .text))) {
-                                            anteBlind = int.parse(
-                                                _anteBlindController.text);
-                                            smallBlind =
-                                                (tmpBank - anteBlind) ~/ 2;
-                                            _smallBlindController.value =
-                                                _smallBlindController.value
-                                                    .copyWith(
-                                              text:
-                                                  "${(tmpBank - anteBlind) ~/ 2}",
-                                              );
-
-                                            await toastWarning(
-                                                "Ante + Big Blind <= Bank");
-
-                                            } else {
-                                              anteBlind = int.parse(value);
-                                            }
-                                      
-                                            
-                                          }                        
-                                          setState(() {});
-                                          //autoIntBlind = smallBlind * 2;
-                                        }),
-                                  ),
-                                ],
-                              )),
-                          Container(
-              padding: const EdgeInsets.only(right: stdEdgeOffset),
-                              height: stdHeight * 0.75,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: Text('1st lap',
-                                        style: TextStyle(
-                                            color: context.theme.textColor,
-                                            fontSize: stdFontSize * 0.8,
-                                            fontWeight: FontWeight.normal)),
-                                  ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: FittedBox(
-                                      fit: BoxFit.fitWidth,
-                                      child: NumberPicker(
-                                          haptics: true,
-                                          selectedTextStyle: TextStyle(
-                                              color: context.theme.primaryColor,
-                                              fontSize: stdFontSize * 0.8,
-                                              fontWeight: FontWeight.normal),
-                                          textStyle: TextStyle(
-                                              color: context.theme.bankColor,
-                                              fontSize: stdFontSize * 0.7,
-                                              fontWeight: FontWeight.normal),
-                                          itemWidth: stdHeight,
-                                          value: firstLap,
-                                          axis: Axis.horizontal,
-                                          itemCount: 3,
-                                          minValue: 1,
-                                          maxValue: 25,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              firstLap = value;
-                                            });
-                                          }),
-                                    ),
-                                  ),
-                                  const Expanded(
-                                    flex: 1,
-                                    child: SizedBox(),
-                                  ),
-                                ],
-                              )),
-                        ],
-                      ),
                     ),
                   ),
-                ]),
-            
-            // Offset
-            const SizedBox(),
-            // Time manager
-            ExpansionPanelList(
-                expandedHeaderPadding: const EdgeInsets.all(0),
-                elevation: 0,
-                expansionCallback: (i, useAutoIncrease) {
-                  setState(() {
-                    useAutoIncrease = !useAutoIncrease;
-                  });
-                },
-                children: [
-                  ExpansionPanel(
-                    //hasIcon: false,
-                    canTapOnHeader: false,
-                    isExpanded: (useAutoIncrease || useAnte),
-                    backgroundColor: context.theme.bgrColor,
-                    headerBuilder: (BuildContext context, bool isExpanded) {
-                      return const SizedBox(height: 0,);
-                    },
-                    body: Container(
-                      margin: const EdgeInsets.symmetric(
-                          vertical: stdEdgeOffset / 3),
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: stdEdgeOffset),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: stdHeight * 0.5,
-                            child: Center(
-                              child: Text("Time Manager",
-                                  style: TextStyle(
-                                      color: context.theme.textColor,
-                                      fontSize: stdFontSize * 0.85,
-                                      fontWeight: FontWeight.normal)),
-                            ),
-                          ),
-                          SizedBox(
-                            //width: double.infinity,
-                            height: 1,
-                            child: AnimatedContainer(
-                              duration: Duration(milliseconds:useAnte? 400: 200),
-                              //margin: const EdgeInsets.symmetric(horizontal: stdEdgeOffset),
-                              color: context.theme.textColor,
-                              width: (useAutoIncrease || useAnte) ? 250 : 0,
-                              height: 1,
-                            ),
-                          ),
-                          SizedBox(
-                              height: stdHeight * 0.75,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: Text('Factor',
-                                        style: TextStyle(
-                                            color: context.theme.textColor,
-                                            fontSize: stdFontSize * 0.8,
-                                            fontWeight: FontWeight.normal)),
-                                  ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: FittedBox(
-                                      fit: BoxFit.fitWidth,
-                                      child: NumberPickerDouble(
-                                          dimension: "x",
-                                          haptics: true,
-                                          //zeroPad: true,
-                                          selectedTextStyle: TextStyle(
-                                              color: context.theme.primaryColor,
-                                              fontSize: stdFontSize * 0.8,
-                                              fontWeight: FontWeight.normal),
-                                          textStyle: TextStyle(
-                                              color: context.theme.bankColor,
-                                              fontSize: stdFontSize * 0.7,
-                                              fontWeight: FontWeight.normal),
-                                          itemWidth: stdHeight,
-                                          //itemHeight: stdFontSize * 0.85,
-                                          value: autoIncreaseMultiplier,
-                                          axis: Axis.horizontal,
-                                          itemCount: 3,
-                                          step: 0.5,
-                                          minValue: 1.0,
-                                          maxValue: 4.0,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              autoIncreaseMultiplier = value; //value;
-                                              
-                                            });
-                                          }),
-                                    ),
-                                  ),
-                                  const Expanded(
-                                    flex: 1,
-                                    child: SizedBox(),
-                                  ),
-                                ],
-                              )),
-                          SizedBox(
-                              height: stdHeight * 0.75,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: Text('Period',
-                                        style: TextStyle(
-                                            color: autoIncreaseEveryLap
-                                                ? context.theme.bankColor
-                                                : context.theme.textColor,
-                                            fontSize: stdFontSize * 0.8,
-                                            fontWeight: FontWeight.normal)),
-                                  ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: FittedBox(
-                                      fit: BoxFit.fitWidth,
-                                      child: NumberPicker(
-                                          scrollable: !autoIncreaseEveryLap,
-                                          haptics: true,
-                                          selectedTextStyle: TextStyle(
-                                              color: autoIncreaseEveryLap
-                                                  ? context.theme.bankColor
-                                                  : context.theme.primaryColor,
-                                              fontSize: stdFontSize * 0.8,
-                                              fontWeight: FontWeight.normal),
-                                          textStyle: TextStyle(
-                                              color: context.theme.bankColor,
-                                              fontSize: stdFontSize * 0.7,
-                                              fontWeight: FontWeight.normal),
-                                          itemWidth: stdHeight,
-                                          value: autoTime,
-                                          axis: Axis.horizontal,
-                                          itemCount: 3,
-                                          step: 5,
-                                          minValue: 5,
-                                          maxValue: 60,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              autoTime = value;
-                                            });
-                                          }),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Text('min',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            color: autoIncreaseEveryLap
-                                                ? context.theme.bankColor
-                                                : context.theme.textColor,
-                                            fontSize: stdFontSize * 0.85,
-                                            fontWeight: FontWeight.normal)),
-                                  ),
-                                ],
-                              )),
-                          SizedBox(
-
-                              //color: Colors.red,
-                              height: stdHeight * 0.75,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    flex: 7,
-                                    child: Text('Every Lap',
-                                        style: TextStyle(
-                                            color: context.theme.textColor,
-                                            fontSize: stdFontSize * 0.8,
-                                            fontWeight: FontWeight.normal)),
-                                  ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: SizedBox(
-                                      height: stdHeight * 0.75,
-                                      child: Checkbox(
-                                        checkColor: Colors.white,
-                                        fillColor:
-                                            MaterialStateProperty.all<Color>(
-                                                autoIncreaseEveryLap
-                                                    ? context.theme.primaryColor
-                                                    : context.theme.bankColor),
-                                        value: autoIncreaseEveryLap,
-                                        onChanged: (bool? value) {
-                                          setState(() {
-                                            autoIncreaseEveryLap = value!;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              )),
-                        ],
-                      ),
+                  // Starting stack
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: stdHorizontalOffset),
+                    child: _SettingsNumericField(
+                      label: context.strings.sett_win1,
+                      hint: state.startingStack.toString(),
+                      controller: bankController,
+                      fieldKey: GameSettingsKeys.stackField,
+                      onChanged: (_) {
+                        setState(() {});
+                        validateCurrentModeIfNeeded();
+                      },
                     ),
                   ),
-                ]),
-                */
-              // Save Button
-              MyButton(
-                key: GameSettingsKeys.confirmButton,
-                height: stdButtonHeight * 0.75,
-                width: double.infinity,
-                buttonColor: context.theme.primaryColor,
-                textString: context.strings.sett_conf,
-                action: () async {
-                  if ((focusNode1.hasFocus) || (focusNode2.hasFocus)) {
-                    focusNode1.unfocus();
-                    focusNode2.unfocus();
-                  }
+                  // Allow custom bets checkbox
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: stdHorizontalOffset,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            context.strings.sett_custom_bets,
+                            style: TextStyle(
+                              color: context.theme.onBackground,
+                              fontSize: stdFontSize,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                        Transform.scale(
+                          scale: 1.25,
+                          child: Checkbox(
+                            key: GameSettingsKeys.allowCustomBetsCheckbox,
+                            value: allowCustomBets,
+                            checkColor: Colors.white,
+                            fillColor: WidgetStateProperty.all<Color>(
+                              allowCustomBets
+                                  ? context.theme.primaryColor
+                                  : context.theme.bgrColor,
+                            ),
+                            onChanged: onCustomRaisesChanged,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
-                  //widget.thisLobby.lobbyAutoBool = useAutoIncrease;
-                  //widget.thisLobby.lobbyAnteBool = useAnte;
+                  // Modes
+                  _SettingsModeSelector(
+                    selectedMode: settingsMode,
+                    onModeSelected: (mode) {
+                      setState(() {
+                        settingsMode = mode;
+                      });
+                    },
+                  ),
+                  (settingsMode == GameSettingsModeState.simple)
+                      ? _SimpleSettingsSection(
+                          blinds: levels.first,
+                          anteTypeLabel: anteTypeLabel,
+                          changeSimpleLevel: (level) => updateLevel(0, level),
+                          //smallBlindController: _simpleSmallBlindController,
+                          //anteController: _simpleAnteController,
+                        )
+                      : Flexible(
+                          child: _ProSettingsSection(
+                            progressionType: progressionType,
+                            progressionIntervalHint: state
+                                    .progression.progressionInterval
+                                    ?.toString() ??
+                                '10',
+                            progressionIntervalController:
+                                progressionIntervalController,
+                            levelsCountController: levelsCountController,
+                            levelsCountHint: levels.length.toString(),
+                            levels: levels,
+                            anteTypeLabel: anteTypeLabel,
+                            onProgressionTypeChanged: (value) {
+                              if (value == null) {
+                                return;
+                              }
 
-                  //widget.thisLobby.lobbyAnte= useAnte? anteBlind: 0;
-                  //widget.thisLobby.lobbyFirstAnte = firstLap;
+                              setState(() {
+                                progressionType = value;
+                                if (progressionType ==
+                                    BlindProgressionType.manual) {
+                                  progressionIntervalController.clear();
+                                }
+                              });
+                            },
+                            onProgressionIntervalChanged: (_) =>
+                                setState(() {}),
+                            onLevelsCountChanged: (value) {
+                              final parsed = int.tryParse(digitsOnly(value));
+                              if (parsed != null) {
+                                syncLevelsCount(parsed);
+                              }
+                            },
+                            onLevelChanged: updateLevel,
+                            expandedLevelIndex: expandedLevelIndex,
+                            onLevelExpansionChanged: onLevelExpansionChanged,
+                          ),
+                        ),
 
-                  //widget.thisLobby.lobbyFactor = autoIncreaseMultiplier;
-                  //widget.thisLobby.lobbyAutoTime = autoTime;
-                  //widget.thisLobby.lobbyEveryLapBool = autoIncreaseEveryLap;
-
-                  final newSettings = GameSettingsModelResult(
-                    startingStack: tmpBank,
-                    smallBlind: smallBlind,
-                    allowCustomBets: allowCustomBets,
-                  );
-
-                  logs.writeLog('GameSettings: save $newSettings');
-                  widget.viewModel.saveSettings(newSettings);
-                },
+                  MyButton(
+                    key: GameSettingsKeys.confirmButton,
+                    height: stdButtonHeight * 0.75,
+                    width: double.infinity,
+                    buttonColor: context.theme.primaryColor,
+                    textString: context.strings.sett_conf,
+                    action: saveSettings,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       );

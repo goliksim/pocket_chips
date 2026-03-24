@@ -10,6 +10,7 @@ import '../../../domain/model_holders/game_state_machine/game_state_machine.dart
 import '../../../domain/models/game/game_state_effect.dart';
 import '../../../domain/models/game/game_state_enum.dart';
 import '../../../domain/models/game/game_state_model.dart';
+import '../../../domain/models/lobby/lobby_state_model.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../services/event_push_service/handlers/event_handler.dart';
 import '../../../services/event_push_service/promotion_service.dart';
@@ -175,7 +176,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
       final betBool = gameModel.checkBidsEqual();
 
       final currentPlayerCanSkip = (currentBet == maxBet);
-      final allowCustomBets = gameModel.lobbyState.allowCustomBets;
+      final allowCustomBets = gameModel.lobbyState.settings.allowCustomBets;
 
       final canRaise = allowCustomBets
           ? !callIsAllIn && currentBank > callValue

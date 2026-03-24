@@ -50,7 +50,6 @@ LobbyStateModel buildLobbyState({
     LobbyStateModel(
       players: players,
       banks: banks ?? {for (var player in players) player.uid: bank},
-      smallBlindValue: smallBlind,
       defaultBank: bank,
       gameState: gameState,
       dealerId: dealerId,

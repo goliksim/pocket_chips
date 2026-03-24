@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../../domain/models/game/game_state_enum.dart';
+import 'lobby_game_settings_entity.dart';
 import 'player_entity.dart';
 
 part 'lobby_state_entity.g.dart';
@@ -8,20 +9,19 @@ part 'lobby_state_entity.g.dart';
 @JsonSerializable()
 class LobbyStateEntity {
   final GameStatusEnum gameState;
-  final int smallBlindValue;
+  final int? smallBlindValue;
   final int defaultBank;
-  @JsonKey(defaultValue: false)
-  final bool allowCustomBets;
+  final LobbyGameSettingsEntity? settings;
 
   final List<PlayerEntity>? players;
   final Map<String, int>? banks;
   final String? dealerId;
 
   const LobbyStateEntity({
-    required this.smallBlindValue,
+    this.smallBlindValue,
     required this.defaultBank,
     required this.gameState,
-    required this.allowCustomBets,
+    this.settings,
     this.players,
     this.banks,
     this.dealerId,
@@ -34,5 +34,5 @@ class LobbyStateEntity {
 
   @override
   String toString() =>
-      '[LobbyStateEntity] - players: $players, banks: $banks, smallBlindValue: $smallBlindValue, dealerId: $dealerId, defaultBank: $defaultBank, allowCustomBets: $allowCustomBets, gameState: $gameState';
+      '[LobbyStateEntity] - players: $players, banks: $banks, smallBlindValue: $smallBlindValue, dealerId: $dealerId, defaultBank: $defaultBank, gameState: $gameState, settings: $settings';
 }
