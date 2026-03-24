@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../../app/keys/keys.dart';
@@ -5,6 +7,8 @@ import '../../domain/models/game/blind_level_model.dart';
 import '../../domain/models/game/blind_progression_model.dart';
 import '../../domain/models/game/game_settings_model.dart';
 import '../../domain/models/lobby/lobby_state_model.dart';
+import '../../l10n/localization_extension.dart';
+import '../../services/toast_manager.dart';
 import '../../utils/extensions.dart';
 import '../../utils/logs.dart';
 import '../../utils/theme/ui_values.dart';
@@ -31,16 +35,17 @@ class GameSettingsDialog extends StatefulWidget {
   State<GameSettingsDialog> createState() => _GameSettingsDialogState();
 }
 
-class _GameSettingsDialogState extends State<GameSettingsDialog> {
-  late final TextEditingController bankController;
-  late final TextEditingController progressionIntervalController;
-  late final TextEditingController levelsCountController;
+class _GameSettingsDialogState extends State<GameSettingsDialog>
+    with ToastsMixin {
+  late final TextEditingController _bankController;
+  late final TextEditingController _progressionIntervalController;
+  late final TextEditingController _levelsCountController;
 
-  late GameSettingsModeState settingsMode;
-  late BlindProgressionType progressionType;
-  late List<BlindLevelModel> levels;
-  late bool allowCustomBets;
-  int? expandedLevelIndex;
+  late GameSettingsModeState _settingsMode;
+  late BlindProgressionType _progressionType;
+  late List<BlindLevelModel> _levels;
+  late bool _allowCustomBets;
+  int? _expandedLevelIndex;
 
   GameSettingsModelArgs get state => widget.viewModel.state;
 
@@ -49,75 +54,99 @@ class _GameSettingsDialogState extends State<GameSettingsDialog> {
     super.initState();
     logs.writeLog('Settings is opened');
 
-    allowCustomBets = state.allowCustomBets;
+    _allowCustomBets = state.allowCustomBets;
     final progression = state.progression;
 
-    settingsMode = state.progression.map(
+    _settingsMode = state.progression.map(
       (_) => GameSettingsModeState.simple,
       pro: (_) => GameSettingsModeState.pro,
     );
 
-    progressionType = progression.progressionType;
-    levels = progression.levels;
+    _progressionType = progression.progressionType;
+    _levels = progression.levels;
 
-    bankController = TextEditingController();
-    progressionIntervalController = TextEditingController(
-      text: progression.progressionInterval?.toString() ?? '',
-    );
-    levelsCountController = TextEditingController(
-      text: levels.length.toString(),
-    );
+    _bankController = TextEditingController();
+    _progressionIntervalController = TextEditingController();
+    _levelsCountController = TextEditingController();
   }
 
   @override
   void dispose() {
-    bankController.dispose();
-    progressionIntervalController.dispose();
-    levelsCountController.dispose();
+    _bankController.dispose();
+    _progressionIntervalController.dispose();
+    _levelsCountController.dispose();
     super.dispose();
   }
 
-  int get startingStack => parseControllerValue(
-        bankController,
-        fallback: state.startingStack,
+  int? get _startingStack => _parseControllerValue(
+        _bankController,
+        fallback: null,
       );
 
-  bool validateLevels() => levels.every(validateLevel);
+  int get _progressionInterval =>
+      _parseControllerValue(_progressionIntervalController) ?? 10;
 
-  bool validateLevel(BlindLevelModel level) {
-    if (startingStack < level.smallBlind * 2) {
-      widget.viewModel.showInvalidStackToast();
+  bool _validateLevels() {
+    for (var level in _levels) {
+      if (!_validateLevel(level)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool _validateLevel(BlindLevelModel level) {
+    final effectiveAnte = (level.anteType == AnteType.bigBlindAnte
+            ? level.smallBlind * 2
+            : level.anteValue) ??
+        0;
+
+    final newStartingStack = _startingStack ?? state.startingStack;
+
+    if (newStartingStack < level.smallBlind * 2 + effectiveAnte) {
+      showToast(context.strings.toast_stack_warning);
       return false;
     }
 
     return true;
   }
 
-  void validateCurrentModeIfNeeded() {
-    if (settingsMode == GameSettingsModeState.simple) {
-      //TODO
-      validateLevel(levels.first);
-      return;
-    }
-    //TODO
-    validateLevels();
-  }
-
-  void onCustomRaisesChanged(bool? value) {
+  void _onCustomRaisesChanged(bool? value) {
     if (value == null) {
       return;
     }
 
     setState(() {
-      allowCustomBets = value;
+      _allowCustomBets = value;
     });
   }
 
-  int parseControllerValue(
+  bool _validateStartingStack() {
+    if (_startingStack == 0) {
+      showToast(context.strings.toast_bank3);
+      return false;
+    }
+    return true;
+  }
+
+  int? _parseControllerValue<T>(
     TextEditingController controller, {
-    required int fallback,
+    int? fallback,
+    bool allowZero = false,
   }) {
-    final filtered = digitsOnly(controller.text);
+    final filtered = _digitsOnly(controller.text);
+
+    // Предотвращаем ввод нулей если allowZero = false
+    if (!allowZero && filtered.isNotEmpty && filtered[0] == '0') {
+      final corrected = filtered.replaceFirst(RegExp(r'^0+'), '');
+      final finalValue = corrected.isEmpty ? '0' : corrected;
+      controller.value = controller.value.copyWith(
+        text: finalValue,
+        selection: TextSelection.collapsed(offset: finalValue.length),
+      );
+      return int.tryParse(finalValue) ?? fallback;
+    }
+
     if (filtered != controller.text) {
       controller.value = controller.value.copyWith(
         text: filtered,
@@ -128,11 +157,12 @@ class _GameSettingsDialogState extends State<GameSettingsDialog> {
     return int.tryParse(filtered) ?? fallback;
   }
 
-  String digitsOnly(String value) => value.replaceAll(RegExp(r'[^0-9]'), '');
+  String _digitsOnly(String value) => value.replaceAll(RegExp(r'[^0-9]'), '');
 
-  void syncLevelsCount(int count) {
-    final normalizedCount = count < 1 ? 1 : count;
-    final currentLevels = List<BlindLevelModel>.from(levels);
+  void _syncLevelsCount(int count) {
+    final normalizedCount = clampDouble(count.toDouble(), 1, 20).toInt();
+
+    final currentLevels = List<BlindLevelModel>.from(_levels);
 
     if (normalizedCount > currentLevels.length) {
       final seedLevel = currentLevels.isNotEmpty
@@ -147,68 +177,55 @@ class _GameSettingsDialogState extends State<GameSettingsDialog> {
     }
 
     setState(() {
-      levels = currentLevels;
-      levelsCountController.text = normalizedCount.toString();
-      levelsCountController.selection = TextSelection.collapsed(
-        offset: levelsCountController.text.length,
+      _levels = currentLevels;
+      _levelsCountController.text = normalizedCount.toString();
+      _levelsCountController.selection = TextSelection.collapsed(
+        offset: _levelsCountController.text.length,
       );
     });
   }
 
-  void updateLevel(int index, BlindLevelModel level) {
-    final updatedLevels = List<BlindLevelModel>.from(levels);
+  void _updateLevel(int index, BlindLevelModel level) {
+    final updatedLevels = List<BlindLevelModel>.from(_levels);
     updatedLevels[index] = level;
 
     setState(() {
-      levels = updatedLevels;
+      _levels = updatedLevels;
     });
 
-    validateLevels();
+    _validateLevel(level);
   }
 
   void onLevelExpansionChanged(int index, bool isExpanded) {
     setState(() {
-      expandedLevelIndex = isExpanded ? index : null;
+      _expandedLevelIndex = isExpanded ? index : null;
     });
   }
 
-  String anteTypeLabel(AnteType anteType) {
-    switch (anteType) {
-      case AnteType.none:
-        return 'None';
-      case AnteType.traditional:
-        return 'Traditional';
-      case AnteType.bigBlindAnte:
-        return 'Big Blind Ante';
-    }
-  }
-
-  Future<void> saveSettings() async {
-    final isValid = settingsMode == GameSettingsModeState.simple
-        ? validateLevel(levels.first)
-        : validateLevels();
-
-    if (!isValid) {
+  Future<void> _saveSettings() async {
+    // Проверяем Starting stack
+    // Проверяем блайнды
+    if (!_validateStartingStack()) {
       return;
     }
 
-    final progressionInterval = progressionType == BlindProgressionType.manual
+    final progressionInterval = _progressionType == BlindProgressionType.manual
         ? null
-        : int.tryParse(digitsOnly(progressionIntervalController.text));
+        : _progressionInterval;
 
     final newSettings = GameSettingsModelResult(
-      allowCustomBets: allowCustomBets,
-      newStartingStack: startingStack,
-      newProgression: settingsMode == GameSettingsModeState.simple
+      allowCustomBets: _allowCustomBets,
+      newStartingStack: _startingStack,
+      newProgression: _settingsMode == GameSettingsModeState.simple
           ? BlindProgressionModel(
-              progressionType: progressionType,
-              progressionInterval: progressionInterval,
-              blinds: levels.first,
+              progressionType: BlindProgressionType.manual,
+              progressionInterval: null,
+              blinds: _levels.first,
             )
           : BlindProgressionModel.pro(
-              progressionType: progressionType,
+              progressionType: _progressionType,
               progressionInterval: progressionInterval,
-              levels: levels,
+              levels: _levels,
             ),
     );
 
@@ -259,12 +276,14 @@ class _GameSettingsDialogState extends State<GameSettingsDialog> {
                         EdgeInsets.symmetric(horizontal: stdHorizontalOffset),
                     child: _SettingsNumericField(
                       label: context.strings.sett_win1,
-                      hint: state.startingStack.toString(),
-                      controller: bankController,
+                      initialValue: state.startingStack.toString(),
+                      controller: _bankController,
                       fieldKey: GameSettingsKeys.stackField,
+                      allowZero: false,
                       onChanged: (_) {
                         setState(() {});
-                        validateCurrentModeIfNeeded();
+                        _validateStartingStack();
+                        _validateLevels();
                       },
                     ),
                   ),
@@ -290,14 +309,14 @@ class _GameSettingsDialogState extends State<GameSettingsDialog> {
                           scale: 1.25,
                           child: Checkbox(
                             key: GameSettingsKeys.allowCustomBetsCheckbox,
-                            value: allowCustomBets,
+                            value: _allowCustomBets,
                             checkColor: Colors.white,
                             fillColor: WidgetStateProperty.all<Color>(
-                              allowCustomBets
+                              _allowCustomBets
                                   ? context.theme.primaryColor
                                   : context.theme.bgrColor,
                             ),
-                            onChanged: onCustomRaisesChanged,
+                            onChanged: _onCustomRaisesChanged,
                           ),
                         ),
                       ],
@@ -306,57 +325,49 @@ class _GameSettingsDialogState extends State<GameSettingsDialog> {
 
                   // Modes
                   _SettingsModeSelector(
-                    selectedMode: settingsMode,
+                    selectedMode: _settingsMode,
                     onModeSelected: (mode) {
                       setState(() {
-                        settingsMode = mode;
+                        _settingsMode = mode;
                       });
                     },
                   ),
-                  (settingsMode == GameSettingsModeState.simple)
+                  (_settingsMode == GameSettingsModeState.simple)
                       ? _SimpleSettingsSection(
-                          blinds: levels.first,
-                          anteTypeLabel: anteTypeLabel,
-                          changeSimpleLevel: (level) => updateLevel(0, level),
-                          //smallBlindController: _simpleSmallBlindController,
-                          //anteController: _simpleAnteController,
+                          blinds: _levels.first,
+                          changeSimpleLevel: (level) => _updateLevel(0, level),
                         )
                       : Flexible(
                           child: _ProSettingsSection(
-                            progressionType: progressionType,
-                            progressionIntervalHint: state
-                                    .progression.progressionInterval
-                                    ?.toString() ??
-                                '10',
+                            progressionType: _progressionType,
+                            progressionIntervalHint:
+                                _progressionInterval.toString(),
                             progressionIntervalController:
-                                progressionIntervalController,
-                            levelsCountController: levelsCountController,
-                            levelsCountHint: levels.length.toString(),
-                            levels: levels,
-                            anteTypeLabel: anteTypeLabel,
+                                _progressionIntervalController,
+                            levelsCountController: _levelsCountController,
+                            levelsCountHint: _levels.length.toString(),
+                            levels: _levels,
                             onProgressionTypeChanged: (value) {
                               if (value == null) {
                                 return;
                               }
 
                               setState(() {
-                                progressionType = value;
-                                if (progressionType ==
+                                _progressionType = value;
+                                if (_progressionType ==
                                     BlindProgressionType.manual) {
-                                  progressionIntervalController.clear();
+                                  _progressionIntervalController.clear();
                                 }
                               });
                             },
-                            onProgressionIntervalChanged: (_) =>
-                                setState(() {}),
                             onLevelsCountChanged: (value) {
-                              final parsed = int.tryParse(digitsOnly(value));
+                              final parsed = int.tryParse(_digitsOnly(value));
                               if (parsed != null) {
-                                syncLevelsCount(parsed);
+                                _syncLevelsCount(parsed);
                               }
                             },
-                            onLevelChanged: updateLevel,
-                            expandedLevelIndex: expandedLevelIndex,
+                            onLevelChanged: _updateLevel,
+                            expandedLevelIndex: _expandedLevelIndex,
                             onLevelExpansionChanged: onLevelExpansionChanged,
                           ),
                         ),
@@ -367,7 +378,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog> {
                     width: double.infinity,
                     buttonColor: context.theme.primaryColor,
                     textString: context.strings.sett_conf,
-                    action: saveSettings,
+                    action: _saveSettings,
                   ),
                 ],
               ),

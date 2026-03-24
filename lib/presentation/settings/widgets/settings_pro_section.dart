@@ -8,9 +8,7 @@ class _ProSettingsSection extends StatelessWidget {
   final String levelsCountHint;
   final List<BlindLevelModel> levels;
 
-  final String Function(AnteType value) anteTypeLabel;
   final ValueChanged<BlindProgressionType?> onProgressionTypeChanged;
-  final ValueChanged<String> onProgressionIntervalChanged;
   final ValueChanged<String> onLevelsCountChanged;
   final void Function(int index, BlindLevelModel level) onLevelChanged;
   final int? expandedLevelIndex;
@@ -23,25 +21,12 @@ class _ProSettingsSection extends StatelessWidget {
     required this.levelsCountController,
     required this.levelsCountHint,
     required this.levels,
-    required this.anteTypeLabel,
     required this.onProgressionTypeChanged,
-    required this.onProgressionIntervalChanged,
     required this.onLevelsCountChanged,
     required this.onLevelChanged,
     required this.expandedLevelIndex,
     required this.onLevelExpansionChanged,
   });
-
-  String _progressionLabel(BlindProgressionType type) {
-    switch (type) {
-      case BlindProgressionType.manual:
-        return 'Manual';
-      case BlindProgressionType.everyNHands:
-        return 'N hands';
-      case BlindProgressionType.everyNMinutes:
-        return 'N minutes';
-    }
-  }
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -51,31 +36,35 @@ class _ProSettingsSection extends StatelessWidget {
           spacing: stdHorizontalOffset / 2,
           children: [
             _SettingsDropdownField<BlindProgressionType>(
-              label: 'Progression',
+              label: context.strings.sett_progression,
               value: progressionType,
               values: BlindProgressionType.values,
-              labelBuilder: _progressionLabel,
+              labelBuilder: context.strings.progressionLabel,
               onChanged: onProgressionTypeChanged,
+              dropdownFontSizeMultiplier: 0.85,
+              widthMultiplier: 0.83,
             ),
             if (progressionType == BlindProgressionType.everyNHands)
               _SettingsNumericField(
-                label: 'Hands interval',
-                hint: progressionIntervalHint,
+                label: context.strings.sett_progression_hands_interval,
+                initialValue: progressionIntervalHint,
                 controller: progressionIntervalController,
-                onChanged: onProgressionIntervalChanged,
+                onChanged: (_) {},
               ),
             if (progressionType == BlindProgressionType.everyNMinutes)
               _SettingsNumericField(
-                label: 'Minutes interval',
-                hint: progressionIntervalHint,
+                label: context.strings.sett_progression_minutes_interval,
+                initialValue: progressionIntervalHint,
                 controller: progressionIntervalController,
-                onChanged: onProgressionIntervalChanged,
+                onChanged: (_) {},
               ),
             _SettingsNumericField(
-              label: 'Levels count',
-              hint: levelsCountHint,
+              label: context.strings.sett_levels_count,
+              initialValue: levelsCountHint,
               controller: levelsCountController,
               onChanged: onLevelsCountChanged,
+              allowZero: false,
+              maxValue: 20,
             ),
             Flexible(
               child: SingleChildScrollView(
@@ -86,7 +75,6 @@ class _ProSettingsSection extends StatelessWidget {
                       index: index,
                       level: levels[index],
                       isExpanded: expandedLevelIndex == index,
-                      anteTypeLabel: anteTypeLabel,
                       onExpansionChanged: (isExpanded) =>
                           onLevelExpansionChanged(index, isExpanded),
                       onLevelChanged: (level) => onLevelChanged(index, level),

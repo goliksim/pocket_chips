@@ -44,5 +44,5 @@ extension LobbyStateModelX on LobbyStateModel {
 
   AnteType get anteType => currentLevel.anteType;
 
-  int get anteValue => currentLevel.anteValue;
+  int? get anteValue => currentLevel.anteValue;
 }

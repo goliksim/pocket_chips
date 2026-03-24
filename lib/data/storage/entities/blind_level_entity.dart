@@ -8,12 +8,12 @@ part 'blind_level_entity.g.dart';
 class BlindLevelEntity {
   final int smallBlind;
   final AnteType anteType;
-  final int anteValue;
+  final int? anteValue;
 
   const BlindLevelEntity({
     required this.smallBlind,
     required this.anteType,
-    required this.anteValue,
+    this.anteValue,
   });
 
   factory BlindLevelEntity.fromJson(Map<String, dynamic> json) =>

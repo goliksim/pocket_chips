@@ -19,6 +19,6 @@ abstract class BlindLevelModel with _$BlindLevelModel {
   const factory BlindLevelModel({
     required int smallBlind,
     @Default(AnteType.none) AnteType anteType,
-    @Default(0) int anteValue,
+    int? anteValue,
   }) = _BlindLevelModel;
 }

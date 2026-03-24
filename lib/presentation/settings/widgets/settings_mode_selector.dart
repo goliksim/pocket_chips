@@ -9,15 +9,13 @@ class _SettingsModeSelector extends StatelessWidget {
     required this.onModeSelected,
   });
 
-  String _modeLabel(GameSettingsModeState mode) =>
-      mode == GameSettingsModeState.simple ? 'Simple' : 'Pro';
-
   @override
   Widget build(BuildContext context) => Row(
         children: [
           Expanded(
             child: _ModeButton(
-              label: _modeLabel(GameSettingsModeState.simple),
+              label: context.strings
+                  .settingsModeLabel(GameSettingsModeState.simple),
               isSelected: selectedMode == GameSettingsModeState.simple,
               onTap: () => onModeSelected(GameSettingsModeState.simple),
             ),
@@ -27,7 +25,8 @@ class _SettingsModeSelector extends StatelessWidget {
             child: ProVersionWrapper(
               offset: -6,
               child: _ModeButton(
-                label: _modeLabel(GameSettingsModeState.pro),
+                label: context.strings
+                    .settingsModeLabel(GameSettingsModeState.pro),
                 isSelected: selectedMode == GameSettingsModeState.pro,
                 onTap: () => onModeSelected(GameSettingsModeState.pro),
               ),
@@ -70,6 +69,9 @@ class _ModeButton extends StatelessWidget {
           child: Center(
             child: Text(
               label,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: isSelected
                     ? context.theme.onPrimary

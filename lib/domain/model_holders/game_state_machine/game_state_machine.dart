@@ -662,7 +662,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
       var updatedModel = model;
 
-      if (anteType == AnteType.none || anteValue <= 0) {
+      if (anteType == AnteType.none || anteValue == null || anteValue <= 0) {
         return updatedModel;
       } else if (anteType == AnteType.bigBlindAnte) {
         final bigBlindPlayer =

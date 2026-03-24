@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -322,13 +321,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sett_title => 'Настройки игры';
 
   @override
-  String get sett_win1 => 'Начальный стек';
-
-  @override
-  String get sett_win2 => 'Малый блайнд';
-
-  @override
-  String get sett_win3 => 'Большой блайнд';
+  String get sett_win1 => 'Сбросить стеки';
 
   @override
   String get sett_custom_bets => 'Разрешить свои ставки/повышения';
@@ -452,6 +445,80 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get toast_custom_bet_warning =>
       'Такая ставка возможна, но противоречит правилам минимального рейза';
+
+  @override
+  String get toast_ante_zero => 'Анте не может быть нулевым';
+
+  @override
+  String get toast_levels_zero => 'Количество уровней не может быть нулевым';
+
+  @override
+  String get toast_stack_warning =>
+      'Не рекомендуем стек меньше, чем большой блайнд + анте.';
+
+  @override
+  String get toast_cannot_be_zero => 'Значение не может быть нулевым';
+
+  @override
+  String get toast_exceeds_maximum =>
+      'Значение превышает максимально допустимое';
+
+  @override
+  String get sett_ante_type => 'Тип анте';
+
+  @override
+  String get sett_ante => 'Размер анте';
+
+  @override
+  String get sett_progression => 'Прогрессия';
+
+  @override
+  String get sett_progression_manual => 'Вручную';
+
+  @override
+  String get sett_progression_hands => 'N раздач';
+
+  @override
+  String get sett_progression_minutes => 'N минут';
+
+  @override
+  String get sett_progression_hands_interval => 'Число раздач';
+
+  @override
+  String get sett_progression_minutes_interval => 'Число минут';
+
+  @override
+  String get sett_levels_count => 'Число уровней';
+
+  @override
+  String get sett_level => 'Уровень';
+
+  @override
+  String get sett_small_blind => 'Малый блайнд';
+
+  @override
+  String get sett_big_blind => 'Большой блайнд';
+
+  @override
+  String get sett_mode_simple => 'Упрощенные';
+
+  @override
+  String get sett_mode_pro => 'Pro';
+
+  @override
+  String get sett_level_blind => 'Блайнды';
+
+  @override
+  String get sett_level_ante => 'Анте';
+
+  @override
+  String get ante_type_none => 'Нет';
+
+  @override
+  String get ante_type_traditional => 'Базовый (Все)';
+
+  @override
+  String get ante_type_big_blind => 'BBA (Только Бб)';
 
   @override
   String get toast_unav => 'Недоступно';

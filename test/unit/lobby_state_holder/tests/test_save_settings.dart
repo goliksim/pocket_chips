@@ -28,7 +28,11 @@ void runSaveSettingsNoEditingTest(
   final newSettings = GameSettingsModelResult(
     allowCustomBets: null,
     newStartingStack: null,
-    newProgression: lobbyState.settings.progression,
+    newProgression: BlindProgressionModel(
+      progressionType: BlindProgressionType.manual,
+      progressionInterval: null,
+      blinds: BlindLevelModel(smallBlind: 20),
+    ),
   );
 
   await lobbyStateHolder.future;

@@ -689,20 +689,8 @@ abstract class AppLocalizations {
   /// No description provided for @sett_win1.
   ///
   /// In en, this message translates to:
-  /// **'Starting Stack'**
+  /// **'Update stacks'**
   String get sett_win1;
-
-  /// No description provided for @sett_win2.
-  ///
-  /// In en, this message translates to:
-  /// **'Small Blind'**
-  String get sett_win2;
-
-  /// No description provided for @sett_win3.
-  ///
-  /// In en, this message translates to:
-  /// **'Big Blind'**
-  String get sett_win3;
 
   /// No description provided for @sett_custom_bets.
   ///
@@ -943,6 +931,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This bet is possible, but it violates the minimum raise rules'**
   String get toast_custom_bet_warning;
+
+  /// No description provided for @toast_ante_zero.
+  ///
+  /// In en, this message translates to:
+  /// **'Ante cannot be zero'**
+  String get toast_ante_zero;
+
+  /// No description provided for @toast_levels_zero.
+  ///
+  /// In en, this message translates to:
+  /// **'Levels count cannot be zero'**
+  String get toast_levels_zero;
+
+  /// No description provided for @toast_stack_warning.
+  ///
+  /// In en, this message translates to:
+  /// **'We not recommend Stack less than Big Blind + Ante'**
+  String get toast_stack_warning;
+
+  /// No description provided for @toast_cannot_be_zero.
+  ///
+  /// In en, this message translates to:
+  /// **'Value cannot be zero'**
+  String get toast_cannot_be_zero;
+
+  /// No description provided for @toast_exceeds_maximum.
+  ///
+  /// In en, this message translates to:
+  /// **'Value exceeds maximum allowed'**
+  String get toast_exceeds_maximum;
+
+  /// No description provided for @sett_ante_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Ante Type'**
+  String get sett_ante_type;
+
+  /// No description provided for @sett_ante.
+  ///
+  /// In en, this message translates to:
+  /// **'Ante value'**
+  String get sett_ante;
+
+  /// No description provided for @sett_progression.
+  ///
+  /// In en, this message translates to:
+  /// **'Progression'**
+  String get sett_progression;
+
+  /// No description provided for @sett_progression_manual.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual'**
+  String get sett_progression_manual;
+
+  /// No description provided for @sett_progression_hands.
+  ///
+  /// In en, this message translates to:
+  /// **'N hands'**
+  String get sett_progression_hands;
+
+  /// No description provided for @sett_progression_minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'N minutes'**
+  String get sett_progression_minutes;
+
+  /// No description provided for @sett_progression_hands_interval.
+  ///
+  /// In en, this message translates to:
+  /// **'Hands interval'**
+  String get sett_progression_hands_interval;
+
+  /// No description provided for @sett_progression_minutes_interval.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes interval'**
+  String get sett_progression_minutes_interval;
+
+  /// No description provided for @sett_levels_count.
+  ///
+  /// In en, this message translates to:
+  /// **'Levels count'**
+  String get sett_levels_count;
+
+  /// No description provided for @sett_level.
+  ///
+  /// In en, this message translates to:
+  /// **'Level'**
+  String get sett_level;
+
+  /// No description provided for @sett_small_blind.
+  ///
+  /// In en, this message translates to:
+  /// **'Small blind'**
+  String get sett_small_blind;
+
+  /// No description provided for @sett_big_blind.
+  ///
+  /// In en, this message translates to:
+  /// **'Big blind'**
+  String get sett_big_blind;
+
+  /// No description provided for @sett_mode_simple.
+  ///
+  /// In en, this message translates to:
+  /// **'Simple'**
+  String get sett_mode_simple;
+
+  /// No description provided for @sett_mode_pro.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro'**
+  String get sett_mode_pro;
+
+  /// No description provided for @sett_level_blind.
+  ///
+  /// In en, this message translates to:
+  /// **'Blinds'**
+  String get sett_level_blind;
+
+  /// No description provided for @sett_level_ante.
+  ///
+  /// In en, this message translates to:
+  /// **'Ante'**
+  String get sett_level_ante;
+
+  /// No description provided for @ante_type_none.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get ante_type_none;
+
+  /// No description provided for @ante_type_traditional.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic (All)'**
+  String get ante_type_traditional;
+
+  /// No description provided for @ante_type_big_blind.
+  ///
+  /// In en, this message translates to:
+  /// **'BBA (Only Bb)'**
+  String get ante_type_big_blind;
 
   /// No description provided for @toast_unav.
   ///

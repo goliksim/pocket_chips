@@ -320,13 +320,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sett_title => 'Game Settings';
 
   @override
-  String get sett_win1 => 'Starting Stack';
-
-  @override
-  String get sett_win2 => 'Small Blind';
-
-  @override
-  String get sett_win3 => 'Big Blind';
+  String get sett_win1 => 'Update stacks';
 
   @override
   String get sett_custom_bets => 'Allow custom bets/raises';
@@ -449,6 +443,79 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get toast_custom_bet_warning =>
       'This bet is possible, but it violates the minimum raise rules';
+
+  @override
+  String get toast_ante_zero => 'Ante cannot be zero';
+
+  @override
+  String get toast_levels_zero => 'Levels count cannot be zero';
+
+  @override
+  String get toast_stack_warning =>
+      'We not recommend Stack less than Big Blind + Ante';
+
+  @override
+  String get toast_cannot_be_zero => 'Value cannot be zero';
+
+  @override
+  String get toast_exceeds_maximum => 'Value exceeds maximum allowed';
+
+  @override
+  String get sett_ante_type => 'Ante Type';
+
+  @override
+  String get sett_ante => 'Ante value';
+
+  @override
+  String get sett_progression => 'Progression';
+
+  @override
+  String get sett_progression_manual => 'Manual';
+
+  @override
+  String get sett_progression_hands => 'N hands';
+
+  @override
+  String get sett_progression_minutes => 'N minutes';
+
+  @override
+  String get sett_progression_hands_interval => 'Hands interval';
+
+  @override
+  String get sett_progression_minutes_interval => 'Minutes interval';
+
+  @override
+  String get sett_levels_count => 'Levels count';
+
+  @override
+  String get sett_level => 'Level';
+
+  @override
+  String get sett_small_blind => 'Small blind';
+
+  @override
+  String get sett_big_blind => 'Big blind';
+
+  @override
+  String get sett_mode_simple => 'Simple';
+
+  @override
+  String get sett_mode_pro => 'Pro';
+
+  @override
+  String get sett_level_blind => 'Blinds';
+
+  @override
+  String get sett_level_ante => 'Ante';
+
+  @override
+  String get ante_type_none => 'None';
+
+  @override
+  String get ante_type_traditional => 'Basic (All)';
+
+  @override
+  String get ante_type_big_blind => 'BBA (Only Bb)';
 
   @override
   String get toast_unav => 'Unavailible now';

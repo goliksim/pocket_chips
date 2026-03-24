@@ -1,18 +1,13 @@
 part of '../game_settings_dialog.dart';
 
 class _SimpleSettingsSection extends StatelessWidget {
-  //final TextEditingController smallBlindController;
-  //final TextEditingController anteController;
   final BlindLevelModel blinds;
-  final String Function(AnteType value) anteTypeLabel;
+
   final Function(BlindLevelModel value) changeSimpleLevel;
 
   const _SimpleSettingsSection({
     required this.blinds,
     required this.changeSimpleLevel,
-    required this.anteTypeLabel,
-    //required this.smallBlindController,
-    //required this.anteController,
   });
 
   void _onSmallBlindChanged(String value) => changeSimpleLevel(
@@ -24,12 +19,27 @@ class _SimpleSettingsSection extends StatelessWidget {
       );
 
   void _onAnteTypeChanged(AnteType? value) {
-    if (value == null) {
+    if (value == null || value == blinds.anteType) {
       return;
     }
 
+    final int? anteValue;
+    switch (value) {
+      case AnteType.traditional:
+        anteValue = blinds.smallBlind;
+        break;
+      case AnteType.bigBlindAnte:
+        anteValue = blinds.smallBlind * 2;
+        break;
+      default:
+        anteValue = null;
+    }
+
     changeSimpleLevel(
-      blinds.copyWith(anteType: value),
+      blinds.copyWith(
+        anteType: value,
+        anteValue: anteValue,
+      ),
     );
   }
 
@@ -41,29 +51,31 @@ class _SimpleSettingsSection extends StatelessWidget {
           spacing: stdHorizontalOffset / 2,
           children: [
             _SettingsNumericField(
-              label: context.strings.sett_win2,
-              hint: blinds.smallBlind.toString(),
-              //controller: smallBlindController,
+              label: context.strings.sett_small_blind,
+              initialValue: blinds.smallBlind.toString(),
               fieldKey: GameSettingsKeys.smallBlindField,
               onChanged: _onSmallBlindChanged,
+              allowZero: false,
             ),
             _SettingsReadonlyRow(
-              label: context.strings.sett_win3,
+              label: context.strings.sett_big_blind,
               value: '${blinds.smallBlind * 2}',
             ),
             _SettingsDropdownField<AnteType>(
-              label: 'Ante Type',
+              label: context.strings.sett_ante_type,
               value: blinds.anteType,
               values: AnteType.values,
-              labelBuilder: anteTypeLabel,
+              labelBuilder: context.strings.anteTypeLabel,
               onChanged: _onAnteTypeChanged,
+              dropdownFontSizeMultiplier: 0.85,
+              widthMultiplier: 0.83,
             ),
             if (blinds.anteType != AnteType.none)
               _SettingsNumericField(
-                label: 'Ante',
-                hint: blinds.anteValue.toString(),
-                //controller: anteController,
+                label: context.strings.sett_ante,
+                initialValue: blinds.anteValue.toString(),
                 onChanged: _onAnteChanged,
+                allowZero: false,
               ),
           ],
         ),
