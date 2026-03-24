@@ -6,6 +6,7 @@ import 'package:pocket_chips/domain/repositories/app_repository.dart';
 import 'game_test.mocks.dart';
 import 'tests/game/game_test_1.dart';
 import 'tests/game/game_test_10.dart';
+import 'tests/game/game_test_11.dart';
 import 'tests/game/game_test_2.dart';
 import 'tests/game/game_test_3.dart';
 import 'tests/game/game_test_4.dart';
@@ -74,6 +75,11 @@ void main() {
       patrolTest(
         'Game Test 10',
         ($) => runGameTest10($, mockAppRepository),
+      );
+
+      patrolTest(
+        'Game Test 11',
+        ($) => runGameTest11($, mockAppRepository),
       );
     },
   );

@@ -704,6 +704,12 @@ abstract class AppLocalizations {
   /// **'Big Blind'**
   String get sett_win3;
 
+  /// No description provided for @sett_custom_bets.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow custom bets/raises'**
+  String get sett_custom_bets;
+
   /// No description provided for @sett_conf.
   ///
   /// In en, this message translates to:
@@ -931,6 +937,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The Small Blind cannot be zero'**
   String get toast_bank5;
+
+  /// No description provided for @toast_custom_bet_warning.
+  ///
+  /// In en, this message translates to:
+  /// **'This bet is possible, but it violates the minimum raise rules'**
+  String get toast_custom_bet_warning;
 
   /// No description provided for @toast_unav.
   ///

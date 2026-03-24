@@ -248,6 +248,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
       startingStack: lobby.defaultBank,
       canEditStack: lobby.gameState.canEditPlayers,
       smallBlind: lobby.smallBlindValue,
+      allowCustomBets: lobby.allowCustomBets,
     );
   }
 
@@ -256,6 +257,8 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
         activeLobby.copyWith(
           defaultBank: settings.startingStack ?? activeLobby.defaultBank,
           smallBlindValue: settings.smallBlind ?? activeLobby.smallBlindValue,
+          allowCustomBets:
+              settings.allowCustomBets ?? activeLobby.allowCustomBets,
           banks: (settings.startingStack != null)
               ? (Map.of(activeLobby.banks)
                 ..updateAll((_, __) => settings.startingStack!))

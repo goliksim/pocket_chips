@@ -329,6 +329,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sett_win3 => 'Big Blind';
 
   @override
+  String get sett_custom_bets => 'Allow custom bets/raises';
+
+  @override
   String get sett_conf => 'Save Changes';
 
   @override
@@ -442,6 +445,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get toast_bank5 => 'The Small Blind cannot be zero';
+
+  @override
+  String get toast_custom_bet_warning =>
+      'This bet is possible, but it violates the minimum raise rules';
 
   @override
   String get toast_unav => 'Unavailible now';

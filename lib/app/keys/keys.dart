@@ -91,7 +91,8 @@ class GameControlKeys {
   static const Key foldButton = Key('game_fold_button');
 
   static const Key raiseCancelButton = Key('game_raise_cancel_button');
-  static const Key raiseConfirmButton = Key('game_raise_confirm_button');
+  static Key raiseConfirmButton({bool hasAlert = false}) =>
+      Key('game_raise_confirm_button_alert_$hasAlert');
 
   static const Key raiseField = Key('game_raise_field');
   static const Key raiseSlider = Key('game_raise_slider');
@@ -199,6 +200,8 @@ class GameSettingsKeys {
 
   static const Key stackField = Key('settings_stack_field');
   static const Key smallBlindField = Key('settings_sm_blind_field');
+  static const Key allowCustomBetsCheckbox =
+      Key('settings_allow_custom_bets_checkbox');
 
   static const Key confirmButton = Key('settings_confirm_button');
 }

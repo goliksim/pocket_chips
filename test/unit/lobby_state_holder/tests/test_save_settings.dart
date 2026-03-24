@@ -26,6 +26,7 @@ void runSaveSettingsNoEditingTest(
   final newSettings = GameSettingsModelResult(
     startingStack: null,
     smallBlind: null,
+    allowCustomBets: null,
   );
 
   await lobbyStateHolder.future;
@@ -54,6 +55,7 @@ void runSaveSettingsSameBankTest(
   final newSettings = GameSettingsModelResult(
     startingStack: defaultLobbyBank,
     smallBlind: null,
+    allowCustomBets: null,
   );
 
   await lobbyStateHolder.future;
@@ -82,6 +84,7 @@ void runSaveSettingsNewBankTest(
   final newSettings = GameSettingsModelResult(
     startingStack: 333,
     smallBlind: null,
+    allowCustomBets: null,
   );
 
   await lobbyStateHolder.future;
@@ -119,6 +122,7 @@ void runSaveSettingsNewSmallBlindTest(
   final newSettings = GameSettingsModelResult(
     startingStack: null,
     smallBlind: 333,
+    allowCustomBets: null,
   );
 
   await lobbyStateHolder.future;
@@ -130,6 +134,40 @@ void runSaveSettingsNewSmallBlindTest(
     newLobbyState,
     lobbyState.copyWith(
       smallBlindValue: 333,
+    ),
+  );
+}
+
+void runSaveSettingsAllowCustomBetsTest(
+  ProviderContainer container,
+  AppRepository repository,
+) async {
+  final players = createPlayers(2);
+  final lobbyState = createLobbyState(
+    players,
+    smallBlindValue: 20,
+    defaultBank: defaultLobbyBank,
+  );
+
+  when(repository.getLobbyState()).thenAnswer((_) async => lobbyState);
+
+  final lobbyStateHolder = container.read(lobbyStateHolderProvider.notifier);
+
+  final newSettings = GameSettingsModelResult(
+    startingStack: null,
+    smallBlind: null,
+    allowCustomBets: true,
+  );
+
+  await lobbyStateHolder.future;
+  await lobbyStateHolder.saveSettings(newSettings);
+
+  final newLobbyState = lobbyStateHolder.state.requireValue;
+
+  expect(
+    newLobbyState,
+    lobbyState.copyWith(
+      allowCustomBets: true,
     ),
   );
 }

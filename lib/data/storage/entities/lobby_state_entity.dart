@@ -10,6 +10,8 @@ class LobbyStateEntity {
   final GameStatusEnum gameState;
   final int smallBlindValue;
   final int defaultBank;
+  @JsonKey(defaultValue: false)
+  final bool allowCustomBets;
 
   final List<PlayerEntity>? players;
   final Map<String, int>? banks;
@@ -19,6 +21,7 @@ class LobbyStateEntity {
     required this.smallBlindValue,
     required this.defaultBank,
     required this.gameState,
+    required this.allowCustomBets,
     this.players,
     this.banks,
     this.dealerId,
@@ -31,5 +34,5 @@ class LobbyStateEntity {
 
   @override
   String toString() =>
-      '[LobbyStateEntity] - players: $players, banks: $banks, smallBlindValue: $smallBlindValue, dealerId: $dealerId, defaultBank: $defaultBank, gameState: $gameState';
+      '[LobbyStateEntity] - players: $players, banks: $banks, smallBlindValue: $smallBlindValue, dealerId: $dealerId, defaultBank: $defaultBank, allowCustomBets: $allowCustomBets, gameState: $gameState';
 }
