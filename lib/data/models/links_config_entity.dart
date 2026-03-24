@@ -31,7 +31,7 @@ class DefaultLinksConfig {
   static const String iosStoreUrlDefault =
       'https://apps.apple.com/app/idYOUR_IOS_APP_ID';
   static const String privacyPolicyUrlDefault =
-      'https://github.com/goliksim/pocket_chips/blob/main/privacy_policy.md';
+      'https://pocket-chips.blogspot.com/p/privacy-policy.html';
   static const String githubUrlDefault = 'https://github.com/goliksim';
   static const String telegramUrlDefault = 'https://t.me/goliksim';
   static const String supportEmailDefault = 'goliksim@gmail.com';

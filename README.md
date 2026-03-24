@@ -120,7 +120,7 @@ If you want to contribute to the development of this application, please follow 
 5. Create a pull request (PR).
 
 ## License and links
-[PrivacyPolicy](https://github.com/goliksim/pocket_chips/blob/main/privacy_policy.md)
+[PrivacyPolicy](https://pocket-chips.blogspot.com/p/privacy-policy.html)
 
 **Game on Stores**</br>
 [![Google Play](https://img.shields.io/badge/Google_Play-%23414141.svg?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.goliksim.pocketchips&hl=en&gl=US) [![RuStore](https://img.shields.io/badge/RuStore-%234e60af.svg?)](https://apps.rustore.ru/app/com.goliksim.pocketchips) [![RuStore](https://img.shields.io/badge/Web_Verson-%23968ad2.svg?)](https://apps.rustore.ru/app/com.goliksim.pocketchips) 
