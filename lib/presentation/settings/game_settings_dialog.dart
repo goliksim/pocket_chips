@@ -52,7 +52,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
   @override
   void initState() {
     super.initState();
-    logs.writeLog('Settings is opened');
+    logs.writeLog('Settings is opened $state');
 
     _allowCustomBets = state.allowCustomBets;
     final progression = state.progression;
@@ -84,7 +84,9 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
       );
 
   int get _progressionInterval =>
-      _parseControllerValue(_progressionIntervalController) ?? 10;
+      _parseControllerValue(_progressionIntervalController,
+          fallback: state.progression.progressionInterval) ??
+      10;
 
   bool _validateLevels() {
     for (var level in _levels) {
@@ -270,10 +272,91 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                       ),
                     ),
                   ),
+                  Flexible(
+                    child: Container(
+                      margin: EdgeInsets.zero,
+                      padding: EdgeInsets.all(stdHorizontalOffset),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(stdBorderRadius),
+                        color: context.theme.playerColor,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Modes
+                          _SettingsModeSelector(
+                            selectedMode: _settingsMode,
+                            onModeSelected: (mode) {
+                              setState(() {
+                                _settingsMode = mode;
+                              });
+                            },
+                          ),
+                          SizedBox(height: stdHorizontalOffset),
+                          (_settingsMode == GameSettingsModeState.simple)
+                              ? _SimpleSettingsSection(
+                                  blinds: _levels.first,
+                                  changeSimpleLevel: (level) =>
+                                      _updateLevel(0, level),
+                                )
+                              : Flexible(
+                                  child: _ProSettingsSection(
+                                    progressionType: _progressionType,
+                                    progressionIntervalHint:
+                                        _progressionInterval.toString(),
+                                    progressionIntervalController:
+                                        _progressionIntervalController,
+                                    levelsCountController:
+                                        _levelsCountController,
+                                    levelsCountHint: _levels.length.toString(),
+                                    levels: _levels,
+                                    onProgressionTypeChanged: (value) {
+                                      if (value == null) {
+                                        return;
+                                      }
+
+                                      setState(() {
+                                        _progressionType = value;
+                                        if (_progressionType ==
+                                            BlindProgressionType.manual) {
+                                          _progressionIntervalController
+                                              .clear();
+                                        }
+                                      });
+                                    },
+                                    onLevelsCountChanged: (value) {
+                                      final parsed =
+                                          int.tryParse(_digitsOnly(value));
+                                      if (parsed != null) {
+                                        final normalized = clampDouble(
+                                                parsed.toDouble(), 1, 20)
+                                            .toInt();
+                                        _syncLevelsCount(parsed);
+                                        // Обновляем контроллер с нормализованным значением
+                                        if (normalized != parsed) {
+                                          _levelsCountController.text =
+                                              normalized.toString();
+                                        }
+                                      }
+                                    },
+                                    onLevelChanged: _updateLevel,
+                                    expandedLevelIndex: _expandedLevelIndex,
+                                    onLevelExpansionChanged:
+                                        onLevelExpansionChanged,
+                                  ),
+                                ),
+                          SizedBox(height: stdHorizontalOffset / 2),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(),
                   // Starting stack
                   Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: stdHorizontalOffset),
+                    padding: EdgeInsets.only(
+                      left: stdHorizontalOffset,
+                      right: stdHorizontalOffset,
+                    ),
                     child: _SettingsNumericField(
                       label: context.strings.sett_win1,
                       initialValue: state.startingStack.toString(),
@@ -289,9 +372,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                   ),
                   // Allow custom bets checkbox
                   Padding(
-                    padding: EdgeInsets.only(
-                      left: stdHorizontalOffset,
-                    ),
+                    padding: EdgeInsets.only(left: stdHorizontalOffset),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -322,56 +403,6 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                       ],
                     ),
                   ),
-
-                  // Modes
-                  _SettingsModeSelector(
-                    selectedMode: _settingsMode,
-                    onModeSelected: (mode) {
-                      setState(() {
-                        _settingsMode = mode;
-                      });
-                    },
-                  ),
-                  (_settingsMode == GameSettingsModeState.simple)
-                      ? _SimpleSettingsSection(
-                          blinds: _levels.first,
-                          changeSimpleLevel: (level) => _updateLevel(0, level),
-                        )
-                      : Flexible(
-                          child: _ProSettingsSection(
-                            progressionType: _progressionType,
-                            progressionIntervalHint:
-                                _progressionInterval.toString(),
-                            progressionIntervalController:
-                                _progressionIntervalController,
-                            levelsCountController: _levelsCountController,
-                            levelsCountHint: _levels.length.toString(),
-                            levels: _levels,
-                            onProgressionTypeChanged: (value) {
-                              if (value == null) {
-                                return;
-                              }
-
-                              setState(() {
-                                _progressionType = value;
-                                if (_progressionType ==
-                                    BlindProgressionType.manual) {
-                                  _progressionIntervalController.clear();
-                                }
-                              });
-                            },
-                            onLevelsCountChanged: (value) {
-                              final parsed = int.tryParse(_digitsOnly(value));
-                              if (parsed != null) {
-                                _syncLevelsCount(parsed);
-                              }
-                            },
-                            onLevelChanged: _updateLevel,
-                            expandedLevelIndex: _expandedLevelIndex,
-                            onLevelExpansionChanged: onLevelExpansionChanged,
-                          ),
-                        ),
-
                   MyButton(
                     key: GameSettingsKeys.confirmButton,
                     height: stdButtonHeight * 0.75,

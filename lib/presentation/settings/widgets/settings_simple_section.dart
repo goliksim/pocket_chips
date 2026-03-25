@@ -50,16 +50,25 @@ class _SimpleSettingsSection extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: stdHorizontalOffset / 2,
           children: [
-            _SettingsNumericField(
-              label: context.strings.sett_small_blind,
-              initialValue: blinds.smallBlind.toString(),
-              fieldKey: GameSettingsKeys.smallBlindField,
-              onChanged: _onSmallBlindChanged,
-              allowZero: false,
+            Column(
+              children: [
+                _SettingsNumericField(
+                  label: context.strings.sett_small_blind,
+                  initialValue: blinds.smallBlind.toString(),
+                  fieldKey: GameSettingsKeys.smallBlindField,
+                  onChanged: _onSmallBlindChanged,
+                  allowZero: false,
+                ),
+                _SettingsReadonlyRow(
+                  label: context.strings.sett_big_blind,
+                  value: '${blinds.smallBlind * 2}',
+                  fontSizeMultiplier: 0.7,
+                ),
+              ],
             ),
-            _SettingsReadonlyRow(
-              label: context.strings.sett_big_blind,
-              value: '${blinds.smallBlind * 2}',
+            Divider(
+              color: context.theme.bgrColor,
+              thickness: 2,
             ),
             _SettingsDropdownField<AnteType>(
               label: context.strings.sett_ante_type,
@@ -70,13 +79,21 @@ class _SimpleSettingsSection extends StatelessWidget {
               dropdownFontSizeMultiplier: 0.85,
               widthMultiplier: 0.83,
             ),
-            if (blinds.anteType != AnteType.none)
+            if (blinds.anteType != AnteType.none) ...[
+              Divider(
+                color: context.theme.bgrColor,
+                indent: stdHorizontalOffset * 2,
+                endIndent: stdHorizontalOffset * 2,
+                thickness: 2,
+              ),
               _SettingsNumericField(
+                fieldKey: ValueKey('simple_ante_field'),
                 label: context.strings.sett_ante,
                 initialValue: blinds.anteValue.toString(),
                 onChanged: _onAnteChanged,
                 allowZero: false,
               ),
+            ]
           ],
         ),
       );

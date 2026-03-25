@@ -324,7 +324,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sett_win1 => 'Сбросить стеки';
 
   @override
-  String get sett_custom_bets => 'Разрешить свои ставки/повышения';
+  String get sett_custom_bets => 'Ставки вне правил';
 
   @override
   String get sett_conf => 'Сохранить';
@@ -491,7 +491,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sett_levels_count => 'Число уровней';
 
   @override
-  String get sett_level => 'Уровень';
+  String get sett_level => 'Ур.';
 
   @override
   String get sett_small_blind => 'Малый блайнд';

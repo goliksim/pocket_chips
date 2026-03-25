@@ -30,25 +30,36 @@ class _SettingsNumericField extends StatefulWidget {
 class _SettingsNumericFieldState extends State<_SettingsNumericField>
     with ToastsMixin {
   late TextEditingController _controller;
+  bool _ownsController = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = widget.controller ??
-        TextEditingController(text: widget.initialValue ?? '');
+    _attachController();
   }
 
   @override
   void didUpdateWidget(_SettingsNumericField oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.controller != null) {
+    if (oldWidget.controller != widget.controller) {
+      if (_ownsController) {
+        _controller.dispose();
+      }
+      _attachController();
       return;
     }
 
-    if (widget.initialValue != oldWidget.initialValue) {
+    if (!_ownsController && widget.initialValue != oldWidget.initialValue) {
       _controller.text = widget.initialValue ?? '';
     }
+  }
+
+  void _attachController() {
+    final externalController = widget.controller;
+    _ownsController = externalController == null;
+    _controller = externalController ??
+        TextEditingController(text: widget.initialValue ?? '');
   }
 
   void _onChanged(String value) {
@@ -95,55 +106,53 @@ class _SettingsNumericFieldState extends State<_SettingsNumericField>
   }
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.only(bottom: stdHorizontalOffset / 2),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                widget.label,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: context.theme.onBackground,
-                  fontSize: stdFontSize * widget.fontSizeMultiplier,
-                  fontWeight: FontWeight.normal,
-                ),
+  Widget build(BuildContext context) => Row(
+        children: [
+          Expanded(
+            child: Text(
+              widget.label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: context.theme.onBackground,
+                fontSize: stdFontSize * widget.fontSizeMultiplier,
+                fontWeight: FontWeight.normal,
               ),
             ),
-            SizedBox(
-              width: stdButtonWidth * 0.3 * widget.widthMultiplier,
-              child: TextFormField(
-                key: widget.fieldKey,
-                controller: _controller,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  color: context.theme.onBackground,
-                  fontSize: stdFontSize * widget.fontSizeMultiplier,
-                ),
-                maxLength: 8,
-                decoration: InputDecoration(
-                  hintText: widget.initialValue,
-                  hintStyle: TextStyle(
-                    fontSize: stdFontSize * widget.fontSizeMultiplier,
-                    color: context.theme.hintColor,
-                  ),
-                  counterText: "",
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  isDense: true,
-                ),
-                onChanged: _onChanged,
+          ),
+          SizedBox(
+            width: stdButtonWidth * 0.3 * widget.widthMultiplier,
+            child: TextFormField(
+              key: widget.fieldKey,
+              controller: _controller,
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: context.theme.onBackground,
+                fontSize: stdFontSize * widget.fontSizeMultiplier,
+                height: 0,
               ),
+              maxLength: 8,
+              decoration: InputDecoration(
+                hintText: widget.initialValue,
+                hintStyle: TextStyle(
+                  fontSize: stdFontSize * widget.fontSizeMultiplier,
+                  color: context.theme.hintColor,
+                ),
+                counterText: "",
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                isDense: true,
+              ),
+              onChanged: _onChanged,
             ),
-          ],
-        ),
+          ),
+        ],
       );
 
   @override
   void dispose() {
-    if (widget.controller == null) {
+    if (_ownsController) {
       _controller.dispose();
     }
     super.dispose();
@@ -164,38 +173,37 @@ class _SettingsReadonlyRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.only(bottom: stdHorizontalOffset / 2),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                label,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: context.theme.hintColor,
-                  fontSize: stdFontSize * fontSizeMultiplier,
-                  fontWeight: FontWeight.normal,
-                ),
+  Widget build(BuildContext context) => Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: context.theme.hintColor,
+                fontSize: stdFontSize * fontSizeMultiplier,
+                fontWeight: FontWeight.normal,
+                height: 0,
               ),
             ),
-            SizedBox(
-              width: stdButtonWidth * 0.3 * widthMultiplier,
-              child: Text(
-                value,
-                textAlign: TextAlign.right,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: context.theme.hintColor,
-                  fontSize: stdFontSize * fontSizeMultiplier,
-                  fontWeight: FontWeight.normal,
-                ),
+          ),
+          SizedBox(
+            width: stdButtonWidth * 0.3 * widthMultiplier,
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: context.theme.hintColor,
+                fontSize: stdFontSize * fontSizeMultiplier,
+                fontWeight: FontWeight.normal,
+                height: 0,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       );
 }
 
@@ -221,55 +229,51 @@ class _SettingsDropdownField<T> extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.only(bottom: stdHorizontalOffset / 2),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Text(
-                label,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: context.theme.onBackground,
-                  fontSize: stdFontSize * fontSizeMultiplier,
-                  fontWeight: FontWeight.normal,
-                ),
+  Widget build(BuildContext context) => Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: context.theme.onBackground,
+                fontSize: stdFontSize * fontSizeMultiplier,
+                fontWeight: FontWeight.normal,
               ),
             ),
-            SizedBox(width: stdHorizontalOffset),
-            Flexible(
-              child: DropdownButtonFormField<T>(
-                isExpanded: true,
-                isDense: false,
-                initialValue: value,
-                decoration: const InputDecoration(
-                  isDense: true,
-                ),
-                alignment: AlignmentDirectional.centerEnd,
-                style: TextStyle(
-                  color: context.theme.onBackground,
-                  fontSize: stdFontSize * dropdownFontSizeMultiplier,
-                ),
-                dropdownColor: context.theme.bgrColor,
-                items: values
-                    .map(
-                      (item) => DropdownMenuItem<T>(
-                        value: item,
-                        child: Text(
-                          labelBuilder(item),
-                          textAlign: TextAlign.right,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+          ),
+          SizedBox(width: stdHorizontalOffset),
+          Expanded(
+            child: DropdownButtonFormField<T>(
+              isExpanded: true,
+              initialValue: value,
+              decoration: const InputDecoration(
+                isDense: true,
+              ),
+              alignment: AlignmentDirectional.centerEnd,
+              style: TextStyle(
+                color: context.theme.onBackground,
+                fontSize: stdFontSize * dropdownFontSizeMultiplier,
+              ),
+              dropdownColor: context.theme.bgrColor,
+              items: values
+                  .map(
+                    (item) => DropdownMenuItem<T>(
+                      value: item,
+                      child: Text(
+                        labelBuilder(item),
+                        textAlign: TextAlign.right,
+                        maxLines: 2,
+                        overflow: TextOverflow.fade,
                       ),
-                    )
-                    .toList(),
-                onChanged: onChanged,
-              ),
+                    ),
+                  )
+                  .toList(),
+              onChanged: onChanged,
             ),
-          ],
-        ),
+          ),
+        ],
       );
 }

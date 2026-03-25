@@ -488,7 +488,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sett_levels_count => 'Levels count';
 
   @override
-  String get sett_level => 'Level';
+  String get sett_level => 'Lvl';
 
   @override
   String get sett_small_blind => 'Small blind';

@@ -1019,7 +1019,7 @@ abstract class AppLocalizations {
   /// No description provided for @sett_level.
   ///
   /// In en, this message translates to:
-  /// **'Level'**
+  /// **'Lvl'**
   String get sett_level;
 
   /// No description provided for @sett_small_blind.
