@@ -126,7 +126,7 @@ class GameTable extends StatelessWidget {
                   child: ColorFiltered(
                     colorFilter: ColorFilter.mode(
                       context.theme.primaryColor.withAlpha(
-                        context.theme.name == 'light' ? 20 : 0,
+                        context.theme.name == 'light' ? 20 : 20,
                       ),
                       BlendMode.srcATop,
                     ),

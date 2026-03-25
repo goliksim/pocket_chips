@@ -170,9 +170,9 @@ class NavigationManager extends ChangeNotifier {
     required VoidCallback action,
     required String message,
   }) =>
-      showDialog<bool>(
+      transitionDialog<bool>(
         context: context,
-        builder: (BuildContext thisContext) => ConfirmationWindow(
+        child: ConfirmationWindow(
           title: title,
           actionTitle: actionTitle,
           message: message,

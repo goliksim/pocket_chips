@@ -19,7 +19,7 @@ class Themes {
 
   Themes.light()
       : name = 'light',
-        bgrColor = const Color.fromARGB(255, 248, 247, 250),
+        bgrColor = const Color.fromARGB(255, 245, 243, 249),
         bankColor = const Color.fromARGB(255, 215, 213, 245),
         hintColor = const Color.fromARGB(255, 185, 183, 212),
         playerColor = const Color.fromARGB(255, 255, 255, 255),
@@ -31,14 +31,14 @@ class Themes {
 
   Themes.dark()
       : name = 'dark',
-        bgrColor = const Color.fromARGB(254, 29, 29, 34),
-        bankColor = const Color.fromARGB(255, 50, 50, 60),
-        hintColor = const Color.fromARGB(255, 80, 80, 90),
+        bgrColor = const Color.fromARGB(253, 25, 25, 32),
+        bankColor = const Color.fromARGB(255, 48, 48, 62),
+        hintColor = const Color.fromARGB(255, 93, 93, 115),
         playerColor = const Color.fromARGB(255, 36, 35, 45),
-        additionButtonColor = const Color.fromARGB(255, 70, 78, 109),
-        primaryColor = MaterialColor(0xff8882e6, colorLight),
-        secondaryColor = const Color.fromARGB(255, 111, 130, 213),
-        alertColor = const Color.fromARGB(255, 230, 130, 130),
+        additionButtonColor = const Color.fromARGB(255, 64, 69, 110),
+        primaryColor = MaterialColor(0xff746ce5, colorLight),
+        secondaryColor = const Color.fromARGB(255, 102, 126, 231),
+        alertColor = const Color.fromARGB(255, 238, 98, 98),
         onBackground = const Color.fromARGB(255, 241, 241, 251);
 
   static const Map<int, Color> colorLight = {
