@@ -27,10 +27,9 @@ class _SettingsLevelCardState extends State<_SettingsLevelCard> {
   }
 
   String _levelSubtitle(BlindLevelModel level) {
-    final blinds =
-        '${widget.level.smallBlind.toCompactBank}\u2215${(widget.level.smallBlind * 2).toCompact}';
-    final ante =
-        '${widget.level.anteValue != null ? '${widget.level.anteValue?.toCompactBank} \u2215 ' : ''}${context.strings.anteTypeLabel(widget.level.anteType)}';
+    final blinds = context.strings.blindsValueLabel(widget.level.smallBlind);
+    final ante = context.strings
+        .anteValueLabel(widget.level.anteValue, widget.level.anteType);
 
     final blindsText = '${context.strings.sett_level_blind}: $blinds'
         .replaceAll(' ', '\u{00A0}');

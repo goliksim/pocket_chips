@@ -6,16 +6,16 @@ part 'game_state_effect.freezed.dart';
 abstract class GameStateEffect with _$GameStateEffect {
   const factory GameStateEffect.error({
     required GameStateErrorType type,
-  }) = _GameStateErrorEffect;
+  }) = GameStateErrorEffect;
 
   const factory GameStateEffect.hasWinner({
     required String winnerUid,
-  }) = _GameStateHasWinnerEffect;
+  }) = GameStateHasWinnerEffect;
 
   const factory GameStateEffect.needWinnerSelection({
     required Set<String> possibleWinnersUid,
     required bool isSideSpot,
-  }) = _GameStateNeedWinnerSelectionEffect;
+  }) = GameStateNeedWinnerSelectionEffect;
 }
 
 enum GameStateErrorType {

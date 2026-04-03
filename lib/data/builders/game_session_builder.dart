@@ -1,5 +1,7 @@
+import '../../domain/models/game/game_progression_state.dart';
 import '../../domain/models/game/game_session_state.dart';
 import '../storage/entities/game_session_entity.dart';
+import 'game_progression_builder.dart';
 
 class GameSessionEntityBuilder {
   static GameSessionState fromEntity(GameSessionEntity entity) =>
@@ -7,6 +9,9 @@ class GameSessionEntityBuilder {
         bets: entity.bets,
         lapCounter: entity.lapCounter,
         foldedPlayers: entity.foldedPlayersInactive,
+        progressionState: entity.progressionState == null
+            ? const GameProgressionState()
+            : GameProgressionEntityBuilder.fromEntity(entity.progressionState!),
         currentPlayerUid: entity.currentPlayerUid,
         firstPlayerUid: entity.firstPlayerUid,
       );
@@ -16,6 +21,8 @@ class GameSessionEntityBuilder {
         bets: model.bets,
         lapCounter: model.lapCounter,
         foldedPlayersInactive: model.foldedPlayers,
+        progressionState:
+            GameProgressionEntityBuilder.toEntity(model.progressionState),
         currentPlayerUid: model.currentPlayerUid,
         firstPlayerUid: model.firstPlayerUid,
       );

@@ -11,6 +11,7 @@ import '../common/widgets/ui_widgets.dart';
 import '../monitization/ads/app_bar_banner.dart';
 import '../monitization/pro_version/widgets/pro_version_wrapper.dart';
 import 'widgets/game_contol/game_control.dart';
+import 'widgets/game_progression_widget.dart';
 import 'widgets/game_table/game_table.dart';
 import 'widgets/game_title_widget.dart';
 
@@ -105,8 +106,12 @@ class GamePage extends ConsumerWidget {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: stdHorizontalOffset),
+                      padding: EdgeInsets.fromLTRB(
+                        stdHorizontalOffset,
+                        0,
+                        stdHorizontalOffset,
+                        stdHorizontalOffset,
+                      ),
                       child: GameTable(
                         viewModel: viewModel,
                         tableRotationOffset: tableRotationOffset,
@@ -123,6 +128,8 @@ class GamePage extends ConsumerWidget {
                   ),
                   child: GameControl(
                     viewModel: viewModel,
+                    statsWidget:
+                        GameProgressionWidget(tableState: viewState.tableState),
                   ),
                 ),
               ],

@@ -26,7 +26,6 @@ class LobbyStateEntityBuilder {
               (p) => PlayerEntityBuilder.toEntity(p),
             )
             .toList(),
-        smallBlindValue: model.smallBlindValue,
         settings: LobbyGameSettingsEntityBuilder.toEntity(model.settings),
         banks: model.banks,
         dealerId: model.dealerId,

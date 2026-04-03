@@ -168,22 +168,6 @@ class GameTable extends StatelessWidget {
                 ),
               ),
             ),
-            // Small/Big Blinds
-            Positioned(
-              top: height * 0.75,
-              child: SizedBox(
-                height: height / 25,
-                child: FittedBox(
-                  child: Text(
-                    key: GameKeys.blinds(tableState.smallBlindValue),
-                    '${tableState.smallBlindValue.toSeparated} / ${(tableState.smallBlindValue * 2).toSeparated}',
-                    style: TextStyle(
-                      color: context.theme.onBackground.withAlpha(200),
-                    ),
-                  ),
-                ),
-              ),
-            ),
             // Total bets
             Positioned(
               top: height * 0.7,

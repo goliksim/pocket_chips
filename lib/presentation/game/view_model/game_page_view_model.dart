@@ -7,10 +7,12 @@ import '../../../app/navigation/navigation_manager.dart';
 import '../../../di/domain_managers.dart';
 import '../../../di/model_holders.dart';
 import '../../../domain/model_holders/game_state_machine/game_state_machine.dart';
+import '../../../domain/models/game/blind_level_model.dart';
+import '../../../domain/models/game/blind_progression_model.dart';
+import '../../../domain/models/game/game_progression_state.dart';
 import '../../../domain/models/game/game_state_effect.dart';
 import '../../../domain/models/game/game_state_enum.dart';
 import '../../../domain/models/game/game_state_model.dart';
-import '../../../domain/models/lobby/lobby_state_model.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../services/event_push_service/handlers/event_handler.dart';
 import '../../../services/event_push_service/promotion_service.dart';
@@ -35,16 +37,22 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
   AppLocalizations get _strings => ref.read(stringsProvider);
   ToastManager get _toastManager => ref.read(toastManagerProvider);
   PromotionManager get _promotionManager => ref.read(promotionManagerProvider);
+  DateTime get _nowUtc => ref.read(currentTimeProvider)();
+
+  Timer? _minuteRefreshTimer;
 
   GamePageViewState get viewState => state.requireValue;
 
   @override
   FutureOr<GamePageViewState> build() async {
     logs.writeLog('GameVM: BUILDING STATE');
+    ref.onDispose(_disposeMinuteRefreshTimer);
 
     final gameModel = await ref.watch(gameStateMachineProvider.future);
     final gameState = gameModel.lobbyState.gameState;
     final players = gameModel.lobbyState.players;
+
+    _syncMinuteRefreshTimer(gameModel);
 
     final effects = gameModel.effects;
     if (effects.isNotEmpty) {
@@ -85,7 +93,18 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
                 ))
             .toList(),
         // TODO: players noise offset
-        smallBlindValue: gameModel.lobbyState.smallBlindValue,
+        smallBlindValue: gameModel.currentSmallBlindValue,
+        showProgression:
+            gameModel.lobbyState.settings.progression.levels.length > 1 &&
+                gameModel.sessionState.progressionState.currentLevelIndex <
+                    gameModel.lobbyState.settings.progression.levels.length - 1,
+        progressionType:
+            gameModel.lobbyState.settings.progression.progressionType,
+        anteType: gameModel.currentAnteType,
+        anteValue: gameModel.currentAnteValue,
+        progressionLevel:
+            gameModel.sessionState.progressionState.currentLevelIndex + 1,
+        leftInterval: _getIntervalLeft(gameModel.sessionState.progressionState),
       ),
       gameStatus: gameState,
       currentPlayerName: gameModel.currentPlayer?.name,
@@ -127,6 +146,8 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         fold: (_) => _gameStateMachine.executeFold(),
       );
 
+  //TODO смена настроек не сохраняется в стек прошлых состояний
+  //При откате назад, откатываем и настройки тоже
   @override
   Future<void> openSettings() async {
     await _navigationManager.showLobbySettings();
@@ -138,6 +159,9 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
   @override
   Future<void> startBetting() async => _gameStateMachine.startBetting();
 
+  @override
+  Future<void> increaseGameLevel() async => _gameStateMachine.nextLevel();
+
   GamePageControlState _getControlState(GameStateModel gameModel) {
     try {
       final gameState = gameModel.lobbyState.gameState;
@@ -148,6 +172,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         case GameStatusEnum.gameBreak:
           return GamePageControlState.breakdown(
             canStartBetting: gameModel.canStartOrContinueGame,
+            canIncreaseLevel: gameModel.canIncreaseLevel,
           );
         case GameStatusEnum.showdown:
           return GamePageControlState.showdown();
@@ -209,6 +234,10 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
     }
   }
 
+  int? _getIntervalLeft(GameProgressionState progressionState) =>
+      progressionState.handsUntilNextLevel ??
+      progressionState.minutesUntilNextLevelAt(_nowUtc);
+
   Future<void> _executeEffect({
     required GameStateEffect effect,
     required GameStateModel stateModel,
@@ -258,5 +287,40 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         }
       },
     );
+  }
+
+  void _syncMinuteRefreshTimer(GameStateModel gameModel) {
+    final progressionState = gameModel.sessionState.progressionState;
+    final shouldRefreshEveryMinute =
+        gameModel.lobbyState.settings.progression.progressionType ==
+                BlindProgressionType.everyNMinutes &&
+            progressionState.nextLevelAtEpochMsUtc != null;
+
+    if (!shouldRefreshEveryMinute) {
+      _disposeMinuteRefreshTimer();
+      return;
+    }
+
+    _minuteRefreshTimer?.cancel();
+
+    _minuteRefreshTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) {
+        if (ref.mounted) {
+          state = AsyncData(
+            state.requireValue.copyWith(
+              tableState: state.requireValue.tableState.copyWith(
+                leftInterval: _getIntervalLeft(progressionState),
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  void _disposeMinuteRefreshTimer() {
+    _minuteRefreshTimer?.cancel();
+    _minuteRefreshTimer = null;
   }
 }

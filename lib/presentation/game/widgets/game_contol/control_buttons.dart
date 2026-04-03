@@ -87,7 +87,7 @@ class ControlButtons extends StatelessWidget {
               action: () => _raiseAction(),
             ),
           ),
-        SizedBox(width: stdHorizontalOffset),
+        SizedBox(width: stdHorizontalOffset / 2),
         // Call/Check/AlIn
         Flexible(
           flex: _raiseButtonActive ? 20 : 31,
@@ -102,7 +102,7 @@ class ControlButtons extends StatelessWidget {
           ),
         ),
         // Fold
-        SizedBox(width: stdHorizontalOffset),
+        SizedBox(width: stdHorizontalOffset / 2),
         Flexible(
           flex: 10,
           fit: FlexFit.tight,

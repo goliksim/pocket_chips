@@ -1,11 +1,44 @@
 import 'package:collection/collection.dart';
 
+import '../domain/models/game/blind_level_model.dart';
+import '../domain/models/game/blind_progression_model.dart';
 import '../domain/models/game/game_state_model.dart';
-import '../domain/models/lobby/lobby_state_model.dart';
 import '../domain/models/player/player_id.dart';
 import '../domain/models/player/player_model.dart';
 
 extension GameStateModelX on GameStateModel {
+  BlindProgressionModel get blindProgression => lobbyState.settings.progression;
+
+  List<BlindLevelModel> get blindLevels => blindProgression.levels;
+
+  BlindLevelModel get currentBlindLevel {
+    final lastIndex = blindLevels.length - 1;
+    final safeIndex = sessionState.progressionState.currentLevelIndex.clamp(
+      0,
+      lastIndex,
+    );
+
+    return blindLevels[safeIndex];
+  }
+
+  int get currentSmallBlindValue => currentBlindLevel.smallBlind;
+  int get currentBigBlindValue => currentSmallBlindValue * 2;
+  AnteType get currentAnteType => currentBlindLevel.anteType;
+  int? get currentAnteValue => currentBlindLevel.anteValue;
+
+  bool get canIncreaseLevel {
+    if (blindProgression.progressionType != BlindProgressionType.manual) {
+      return false;
+    }
+
+    if (blindProgression.levels.length <= 1) {
+      return false;
+    }
+
+    final progressionState = sessionState.progressionState;
+    return (progressionState.currentLevelIndex < blindLevels.length - 1);
+  }
+
   bool isPlayerActive(PlayerId playerUid) =>
       !sessionState.foldedPlayers.contains(playerUid);
 
@@ -75,7 +108,7 @@ extension GameSessionStateX on GameStateModel {
       lastRaise = bids[bids.length - 1] - bids[bids.length - 2];
     }
 
-    int result = toEqual + [lastRaise, lobbyState.bigBlindValue].max;
+    int result = toEqual + [lastRaise, currentBigBlindValue].max;
 
     final bool raiseIsAllIn =
         result >= (lobbyState.banks[currentPlayerUid] ?? 0);
@@ -85,10 +118,11 @@ extension GameSessionStateX on GameStateModel {
 
   (int, bool) calculateCallValue(String currentPlayerUid) {
     final maxBet =
-        [sessionState.bets.values.maxOrNull ?? 0, lobbyState.bigBlindValue].max;
+        [sessionState.bets.values.maxOrNull ?? 0, currentBigBlindValue].max;
     final currentBet = sessionState.bets[currentPlayerUid] ?? 0;
 
-    final result = maxBet - currentBet;
+    final bank = lobbyState.banks[currentPlayerUid] ?? 0;
+    final result = [maxBet - currentBet, bank].min;
     final callIsAllIn = (result >= (lobbyState.banks[currentPlayerUid] ?? 0));
 
     return (result, callIsAllIn);

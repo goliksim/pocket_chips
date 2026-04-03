@@ -33,16 +33,14 @@ abstract class LobbyStateModel with _$LobbyStateModel {
 }
 
 extension LobbyStateModelX on LobbyStateModel {
-  BlindLevelModel get currentLevel => settings.progression.map(
-        (simple) => simple.blinds,
-        pro: (pro) => pro.levels.first, //TODO тут нифига не первый
+  Iterable<BlindLevelModel> get _progressionLevels =>
+      settings.progression.levels;
+
+  int get maxSmallBlindValue => _progressionLevels.fold(
+        defaultSmallBlindValue,
+        (maxValue, level) =>
+            level.smallBlind > maxValue ? level.smallBlind : maxValue,
       );
 
-  int get smallBlindValue => currentLevel.smallBlind;
-
-  int get bigBlindValue => smallBlindValue * 2;
-
-  AnteType get anteType => currentLevel.anteType;
-
-  int? get anteValue => currentLevel.anteValue;
+  int get maxBigBlindValue => maxSmallBlindValue * 2;
 }

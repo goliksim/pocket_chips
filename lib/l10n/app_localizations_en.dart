@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooltip_dealer => 'Dealer';
 
   @override
+  String get tooltip_increase_level => 'Next progression level';
+
+  @override
   String get tooltip_theme => 'Change Theme';
 
   @override
@@ -398,6 +401,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get game_win4 => 'Select side-pot winner';
 
   @override
+  String get game_progression_setup => 'Setup';
+
+  @override
   String get game_start => 'Start Betting';
 
   @override
@@ -476,7 +482,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sett_progression_hands => 'N hands';
 
   @override
+  String get sett_progression_hands_left => 'Hands left';
+
+  @override
   String get sett_progression_minutes => 'N minutes';
+
+  @override
+  String get sett_progression_minutes_left => 'Minutes left';
 
   @override
   String get sett_progression_hands_interval => 'Hands interval';
@@ -489,6 +501,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sett_level => 'Lvl';
+
+  @override
+  String get sett_level_full => 'Level';
 
   @override
   String get sett_small_blind => 'Small blind';

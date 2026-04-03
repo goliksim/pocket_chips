@@ -104,6 +104,12 @@ abstract class AppLocalizations {
   /// **'Dealer'**
   String get tooltip_dealer;
 
+  /// No description provided for @tooltip_increase_level.
+  ///
+  /// In en, this message translates to:
+  /// **'Next progression level'**
+  String get tooltip_increase_level;
+
   /// No description provided for @tooltip_theme.
   ///
   /// In en, this message translates to:
@@ -842,6 +848,12 @@ abstract class AppLocalizations {
   /// **'Select side-pot winner'**
   String get game_win4;
 
+  /// No description provided for @game_progression_setup.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup'**
+  String get game_progression_setup;
+
   /// No description provided for @game_start.
   ///
   /// In en, this message translates to:
@@ -992,11 +1004,23 @@ abstract class AppLocalizations {
   /// **'N hands'**
   String get sett_progression_hands;
 
+  /// No description provided for @sett_progression_hands_left.
+  ///
+  /// In en, this message translates to:
+  /// **'Hands left'**
+  String get sett_progression_hands_left;
+
   /// No description provided for @sett_progression_minutes.
   ///
   /// In en, this message translates to:
   /// **'N minutes'**
   String get sett_progression_minutes;
+
+  /// No description provided for @sett_progression_minutes_left.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes left'**
+  String get sett_progression_minutes_left;
 
   /// No description provided for @sett_progression_hands_interval.
   ///
@@ -1021,6 +1045,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lvl'**
   String get sett_level;
+
+  /// No description provided for @sett_level_full.
+  ///
+  /// In en, this message translates to:
+  /// **'Level'**
+  String get sett_level_full;
 
   /// No description provided for @sett_small_blind.
   ///

@@ -53,6 +53,7 @@ class LobbyGameSettingsEntityBuilder {
         progression: BlindProgressionEntity(
           mode: model.progression.mode,
           progressionType: model.progression.progressionType,
+          progressionInterval: model.progression.progressionInterval,
           levels: model.progression.levels
               .map(BlindLevelEntityBuilder.toEntity)
               .toList(),

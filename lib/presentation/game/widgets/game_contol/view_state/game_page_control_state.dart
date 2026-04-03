@@ -11,6 +11,7 @@ abstract class GamePageControlState with _$GamePageControlState {
 
   const factory GamePageControlState.breakdown({
     required bool canStartBetting,
+    required bool canIncreaseLevel,
   }) = _GamePageControlBreakDownState;
 
   const factory GamePageControlState.showdown() = _GamePageControlShowDownState;

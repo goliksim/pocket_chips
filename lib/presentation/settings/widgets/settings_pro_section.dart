@@ -61,6 +61,7 @@ class _ProSettingsSection extends StatelessWidget {
                 controller: progressionIntervalController,
                 fontSizeMultiplier: 0.9,
                 maxValue: 100,
+                allowZero: false,
                 onChanged: (_) {},
               ),
             if (progressionType == BlindProgressionType.everyNMinutes)
@@ -71,6 +72,7 @@ class _ProSettingsSection extends StatelessWidget {
                 controller: progressionIntervalController,
                 fontSizeMultiplier: 0.9,
                 maxValue: 120,
+                allowZero: false,
                 onChanged: (_) {},
               ),
             Divider(

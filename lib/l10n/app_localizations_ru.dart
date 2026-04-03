@@ -12,6 +12,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tooltip_dealer => 'Дилер';
 
   @override
+  String get tooltip_increase_level => 'Следующий уровень прогрессии';
+
+  @override
   String get tooltip_theme => 'Сменить тему';
 
   @override
@@ -399,6 +402,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get game_win4 => 'Выберите победителя сайд-пота';
 
   @override
+  String get game_progression_setup => 'Установки';
+
+  @override
   String get game_start => 'Начать торги';
 
   @override
@@ -479,7 +485,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sett_progression_hands => 'N раздач';
 
   @override
+  String get sett_progression_hands_left => 'Раздач осталось';
+
+  @override
   String get sett_progression_minutes => 'N минут';
+
+  @override
+  String get sett_progression_minutes_left => 'Минут осталось';
 
   @override
   String get sett_progression_hands_interval => 'Число раздач';
@@ -492,6 +504,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get sett_level => 'Ур.';
+
+  @override
+  String get sett_level_full => 'Уровень';
 
   @override
   String get sett_small_blind => 'Малый блайнд';
