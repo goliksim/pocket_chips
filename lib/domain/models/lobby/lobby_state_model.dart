@@ -36,11 +36,12 @@ extension LobbyStateModelX on LobbyStateModel {
   Iterable<BlindLevelModel> get _progressionLevels =>
       settings.progression.levels;
 
-  int get maxSmallBlindValue => _progressionLevels.fold(
-        defaultSmallBlindValue,
-        (maxValue, level) =>
-            level.smallBlind > maxValue ? level.smallBlind : maxValue,
-      );
+  int get minRecommendedStartingStack {
+    final firstLevel = _progressionLevels.firstOrNull;
+    if (firstLevel == null) {
+      return 0;
+    }
 
-  int get maxBigBlindValue => maxSmallBlindValue * 2;
+    return firstLevel.minRecommendedStartingStack;
+  }
 }

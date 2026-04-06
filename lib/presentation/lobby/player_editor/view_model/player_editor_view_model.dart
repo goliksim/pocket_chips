@@ -142,11 +142,9 @@ class PlayerEditorViewModel with ChangeNotifier {
 
     // Checking the stack for the minimum blind
     final bank = playerState.bankInput!;
-    final currentBigBlind = lobby.maxBigBlindValue;
-    if (bank < currentBigBlind) {
-      _toastManager.showToast(
-        '${_strings.toast_bank1}\n${_strings.toast_bank2} - $currentBigBlind',
-      );
+
+    if (bank < lobby.minRecommendedStartingStack) {
+      _toastManager.showToast(_strings.toast_bank_warning);
     }
 
     try {

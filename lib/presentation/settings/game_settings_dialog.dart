@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/keys/keys.dart';
@@ -98,15 +99,10 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
   }
 
   bool _validateLevel(BlindLevelModel level) {
-    final effectiveAnte = (level.anteType == AnteType.bigBlindAnte
-            ? level.smallBlind * 2
-            : level.anteValue) ??
-        0;
-
     final newStartingStack = _startingStack ?? state.startingStack;
 
-    if (newStartingStack < level.smallBlind * 2 + effectiveAnte) {
-      showToast(context.strings.toast_stack_warning);
+    if (newStartingStack < level.minRecommendedStartingStack) {
+      showToast(context.strings.toast_bank_warning);
       return false;
     }
 
@@ -194,8 +190,6 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
     setState(() {
       _levels = updatedLevels;
     });
-
-    _validateLevel(level);
   }
 
   void onLevelExpansionChanged(int index, bool isExpanded) {
@@ -210,6 +204,8 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
     if (!_validateStartingStack()) {
       return;
     }
+
+    _validateLevels();
 
     final progressionInterval = _progressionType == BlindProgressionType.manual
         ? null
@@ -247,172 +243,184 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.8,
+            maxWidth: stdButtonWidth,
           ),
-          child: SizedBox(
-            width: stdButtonWidth,
-            child: Padding(
-              padding: EdgeInsets.all(stdHorizontalOffset),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                spacing: stdHorizontalOffset / 2,
-                children: [
-                  // Title
-                  SizedBox(
-                    height: stdButtonHeight * 0.5,
-                    child: Center(
-                      child: FittedBox(
-                        child: Text(
-                          context.strings.sett_title,
-                          style: TextStyle(
-                            color: context.theme.onBackground,
-                            fontSize: stdFontSize,
-                            fontWeight: FontWeight.bold,
-                          ),
+          child: Padding(
+            padding: EdgeInsets.all(stdHorizontalOffset),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Title
+                SizedBox(
+                  height: stdButtonHeight * 0.5,
+                  child: Center(
+                    child: FittedBox(
+                      child: Text(
+                        context.strings.sett_title,
+                        style: TextStyle(
+                          color: context.theme.onBackground,
+                          fontSize: stdFontSize,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                  Flexible(
-                    child: Container(
-                      margin: EdgeInsets.zero,
-                      padding: EdgeInsets.all(stdHorizontalOffset),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(stdBorderRadius),
-                        color: context.theme.playerColor,
-                      ),
+                ),
+                Flexible(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(stdBorderRadius),
+                    child: SingleChildScrollView(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Modes
-                          _SettingsModeSelector(
-                            selectedMode: _settingsMode,
-                            onModeSelected: (mode) {
-                              setState(() {
-                                _settingsMode = mode;
-                              });
-                            },
-                          ),
-                          SizedBox(height: stdHorizontalOffset),
-                          (_settingsMode == GameSettingsModeState.simple)
-                              ? _SimpleSettingsSection(
-                                  blinds: _levels.first,
-                                  changeSimpleLevel: (level) =>
-                                      _updateLevel(0, level),
-                                )
-                              : Flexible(
-                                  child: _ProSettingsSection(
-                                    progressionType: _progressionType,
-                                    progressionIntervalHint:
-                                        _progressionInterval.toString(),
-                                    progressionIntervalController:
-                                        _progressionIntervalController,
-                                    levelsCountController:
-                                        _levelsCountController,
-                                    levelsCountHint: _levels.length.toString(),
-                                    levels: _levels,
-                                    onProgressionTypeChanged: (value) {
-                                      if (value == null) {
-                                        return;
-                                      }
-
+                          Flexible(
+                            child: Container(
+                              margin: EdgeInsets.zero,
+                              padding: EdgeInsets.all(stdHorizontalOffset),
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.circular(stdBorderRadius),
+                                color: context.theme.playerColor,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // Modes
+                                  _SettingsModeSelector(
+                                    selectedMode: _settingsMode,
+                                    onModeSelected: (mode) {
                                       setState(() {
-                                        _progressionType = value;
-                                        if (_progressionType ==
-                                            BlindProgressionType.manual) {
-                                          _progressionIntervalController
-                                              .clear();
-                                        }
+                                        _settingsMode = mode;
                                       });
                                     },
-                                    onLevelsCountChanged: (value) {
-                                      final parsed =
-                                          int.tryParse(_digitsOnly(value));
-                                      if (parsed != null) {
-                                        final normalized = clampDouble(
-                                                parsed.toDouble(), 1, 20)
-                                            .toInt();
-                                        _syncLevelsCount(parsed);
-                                        // Обновляем контроллер с нормализованным значением
-                                        if (normalized != parsed) {
-                                          _levelsCountController.text =
-                                              normalized.toString();
-                                        }
-                                      }
-                                    },
-                                    onLevelChanged: _updateLevel,
-                                    expandedLevelIndex: _expandedLevelIndex,
-                                    onLevelExpansionChanged:
-                                        onLevelExpansionChanged,
+                                  ),
+                                  SizedBox(height: stdHorizontalOffset),
+                                  (_settingsMode ==
+                                          GameSettingsModeState.simple)
+                                      ? _SimpleSettingsSection(
+                                          blinds: _levels.first,
+                                          changeSimpleLevel: (level) =>
+                                              _updateLevel(0, level),
+                                        )
+                                      : _ProSettingsSection(
+                                          progressionType: _progressionType,
+                                          progressionIntervalHint:
+                                              _progressionInterval.toString(),
+                                          progressionIntervalController:
+                                              _progressionIntervalController,
+                                          levelsCountController:
+                                              _levelsCountController,
+                                          levelsCountHint:
+                                              _levels.length.toString(),
+                                          levels: _levels,
+                                          onProgressionTypeChanged: (value) {
+                                            if (value == null) {
+                                              return;
+                                            }
+
+                                            setState(() {
+                                              _progressionType = value;
+                                              if (_progressionType ==
+                                                  BlindProgressionType.manual) {
+                                                _progressionIntervalController
+                                                    .clear();
+                                              }
+                                            });
+                                          },
+                                          onLevelsCountChanged: (value) {
+                                            final parsed = int.tryParse(
+                                                _digitsOnly(value));
+                                            if (parsed != null) {
+                                              final normalized = clampDouble(
+                                                      parsed.toDouble(), 1, 20)
+                                                  .toInt();
+                                              _syncLevelsCount(parsed);
+                                              // Обновляем контроллер с нормализованным значением
+                                              if (normalized != parsed) {
+                                                _levelsCountController.text =
+                                                    normalized.toString();
+                                              }
+                                            }
+                                          },
+                                          onLevelChanged: _updateLevel,
+                                          expandedLevelIndex:
+                                              _expandedLevelIndex,
+                                          onLevelExpansionChanged:
+                                              onLevelExpansionChanged,
+                                        ),
+                                  SizedBox(height: stdHorizontalOffset / 2),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: stdHorizontalOffset / 2),
+                          // Starting stack
+                          Padding(
+                            padding: EdgeInsets.only(
+                              left: stdHorizontalOffset,
+                              right: stdHorizontalOffset,
+                            ),
+                            child: _SettingsNumericField(
+                              label: context.strings.sett_win1,
+                              initialValue: state.startingStack.toString(),
+                              controller: _bankController,
+                              fieldKey: GameSettingsKeys.stackField,
+                              allowZero: false,
+                              onChanged: (_) {
+                                setState(() {});
+                                _validateStartingStack();
+                              },
+                            ),
+                          ),
+                          // Allow custom bets checkbox
+                          Padding(
+                            padding: EdgeInsets.only(left: stdHorizontalOffset),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    context.strings.sett_custom_bets,
+                                    style: TextStyle(
+                                      color: context.theme.onBackground,
+                                      fontSize: stdFontSize,
+                                      fontWeight: FontWeight.normal,
+                                    ),
                                   ),
                                 ),
-                          SizedBox(height: stdHorizontalOffset / 2),
+                                Transform.scale(
+                                  scale: 1.25,
+                                  child: Checkbox(
+                                    key: GameSettingsKeys
+                                        .allowCustomBetsCheckbox,
+                                    value: _allowCustomBets,
+                                    checkColor: Colors.white,
+                                    fillColor: WidgetStateProperty.all<Color>(
+                                      _allowCustomBets
+                                          ? context.theme.primaryColor
+                                          : context.theme.bgrColor,
+                                    ),
+                                    onChanged: _onCustomRaisesChanged,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(),
-                  // Starting stack
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: stdHorizontalOffset,
-                      right: stdHorizontalOffset,
-                    ),
-                    child: _SettingsNumericField(
-                      label: context.strings.sett_win1,
-                      initialValue: state.startingStack.toString(),
-                      controller: _bankController,
-                      fieldKey: GameSettingsKeys.stackField,
-                      allowZero: false,
-                      onChanged: (_) {
-                        setState(() {});
-                        _validateStartingStack();
-                        _validateLevels();
-                      },
-                    ),
-                  ),
-                  // Allow custom bets checkbox
-                  Padding(
-                    padding: EdgeInsets.only(left: stdHorizontalOffset),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            context.strings.sett_custom_bets,
-                            style: TextStyle(
-                              color: context.theme.onBackground,
-                              fontSize: stdFontSize,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                        Transform.scale(
-                          scale: 1.25,
-                          child: Checkbox(
-                            key: GameSettingsKeys.allowCustomBetsCheckbox,
-                            value: _allowCustomBets,
-                            checkColor: Colors.white,
-                            fillColor: WidgetStateProperty.all<Color>(
-                              _allowCustomBets
-                                  ? context.theme.primaryColor
-                                  : context.theme.bgrColor,
-                            ),
-                            onChanged: _onCustomRaisesChanged,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  MyButton(
-                    key: GameSettingsKeys.confirmButton,
-                    height: stdButtonHeight * 0.75,
-                    width: double.infinity,
-                    buttonColor: context.theme.primaryColor,
-                    textString: context.strings.sett_conf,
-                    action: _saveSettings,
-                  ),
-                ],
-              ),
+                ),
+                SizedBox(height: stdHorizontalOffset / 2),
+                MyButton(
+                  key: GameSettingsKeys.confirmButton,
+                  height: stdButtonHeight * 0.65,
+                  width: double.infinity,
+                  buttonColor: context.theme.primaryColor,
+                  textString: context.strings.sett_conf,
+                  action: _saveSettings,
+                ),
+              ],
             ),
           ),
         ),

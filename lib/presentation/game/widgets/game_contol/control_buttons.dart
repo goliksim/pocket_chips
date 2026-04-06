@@ -66,7 +66,8 @@ class ControlButtons extends StatelessWidget {
     );
   }
 
-  bool get _raiseButtonActive => state.raiseState.canRaise;
+  bool get _raiseButtonActive =>
+      state.raiseState.canRaise || state.raiseState.raiseIsAllIn;
 
   @override
   Widget build(BuildContext context) {

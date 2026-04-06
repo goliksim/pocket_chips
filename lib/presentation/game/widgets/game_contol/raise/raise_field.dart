@@ -221,6 +221,7 @@ class _RaiseSliderState extends State<_RaiseSlider> {
     super.initState();
   }
 
+  //TODO bad logic
   int get totalBetMin => widget.minBet + widget.currentBet;
   int get totalBetMax => widget.maxBet + widget.currentBet;
 

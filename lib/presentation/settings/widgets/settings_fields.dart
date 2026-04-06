@@ -50,8 +50,13 @@ class _SettingsNumericFieldState extends State<_SettingsNumericField>
       return;
     }
 
-    if (!_ownsController && widget.initialValue != oldWidget.initialValue) {
-      _controller.text = widget.initialValue ?? '';
+    if (_ownsController && widget.initialValue != oldWidget.initialValue) {
+      final newValue = widget.initialValue ?? '';
+      _controller.value = _controller.value.copyWith(
+        text: newValue,
+        selection: TextSelection.collapsed(offset: newValue.length),
+        composing: TextRange.empty,
+      );
     }
   }
 

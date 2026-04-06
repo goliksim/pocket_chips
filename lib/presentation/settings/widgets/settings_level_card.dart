@@ -47,7 +47,7 @@ class _SettingsLevelCardState extends State<_SettingsLevelCard> {
     final int? anteValue;
     switch (value) {
       case AnteType.traditional:
-        anteValue = widget.level.smallBlind;
+        anteValue = [widget.level.smallBlind ~/ 10, 1].max;
         break;
       case AnteType.bigBlindAnte:
         anteValue = widget.level.smallBlind * 2;

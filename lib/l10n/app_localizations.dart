@@ -716,17 +716,11 @@ abstract class AppLocalizations {
   /// **'Welcome to New Game!'**
   String get game_welc;
 
-  /// No description provided for @game_turn1.
+  /// No description provided for @game_turn.
   ///
   /// In en, this message translates to:
   /// **'Turn'**
-  String get game_turn1;
-
-  /// No description provided for @game_turn2.
-  ///
-  /// In en, this message translates to:
-  /// **'of'**
-  String get game_turn2;
+  String get game_turn;
 
   /// No description provided for @game_shdw.
   ///
@@ -751,12 +745,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Flop'**
   String get game_flop;
-
-  /// No description provided for @game_turn.
-  ///
-  /// In en, this message translates to:
-  /// **'Turn'**
-  String get game_turn;
 
   /// No description provided for @game_river.
   ///
@@ -908,40 +896,22 @@ abstract class AppLocalizations {
   /// **'You cant play without players'**
   String get toast_moreplay2;
 
-  /// No description provided for @toast_bank1.
-  ///
-  /// In en, this message translates to:
-  /// **'We recommend a value for the stack at least big blind'**
-  String get toast_bank1;
-
-  /// No description provided for @toast_bank2.
-  ///
-  /// In en, this message translates to:
-  /// **'In your case'**
-  String get toast_bank2;
-
   /// No description provided for @toast_bank3.
   ///
   /// In en, this message translates to:
   /// **'The stack cannot be zero'**
   String get toast_bank3;
 
-  /// No description provided for @toast_bank4.
+  /// No description provided for @toast_bank_warning.
   ///
   /// In en, this message translates to:
-  /// **'We recommend a Big Blind value less than Stack'**
-  String get toast_bank4;
-
-  /// No description provided for @toast_bank5.
-  ///
-  /// In en, this message translates to:
-  /// **'The Small Blind cannot be zero'**
-  String get toast_bank5;
+  /// **'Attention! Starting stack is lower than the required forced bets'**
+  String get toast_bank_warning;
 
   /// No description provided for @toast_custom_bet_warning.
   ///
   /// In en, this message translates to:
-  /// **'This bet is possible, but it violates the minimum raise rules'**
+  /// **'This bet is possible, but it violates the min raise rules'**
   String get toast_custom_bet_warning;
 
   /// No description provided for @toast_ante_zero.
@@ -955,12 +925,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Levels count cannot be zero'**
   String get toast_levels_zero;
-
-  /// No description provided for @toast_stack_warning.
-  ///
-  /// In en, this message translates to:
-  /// **'We not recommend Stack less than Big Blind + Ante'**
-  String get toast_stack_warning;
 
   /// No description provided for @toast_cannot_be_zero.
   ///

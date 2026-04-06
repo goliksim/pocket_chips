@@ -91,21 +91,15 @@ class _ProSettingsSection extends StatelessWidget {
               maxValue: 20,
             ),
             SizedBox(height: stdHorizontalOffset / 2),
-            Flexible(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: List<Widget>.generate(
-                    levels.length,
-                    (index) => _SettingsLevelCard(
-                      index: index,
-                      level: levels[index],
-                      isExpanded: expandedLevelIndex == index,
-                      onExpansionChanged: (isExpanded) =>
-                          onLevelExpansionChanged(index, isExpanded),
-                      onLevelChanged: (level) => onLevelChanged(index, level),
-                    ),
-                  ),
-                ),
+            ...List<Widget>.generate(
+              levels.length,
+              (index) => _SettingsLevelCard(
+                index: index,
+                level: levels[index],
+                isExpanded: expandedLevelIndex == index,
+                onExpansionChanged: (isExpanded) =>
+                    onLevelExpansionChanged(index, isExpanded),
+                onLevelChanged: (level) => onLevelChanged(index, level),
               ),
             ),
           ],

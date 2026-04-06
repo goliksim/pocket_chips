@@ -61,7 +61,7 @@ class GameTitleWidgetState extends State<GameTitleWidget> {
   @override
   Widget build(BuildContext context) {
     final playerText = widget.player != null
-        ? '${context.strings.game_turn1} ${context.strings.game_turn2} ${widget.player}'
+        ? '${context.strings.game_turn} ${widget.player}'
         : null;
 
     final displayText = _temporaryStateText ?? playerText ?? widget.gameState;

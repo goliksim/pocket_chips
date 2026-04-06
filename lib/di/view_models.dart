@@ -89,7 +89,7 @@ final bankEditorViewModelProvider = Provider.autoDispose<BankEditorViewModel>(
       strings: ref.read(stringsProvider),
       pop: () => ref.read(navigationManagerProvider).pop(),
       currentDefaultBank: lobbyState.defaultBank,
-      currentBigBlind: lobbyState.maxBigBlindValue,
+      minRecommendedStartingStack: lobbyState.minRecommendedStartingStack,
     );
   },
 );

@@ -336,10 +336,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get game_welc => 'Добро пожаловать!';
 
   @override
-  String get game_turn1 => 'Ход';
-
-  @override
-  String get game_turn2 => '';
+  String get game_turn => 'Терн';
 
   @override
   String get game_shdw => 'Вскрытие';
@@ -352,9 +349,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get game_flop => 'Флоп';
-
-  @override
-  String get game_turn => 'Терн';
 
   @override
   String get game_river => 'Ривер';
@@ -432,21 +426,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get toast_moreplay2 => 'Вы не можете начать игру без игроков';
 
   @override
-  String get toast_bank1 =>
-      'Рекомендуем значение стека не менее большого блайнда';
+  String get toast_bank3 => 'Начальный стек не может быть нулевым';
 
   @override
-  String get toast_bank2 => 'В вашем случае';
-
-  @override
-  String get toast_bank3 => 'Стек не может быть равен нулю';
-
-  @override
-  String get toast_bank4 =>
-      'Рекомендуем использовать значение большого блайнда меньше стека';
-
-  @override
-  String get toast_bank5 => 'Нелья играть без блайндов';
+  String get toast_bank_warning =>
+      'Внимание! Начальный стек меньше обязательных ставок';
 
   @override
   String get toast_custom_bet_warning =>
@@ -457,10 +441,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get toast_levels_zero => 'Количество уровней не может быть нулевым';
-
-  @override
-  String get toast_stack_warning =>
-      'Не рекомендуем стек меньше, чем большой блайнд + анте.';
 
   @override
   String get toast_cannot_be_zero => 'Значение не может быть нулевым';

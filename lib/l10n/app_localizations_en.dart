@@ -335,10 +335,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get game_welc => 'Welcome to New Game!';
 
   @override
-  String get game_turn1 => 'Turn';
-
-  @override
-  String get game_turn2 => 'of';
+  String get game_turn => 'Turn';
 
   @override
   String get game_shdw => 'Showdown';
@@ -351,9 +348,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get game_flop => 'Flop';
-
-  @override
-  String get game_turn => 'Turn';
 
   @override
   String get game_river => 'River';
@@ -431,34 +425,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toast_moreplay2 => 'You cant play without players';
 
   @override
-  String get toast_bank1 =>
-      'We recommend a value for the stack at least big blind';
-
-  @override
-  String get toast_bank2 => 'In your case';
-
-  @override
   String get toast_bank3 => 'The stack cannot be zero';
 
   @override
-  String get toast_bank4 => 'We recommend a Big Blind value less than Stack';
-
-  @override
-  String get toast_bank5 => 'The Small Blind cannot be zero';
+  String get toast_bank_warning =>
+      'Attention! Starting stack is lower than the required forced bets';
 
   @override
   String get toast_custom_bet_warning =>
-      'This bet is possible, but it violates the minimum raise rules';
+      'This bet is possible, but it violates the min raise rules';
 
   @override
   String get toast_ante_zero => 'Ante cannot be zero';
 
   @override
   String get toast_levels_zero => 'Levels count cannot be zero';
-
-  @override
-  String get toast_stack_warning =>
-      'We not recommend Stack less than Big Blind + Ante';
 
   @override
   String get toast_cannot_be_zero => 'Value cannot be zero';

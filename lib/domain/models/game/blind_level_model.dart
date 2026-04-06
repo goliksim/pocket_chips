@@ -22,3 +22,7 @@ abstract class BlindLevelModel with _$BlindLevelModel {
     int? anteValue,
   }) = _BlindLevelModel;
 }
+
+extension BlindLevelModelX on BlindLevelModel {
+  int get minRecommendedStartingStack => smallBlind * 2 + (anteValue ?? 0);
+}

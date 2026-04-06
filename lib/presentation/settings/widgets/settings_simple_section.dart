@@ -26,7 +26,7 @@ class _SimpleSettingsSection extends StatelessWidget {
     final int? anteValue;
     switch (value) {
       case AnteType.traditional:
-        anteValue = blinds.smallBlind;
+        anteValue = [blinds.smallBlind ~/ 10, 1].max;
         break;
       case AnteType.bigBlindAnte:
         anteValue = blinds.smallBlind * 2;
@@ -50,21 +50,17 @@ class _SimpleSettingsSection extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: stdHorizontalOffset / 2,
           children: [
-            Column(
-              children: [
-                _SettingsNumericField(
-                  label: context.strings.sett_small_blind,
-                  initialValue: blinds.smallBlind.toString(),
-                  fieldKey: GameSettingsKeys.smallBlindField,
-                  onChanged: _onSmallBlindChanged,
-                  allowZero: false,
-                ),
-                _SettingsReadonlyRow(
-                  label: context.strings.sett_big_blind,
-                  value: '${blinds.smallBlind * 2}',
-                  fontSizeMultiplier: 0.7,
-                ),
-              ],
+            _SettingsNumericField(
+              label: context.strings.sett_small_blind,
+              initialValue: blinds.smallBlind.toString(),
+              fieldKey: GameSettingsKeys.smallBlindField,
+              onChanged: _onSmallBlindChanged,
+              allowZero: false,
+            ),
+            _SettingsReadonlyRow(
+              label: context.strings.sett_big_blind,
+              value: '${blinds.smallBlind * 2}',
+              fontSizeMultiplier: 0.7,
             ),
             Divider(
               color: context.theme.bgrColor,
@@ -93,7 +89,7 @@ class _SimpleSettingsSection extends StatelessWidget {
                 onChanged: _onAnteChanged,
                 allowZero: false,
               ),
-            ]
+            ],
           ],
         ),
       );

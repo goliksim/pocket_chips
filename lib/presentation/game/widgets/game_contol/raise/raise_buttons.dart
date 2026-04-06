@@ -34,6 +34,7 @@ class _RaiseButtonsState extends State<RaiseButtons> {
     required int additionalBet,
     required int currentBet,
   }) {
+    //TODO bad logic
     final totalBet = additionalBet + currentBet;
     var valueString = totalBet.toSeparatedBank;
 

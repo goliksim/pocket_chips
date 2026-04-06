@@ -191,36 +191,46 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
               .sessionState.bets[gameModel.sessionState.currentPlayerUid] ??
           0;
 
-      final (raiseBank, raiseIsAllIn) =
+      final (minRaiseValue, raiseIsAllIn) =
           gameModel.calculateRaiseValue(currentPlayerUid);
 
       final (callValue, callIsAllIn) =
           gameModel.calculateCallValue(currentPlayerUid);
-      final betBool = gameModel.checkBidsEqual();
 
-      final currentPlayerCanSkip = (currentBet == maxBet);
       final allowCustomBets = gameModel.lobbyState.settings.allowCustomBets;
 
-      final canRaise = allowCustomBets
-          ? !callIsAllIn && currentBank > callValue
-          : !callIsAllIn && (currentBank > raiseBank || raiseIsAllIn);
+      final bool canCheck = (currentBet == maxBet);
+      final bool canRaise;
+      final bool canAllIn;
 
-      final isFirstBet = betBool && gameState != GameStatusEnum.preFlop;
+      final int minPossibleBet;
+      final int maxPossibleBet = currentBank;
+      final int minRuleBet = [maxPossibleBet, minRaiseValue].min;
 
-      final maxPossibleBet = currentBank;
-      final minPossibleBet = allowCustomBets ? callValue : raiseBank;
+      if (allowCustomBets) {
+        canRaise = !callIsAllIn;
+        canAllIn = false;
+        minPossibleBet = callValue;
+      } else {
+        canRaise = !callIsAllIn && (currentBank > minRaiseValue);
+        canAllIn = raiseIsAllIn;
+        minPossibleBet = minRaiseValue;
+      }
+
+      final isFirstBet =
+          gameModel.checkBidsEqual() && gameState != GameStatusEnum.preFlop;
 
       return GamePageControlState.active(
         raiseState: RaiseControlState(
           canRaise: canRaise,
-          raiseIsAllIn: raiseIsAllIn,
+          raiseIsAllIn: canAllIn,
           isFirstBet: isFirstBet,
           maxPossibleBet: maxPossibleBet,
           minPossibleBet: minPossibleBet,
-          minRuleBet: raiseBank,
+          minRuleBet: minRuleBet,
           currentBet: currentBet,
         ),
-        mainState: currentPlayerCanSkip
+        mainState: canCheck
             ? MainControlState.check()
             : MainControlState.call(
                 callIsAllIn: callIsAllIn,
