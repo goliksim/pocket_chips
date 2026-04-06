@@ -18,6 +18,7 @@ class _SettingsModeSelector extends StatelessWidget {
                   .settingsModeLabel(GameSettingsModeState.simple),
               isSelected: selectedMode == GameSettingsModeState.simple,
               onTap: () => onModeSelected(GameSettingsModeState.simple),
+              buttonKey: GameSettingsKeys.simpleModeButton,
             ),
           ),
           SizedBox(width: stdHorizontalOffset / 2),
@@ -29,6 +30,7 @@ class _SettingsModeSelector extends StatelessWidget {
                     .settingsModeLabel(GameSettingsModeState.pro),
                 isSelected: selectedMode == GameSettingsModeState.pro,
                 onTap: () => onModeSelected(GameSettingsModeState.pro),
+                buttonKey: GameSettingsKeys.proModeButton,
               ),
             ),
           ),
@@ -40,15 +42,18 @@ class _ModeButton extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  final Key? buttonKey;
 
   const _ModeButton({
     required this.label,
     required this.isSelected,
     required this.onTap,
+    this.buttonKey,
   });
 
   @override
   Widget build(BuildContext context) => GestureDetector(
+        key: buttonKey,
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),

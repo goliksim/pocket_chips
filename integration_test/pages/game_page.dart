@@ -91,6 +91,9 @@ class GamePageTester {
           case GameStatusEnum.notStarted:
             _verifyGameStatusNotStarted();
             break;
+          case GameStatusEnum.gameBreak:
+            _verifyGameStatusBreakdown();
+            break;
           case GameStatusEnum.preFlop:
             _verifyGameStatusPreFlop();
             break;
@@ -109,6 +112,18 @@ class GamePageTester {
 
         expect(find.byKey(GameKeys.undoButton),
             isVisible ? findsOneWidget : findsNothing);
+      };
+
+  TAction tapIncreaseLevel() =>
+      () => $(GameKeys.increaseLevelButton).tapPROWidget();
+
+  TAction verifyIncreaseLevelVisibility({bool isVisible = true}) => () async {
+        await $.tester.pumpAndSettle();
+
+        expect(
+          find.byKey(GameKeys.increaseLevelButton),
+          isVisible ? findsOneWidget : findsNothing,
+        );
       };
 
   TAction startGame() => () => $(GameKeys.startGameButton).tap();
@@ -291,6 +306,50 @@ class GamePageTester {
 
   TAction tapWinnerDialog() => () => $(WinnerKeys.winnerDialog).tap();
 
+  TAction verifyProgressionVisible({bool isVisible = true}) => () async {
+        await $.tester.pumpAndSettle();
+
+        expect(
+          find.byKey(GameKeys.progressionWidget),
+          isVisible ? findsOneWidget : findsNothing,
+        );
+      };
+
+  TAction verifyProgressionLevel(
+    int level, {
+    bool isVisible = true,
+  }) =>
+      () async {
+        await $.tester.pumpAndSettle();
+
+        expect(
+          find.byKey(GameKeys.progressionLevel(level)),
+          isVisible ? findsOneWidget : findsNothing,
+        );
+      };
+
+  TAction verifyProgressionSetupLabel({bool isVisible = true}) => () async {
+        await $.tester.pumpAndSettle();
+
+        expect(
+          find.byKey(GameKeys.progressionSetupLabel),
+          isVisible ? findsOneWidget : findsNothing,
+        );
+      };
+
+  TAction verifyProgressionInterval(
+    int value, {
+    bool isVisible = true,
+  }) =>
+      () async {
+        await $.tester.pumpAndSettle();
+
+        expect(
+          find.byKey(GameKeys.progressionIntervalValue(value)),
+          isVisible ? findsOneWidget : findsNothing,
+        );
+      };
+
   void _verifyGameStatusNotStarted() {
     expect(find.byKey(GameKeys.startGameButton), findsOneWidget);
     expect(
@@ -301,6 +360,11 @@ class GamePageTester {
 
   void _verifyGameStatusPreFlop() => expect(
         find.byKey(GameKeys.gameStatusTitle(GameStatusEnum.preFlop)),
+        findsOneWidget,
+      );
+
+  void _verifyGameStatusBreakdown() => expect(
+        find.byKey(GameKeys.gameStatusTitle(GameStatusEnum.gameBreak)),
         findsOneWidget,
       );
 

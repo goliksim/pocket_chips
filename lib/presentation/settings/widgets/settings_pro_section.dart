@@ -55,7 +55,7 @@ class _ProSettingsSection extends StatelessWidget {
               ),
             if (progressionType == BlindProgressionType.everyNHands)
               _SettingsNumericField(
-                fieldKey: const ValueKey('progression_interval_hands_field'),
+                fieldKey: GameSettingsKeys.progressionHandsIntervalField,
                 label: context.strings.sett_progression_hands_interval,
                 initialValue: progressionIntervalHint,
                 controller: progressionIntervalController,
@@ -66,7 +66,7 @@ class _ProSettingsSection extends StatelessWidget {
               ),
             if (progressionType == BlindProgressionType.everyNMinutes)
               _SettingsNumericField(
-                fieldKey: const ValueKey('progression_interval_minutes_field'),
+                fieldKey: GameSettingsKeys.progressionMinutesIntervalField,
                 label: context.strings.sett_progression_minutes_interval,
                 initialValue: progressionIntervalHint,
                 controller: progressionIntervalController,
@@ -81,7 +81,7 @@ class _ProSettingsSection extends StatelessWidget {
               thickness: 2,
             ),
             _SettingsNumericField(
-              fieldKey: const ValueKey('levels_count_field'),
+              fieldKey: GameSettingsKeys.levelsCountField,
               label: context.strings.sett_levels_count,
               initialValue: levelsCountHint,
               controller: levelsCountController,

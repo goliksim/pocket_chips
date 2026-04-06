@@ -31,6 +31,7 @@ class GameProgressionWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Container(
+            key: GameKeys.progressionWidget,
             width: double.maxFinite,
             decoration: BoxDecoration(
               color: context.theme.bgrColor,
@@ -51,6 +52,10 @@ class GameProgressionWidget extends StatelessWidget {
                     tableState.showProgression
                         ? progressionLevel
                         : context.strings.game_progression_setup,
+                    key: tableState.showProgression
+                        ? GameKeys.progressionLevel(
+                            tableState.progressionLevel ?? 0)
+                        : GameKeys.progressionSetupLabel,
                     style: TextStyle(
                       color: context.theme.primaryColor.withAlpha(200),
                       fontSize: stdFontSize,
@@ -102,6 +107,9 @@ class GameProgressionWidget extends StatelessWidget {
                         _ProgressionItem(
                           title: progressionText,
                           value: '${tableState.leftInterval}',
+                          valueKey: GameKeys.progressionIntervalValue(
+                            tableState.leftInterval!,
+                          ),
                         ),
                       ]
                     ],
@@ -119,10 +127,12 @@ class GameProgressionWidget extends StatelessWidget {
 class _ProgressionItem extends StatelessWidget {
   final String? title;
   final String value;
+  final Key? valueKey;
 
   const _ProgressionItem({
     required this.value,
     this.title,
+    this.valueKey,
     super.key,
   });
 
@@ -142,6 +152,7 @@ class _ProgressionItem extends StatelessWidget {
           SizedBox(width: stdHorizontalOffset),
           Flexible(
             child: Text(
+              key: valueKey,
               value,
               style: TextStyle(
                 color: context.theme.primaryColor,

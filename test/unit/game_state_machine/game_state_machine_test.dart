@@ -12,6 +12,7 @@ import 'tests/test_execute_fold.dart';
 import 'tests/test_execute_raise.dart';
 import 'tests/test_hands_up_starting_bet.dart';
 import 'tests/test_initialization.dart';
+import 'tests/test_progression.dart';
 import 'tests/test_raise_value_calculation.dart';
 import 'tests/test_showndown_step.dart';
 import 'tests/test_starting_bet.dart';
@@ -46,6 +47,58 @@ void main() {
       test(
         'Initialization with auto-fold for players with zero bank',
         () => runInitializationAndAutoFold(container, mockAppRepository),
+      );
+      test(
+        'Initialization restores saved blind progression state',
+        () => runInitializationWithSavedHandsProgressionTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        'Manual progression resets after rebuild in notStarted state',
+        () => runManualProgressionResetOnRebuildTest(mockAppRepository),
+      );
+      test(
+        'Manual progression clamps current level on restore',
+        () => runManualProgressionClampOnRestoreTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+
+      test(
+        'Hands progression advances level after completed hand',
+        () => runEveryNHandsProgressionTest(container, mockAppRepository),
+      );
+
+      test(
+        'Timed progression advances on restore during breakdown',
+        () => runTimedProgressionAdvanceOnRestoreTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        'Hands progression does not advance after reaching last level',
+        () => runEveryNHandsLastLevelNoAdvanceTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        'Manual progression does not change during active hand',
+        () => runManualProgressionIgnoredDuringHandTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        'Manual progression stays on last level',
+        () => runManualProgressionStaysOnLastLevelTest(
+          container,
+          mockAppRepository,
+        ),
       );
 
       // ---

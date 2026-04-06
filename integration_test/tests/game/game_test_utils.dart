@@ -5,8 +5,12 @@ import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/models/config_model.dart';
+import 'package:pocket_chips/domain/models/game/blind_level_model.dart';
+import 'package:pocket_chips/domain/models/game/blind_progression_model.dart';
+import 'package:pocket_chips/domain/models/game/game_progression_state.dart';
 import 'package:pocket_chips/domain/models/game/game_session_state.dart';
 import 'package:pocket_chips/domain/models/game/game_state_enum.dart';
+import 'package:pocket_chips/domain/models/lobby/lobby_game_settings_model.dart';
 import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 import 'package:pocket_chips/services/assets_provider.dart';
@@ -46,6 +50,7 @@ LobbyStateModel buildLobbyState({
   GameStatusEnum gameState = GameStatusEnum.notStarted,
   String? dealerId,
   Map<String, int>? banks,
+  BlindProgressionModel? progression,
 }) =>
     LobbyStateModel(
       players: players,
@@ -53,6 +58,14 @@ LobbyStateModel buildLobbyState({
       defaultBank: bank,
       gameState: gameState,
       dealerId: dealerId,
+      settings: LobbyGameSettingsModel(
+        progression: progression ??
+            BlindProgressionModel(
+              progressionType: BlindProgressionType.manual,
+              progressionInterval: null,
+              blinds: BlindLevelModel(smallBlind: smallBlind),
+            ),
+      ),
     );
 
 GameSessionState buildSessionState({
@@ -61,6 +74,7 @@ GameSessionState buildSessionState({
   int lapCounter = 0,
   String? currentPlayerUid,
   String? firstPlayerUid,
+  GameProgressionState? progressionState,
 }) =>
     GameSessionState(
       bets: bets ?? {},
@@ -68,6 +82,7 @@ GameSessionState buildSessionState({
       lapCounter: lapCounter,
       currentPlayerUid: currentPlayerUid,
       firstPlayerUid: firstPlayerUid,
+      progressionState: progressionState ?? const GameProgressionState(),
     );
 
 TAction pumpGameApp({

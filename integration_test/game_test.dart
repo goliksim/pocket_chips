@@ -7,6 +7,8 @@ import 'game_test.mocks.dart';
 import 'tests/game/game_test_1.dart';
 import 'tests/game/game_test_10.dart';
 import 'tests/game/game_test_11.dart';
+import 'tests/game/game_test_12.dart';
+import 'tests/game/game_test_13.dart';
 import 'tests/game/game_test_2.dart';
 import 'tests/game/game_test_3.dart';
 import 'tests/game/game_test_4.dart';
@@ -80,6 +82,16 @@ void main() {
       patrolTest(
         'Game Test 11',
         ($) => runGameTest11($, mockAppRepository),
+      );
+
+      patrolTest(
+        'Game Test 12',
+        ($) => runGameTest12($, mockAppRepository),
+      );
+
+      patrolTest(
+        'Game Test 13',
+        ($) => runGameTest13($, mockAppRepository),
       );
     },
   );

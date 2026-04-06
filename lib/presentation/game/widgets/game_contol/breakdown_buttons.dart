@@ -67,7 +67,7 @@ class BreakdownButtons extends StatelessWidget {
               child: Tooltip(
                 message: context.strings.tooltip_increase_level,
                 child: MyButton(
-                  key: GameKeys.settingsButton,
+                  key: GameKeys.increaseLevelButton,
                   height: stdButtonHeight,
                   width: double.infinity,
                   buttonColor: context.theme.secondaryColor,

@@ -60,11 +60,17 @@ class BankEditorKeys {
 class GameKeys {
   static const Key page = Key('gamePage');
   static const Key undoButton = Key('undoButton');
+  static const Key increaseLevelButton = Key('increaseLevelButton');
+  static const Key progressionWidget = Key('progressionWidget');
+  static const Key progressionSetupLabel = Key('progressionSetupLabel');
 
   static Key gameStatusTitle(GameStatusEnum status) =>
       Key('gameStatusTitle_${status.name}');
   static Key blinds(int smallBlind) =>
       Key('blinds_${smallBlind}_${smallBlind * 2}');
+  static Key progressionLevel(int level) => Key('progressionLevel_$level');
+  static Key progressionIntervalValue(int value) =>
+      Key('progressionIntervalValue_$value');
 
   static const startGameButton = Key('startGameButton');
   static const settingsButton = Key('settingsButton');
@@ -197,9 +203,16 @@ class SavedPlayersKeys {
 
 class GameSettingsKeys {
   static const Key dialog = Key('settings_dialog');
+  static const Key simpleModeButton = Key('settings_simple_mode_button');
+  static const Key proModeButton = Key('settings_pro_mode_button');
 
   static const Key stackField = Key('settings_stack_field');
   static const Key smallBlindField = Key('settings_sm_blind_field');
+  static const Key levelsCountField = Key('settings_levels_count_field');
+  static const Key progressionHandsIntervalField =
+      Key('settings_progression_hands_interval_field');
+  static const Key progressionMinutesIntervalField =
+      Key('settings_progression_minutes_interval_field');
   static const Key allowCustomBetsCheckbox =
       Key('settings_allow_custom_bets_checkbox');
 

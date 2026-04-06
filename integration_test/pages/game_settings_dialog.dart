@@ -25,6 +25,14 @@ class GameSettingsDialogTester {
   TAction enterSmallBlind(String text) =>
       () => $(GameSettingsKeys.smallBlindField).enterText(text);
 
+  TAction switchToSimpleMode() =>
+      () => $(GameSettingsKeys.simpleModeButton).tap();
+
+  TAction switchToProMode() => () => $(GameSettingsKeys.proModeButton).tap();
+
+  TAction enterLevelsCount(String text) =>
+      () => $(GameSettingsKeys.levelsCountField).enterText(text);
+
   TAction verifyAllowCustomBetsValue(bool expectedValue) => () async {
         await $.tester.pumpAndSettle();
 
