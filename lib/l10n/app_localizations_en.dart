@@ -627,10 +627,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get update_3 =>
-      'PRO users can now put their photos from the gallery to players';
+      'PRO users can their photos from the gallery to players';
 
   @override
-  String get update_4 => 'PRO users can now undo their last game action';
+  String get update_4 => 'PRO users can undo their last game action';
+
+  @override
+  String get update_5 =>
+      'PRO users can customize the blind structure in the settings';
+
+  @override
+  String get update_6 => 'Added the ability to customize the ante';
 
   @override
   String get pro_version_offer_title => 'Maximum features in the PRO version';
@@ -654,14 +661,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pro_version_offer_option_4 => 'Up to 10 players in the lobby';
 
   @override
-  String get pro_version_offer_option_5 =>
-      'Saving game progress and frequent players';
+  String get pro_version_offer_option_5 => 'Saving players & game progress';
 
   @override
   String get pro_version_offer_option_6 => 'Custom player avatars';
 
   @override
   String get pro_version_offer_option_7 => 'Undo last action';
+
+  @override
+  String get pro_version_offer_option_8 => 'Blind structure in settings';
 
   @override
   String get pro_version_offer_button_purchased => 'PRO active';

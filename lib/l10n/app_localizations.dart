@@ -1289,14 +1289,26 @@ abstract class AppLocalizations {
   /// No description provided for @update_3.
   ///
   /// In en, this message translates to:
-  /// **'PRO users can now put their photos from the gallery to players'**
+  /// **'PRO users can their photos from the gallery to players'**
   String get update_3;
 
   /// No description provided for @update_4.
   ///
   /// In en, this message translates to:
-  /// **'PRO users can now undo their last game action'**
+  /// **'PRO users can undo their last game action'**
   String get update_4;
+
+  /// No description provided for @update_5.
+  ///
+  /// In en, this message translates to:
+  /// **'PRO users can customize the blind structure in the settings'**
+  String get update_5;
+
+  /// No description provided for @update_6.
+  ///
+  /// In en, this message translates to:
+  /// **'Added the ability to customize the ante'**
+  String get update_6;
 
   /// No description provided for @pro_version_offer_title.
   ///
@@ -1343,7 +1355,7 @@ abstract class AppLocalizations {
   /// No description provided for @pro_version_offer_option_5.
   ///
   /// In en, this message translates to:
-  /// **'Saving game progress and frequent players'**
+  /// **'Saving players & game progress'**
   String get pro_version_offer_option_5;
 
   /// No description provided for @pro_version_offer_option_6.
@@ -1357,6 +1369,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Undo last action'**
   String get pro_version_offer_option_7;
+
+  /// No description provided for @pro_version_offer_option_8.
+  ///
+  /// In en, this message translates to:
+  /// **'Blind structure in settings'**
+  String get pro_version_offer_option_8;
 
   /// No description provided for @pro_version_offer_button_purchased.
   ///

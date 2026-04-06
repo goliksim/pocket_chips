@@ -623,19 +623,25 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get update_1 =>
-      'Исправлены многие проблемы приложения, улучшен пользовательский опыт';
+      'Исправлены многие ошибки, улучшен пользовательский опыт';
 
   @override
   String get update_2 =>
-      'Добавлена страница для поддержки автора, буду рад любой помощи!';
+      'Добавлена страница поддержки автора, буду рад любой помощи!';
 
   @override
-  String get update_3 =>
-      'ПРО пользователи теперь могут ставить игрокам свои фото из галереи';
+  String get update_3 => 'ПРО пользователи могут настраивать аватар из галереи';
 
   @override
   String get update_4 =>
-      'ПРО пользователи теперь могут отменять последнее действие игры';
+      'ПРО пользователи могут отменять последнее действие игры';
+
+  @override
+  String get update_5 =>
+      'ПРО пользователи могут настраивать структуру блайндов в настройках';
+
+  @override
+  String get update_6 => 'Добавлена возможность настройки анте';
 
   @override
   String get pro_version_offer_title => 'Максимум возможностей в PRO версии';
@@ -660,13 +666,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pro_version_offer_option_5 =>
-      'Сохранение прогресса игры и частых игроков';
+      'Сохранение игроков и прогресса игры';
 
   @override
   String get pro_version_offer_option_6 => 'Кастомные аватары игроков';
 
   @override
   String get pro_version_offer_option_7 => 'Отмена последнего действия';
+
+  @override
+  String get pro_version_offer_option_8 => 'Настройка структура блайндов';
 
   @override
   String get pro_version_offer_button_purchased => 'PRO активен';

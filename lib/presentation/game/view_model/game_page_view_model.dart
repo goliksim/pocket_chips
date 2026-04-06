@@ -146,8 +146,6 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         fold: (_) => _gameStateMachine.executeFold(),
       );
 
-  //TODO смена настроек не сохраняется в стек прошлых состояний
-  //При откате назад, откатываем и настройки тоже
   @override
   Future<void> openSettings() async {
     await _navigationManager.showLobbySettings();
