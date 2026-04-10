@@ -2,12 +2,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pocket_chips/di/model_holders.dart';
+import 'package:pocket_chips/domain/models/game/blind_level_model.dart';
 import 'package:pocket_chips/domain/models/game/game_session_state.dart';
 import 'package:pocket_chips/domain/models/game/game_state_effect.dart';
 import 'package:pocket_chips/domain/models/game/game_state_enum.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import '../../test_utils.dart';
+
+void expectWinnerSelectionEffect(
+  List<GameStateEffect> effects, {
+  required Set<String> possibleWinnersUid,
+  required bool isSideSpot,
+  int? expectedAnteValue,
+  int? expectedFoldedValue,
+}) {
+  expect(effects.length, 1);
+
+  final effect = effects.single;
+  expect(effect, isA<GameStateNeedWinnerSelectionEffect>());
+
+  effect.map(
+    error: (_) => fail('Expected needWinnerSelection effect'),
+    hasWinner: (_) => fail('Expected needWinnerSelection effect'),
+    needWinnerSelection: (effect) {
+      expect(effect.playerContributions.keys.toSet(), possibleWinnersUid);
+      expect(effect.isSideSpot, isSideSpot);
+      if (expectedAnteValue != null) {
+        expect(effect.anteValue, expectedAnteValue);
+      }
+      if (expectedFoldedValue != null) {
+        expect(effect.foldedValue, expectedFoldedValue);
+      }
+    },
+  );
+}
 
 /// [ShowdownTest] Money distribution and winner dialog after all players folds
 void runShowdownWinFromFoldedTest(
@@ -119,14 +148,10 @@ void runShowdownEqualBidsOneWinnerTest(
 
   // Effects check
   final expectedWinners = players.map((p) => p.uid).toSet();
-  expect(
+  expectWinnerSelectionEffect(
     tempState.effects,
-    [
-      GameStateEffect.needWinnerSelection(
-        possibleWinnersUid: expectedWinners,
-        isSideSpot: false,
-      )
-    ],
+    possibleWinnersUid: expectedWinners,
+    isSideSpot: false,
   );
 
   await gameStateMachine.executeWinnerSelection(
@@ -201,14 +226,10 @@ void runShowdownEqualBidsTwoWinnerTest(
 
   // Effects check
   final expectedWinners = players.map((p) => p.uid).toSet();
-  expect(
+  expectWinnerSelectionEffect(
     tempState.effects,
-    [
-      GameStateEffect.needWinnerSelection(
-        possibleWinnersUid: expectedWinners,
-        isSideSpot: false,
-      )
-    ],
+    possibleWinnersUid: expectedWinners,
+    isSideSpot: false,
   );
 
   await gameStateMachine.executeWinnerSelection(
@@ -283,14 +304,10 @@ void runShowdownEqualBidsAllWinnersTest(
 
   // Effects check
   final expectedWinners = players.map((p) => p.uid).toSet();
-  expect(
+  expectWinnerSelectionEffect(
     tempState.effects,
-    [
-      GameStateEffect.needWinnerSelection(
-        possibleWinnersUid: expectedWinners,
-        isSideSpot: false,
-      )
-    ],
+    possibleWinnersUid: expectedWinners,
+    isSideSpot: false,
   );
 
   await gameStateMachine.executeWinnerSelection(
@@ -367,14 +384,10 @@ void runShowdownTwoAllPreflopInTest(
 
   // Effects check
   final expectedWinners = {players[1].uid, players[2].uid, players[3].uid};
-  expect(
+  expectWinnerSelectionEffect(
     tempState.effects,
-    [
-      GameStateEffect.needWinnerSelection(
-        possibleWinnersUid: expectedWinners,
-        isSideSpot: false,
-      )
-    ],
+    possibleWinnersUid: expectedWinners,
+    isSideSpot: false,
   );
 
   await gameStateMachine.executeWinnerSelection(
@@ -452,14 +465,10 @@ void runShowdownTwoAllPreflopIn2Test(
 
   // Effects check
   final expectedWinners = {players[1].uid, players[2].uid, players[3].uid};
-  expect(
+  expectWinnerSelectionEffect(
     tempState.effects,
-    [
-      GameStateEffect.needWinnerSelection(
-        possibleWinnersUid: expectedWinners,
-        isSideSpot: false,
-      )
-    ],
+    possibleWinnersUid: expectedWinners,
+    isSideSpot: false,
   );
 
   await gameStateMachine.executeWinnerSelection(
@@ -538,14 +547,10 @@ void runShowdownTwoAllPreflopIn3Test(
 
   // Effects check
   final expectedWinners = {players[1].uid, players[2].uid, players[3].uid};
-  expect(
+  expectWinnerSelectionEffect(
     tempState.effects,
-    [
-      GameStateEffect.needWinnerSelection(
-        possibleWinnersUid: expectedWinners,
-        isSideSpot: false,
-      )
-    ],
+    possibleWinnersUid: expectedWinners,
+    isSideSpot: false,
   );
 
   await gameStateMachine.executeWinnerSelection(
@@ -623,14 +628,10 @@ void runShowdownTwoAllPreflopIn4Test(
 
   // Effects check
   final expectedWinners = {players[1].uid, players[2].uid, players[3].uid};
-  expect(
+  expectWinnerSelectionEffect(
     tempState.effects,
-    [
-      GameStateEffect.needWinnerSelection(
-        possibleWinnersUid: expectedWinners,
-        isSideSpot: false,
-      )
-    ],
+    possibleWinnersUid: expectedWinners,
+    isSideSpot: false,
   );
 
   await gameStateMachine.executeWinnerSelection(
@@ -713,14 +714,10 @@ void runShowdownDistribution1Test(
 
 // Effects check
   final expectedWinners = {players[1].uid, players[2].uid};
-  expect(
+  expectWinnerSelectionEffect(
     tempState.effects,
-    [
-      GameStateEffect.needWinnerSelection(
-        possibleWinnersUid: expectedWinners,
-        isSideSpot: false,
-      )
-    ],
+    possibleWinnersUid: expectedWinners,
+    isSideSpot: false,
   );
 
   await gameStateMachine.executeWinnerSelection(
@@ -805,14 +802,10 @@ void runShowdownDistribution2Test(
 
 // Effects check
   final expectedWinners = {players[1].uid, players[2].uid};
-  expect(
+  expectWinnerSelectionEffect(
     tempState.effects,
-    [
-      GameStateEffect.needWinnerSelection(
-        possibleWinnersUid: expectedWinners,
-        isSideSpot: false,
-      )
-    ],
+    possibleWinnersUid: expectedWinners,
+    isSideSpot: false,
   );
 
   await gameStateMachine.executeWinnerSelection(
@@ -904,14 +897,10 @@ void runShowdownDistribution3Test(
     players[3].uid,
     players[4].uid
   };
-  expect(
+  expectWinnerSelectionEffect(
     tempState1.effects,
-    [
-      GameStateEffect.needWinnerSelection(
-        possibleWinnersUid: expectedWinners1,
-        isSideSpot: false,
-      )
-    ],
+    possibleWinnersUid: expectedWinners1,
+    isSideSpot: false,
   );
 
   await gameStateMachine.executeWinnerSelection(
@@ -921,14 +910,10 @@ void runShowdownDistribution3Test(
 
   // Effects check
   final expectedWinners2 = {players[0].uid, players[3].uid, players[4].uid};
-  expect(
+  expectWinnerSelectionEffect(
     tempState2.effects,
-    [
-      GameStateEffect.needWinnerSelection(
-        possibleWinnersUid: expectedWinners2,
-        isSideSpot: true,
-      )
-    ],
+    possibleWinnersUid: expectedWinners2,
+    isSideSpot: true,
   );
 
   await gameStateMachine.executeWinnerSelection(
@@ -1007,14 +992,10 @@ void runShowdownDistribution4Test(
 
   // Effects check
   final expectedWinners = players.map((e) => e.uid).toSet();
-  expect(
+  expectWinnerSelectionEffect(
     tempState.effects,
-    [
-      GameStateEffect.needWinnerSelection(
-        possibleWinnersUid: expectedWinners,
-        isSideSpot: false,
-      )
-    ],
+    possibleWinnersUid: expectedWinners,
+    isSideSpot: false,
   );
 
   await gameStateMachine.executeWinnerSelection(
@@ -1052,4 +1033,137 @@ void runShowdownDistribution4Test(
       firstPlayerUid: null,
     ),
   );
+}
+
+/// [ShowdownTest] folded-only extra bet is skipped as a separate pot
+/// and shown as folded dead money in the next selectable pot.
+void runShowdownFoldedDeadMoneyEffectTest(
+  ProviderContainer container,
+  AppRepository repository,
+) async {
+  final players = createPlayers(4);
+  final lobbyState = createLobbyState(
+    players,
+    smallBlindValue: 20,
+    gameState: GameStatusEnum.showdown,
+    banks: {
+      for (final player in players) player.uid: 0,
+    },
+  );
+  final gameSessionState = GameSessionState(
+    lapCounter: 0,
+    foldedPlayers: {players[0].uid},
+    currentPlayerUid: players[1].uid,
+    firstPlayerUid: players[1].uid,
+    bets: {
+      players[0].uid: 10,
+      players[1].uid: 20,
+      players[2].uid: 20,
+      players[3].uid: 20,
+    },
+  );
+
+  when(repository.getLobbyState()).thenAnswer((_) async => lobbyState);
+  when(repository.getGameSessionState())
+      .thenAnswer((_) async => gameSessionState);
+
+  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
+
+  final gameState = gameStateMachine.state.requireValue;
+
+  expectWinnerSelectionEffect(
+    gameState.effects,
+    possibleWinnersUid: {
+      players[1].uid,
+      players[2].uid,
+      players[3].uid,
+    },
+    isSideSpot: false,
+    expectedFoldedValue: 10,
+  );
+}
+
+/// [ShowdownTest] traditional ante stays proportional across side pots.
+void runShowdownTraditionalAnteDistributionTest(
+  ProviderContainer container,
+  AppRepository repository,
+) async {
+  final players = createPlayers(3);
+  final lobbyState = createLobbyState(
+    players,
+    smallBlindValue: 20,
+    anteType: AnteType.traditional,
+    anteValue: 100,
+    gameState: GameStatusEnum.showdown,
+    banks: {
+      players[0].uid: 0,
+      players[1].uid: 0,
+      players[2].uid: 0,
+    },
+  );
+  final gameSessionState = GameSessionState(
+    lapCounter: 0,
+    foldedPlayers: {},
+    currentPlayerUid: players[0].uid,
+    firstPlayerUid: players[0].uid,
+    bets: {
+      players[0].uid: 0,
+      players[1].uid: 1000,
+      players[2].uid: 1000,
+    },
+    anteBets: {
+      players[0].uid: 10,
+      players[1].uid: 100,
+      players[2].uid: 100,
+    },
+  );
+
+  when(repository.getLobbyState()).thenAnswer((_) async => lobbyState);
+  when(repository.getGameSessionState())
+      .thenAnswer((_) async => gameSessionState);
+
+  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
+
+  final initialState = gameStateMachine.state.requireValue;
+  expectWinnerSelectionEffect(
+    initialState.effects,
+    possibleWinnersUid: {
+      players[0].uid,
+      players[1].uid,
+      players[2].uid,
+    },
+    isSideSpot: false,
+  );
+
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: {players[0].uid},
+  );
+
+  final sidePotState = gameStateMachine.state.requireValue;
+  expectWinnerSelectionEffect(
+    sidePotState.effects,
+    possibleWinnersUid: {
+      players[1].uid,
+      players[2].uid,
+    },
+    isSideSpot: true,
+  );
+
+  await gameStateMachine.executeWinnerSelection(
+    selectedWinners: {players[1].uid},
+  );
+
+  final finalState = gameStateMachine.state.requireValue;
+
+  expect(
+    finalState.lobbyState.banks,
+    {
+      players[0].uid: 30,
+      players[1].uid: 2180,
+      players[2].uid: 0,
+    },
+  );
+  expect(finalState.effects, []);
 }

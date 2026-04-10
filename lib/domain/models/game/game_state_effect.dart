@@ -13,8 +13,11 @@ abstract class GameStateEffect with _$GameStateEffect {
   }) = GameStateHasWinnerEffect;
 
   const factory GameStateEffect.needWinnerSelection({
-    required Set<String> possibleWinnersUid,
     required bool isSideSpot,
+    @Default(0) int potValue,
+    @Default(0) int anteValue,
+    @Default(0) int foldedValue,
+    @Default(<String, int>{}) Map<String, int> playerContributions,
   }) = GameStateNeedWinnerSelectionEffect;
 }
 

@@ -116,6 +116,7 @@
     "game_call":"Колл",
     "game_all":"Ва-банк",
     "game_bet":"Cтавка",
+    "game_total_bet":"Общая ставка",
     "game_bet_to":"Полная ставка",
     "game_raise":"Рейз",
     "game_raise_to":"Рейз до",
@@ -124,7 +125,20 @@
     "game_win2":"победитель!",
     "game_win3":"Выберите победителей",
     "game_win_conf":"Подтвердить",
-    "game_win4":"Выберите победителя сайд-пота",
+    "game_pot_main":"Основной банк",
+    "game_pot_side":"Сайд-пот",
+    "game_pot_including_ante":"включая анте {amount}",
+    "@game_pot_including_ante":{
+      "placeholders":{
+        "amount":{}
+      }
+    },
+    "game_pot_including_folded":"включая сброшенные {amount}",
+    "@game_pot_including_folded":{
+      "placeholders":{
+        "amount":{}
+      }
+    },
     "game_progression_setup": "Установки",
     "game_start":"Начать торги",
     "toast_thanks":"Спасибо!",
@@ -145,6 +159,7 @@
     "sett_ante_type":"Тип анте",
     "sett_ante":"Размер анте",
     "sett_progression":"Прогрессия",
+    "sett_progression_tooltip": "Уровни будут переключаться вручную, каждые N раздач или N минут.\nПереключение происходит только на перерыве.", 
     "sett_progression_manual":"Вручную",
     "sett_progression_hands":"N раздач",
     "sett_progression_hands_left":"Раздач осталось",
@@ -162,8 +177,9 @@
     "sett_mode_simple":"Упрощенные",
     "sett_mode_pro":"Pro",
     "ante_type_none":"Нет",
-    "ante_type_traditional":"Базовый (Все)",
-    "ante_type_big_blind":"BBA (Только Бб)",
+    "ante_type_tooltip":"Обычное анте: Платят все игроки (по ~10% SB) перед блайндами.\nBB анте: Платит только ББ (сумма = 1BB) после блайндов, достается победителю основного банка полностью.",
+    "ante_type_traditional":"Стандартное",
+    "ante_type_big_blind":"BBA",
     "toast_unav":"Недоступно",
     "toast_incorrect_player":"Проверьте имя и начальный стек",
     "toast_playp_edit_new_dealer":"Новый дилер -",

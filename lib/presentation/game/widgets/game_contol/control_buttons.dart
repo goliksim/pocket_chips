@@ -24,7 +24,11 @@ class ControlButtons extends StatelessWidget {
   /// Bet or Raise button title
   String _raiseButtonTitle(AppLocalizations strings) {
     if (state.raiseState.raiseIsAllIn) {
-      return strings.game_all;
+      final prefix = strings.game_all;
+      final value =
+          (state.raiseState.maxPossibleBet + state.raiseState.currentBet)
+              .toCompactBank;
+      return '$prefix\n$value';
     }
 
     return state.raiseState.isFirstBet ? strings.game_bet : strings.game_raise;

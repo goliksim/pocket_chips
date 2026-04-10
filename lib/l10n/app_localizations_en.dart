@@ -368,6 +368,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get game_bet => 'Bet';
 
   @override
+  String get game_total_bet => 'Total bet';
+
+  @override
   String get game_bet_to => 'Bet to';
 
   @override
@@ -386,13 +389,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get game_win2 => 'is winner!';
 
   @override
-  String get game_win3 => 'Select the winners';
+  String get game_win3 => 'Select winners';
 
   @override
   String get game_win_conf => 'Enter';
 
   @override
-  String get game_win4 => 'Select side-pot winner';
+  String get game_pot_main => 'Main Pot';
+
+  @override
+  String get game_pot_side => 'Side Pot';
+
+  @override
+  String game_pot_including_ante(Object amount) {
+    return 'including ante $amount';
+  }
+
+  @override
+  String game_pot_including_folded(Object amount) {
+    return 'including folded $amount';
+  }
 
   @override
   String get game_progression_setup => 'Setup';
@@ -457,6 +473,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sett_progression => 'Progression';
 
   @override
+  String get sett_progression_tooltip =>
+      'Levels will be switched manually, every N hands or N minutes.\nSwitching occurs only during breakdown.';
+
+  @override
   String get sett_progression_manual => 'Manual';
 
   @override
@@ -508,10 +528,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ante_type_none => 'None';
 
   @override
-  String get ante_type_traditional => 'Basic (All)';
+  String get ante_type_tooltip =>
+      'Traditional: All players pays (~10% of SB) before the blinds. BBA: Only BB pays (amount = 1BB) after the blinds, goes to main pot winner in full.';
 
   @override
-  String get ante_type_big_blind => 'BBA (Only Bb)';
+  String get ante_type_traditional => 'Traditional';
+
+  @override
+  String get ante_type_big_blind => 'BBA';
 
   @override
   String get toast_unav => 'Unavailible now';

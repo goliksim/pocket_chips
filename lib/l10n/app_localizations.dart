@@ -782,6 +782,12 @@ abstract class AppLocalizations {
   /// **'Bet'**
   String get game_bet;
 
+  /// No description provided for @game_total_bet.
+  ///
+  /// In en, this message translates to:
+  /// **'Total bet'**
+  String get game_total_bet;
+
   /// No description provided for @game_bet_to.
   ///
   /// In en, this message translates to:
@@ -821,7 +827,7 @@ abstract class AppLocalizations {
   /// No description provided for @game_win3.
   ///
   /// In en, this message translates to:
-  /// **'Select the winners'**
+  /// **'Select winners'**
   String get game_win3;
 
   /// No description provided for @game_win_conf.
@@ -830,11 +836,29 @@ abstract class AppLocalizations {
   /// **'Enter'**
   String get game_win_conf;
 
-  /// No description provided for @game_win4.
+  /// No description provided for @game_pot_main.
   ///
   /// In en, this message translates to:
-  /// **'Select side-pot winner'**
-  String get game_win4;
+  /// **'Main Pot'**
+  String get game_pot_main;
+
+  /// No description provided for @game_pot_side.
+  ///
+  /// In en, this message translates to:
+  /// **'Side Pot'**
+  String get game_pot_side;
+
+  /// No description provided for @game_pot_including_ante.
+  ///
+  /// In en, this message translates to:
+  /// **'including ante {amount}'**
+  String game_pot_including_ante(Object amount);
+
+  /// No description provided for @game_pot_including_folded.
+  ///
+  /// In en, this message translates to:
+  /// **'including folded {amount}'**
+  String game_pot_including_folded(Object amount);
 
   /// No description provided for @game_progression_setup.
   ///
@@ -956,6 +980,12 @@ abstract class AppLocalizations {
   /// **'Progression'**
   String get sett_progression;
 
+  /// No description provided for @sett_progression_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Levels will be switched manually, every N hands or N minutes.\nSwitching occurs only during breakdown.'**
+  String get sett_progression_tooltip;
+
   /// No description provided for @sett_progression_manual.
   ///
   /// In en, this message translates to:
@@ -1058,16 +1088,22 @@ abstract class AppLocalizations {
   /// **'None'**
   String get ante_type_none;
 
+  /// No description provided for @ante_type_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Traditional: All players pays (~10% of SB) before the blinds. BBA: Only BB pays (amount = 1BB) after the blinds, goes to main pot winner in full.'**
+  String get ante_type_tooltip;
+
   /// No description provided for @ante_type_traditional.
   ///
   /// In en, this message translates to:
-  /// **'Basic (All)'**
+  /// **'Traditional'**
   String get ante_type_traditional;
 
   /// No description provided for @ante_type_big_blind.
   ///
   /// In en, this message translates to:
-  /// **'BBA (Only Bb)'**
+  /// **'BBA'**
   String get ante_type_big_blind;
 
   /// No description provided for @toast_unav.

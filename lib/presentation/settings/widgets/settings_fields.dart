@@ -221,6 +221,7 @@ class _SettingsDropdownField<T> extends StatelessWidget {
   final double fontSizeMultiplier;
   final double dropdownFontSizeMultiplier;
   final double widthMultiplier;
+  final String? tooltip;
 
   const _SettingsDropdownField({
     required this.label,
@@ -231,6 +232,7 @@ class _SettingsDropdownField<T> extends StatelessWidget {
     this.fontSizeMultiplier = 1.0,
     this.dropdownFontSizeMultiplier = 1.0,
     this.widthMultiplier = 1.0,
+    this.tooltip,
   });
 
   @override
@@ -238,14 +240,33 @@ class _SettingsDropdownField<T> extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
-            child: Text(
-              label,
+            child: Text.rich(
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: context.theme.onBackground,
-                fontSize: stdFontSize * fontSizeMultiplier,
-                fontWeight: FontWeight.normal,
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '$label ',
+                    style: TextStyle(
+                      color: context.theme.onBackground,
+                      fontSize: stdFontSize,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  if (tooltip != null)
+                    WidgetSpan(
+                      child: Tooltip(
+                        triggerMode: TooltipTriggerMode.tap,
+                        showDuration: const Duration(seconds: 7),
+                        message: tooltip,
+                        child: Icon(
+                          Icons.help_outline,
+                          color: context.theme.hintColor,
+                          size: stdIconSize * 0.75 * fontSizeMultiplier,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),

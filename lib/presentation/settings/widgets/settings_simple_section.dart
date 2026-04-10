@@ -74,6 +74,7 @@ class _SimpleSettingsSection extends StatelessWidget {
               onChanged: _onAnteTypeChanged,
               dropdownFontSizeMultiplier: 0.85,
               widthMultiplier: 0.83,
+              tooltip: context.strings.ante_type_tooltip,
             ),
             if (blinds.anteType != AnteType.none) ...[
               Divider(

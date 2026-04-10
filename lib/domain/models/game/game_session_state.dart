@@ -8,6 +8,7 @@ part 'game_session_state.freezed.dart';
 abstract class GameSessionState with _$GameSessionState {
   const factory GameSessionState({
     required Map<String, int> bets,
+    @Default(<String, int>{}) Map<String, int> anteBets,
     required Set<String> foldedPlayers,
     required int lapCounter,
     @Default(GameProgressionState()) GameProgressionState progressionState,
@@ -17,6 +18,7 @@ abstract class GameSessionState with _$GameSessionState {
 
   factory GameSessionState.initial() => GameSessionState(
         bets: {},
+        anteBets: {},
         foldedPlayers: {},
         lapCounter: 0,
       );

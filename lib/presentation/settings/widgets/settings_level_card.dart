@@ -173,6 +173,7 @@ class _SettingsLevelCardState extends State<_SettingsLevelCard> {
                         fontSizeMultiplier: 0.9,
                         dropdownFontSizeMultiplier: 0.75,
                         widthMultiplier: 0.83,
+                        tooltip: context.strings.ante_type_tooltip,
                       ),
                       if (widget.level.anteType != AnteType.none) ...[
                         Divider(

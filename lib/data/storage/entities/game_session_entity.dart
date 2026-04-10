@@ -7,6 +7,8 @@ part 'game_session_entity.g.dart';
 @JsonSerializable()
 class GameSessionEntity {
   final Map<String, int> bets;
+  @JsonKey(defaultValue: <String, int>{})
+  final Map<String, int> anteBets;
   final Set<String> foldedPlayersInactive;
   final int lapCounter;
   final GameProgressionEntity? progressionState;
@@ -15,6 +17,7 @@ class GameSessionEntity {
 
   const GameSessionEntity({
     required this.bets,
+    required this.anteBets,
     required this.foldedPlayersInactive,
     required this.lapCounter,
     this.progressionState,

@@ -20,6 +20,8 @@ LobbyStateModel createLobbyState(
   List<PlayerModel> players, {
   String? dealerId,
   int smallBlindValue = 10,
+  AnteType anteType = AnteType.none,
+  int? anteValue,
   bool allowCustomBets = false,
   Map<String, int>? banks,
   int? defaultBank,
@@ -33,7 +35,11 @@ LobbyStateModel createLobbyState(
         progression: BlindProgressionModel(
           progressionType: BlindProgressionType.manual,
           progressionInterval: null,
-          blinds: BlindLevelModel(smallBlind: smallBlindValue),
+          blinds: BlindLevelModel(
+            smallBlind: smallBlindValue,
+            anteType: anteType,
+            anteValue: anteValue,
+          ),
         ),
       ),
       banks: banks ??

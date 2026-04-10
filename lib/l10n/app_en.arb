@@ -114,15 +114,29 @@
     "game_call":"Call",
     "game_all":"All in",
     "game_bet":"Bet",
+    "game_total_bet":"Total bet",
     "game_bet_to":"Bet to",
     "game_raise":"Raise",
     "game_raise_to":"Raise to",
     "game_raise_canc":"Cancel",
     "game_win1":"winner",
     "game_win2":"is winner!",
-    "game_win3":"Select the winners",
+    "game_win3":"Select winners",
     "game_win_conf":"Enter",
-    "game_win4":"Select side-pot winner",
+    "game_pot_main":"Main Pot",
+    "game_pot_side":"Side Pot",
+    "game_pot_including_ante":"including ante {amount}",
+    "@game_pot_including_ante":{
+      "placeholders":{
+        "amount":{}
+      }
+    },
+    "game_pot_including_folded":"including folded {amount}",
+    "@game_pot_including_folded":{
+      "placeholders":{
+        "amount":{}
+      }
+    },
     "game_progression_setup": "Setup",
     "game_start":"Start Betting",
     "toast_thanks":"Thank you!",
@@ -143,6 +157,7 @@
     "sett_ante_type":"Ante Type",
     "sett_ante":"Ante value",
     "sett_progression":"Progression",
+    "sett_progression_tooltip":"Levels will be switched manually, every N hands or N minutes.\nSwitching occurs only during breakdown.",
     "sett_progression_manual":"Manual",
     "sett_progression_hands":"N hands",
     "sett_progression_hands_left":"Hands left",
@@ -160,8 +175,9 @@
     "sett_level_blind": "Blinds",
     "sett_level_ante": "Ante",
     "ante_type_none":"None",
-    "ante_type_traditional":"Basic (All)",
-    "ante_type_big_blind":"BBA (Only Bb)",
+    "ante_type_tooltip":"Traditional: All players pays (~10% of SB) before the blinds. BBA: Only BB pays (amount = 1BB) after the blinds, goes to main pot winner in full.",
+    "ante_type_traditional":"Traditional",
+    "ante_type_big_blind":"BBA",
     "toast_unav":"Unavailible now",
     "toast_incorrect_player":"Check for name and initial stack",
     "toast_playp_edit_new_dealer":"New dealer is -",

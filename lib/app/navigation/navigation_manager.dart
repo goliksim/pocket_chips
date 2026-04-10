@@ -156,7 +156,6 @@ class NavigationManager extends ChangeNotifier {
         context: context,
         child: Consumer(
           builder: (_, ref, __) => WinnerChoiceWindow(
-            title: args.title,
             viewModel: ref.watch(
               winnerChooseViewModelProvider(args),
             ),

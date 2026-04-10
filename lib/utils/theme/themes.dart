@@ -33,10 +33,10 @@ class Themes {
       : name = 'dark',
         bgrColor = const Color.fromARGB(253, 25, 25, 32),
         bankColor = const Color.fromARGB(255, 48, 48, 62),
-        hintColor = const Color.fromARGB(255, 93, 93, 115),
+        hintColor = const Color.fromARGB(255, 107, 107, 133),
         playerColor = const Color.fromARGB(255, 36, 35, 45),
         additionButtonColor = const Color.fromARGB(255, 64, 69, 110),
-        primaryColor = MaterialColor(0xff746ce5, colorLight),
+        primaryColor = MaterialColor(0xff7e77e5, colorLight),
         secondaryColor = const Color.fromARGB(255, 102, 126, 231),
         alertColor = const Color.fromARGB(255, 238, 98, 98),
         onBackground = const Color.fromARGB(255, 241, 241, 251);

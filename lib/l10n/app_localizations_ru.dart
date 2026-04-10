@@ -369,6 +369,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get game_bet => 'Cтавка';
 
   @override
+  String get game_total_bet => 'Общая ставка';
+
+  @override
   String get game_bet_to => 'Полная ставка';
 
   @override
@@ -393,7 +396,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get game_win_conf => 'Подтвердить';
 
   @override
-  String get game_win4 => 'Выберите победителя сайд-пота';
+  String get game_pot_main => 'Основной банк';
+
+  @override
+  String get game_pot_side => 'Сайд-пот';
+
+  @override
+  String game_pot_including_ante(Object amount) {
+    return 'включая анте $amount';
+  }
+
+  @override
+  String game_pot_including_folded(Object amount) {
+    return 'включая сброшенные $amount';
+  }
 
   @override
   String get game_progression_setup => 'Установки';
@@ -459,6 +475,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sett_progression => 'Прогрессия';
 
   @override
+  String get sett_progression_tooltip =>
+      'Уровни будут переключаться вручную, каждые N раздач или N минут.\nПереключение происходит только на перерыве.';
+
+  @override
   String get sett_progression_manual => 'Вручную';
 
   @override
@@ -510,10 +530,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get ante_type_none => 'Нет';
 
   @override
-  String get ante_type_traditional => 'Базовый (Все)';
+  String get ante_type_tooltip =>
+      'Обычное анте: Платят все игроки (по ~10% SB) перед блайндами.\nBB анте: Платит только ББ (сумма = 1BB) после блайндов, достается победителю основного банка полностью.';
 
   @override
-  String get ante_type_big_blind => 'BBA (Только Бб)';
+  String get ante_type_traditional => 'Стандартное';
+
+  @override
+  String get ante_type_big_blind => 'BBA';
 
   @override
   String get toast_unav => 'Недоступно';

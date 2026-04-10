@@ -243,8 +243,8 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
   GameStateModel _resetShowdownEffects(GameStateModel model) => model.copyWith(
         effects: [
           if (model.effects.isEmpty && model.activePlayers.length > 1)
-            GameStateEffect.needWinnerSelection(
-              possibleWinnersUid: model.possibleWinnersUids,
+            _buildWinnerSelectionEffect(
+              model: model,
               isSideSpot: false,
             ),
         ],
@@ -252,6 +252,28 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
   GameStateModel _removeEffects(GameStateModel model) =>
       model.copyWith(effects: []);
+
+  GameStateEffect _buildWinnerSelectionEffect({
+    required GameStateModel model,
+    required bool isSideSpot,
+  }) {
+    final layer = _buildDistributionLayer(
+      model: model,
+      sessionState: model.sessionState,
+    );
+
+    if (layer == null) {
+      return GameStateEffect.needWinnerSelection(isSideSpot: isSideSpot);
+    }
+
+    return GameStateEffect.needWinnerSelection(
+      isSideSpot: isSideSpot,
+      potValue: layer.potValue,
+      anteValue: layer.anteValue,
+      foldedValue: layer.foldedValue,
+      playerContributions: layer.possibleWinnerContributions,
+    );
+  }
 
   // Notifing the client of winner or requirement of winners selection
   GameStateModel _selectWinnersOnShowdown({
@@ -264,7 +286,8 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
     if (winFromFold) {
       final winner = model.activePlayers.first;
-      final totalBets = model.sessionState.bets.values.sum;
+      final totalBets = model.sessionState.bets.values.sum +
+          model.sessionState.anteBets.values.sum;
       final newBanks = Map.of(model.lobbyState.banks)
         ..update(winner.uid, (value) => value + totalBets);
 
@@ -290,8 +313,8 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
           gameState: GameStatusEnum.showdown,
         ),
         effects: [
-          GameStateEffect.needWinnerSelection(
-            possibleWinnersUid: model.possibleWinnersUids,
+          _buildWinnerSelectionEffect(
+            model: model,
             isSideSpot: false,
           ),
         ],
@@ -338,6 +361,31 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     );
   }
 
+  GameStateModel _processAnte({
+    required GameStateModel model,
+    required PlayerId playerId,
+    required int ante,
+  }) {
+    final newAnteBets = Map<String, int>.from(model.sessionState.anteBets)
+      ..update(
+        playerId,
+        (value) => value + ante,
+        ifAbsent: () => ante,
+      );
+
+    final newBanks = Map.of(model.lobbyState.banks)
+      ..update(
+        playerId,
+        (value) => value - ante,
+        ifAbsent: () => 0,
+      );
+
+    return model.copyWith(
+      lobbyState: model.lobbyState.copyWith(banks: newBanks),
+      sessionState: model.sessionState.copyWith(anteBets: newAnteBets),
+    );
+  }
+
   // Update current players bank/bet and find next player
   Future<void> _executeBet(int bid) async {
     logs.writeLog('GameSM: executeBet $bid');
@@ -368,122 +416,91 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     var lobbyState = model.lobbyState;
     var sessionState = model.sessionState;
 
-    // Sorted bets set
-    List<int> bets =
-        sessionState.bets.values.toSet().where((b) => b > 0).toList()..sort();
+    while (true) {
+      final layer = _buildDistributionLayer(
+        model: model,
+        sessionState: sessionState,
+      );
 
-    // Iterate over each bet value
-    logs.writeLog('GameSM: distrubution bets $bets');
-    for (var i = 0; i < bets.length; i++) {
-      final bid = bets[i];
-
-      logs.writeLog('GameSM: distrubution $bid');
-      if (bid <= 0) continue;
-
-      // Side-spot check
-      final possibleWinnersUids = model.possibleWinnersUids;
-      if (winners.isEmpty && possibleWinnersUids.length > 1) {
-        logs.writeLog('GameSM: need to call winnerChooseDialog');
-
-        return model.copyWith(
-          effects: [
-            GameStateEffect.needWinnerSelection(
-              possibleWinnersUid: possibleWinnersUids,
-              isSideSpot: true,
-            )
-          ],
-        );
-      }
-
-      // The amount that will be distributed among the winners for this bet
-      int sumToDivide = 0;
-
-      // We go through the bets and check if anyone has placed a given bet.
-      for (final entry in sessionState.bets.entries) {
-        // If a guy placed such a bet
-        if (entry.value >= bid) {
-          // If not a winner, then we contribute it to the general bank.
-          if (!winners.contains(entry.key)) {
-            logs.writeLog(
-              'GameSM: ${entry.key} not winner, increase dividingSum',
-            );
-            sumToDivide += bid;
-          } else {
-            logs.writeLog('GameSM: ${entry.value} is winner bet, returning');
-            // If this is a winner, then he got his money back.
-            final newBanks = Map.of(lobbyState.banks)
-              ..update(entry.key, (value) => value + bid);
-
-            lobbyState = lobbyState.copyWith(banks: newBanks);
-          }
-        }
-      }
-      logs.writeLog('GameSM: sumToDivide $sumToDivide');
-
-      // End the loop if there's a remainder and there are no more players
-      // Return the money to the player who bet the most
-      if (winners.isEmpty) {
-        final newBanks = Map.of(lobbyState.banks);
-
-        for (final player in model.activePlayers) {
-          newBanks.update(player.uid,
-              (value) => value + (sessionState.bets[player.uid] ?? 0));
-        }
-        lobbyState = lobbyState.copyWith(banks: newBanks);
-
-        return model.copyWith(
+      if (layer == null) {
+        return GameStateModel(
           lobbyState: lobbyState,
+          sessionState: sessionState,
           effects: [],
         );
       }
 
-      final winnersCount = winners.length;
+      if (winners.isEmpty) {
+        // If we erase winners on previous pot and still have contributions - it means we have side spot
 
-      // The divided spoils are divided among the winners, and only those who are still in the game
-      for (final winnerUid in winners) {
-        final bet = sessionState.bets[winnerUid] ?? 0;
+        // If we have more than 1 player in side spot - we need to select winner in UI
+        if (layer.possibleWinnerContributions.length > 1) {
+          logs.writeLog('GameSM: need to call winnerChooseDialog');
 
-        if (bet > 0) {
-          logs.writeLog(
-            'GameSM: adding ${sumToDivide ~/ winnersCount} to $winnerUid',
+          return model.copyWith(
+            sessionState: sessionState,
+            effects: [
+              GameStateEffect.needWinnerSelection(
+                isSideSpot: true,
+                potValue: layer.potValue,
+                anteValue: layer.anteValue,
+                foldedValue: layer.foldedValue,
+                playerContributions: layer.possibleWinnerContributions,
+              ),
+            ],
           );
+        }
+
+        // If we have only 1 player in side spot - he overpaid for some reason, just return money
+        final winnerUid = layer.possibleWinnerContributions.keys.singleOrNull;
+        if (winnerUid == null) {
+          return GameStateModel(
+            lobbyState: lobbyState,
+            sessionState: sessionState,
+            effects: [],
+          );
+        }
+
+        final newBanks = Map.of(lobbyState.banks)
+          ..update(
+            winnerUid,
+            (value) => value + layer.potValue,
+          );
+
+        lobbyState = lobbyState.copyWith(banks: newBanks);
+      } else {
+        // Happy pass - if all winners are in current layer, just distribute money and finish
+        final eligibleWinners = winners
+            .where(layer.possibleWinnerContributions.containsKey)
+            .toSet();
+
+        if (eligibleWinners.isEmpty) {
+          return GameStateModel(
+            lobbyState: lobbyState,
+            sessionState: sessionState,
+            effects: [],
+          );
+        }
+
+        final sumPerPerson = layer.potValue ~/ eligibleWinners.length;
+
+        for (final winnerUid in eligibleWinners) {
+          logs.writeLog('GameSM: adding $sumPerPerson to $winnerUid');
           final newBanks = Map.of(lobbyState.banks)
             ..update(
               winnerUid,
-              (value) => value + (sumToDivide ~/ winnersCount),
+              (value) => value + sumPerPerson,
             );
           lobbyState = lobbyState.copyWith(banks: newBanks);
         }
+
+        winners = <String>{};
       }
 
-      // Subtract the processed rate from the list of bets
-      for (int m = 0; m < bets.length; m++) {
-        bets[m] -= bid;
-      }
-      logs.writeLog('GameSM: distrubution new bets $bets');
-
-      // We exclude from the count the players whose bet was equal to the wagered one
-
-      final newBets = Map.of(sessionState.bets);
-
-      for (final player in model.lobbyState.players) {
-        if (sessionState.bets[player.uid] == bid) {
-          winners.remove(player.uid);
-        }
-
-        // We reduce the players' bets, since the amount equal to [bid] has already been played
-        newBets.update(
-          player.uid,
-          (value) {
-            final newBet = value - bid;
-            return newBet > 0 ? newBet : 0;
-          },
-          ifAbsent: () => 0,
-        );
-      }
-
-      sessionState = sessionState.copyWith(
-        bets: newBets,
+      sessionState = _consumeDistributionLayer(
+        model: model,
+        sessionState: sessionState,
+        layer: layer,
       );
 
       model = GameStateModel(
@@ -492,11 +509,148 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
         effects: [],
       );
     }
+  }
 
-    return GameStateModel(
-      lobbyState: lobbyState,
+  _DistributionLayer? _buildDistributionLayer({
+    required GameStateModel model,
+    required GameSessionState sessionState,
+  }) {
+    Map<String, int> buildDistributionBets({
+      required GameStateModel model,
+      required GameSessionState sessionState,
+    }) {
+      if (model.currentAnteType != AnteType.traditional) {
+        return sessionState.bets;
+      }
+
+      final mergedBets = <String, int>{};
+      final playerUids = {
+        ...sessionState.bets.keys,
+        ...sessionState.anteBets.keys,
+      };
+
+      for (final playerUid in playerUids) {
+        final total = (sessionState.bets[playerUid] ?? 0) +
+            (sessionState.anteBets[playerUid] ?? 0);
+        if (total > 0) {
+          mergedBets[playerUid] = total;
+        }
+      }
+
+      return mergedBets;
+    }
+
+    final effectiveBets = buildDistributionBets(
+      model: model,
       sessionState: sessionState,
-      effects: [],
+    );
+
+    final activeContributors = model.activePlayers
+        .where((player) => (effectiveBets[player.uid] ?? 0) > 0)
+        .toList();
+
+    if (activeContributors.isEmpty) {
+      return null;
+    }
+
+    final totalBid =
+        activeContributors.map((player) => effectiveBets[player.uid] ?? 0).min;
+    final participantContributions = <String, int>{};
+    var foldedValue = 0;
+
+    var maxConsumedBet = 0;
+    var totalConsumedAnte = 0;
+
+    for (final player in model.lobbyState.players) {
+      final contribution = min(effectiveBets[player.uid] ?? 0, totalBid);
+      if (contribution <= 0) {
+        continue;
+      }
+
+      participantContributions[player.uid] = contribution;
+
+      var consumedAnte = 0;
+      var consumedBet = 0;
+      if (model.currentAnteType == AnteType.traditional) {
+        consumedAnte =
+            min(sessionState.anteBets[player.uid] ?? 0, contribution);
+        consumedBet = contribution - consumedAnte;
+      } else {
+        consumedBet = contribution;
+      }
+
+      totalConsumedAnte += consumedAnte;
+      maxConsumedBet = max(maxConsumedBet, consumedBet);
+
+      // If player is folded - his bet goes to deadmoney
+      if (!model.isPlayerActive(player.uid)) {
+        foldedValue += contribution;
+      }
+    }
+
+    final anteValue = model.currentAnteType == AnteType.bigBlindAnte
+        ? sessionState.anteBets.values.sum
+        : totalConsumedAnte;
+
+    final basePotValue = participantContributions.values.sum;
+    final potValue = model.currentAnteType == AnteType.bigBlindAnte
+        ? basePotValue + anteValue
+        : basePotValue;
+
+    return _DistributionLayer(
+      potValue: potValue,
+      anteValue: anteValue,
+      foldedValue: foldedValue,
+      possibleWinnerContributions: {
+        for (final player in activeContributors) player.uid: totalBid,
+      },
+      participantContributions: participantContributions,
+    );
+  }
+
+  /// Reducing player bets on current layer and ante bets
+  GameSessionState _consumeDistributionLayer({
+    required GameStateModel model,
+    required GameSessionState sessionState,
+    required _DistributionLayer layer,
+  }) {
+    final newBets = Map<String, int>.from(sessionState.bets);
+    final newAnteBets = Map<String, int>.from(sessionState.anteBets);
+
+    for (final entry in layer.participantContributions.entries) {
+      final playerUid = entry.key;
+      var remainingContribution = entry.value;
+
+      if (model.currentAnteType == AnteType.traditional) {
+        final anteValue = newAnteBets[playerUid] ?? 0;
+        final consumedAnte = min(anteValue, remainingContribution);
+        final anteLeft = anteValue - consumedAnte;
+
+        if (anteLeft > 0) {
+          newAnteBets[playerUid] = anteLeft;
+        } else {
+          newAnteBets.remove(playerUid);
+        }
+
+        remainingContribution -= consumedAnte;
+      }
+
+      final betValue = newBets[playerUid] ?? 0;
+      final betLeft = betValue - remainingContribution;
+      if (betLeft > 0) {
+        newBets[playerUid] = betLeft;
+      } else {
+        newBets.remove(playerUid);
+      }
+    }
+
+    if (model.currentAnteType == AnteType.bigBlindAnte && layer.anteValue > 0) {
+      newAnteBets.clear();
+    }
+
+    return sessionState.copyWith(
+      bets: newBets,
+      anteBets: newAnteBets,
     );
   }
 
@@ -637,6 +791,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     final model1 = model.copyWith(
       sessionState: model.sessionState.copyWith(
         bets: {},
+        anteBets: {},
         foldedPlayers: {},
         firstPlayerUid: null,
         currentPlayerUid: null,
@@ -720,6 +875,25 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       );
     }
 
+    GameStateModel processAnteOrAllIn({
+      required GameStateModel modelToProcess,
+      required PlayerModel player,
+      required int value,
+    }) {
+      final bank = modelToProcess.lobbyState.banks[player.uid] ?? 0;
+      final actualAnte = min(bank, value);
+
+      if (actualAnte <= 0) {
+        return modelToProcess;
+      }
+
+      return _processAnte(
+        model: modelToProcess,
+        playerId: player.uid,
+        ante: actualAnte,
+      );
+    }
+
     GameStateModel processAntes({
       required GameStateModel model,
       required int dealerPosition,
@@ -736,7 +910,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
         final bigBlindPlayer =
             updatedModel.lobbyState.players[bigBlindPosition];
 
-        return processBetOrAllIn(
+        return processAnteOrAllIn(
           modelToProcess: updatedModel,
           player: bigBlindPlayer,
           value: anteValue,
@@ -752,7 +926,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
             continue;
           }
 
-          updatedModel = processBetOrAllIn(
+          updatedModel = processAnteOrAllIn(
             modelToProcess: updatedModel,
             player: player,
             value: anteValue,
@@ -779,13 +953,15 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       fromPosition: smallBlindPosition,
     );
 
-    editableModel = processAntes(
-      model: editableModel,
-      dealerPosition: dealerPosition,
-      bigBlindPosition: bigBlindPosition,
-    );
-
     // Small blind bet
+    if (editableModel.currentAnteType == AnteType.traditional) {
+      editableModel = processAntes(
+        model: editableModel,
+        dealerPosition: dealerPosition,
+        bigBlindPosition: bigBlindPosition,
+      );
+    }
+
     editableModel = processBetOrAllIn(
       modelToProcess: editableModel,
       player: currentLobby().players[smallBlindPosition],
@@ -798,6 +974,14 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       player: currentLobby().players[bigBlindPosition],
       value: editableModel.currentBigBlindValue,
     );
+
+    if (editableModel.currentAnteType == AnteType.bigBlindAnte) {
+      editableModel = processAntes(
+        model: editableModel,
+        dealerPosition: dealerPosition,
+        bigBlindPosition: bigBlindPosition,
+      );
+    }
 
     if (editableModel.checkBidsEqual() &&
         editableModel.activePlayersWithMoneyCount <= 1) {
@@ -1102,4 +1286,20 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       nextLevelAtEpochMsUtc: newNextLevelAtUtc.millisecondsSinceEpoch,
     );
   }
+}
+
+class _DistributionLayer {
+  const _DistributionLayer({
+    required this.potValue,
+    required this.anteValue,
+    required this.foldedValue,
+    required this.possibleWinnerContributions,
+    required this.participantContributions,
+  });
+
+  final int potValue;
+  final int anteValue;
+  final int foldedValue;
+  final Map<String, int> possibleWinnerContributions;
+  final Map<String, int> participantContributions;
 }

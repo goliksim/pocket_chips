@@ -47,11 +47,6 @@ extension GameStateModelX on GameStateModel {
 
   bool get canStartOrContinueGame => activePlayersWithMoney.length >= 2;
 
-  Set<String> get possibleWinnersUids => activePlayers
-      .where((p) => (sessionState.bets[p.uid] ?? 0) > 0)
-      .map((p) => p.uid)
-      .toSet();
-
   PlayerModel? get currentPlayer =>
       lobbyState.players.findByUid(sessionState.currentPlayerUid);
 
@@ -73,10 +68,11 @@ extension GameSessionStateX on GameStateModel {
 
     for (final player in activePlayers) {
       final bid = sessionState.bets[player.uid] ?? 0;
+      final anteBid = sessionState.anteBets[player.uid] ?? 0;
       final bank = lobbyState.banks[player.uid] ?? 0;
 
       bool isEqual = (bid == maxBet);
-      bool isAllIn = ((bid > 0) && (bank <= 0));
+      bool isAllIn = (bank <= 0) && (bid > 0 || anteBid > 0);
 
       if (!(isEqual || isAllIn)) {
         return false;

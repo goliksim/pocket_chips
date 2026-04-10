@@ -7,6 +7,7 @@ class GameSessionEntityBuilder {
   static GameSessionState fromEntity(GameSessionEntity entity) =>
       GameSessionState(
         bets: entity.bets,
+        anteBets: entity.anteBets,
         lapCounter: entity.lapCounter,
         foldedPlayers: entity.foldedPlayersInactive,
         progressionState: entity.progressionState == null
@@ -19,6 +20,7 @@ class GameSessionEntityBuilder {
   static GameSessionEntity toEntity(GameSessionState model) =>
       GameSessionEntity(
         bets: model.bets,
+        anteBets: model.anteBets,
         lapCounter: model.lapCounter,
         foldedPlayersInactive: model.foldedPlayers,
         progressionState:

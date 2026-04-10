@@ -90,6 +90,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
                       gameModel.sessionState.foldedPlayers.contains(p.uid),
                   bank: gameModel.lobbyState.banks[p.uid] ?? 0,
                   bet: gameModel.sessionState.bets[p.uid] ?? 0,
+                  ante: gameModel.sessionState.anteBets[p.uid] ?? 0,
                 ))
             .toList(),
         // TODO: players noise offset
@@ -213,7 +214,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         minPossibleBet = callValue;
       } else {
         canRaise = !callIsAllIn && (currentBank > minRaiseValue);
-        canAllIn = raiseIsAllIn;
+        canAllIn = !callIsAllIn && raiseIsAllIn;
         minPossibleBet = minRaiseValue;
       }
 
@@ -234,7 +235,8 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
             ? MainControlState.check()
             : MainControlState.call(
                 callIsAllIn: callIsAllIn,
-                callValue: callValue,
+                // TODO: move this logic to UI or replace
+                callValue: callIsAllIn ? callValue + currentBet : callValue,
               ),
       );
     } catch (e) {
@@ -270,18 +272,23 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         logs.writeLog('GameVM: calling winner selector');
 
         final players = stateModel.lobbyState.players
-            .where((p) => effect.possibleWinnersUid.contains(p.uid));
+            .where((p) => effect.playerContributions.keys.contains(p.uid));
 
         final winners = await _navigationManager.showWinnerChooseDialog(
           WinnerChoiceArgs(
-            title: effect.isSideSpot ? _strings.game_win4 : _strings.game_win3,
+            isSidePot: effect.isSideSpot,
+            potValue: effect.potValue,
+            anteValue: effect.anteValue,
+            foldedValue: effect.foldedValue,
             possibleWinners: players
                 .map(
                   (p) => PossibleWinnerItem(
                     name: p.name,
                     assetUrl: p.assetUrl,
                     uid: p.uid,
-                    bid: stateModel.sessionState.bets[p.uid] ?? 0,
+                    bid: effect.playerContributions[p.uid] ?? 0,
+                    totalBet: stateModel.sessionState.bets[p.uid] ?? 0,
+                    totalAnte: stateModel.sessionState.anteBets[p.uid] ?? 0,
                   ),
                 )
                 .toList(),

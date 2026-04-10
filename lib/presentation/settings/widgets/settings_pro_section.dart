@@ -44,6 +44,7 @@ class _ProSettingsSection extends StatelessWidget {
               fontSizeMultiplier: 0.9,
               dropdownFontSizeMultiplier: 0.85,
               widthMultiplier: 0.83,
+              tooltip: context.strings.sett_progression_tooltip,
             ),
             if (progressionType != BlindProgressionType.manual)
               Divider(
