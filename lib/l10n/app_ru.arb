@@ -227,5 +227,8 @@
     "pro_version_offer_option_8":"Настройка структура блайндов",
     "pro_version_offer_button_purchased":"PRO активен",
     "pro_version_offer_button_not_purchased":"Стать PRO",
-    "pro_version_offer_button_not_available":"Cейчас не доступно"
+    "pro_version_offer_button_not_available":"Cейчас не доступно",
+    "error_was_found": "Произошла ошибка",
+    "error_copy": "Копировать текст ошибки",
+    "error_retry_button" : "Повторить"
 }

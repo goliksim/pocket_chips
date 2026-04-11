@@ -3,7 +3,6 @@ import 'package:mockito/mockito.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/repositories.dart';
-import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import '../../mocks/purchases_repository_mock.dart';
@@ -11,6 +10,7 @@ import '../../pages/home_page.dart';
 import '../../pages/onboarding_page.dart';
 import '../../pages/pro_version_offer_page.dart';
 import '../../test_utils/test_action.dart';
+import '../../test_utils/test_utils.dart';
 
 /// [ProVersionTest]
 /// Cached PRO mode, store is available and returned PRO MODE
@@ -19,11 +19,8 @@ Future<void> runProVersionTest1(
   PatrolTester tester,
   AppRepository repository,
 ) async {
-  final mockConfig = ConfigModel(
-    isDark: false,
+  final mockConfig = (await defaultConfig()).copyWith(
     firstLaunch: true,
-    locale: 'en',
-    version: '2.0.0',
   );
 
   when(repository.getConfig()).thenAnswer(

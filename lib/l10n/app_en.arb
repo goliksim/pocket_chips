@@ -225,5 +225,8 @@
     "pro_version_offer_option_8":"Blind structure in settings",
     "pro_version_offer_button_purchased":"PRO active",
     "pro_version_offer_button_not_purchased":"Get PRO",
-    "pro_version_offer_button_not_available":"Currently unavailable"
+    "pro_version_offer_button_not_available":"Currently unavailable",
+    "error_was_found": "An error occured",
+    "error_copy": "Copy error info",
+    "error_retry_button" : "Retry"
 }

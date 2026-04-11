@@ -685,4 +685,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pro_version_offer_button_not_available => 'Currently unavailable';
+
+  @override
+  String get error_was_found => 'An error occured';
+
+  @override
+  String get error_copy => 'Copy error info';
+
+  @override
+  String get error_retry_button => 'Retry';
 }

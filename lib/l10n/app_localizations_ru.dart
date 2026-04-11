@@ -689,4 +689,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pro_version_offer_button_not_available => 'Cейчас не доступно';
+
+  @override
+  String get error_was_found => 'Произошла ошибка';
+
+  @override
+  String get error_copy => 'Копировать текст ошибки';
+
+  @override
+  String get error_retry_button => 'Повторить';
 }

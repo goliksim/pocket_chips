@@ -11,7 +11,7 @@ class ConfigModelHolder extends AsyncNotifier<ConfigModel> {
   @override
   FutureOr<ConfigModel> build() => ref.read(appRepositoryProvider).getConfig();
 
-  Future<String> getCurrentVersion() async {
+  static Future<String> getCurrentVersion() async {
     final packageInfo = await PackageInfo.fromPlatform();
     return packageInfo.version;
   }

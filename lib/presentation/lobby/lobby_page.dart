@@ -6,6 +6,7 @@ import '../../di/view_models.dart';
 import '../../domain/models/lobby/lobby_state_model.dart';
 import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
+import '../common/widgets/error_page.dart';
 import '../common/widgets/loading_page.dart';
 import '../common/widgets/ui_widgets.dart';
 import '../monitization/ads/app_bar_banner.dart';
@@ -28,7 +29,7 @@ class LobbyPage extends ConsumerWidget {
 
     final stateProvider = ref.watch(lobbyPageViewModelProvider);
 
-    return stateProvider.maybeWhen(
+    return stateProvider.when(
       skipLoadingOnReload: true,
       data: (state) => PatternBackground(
         child: Scaffold(
@@ -156,7 +157,12 @@ class LobbyPage extends ConsumerWidget {
           ),
         ),
       ),
-      orElse: () => const LoadingPage(),
+      loading: () => const LoadingPage(),
+      error: (error, trace) => ErrorPage(
+        message: 'LobbyPage error occured:\n$error\n$trace',
+        retryCallback: () => viewModel.runBuild(),
+        canPop: true,
+      ),
     );
   }
 }

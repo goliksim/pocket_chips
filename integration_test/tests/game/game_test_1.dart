@@ -6,6 +6,7 @@ import '../../pages/game_page.dart';
 import '../../pages/game_settings_dialog.dart';
 import '../../pages/lobby_page.dart';
 import '../../test_utils/test_action.dart';
+import '../../test_utils/test_utils.dart';
 import 'game_test_utils.dart';
 
 /// [GameTest]

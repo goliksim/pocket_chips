@@ -1167,3 +1167,118 @@ void runShowdownTraditionalAnteDistributionTest(
   );
   expect(finalState.effects, []);
 }
+
+/// [ShowdownTest] Tests that a short-stack traditional ante creates a pot
+/// with bid=0 and the collected ante as anteValue.
+void runShowdownTraditionalAnteShortStackEffectTest(
+  ProviderContainer container,
+  AppRepository repository,
+) async {
+  final players = createPlayers(3);
+  final lobbyState = createLobbyState(
+    players,
+    smallBlindValue: 20,
+    anteType: AnteType.traditional,
+    anteValue: 100,
+    gameState: GameStatusEnum.showdown,
+    banks: {
+      for (final player in players) player.uid: 0,
+    },
+  );
+
+  // Player 0 is all-in for 10 chips (short stack).
+  final gameSessionState = GameSessionState(
+    lapCounter: 0,
+    foldedPlayers: {},
+    currentPlayerUid: players[0].uid,
+    firstPlayerUid: players[0].uid,
+    bets: {
+      players[0].uid: 0,
+      players[1].uid: 200,
+      players[2].uid: 200,
+    },
+    anteBets: {
+      players[0].uid: 10,
+      players[1].uid: 100,
+      players[2].uid: 100,
+    },
+  );
+
+  when(repository.getLobbyState()).thenAnswer((_) async => lobbyState);
+  when(repository.getGameSessionState())
+      .thenAnswer((_) async => gameSessionState);
+
+  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
+
+  final initialState = gameStateMachine.state.requireValue;
+  // First layer: bounded by player 0's 10 chips.
+  // consumedAnte = 10 from each. consumedBet = 0.
+  // totalConsumedAnte = 30. maxConsumedBet = 0.
+  // So expected anteValue = 30.
+  expect(initialState.effects.length, 1);
+  final effect =
+      initialState.effects.single as GameStateNeedWinnerSelectionEffect;
+  expect(effect.isSideSpot, false);
+  expect(effect.anteValue, 30);
+  expect(effect.potValue, 30);
+  expect(effect.playerContributions.values.every((v) => v == 10), true);
+}
+
+/// [ShowdownTest] Tests that when everyone matches the traditional ante,
+/// it skips creating an 'ante' pot and directly shows the main pot with ante separated.
+void runShowdownTraditionalAnteNormalEffectTest(
+  ProviderContainer container,
+  AppRepository repository,
+) async {
+  final players = createPlayers(3);
+  final lobbyState = createLobbyState(
+    players,
+    smallBlindValue: 20,
+    anteType: AnteType.traditional,
+    anteValue: 10,
+    gameState: GameStatusEnum.showdown,
+    banks: {
+      for (final player in players) player.uid: 0,
+    },
+  );
+
+  final gameSessionState = GameSessionState(
+    lapCounter: 0,
+    foldedPlayers: {},
+    currentPlayerUid: players[0].uid,
+    firstPlayerUid: players[0].uid,
+    bets: {
+      players[0].uid: 100,
+      players[1].uid: 100,
+      players[2].uid: 100,
+    },
+    anteBets: {
+      players[0].uid: 10,
+      players[1].uid: 10,
+      players[2].uid: 10,
+    },
+  );
+
+  when(repository.getLobbyState()).thenAnswer((_) async => lobbyState);
+  when(repository.getGameSessionState())
+      .thenAnswer((_) async => gameSessionState);
+
+  final gameStateMachine = container.read(gameStateMachineProvider.notifier);
+  await gameStateMachine.future;
+
+  final initialState = gameStateMachine.state.requireValue;
+
+  expect(initialState.effects.length, 1);
+  final effect =
+      initialState.effects.single as GameStateNeedWinnerSelectionEffect;
+  expect(effect.isSideSpot, false);
+
+  // Ante should cleanly separate out as dead money
+  expect(effect.anteValue, 30);
+  // Pot value includes both bet and ante for traditional ante
+  // (3*(100 bet + 10 ante)) = 330
+  expect(effect.potValue, 330);
+  // playerContributions (bid) should represent ONLY the regular bets
+  expect(effect.playerContributions.values.every((v) => v == 110), true);
+}

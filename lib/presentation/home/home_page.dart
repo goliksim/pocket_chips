@@ -144,7 +144,7 @@ class _HomePage extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) {
-    final viewModel = ref.watch(homePageViewModelProvider.notifier);
+    final viewModel = ref.read(homePageViewModelProvider.notifier);
     final asyncState = ref.watch(homePageViewModelProvider);
 
     final isLoading = asyncState.isLoading;

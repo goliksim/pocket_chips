@@ -162,6 +162,20 @@ void main() {
         '[Starting-Betting] second player has no chips',
         () => runStartingBetSecondNoChipsTest(container, mockAppRepository),
       );
+      test(
+        '[Starting-Betting] traditional ante is posted before blinds',
+        () => runStartingBetTraditionalAntePriorityTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        '[Starting-Betting] BBA is posted after big blind',
+        () => runStartingBetBigBlindAntePriorityTest(
+          container,
+          mockAppRepository,
+        ),
+      );
 
       test(
         '[Starting-Betting] first&second players has no chips',
@@ -331,6 +345,34 @@ void main() {
       test(
         '[Showdown Test] distribution test 4',
         () => runShowdownDistribution4Test(container, mockAppRepository),
+      );
+      test(
+        '[Showdown Test] folded dead money is carried into next pot',
+        () => runShowdownFoldedDeadMoneyEffectTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        '[Showdown Test] traditional ante stays proportional in side pots',
+        () => runShowdownTraditionalAnteDistributionTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        '[Showdown Test] traditional ante with short stack logic creates zero bid pot',
+        () => runShowdownTraditionalAnteShortStackEffectTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        '[Showdown Test] traditional ante matched by everyone skips zero bid pot and splits early',
+        () => runShowdownTraditionalAnteNormalEffectTest(
+          container,
+          mockAppRepository,
+        ),
       );
 
       //---

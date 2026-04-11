@@ -79,7 +79,7 @@ class InitializationManager with ChangeNotifier {
 
   Future<bool> checkForUpdates(ConfigModel config) async {
     final lastVersion = config.version;
-    final currentVersion = await _configModelHolder.getCurrentVersion();
+    final currentVersion = await ConfigModelHolder.getCurrentVersion();
 
     if (currentVersion.compareTo(lastVersion) > 0) {
       _configModelHolder.updateVerion(currentVersion);

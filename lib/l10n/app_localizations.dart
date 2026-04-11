@@ -1393,6 +1393,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Currently unavailable'**
   String get pro_version_offer_button_not_available;
+
+  /// No description provided for @error_was_found.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occured'**
+  String get error_was_found;
+
+  /// No description provided for @error_copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy error info'**
+  String get error_copy;
+
+  /// No description provided for @error_retry_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get error_retry_button;
 }
 
 class _AppLocalizationsDelegate

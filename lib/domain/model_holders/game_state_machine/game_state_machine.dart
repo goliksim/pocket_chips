@@ -39,11 +39,10 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
     // Reading because can't change lobbyStateHolder from this page
     final lobbyState = await ref.read(lobbyStateHolderProvider.future);
-    final gameState =
-        await ref.read(appRepositoryProvider).getGameSessionState();
 
     final sessionState = lobbyState.gameState.isStarted
-        ? state.value?.sessionState ?? gameState
+        ? state.value?.sessionState ??
+            await ref.read(appRepositoryProvider).getGameSessionState()
         : null;
 
     final normalizedSessionState = _normalizeSessionState(

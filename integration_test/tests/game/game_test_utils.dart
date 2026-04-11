@@ -4,7 +4,6 @@ import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/di/repositories.dart';
-import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/models/game/blind_level_model.dart';
 import 'package:pocket_chips/domain/models/game/blind_progression_model.dart';
 import 'package:pocket_chips/domain/models/game/game_progression_state.dart';
@@ -13,7 +12,6 @@ import 'package:pocket_chips/domain/models/game/game_state_enum.dart';
 import 'package:pocket_chips/domain/models/lobby/lobby_game_settings_model.dart';
 import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
-import 'package:pocket_chips/services/assets_provider.dart';
 
 import '../../game_test.mocks.dart';
 import '../../mocks/lobby_state_holder_mock.dart';
@@ -21,27 +19,7 @@ import '../../mocks/purchases_repository_mock.dart';
 import '../../pages/home_page.dart';
 import '../../pages/lobby_page.dart';
 import '../../test_utils/test_action.dart';
-
-ConfigModel defaultConfig() => ConfigModel(
-      isDark: false,
-      firstLaunch: false,
-      locale: 'en',
-      version: '2.0.0',
-    );
-
-List<PlayerModel> buildPlayers(
-  int count, {
-  int startIndex = 0,
-  String namePrefix = 'name',
-}) =>
-    List.generate(
-      count,
-      (index) => PlayerModel(
-        uid: 'test_uid_${startIndex + index}',
-        name: '${namePrefix}_${startIndex + index}',
-        assetUrl: AssetsProvider.emptyPlayerAsset,
-      ),
-    );
+import '../../test_utils/test_utils.dart';
 
 LobbyStateModel buildLobbyState({
   required List<PlayerModel> players,

@@ -6,6 +6,7 @@ import '../../di/view_models.dart';
 import '../../l10n/localization_extension.dart';
 import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
+import '../common/widgets/error_page.dart';
 import '../common/widgets/loading_page.dart';
 import '../common/widgets/ui_widgets.dart';
 import '../monitization/ads/app_bar_banner.dart';
@@ -26,7 +27,7 @@ class GamePage extends ConsumerWidget {
 
     final stateProvider = ref.watch(gamePageViewModelProvider);
 
-    return stateProvider.maybeWhen(
+    return stateProvider.when(
       skipLoadingOnReload: true,
       data: (viewState) {
         final tableOffsetController =
@@ -137,7 +138,12 @@ class GamePage extends ConsumerWidget {
           ),
         );
       },
-      orElse: () => const LoadingPage(),
+      loading: () => const LoadingPage(),
+      error: (error, trace) => ErrorPage(
+        message: 'GamePage error occured:\n $error\n$trace',
+        retryCallback: () => viewModel.runBuild(),
+        canPop: true,
+      ),
     );
   }
 }
