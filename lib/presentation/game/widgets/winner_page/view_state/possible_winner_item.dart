@@ -9,5 +9,7 @@ abstract class PossibleWinnerItem with _$PossibleWinnerItem {
     required String assetUrl,
     required String name,
     required int bid,
+    int? totalBet,
+    int? totalAnte,
   }) = _PossibleWinnerItem;
 }

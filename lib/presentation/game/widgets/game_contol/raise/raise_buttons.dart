@@ -34,6 +34,7 @@ class _RaiseButtonsState extends State<RaiseButtons> {
     required int additionalBet,
     required int currentBet,
   }) {
+    //TODO bad logic
     final totalBet = additionalBet + currentBet;
     var valueString = totalBet.toSeparatedBank;
 
@@ -70,7 +71,7 @@ class _RaiseButtonsState extends State<RaiseButtons> {
             action: () => widget.onClose(),
           ),
         ),
-        SizedBox(width: stdHorizontalOffset),
+        SizedBox(width: stdHorizontalOffset / 2),
         // Confirm Raise/Bet
         Flexible(
           flex: 31,

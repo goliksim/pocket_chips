@@ -7,6 +7,9 @@ import '../../../app/navigation/navigation_manager.dart';
 import '../../../di/domain_managers.dart';
 import '../../../di/model_holders.dart';
 import '../../../domain/model_holders/game_state_machine/game_state_machine.dart';
+import '../../../domain/models/game/blind_level_model.dart';
+import '../../../domain/models/game/blind_progression_model.dart';
+import '../../../domain/models/game/game_progression_state.dart';
 import '../../../domain/models/game/game_state_effect.dart';
 import '../../../domain/models/game/game_state_enum.dart';
 import '../../../domain/models/game/game_state_model.dart';
@@ -34,16 +37,22 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
   AppLocalizations get _strings => ref.read(stringsProvider);
   ToastManager get _toastManager => ref.read(toastManagerProvider);
   PromotionManager get _promotionManager => ref.read(promotionManagerProvider);
+  DateTime get _nowUtc => ref.read(currentTimeProvider)();
+
+  Timer? _minuteRefreshTimer;
 
   GamePageViewState get viewState => state.requireValue;
 
   @override
   FutureOr<GamePageViewState> build() async {
     logs.writeLog('GameVM: BUILDING STATE');
+    ref.onDispose(_disposeMinuteRefreshTimer);
 
     final gameModel = await ref.watch(gameStateMachineProvider.future);
     final gameState = gameModel.lobbyState.gameState;
     final players = gameModel.lobbyState.players;
+
+    _syncMinuteRefreshTimer(gameModel);
 
     final effects = gameModel.effects;
     if (effects.isNotEmpty) {
@@ -81,10 +90,22 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
                       gameModel.sessionState.foldedPlayers.contains(p.uid),
                   bank: gameModel.lobbyState.banks[p.uid] ?? 0,
                   bet: gameModel.sessionState.bets[p.uid] ?? 0,
+                  ante: gameModel.sessionState.anteBets[p.uid] ?? 0,
                 ))
             .toList(),
         // TODO: players noise offset
-        smallBlindValue: gameModel.lobbyState.smallBlindValue,
+        smallBlindValue: gameModel.currentSmallBlindValue,
+        showProgression:
+            gameModel.lobbyState.settings.progression.levels.length > 1 &&
+                gameModel.sessionState.progressionState.currentLevelIndex <
+                    gameModel.lobbyState.settings.progression.levels.length - 1,
+        progressionType:
+            gameModel.lobbyState.settings.progression.progressionType,
+        anteType: gameModel.currentAnteType,
+        anteValue: gameModel.currentAnteValue,
+        progressionLevel:
+            gameModel.sessionState.progressionState.currentLevelIndex + 1,
+        leftInterval: _getIntervalLeft(gameModel.sessionState.progressionState),
       ),
       gameStatus: gameState,
       currentPlayerName: gameModel.currentPlayer?.name,
@@ -137,6 +158,9 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
   @override
   Future<void> startBetting() async => _gameStateMachine.startBetting();
 
+  @override
+  Future<void> increaseGameLevel() async => _gameStateMachine.nextLevel();
+
   GamePageControlState _getControlState(GameStateModel gameModel) {
     try {
       final gameState = gameModel.lobbyState.gameState;
@@ -147,6 +171,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         case GameStatusEnum.gameBreak:
           return GamePageControlState.breakdown(
             canStartBetting: gameModel.canStartOrContinueGame,
+            canIncreaseLevel: gameModel.canIncreaseLevel,
           );
         case GameStatusEnum.showdown:
           return GamePageControlState.showdown();
@@ -167,46 +192,61 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
               .sessionState.bets[gameModel.sessionState.currentPlayerUid] ??
           0;
 
-      final (raiseBank, raiseIsAllIn) =
+      final (minRaiseValue, raiseIsAllIn) =
           gameModel.calculateRaiseValue(currentPlayerUid);
 
       final (callValue, callIsAllIn) =
           gameModel.calculateCallValue(currentPlayerUid);
-      final betBool = gameModel.checkBidsEqual();
 
-      final currentPlayerCanSkip = (currentBet == maxBet);
-      final allowCustomBets = gameModel.lobbyState.allowCustomBets;
+      final allowCustomBets = gameModel.lobbyState.settings.allowCustomBets;
 
-      final canRaise = allowCustomBets
-          ? !callIsAllIn && currentBank > callValue
-          : !callIsAllIn && (currentBank > raiseBank || raiseIsAllIn);
+      final bool canCheck = (currentBet == maxBet);
+      final bool canRaise;
+      final bool canAllIn;
 
-      final isFirstBet = betBool && gameState != GameStatusEnum.preFlop;
+      final int minPossibleBet;
+      final int maxPossibleBet = currentBank;
+      final int minRuleBet = [maxPossibleBet, minRaiseValue].min;
 
-      final maxPossibleBet = currentBank;
-      final minPossibleBet = allowCustomBets ? callValue : raiseBank;
+      if (allowCustomBets) {
+        canRaise = !callIsAllIn;
+        canAllIn = false;
+        minPossibleBet = callValue;
+      } else {
+        canRaise = !callIsAllIn && (currentBank > minRaiseValue);
+        canAllIn = !callIsAllIn && raiseIsAllIn;
+        minPossibleBet = minRaiseValue;
+      }
+
+      final isFirstBet =
+          gameModel.checkBidsEqual() && gameState != GameStatusEnum.preFlop;
 
       return GamePageControlState.active(
         raiseState: RaiseControlState(
           canRaise: canRaise,
-          raiseIsAllIn: raiseIsAllIn,
+          raiseIsAllIn: canAllIn,
           isFirstBet: isFirstBet,
           maxPossibleBet: maxPossibleBet,
           minPossibleBet: minPossibleBet,
-          minRuleBet: raiseBank,
+          minRuleBet: minRuleBet,
           currentBet: currentBet,
         ),
-        mainState: currentPlayerCanSkip
+        mainState: canCheck
             ? MainControlState.check()
             : MainControlState.call(
                 callIsAllIn: callIsAllIn,
-                callValue: callValue,
+                // TODO: move this logic to UI or replace
+                callValue: callIsAllIn ? callValue + currentBet : callValue,
               ),
       );
     } catch (e) {
       throw Exception();
     }
   }
+
+  int? _getIntervalLeft(GameProgressionState progressionState) =>
+      progressionState.handsUntilNextLevel ??
+      progressionState.minutesUntilNextLevelAt(_nowUtc);
 
   Future<void> _executeEffect({
     required GameStateEffect effect,
@@ -232,18 +272,23 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         logs.writeLog('GameVM: calling winner selector');
 
         final players = stateModel.lobbyState.players
-            .where((p) => effect.possibleWinnersUid.contains(p.uid));
+            .where((p) => effect.playerContributions.keys.contains(p.uid));
 
         final winners = await _navigationManager.showWinnerChooseDialog(
           WinnerChoiceArgs(
-            title: effect.isSideSpot ? _strings.game_win4 : _strings.game_win3,
+            isSidePot: effect.isSideSpot,
+            potValue: effect.potValue,
+            anteValue: effect.anteValue,
+            foldedValue: effect.foldedValue,
             possibleWinners: players
                 .map(
                   (p) => PossibleWinnerItem(
                     name: p.name,
                     assetUrl: p.assetUrl,
                     uid: p.uid,
-                    bid: stateModel.sessionState.bets[p.uid] ?? 0,
+                    bid: effect.playerContributions[p.uid] ?? 0,
+                    totalBet: stateModel.sessionState.bets[p.uid] ?? 0,
+                    totalAnte: stateModel.sessionState.anteBets[p.uid] ?? 0,
                   ),
                 )
                 .toList(),
@@ -257,5 +302,40 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         }
       },
     );
+  }
+
+  void _syncMinuteRefreshTimer(GameStateModel gameModel) {
+    final progressionState = gameModel.sessionState.progressionState;
+    final shouldRefreshEveryMinute =
+        gameModel.lobbyState.settings.progression.progressionType ==
+                BlindProgressionType.everyNMinutes &&
+            progressionState.nextLevelAtEpochMsUtc != null;
+
+    if (!shouldRefreshEveryMinute) {
+      _disposeMinuteRefreshTimer();
+      return;
+    }
+
+    _minuteRefreshTimer?.cancel();
+
+    _minuteRefreshTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) {
+        if (ref.mounted) {
+          state = AsyncData(
+            state.requireValue.copyWith(
+              tableState: state.requireValue.tableState.copyWith(
+                leftInterval: _getIntervalLeft(progressionState),
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  void _disposeMinuteRefreshTimer() {
+    _minuteRefreshTimer?.cancel();
+    _minuteRefreshTimer = null;
   }
 }

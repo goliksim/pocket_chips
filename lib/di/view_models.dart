@@ -89,7 +89,7 @@ final bankEditorViewModelProvider = Provider.autoDispose<BankEditorViewModel>(
       strings: ref.read(stringsProvider),
       pop: () => ref.read(navigationManagerProvider).pop(),
       currentDefaultBank: lobbyState.defaultBank,
-      currentBigBlind: lobbyState.bigBlindValue,
+      minRecommendedStartingStack: lobbyState.minRecommendedStartingStack,
     );
   },
 );
@@ -108,8 +108,6 @@ final lobbySettingsViewModelProvider =
     Provider.autoDispose<GameSettingsViewModel>(
   (ref) => GameSettingsViewModel(
     gameSettingsProvider: ref.read(lobbyStateHolderProvider.notifier),
-    toastManager: ref.read(toastManagerProvider),
-    strings: ref.read(stringsProvider),
     pop: () => ref.read(navigationManagerProvider).pop(),
   ),
 );

@@ -5,6 +5,7 @@ import '../../game_test.mocks.dart';
 import '../../pages/common_tester.dart';
 import '../../pages/game_page.dart';
 import '../../test_utils/test_action.dart';
+import '../../test_utils/test_utils.dart';
 import 'game_test_utils.dart';
 
 /// [GameTest]

@@ -14,8 +14,11 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$WinnerChoiceArgs {
-  String get title;
+  bool get isSidePot;
+  int get potValue;
   List<PossibleWinnerItem> get possibleWinners;
+  int? get anteValue;
+  int? get foldedValue;
 
   /// Create a copy of WinnerChoiceArgs
   /// with the given fields replaced by the non-null parameter values.
@@ -30,18 +33,30 @@ mixin _$WinnerChoiceArgs {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is WinnerChoiceArgs &&
-            (identical(other.title, title) || other.title == title) &&
+            (identical(other.isSidePot, isSidePot) ||
+                other.isSidePot == isSidePot) &&
+            (identical(other.potValue, potValue) ||
+                other.potValue == potValue) &&
             const DeepCollectionEquality()
-                .equals(other.possibleWinners, possibleWinners));
+                .equals(other.possibleWinners, possibleWinners) &&
+            (identical(other.anteValue, anteValue) ||
+                other.anteValue == anteValue) &&
+            (identical(other.foldedValue, foldedValue) ||
+                other.foldedValue == foldedValue));
   }
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, title, const DeepCollectionEquality().hash(possibleWinners));
+      runtimeType,
+      isSidePot,
+      potValue,
+      const DeepCollectionEquality().hash(possibleWinners),
+      anteValue,
+      foldedValue);
 
   @override
   String toString() {
-    return 'WinnerChoiceArgs(title: $title, possibleWinners: $possibleWinners)';
+    return 'WinnerChoiceArgs(isSidePot: $isSidePot, potValue: $potValue, possibleWinners: $possibleWinners, anteValue: $anteValue, foldedValue: $foldedValue)';
   }
 }
 
@@ -51,7 +66,12 @@ abstract mixin class $WinnerChoiceArgsCopyWith<$Res> {
           WinnerChoiceArgs value, $Res Function(WinnerChoiceArgs) _then) =
       _$WinnerChoiceArgsCopyWithImpl;
   @useResult
-  $Res call({String title, List<PossibleWinnerItem> possibleWinners});
+  $Res call(
+      {bool isSidePot,
+      int potValue,
+      List<PossibleWinnerItem> possibleWinners,
+      int? anteValue,
+      int? foldedValue});
 }
 
 /// @nodoc
@@ -67,18 +87,33 @@ class _$WinnerChoiceArgsCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? title = null,
+    Object? isSidePot = null,
+    Object? potValue = null,
     Object? possibleWinners = null,
+    Object? anteValue = freezed,
+    Object? foldedValue = freezed,
   }) {
     return _then(_self.copyWith(
-      title: null == title
-          ? _self.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
+      isSidePot: null == isSidePot
+          ? _self.isSidePot
+          : isSidePot // ignore: cast_nullable_to_non_nullable
+              as bool,
+      potValue: null == potValue
+          ? _self.potValue
+          : potValue // ignore: cast_nullable_to_non_nullable
+              as int,
       possibleWinners: null == possibleWinners
           ? _self.possibleWinners
           : possibleWinners // ignore: cast_nullable_to_non_nullable
               as List<PossibleWinnerItem>,
+      anteValue: freezed == anteValue
+          ? _self.anteValue
+          : anteValue // ignore: cast_nullable_to_non_nullable
+              as int?,
+      foldedValue: freezed == foldedValue
+          ? _self.foldedValue
+          : foldedValue // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -176,14 +211,20 @@ extension WinnerChoiceArgsPatterns on WinnerChoiceArgs {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String title, List<PossibleWinnerItem> possibleWinners)?
+    TResult Function(
+            bool isSidePot,
+            int potValue,
+            List<PossibleWinnerItem> possibleWinners,
+            int? anteValue,
+            int? foldedValue)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _WinnerChoiceArgs() when $default != null:
-        return $default(_that.title, _that.possibleWinners);
+        return $default(_that.isSidePot, _that.potValue, _that.possibleWinners,
+            _that.anteValue, _that.foldedValue);
       case _:
         return orElse();
     }
@@ -204,13 +245,19 @@ extension WinnerChoiceArgsPatterns on WinnerChoiceArgs {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String title, List<PossibleWinnerItem> possibleWinners)
+    TResult Function(
+            bool isSidePot,
+            int potValue,
+            List<PossibleWinnerItem> possibleWinners,
+            int? anteValue,
+            int? foldedValue)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _WinnerChoiceArgs():
-        return $default(_that.title, _that.possibleWinners);
+        return $default(_that.isSidePot, _that.potValue, _that.possibleWinners,
+            _that.anteValue, _that.foldedValue);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -230,13 +277,19 @@ extension WinnerChoiceArgsPatterns on WinnerChoiceArgs {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String title, List<PossibleWinnerItem> possibleWinners)?
+    TResult? Function(
+            bool isSidePot,
+            int potValue,
+            List<PossibleWinnerItem> possibleWinners,
+            int? anteValue,
+            int? foldedValue)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _WinnerChoiceArgs() when $default != null:
-        return $default(_that.title, _that.possibleWinners);
+        return $default(_that.isSidePot, _that.potValue, _that.possibleWinners,
+            _that.anteValue, _that.foldedValue);
       case _:
         return null;
     }
@@ -246,12 +299,23 @@ extension WinnerChoiceArgsPatterns on WinnerChoiceArgs {
 /// @nodoc
 
 class _WinnerChoiceArgs implements WinnerChoiceArgs {
-  const _WinnerChoiceArgs({required this.title, required this.possibleWinners});
+  const _WinnerChoiceArgs(
+      {required this.isSidePot,
+      required this.potValue,
+      required this.possibleWinners,
+      this.anteValue,
+      this.foldedValue});
 
   @override
-  final String title;
+  final bool isSidePot;
+  @override
+  final int potValue;
   @override
   final List<PossibleWinnerItem> possibleWinners;
+  @override
+  final int? anteValue;
+  @override
+  final int? foldedValue;
 
   /// Create a copy of WinnerChoiceArgs
   /// with the given fields replaced by the non-null parameter values.
@@ -266,18 +330,30 @@ class _WinnerChoiceArgs implements WinnerChoiceArgs {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _WinnerChoiceArgs &&
-            (identical(other.title, title) || other.title == title) &&
+            (identical(other.isSidePot, isSidePot) ||
+                other.isSidePot == isSidePot) &&
+            (identical(other.potValue, potValue) ||
+                other.potValue == potValue) &&
             const DeepCollectionEquality()
-                .equals(other.possibleWinners, possibleWinners));
+                .equals(other.possibleWinners, possibleWinners) &&
+            (identical(other.anteValue, anteValue) ||
+                other.anteValue == anteValue) &&
+            (identical(other.foldedValue, foldedValue) ||
+                other.foldedValue == foldedValue));
   }
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, title, const DeepCollectionEquality().hash(possibleWinners));
+      runtimeType,
+      isSidePot,
+      potValue,
+      const DeepCollectionEquality().hash(possibleWinners),
+      anteValue,
+      foldedValue);
 
   @override
   String toString() {
-    return 'WinnerChoiceArgs(title: $title, possibleWinners: $possibleWinners)';
+    return 'WinnerChoiceArgs(isSidePot: $isSidePot, potValue: $potValue, possibleWinners: $possibleWinners, anteValue: $anteValue, foldedValue: $foldedValue)';
   }
 }
 
@@ -289,7 +365,12 @@ abstract mixin class _$WinnerChoiceArgsCopyWith<$Res>
       __$WinnerChoiceArgsCopyWithImpl;
   @override
   @useResult
-  $Res call({String title, List<PossibleWinnerItem> possibleWinners});
+  $Res call(
+      {bool isSidePot,
+      int potValue,
+      List<PossibleWinnerItem> possibleWinners,
+      int? anteValue,
+      int? foldedValue});
 }
 
 /// @nodoc
@@ -305,18 +386,33 @@ class __$WinnerChoiceArgsCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? title = null,
+    Object? isSidePot = null,
+    Object? potValue = null,
     Object? possibleWinners = null,
+    Object? anteValue = freezed,
+    Object? foldedValue = freezed,
   }) {
     return _then(_WinnerChoiceArgs(
-      title: null == title
-          ? _self.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
+      isSidePot: null == isSidePot
+          ? _self.isSidePot
+          : isSidePot // ignore: cast_nullable_to_non_nullable
+              as bool,
+      potValue: null == potValue
+          ? _self.potValue
+          : potValue // ignore: cast_nullable_to_non_nullable
+              as int,
       possibleWinners: null == possibleWinners
           ? _self.possibleWinners
           : possibleWinners // ignore: cast_nullable_to_non_nullable
               as List<PossibleWinnerItem>,
+      anteValue: freezed == anteValue
+          ? _self.anteValue
+          : anteValue // ignore: cast_nullable_to_non_nullable
+              as int?,
+      foldedValue: freezed == foldedValue
+          ? _self.foldedValue
+          : foldedValue // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }

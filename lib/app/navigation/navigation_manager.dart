@@ -156,7 +156,6 @@ class NavigationManager extends ChangeNotifier {
         context: context,
         child: Consumer(
           builder: (_, ref, __) => WinnerChoiceWindow(
-            title: args.title,
             viewModel: ref.watch(
               winnerChooseViewModelProvider(args),
             ),
@@ -170,9 +169,9 @@ class NavigationManager extends ChangeNotifier {
     required VoidCallback action,
     required String message,
   }) =>
-      showDialog<bool>(
+      transitionDialog<bool>(
         context: context,
-        builder: (BuildContext thisContext) => ConfirmationWindow(
+        child: ConfirmationWindow(
           title: title,
           actionTitle: actionTitle,
           message: message,

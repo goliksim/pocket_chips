@@ -9,4 +9,6 @@ abstract interface class GameControlViewModel {
   Future<void> openSettings();
 
   Future<void> startBetting();
+
+  Future<void> increaseGameLevel();
 }

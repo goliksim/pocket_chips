@@ -2,7 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pocket_chips/di/model_holders.dart';
-import 'package:pocket_chips/domain/models/game_settings_model.dart';
+import 'package:pocket_chips/domain/models/game/blind_level_model.dart';
+import 'package:pocket_chips/domain/models/game/blind_progression_model.dart';
+import 'package:pocket_chips/domain/models/game/game_settings_model.dart';
 import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
@@ -24,9 +26,13 @@ void runSaveSettingsNoEditingTest(
   final lobbyStateHolder = container.read(lobbyStateHolderProvider.notifier);
 
   final newSettings = GameSettingsModelResult(
-    startingStack: null,
-    smallBlind: null,
     allowCustomBets: null,
+    newStartingStack: null,
+    newProgression: BlindProgressionModel(
+      progressionType: BlindProgressionType.manual,
+      progressionInterval: null,
+      blinds: BlindLevelModel(smallBlind: 20),
+    ),
   );
 
   await lobbyStateHolder.future;
@@ -53,9 +59,13 @@ void runSaveSettingsSameBankTest(
   final lobbyStateHolder = container.read(lobbyStateHolderProvider.notifier);
 
   final newSettings = GameSettingsModelResult(
-    startingStack: defaultLobbyBank,
-    smallBlind: null,
     allowCustomBets: null,
+    newStartingStack: defaultLobbyBank,
+    newProgression: BlindProgressionModel(
+      progressionType: BlindProgressionType.manual,
+      progressionInterval: null,
+      blinds: BlindLevelModel(smallBlind: 20),
+    ),
   );
 
   await lobbyStateHolder.future;
@@ -82,9 +92,13 @@ void runSaveSettingsNewBankTest(
   final lobbyStateHolder = container.read(lobbyStateHolderProvider.notifier);
 
   final newSettings = GameSettingsModelResult(
-    startingStack: 333,
-    smallBlind: null,
     allowCustomBets: null,
+    newStartingStack: 333,
+    newProgression: BlindProgressionModel(
+      progressionType: BlindProgressionType.manual,
+      progressionInterval: null,
+      blinds: BlindLevelModel(smallBlind: 20),
+    ),
   );
 
   await lobbyStateHolder.future;
@@ -120,9 +134,13 @@ void runSaveSettingsNewSmallBlindTest(
   final lobbyStateHolder = container.read(lobbyStateHolderProvider.notifier);
 
   final newSettings = GameSettingsModelResult(
-    startingStack: null,
-    smallBlind: 333,
     allowCustomBets: null,
+    newStartingStack: null,
+    newProgression: BlindProgressionModel(
+      progressionType: BlindProgressionType.manual,
+      progressionInterval: null,
+      blinds: BlindLevelModel(smallBlind: 333),
+    ),
   );
 
   await lobbyStateHolder.future;
@@ -133,7 +151,13 @@ void runSaveSettingsNewSmallBlindTest(
   expect(
     newLobbyState,
     lobbyState.copyWith(
-      smallBlindValue: 333,
+      settings: lobbyState.settings.copyWith(
+        progression: BlindProgressionModel(
+          progressionType: BlindProgressionType.manual,
+          progressionInterval: null,
+          blinds: BlindLevelModel(smallBlind: 333),
+        ),
+      ),
     ),
   );
 }
@@ -154,9 +178,13 @@ void runSaveSettingsAllowCustomBetsTest(
   final lobbyStateHolder = container.read(lobbyStateHolderProvider.notifier);
 
   final newSettings = GameSettingsModelResult(
-    startingStack: null,
-    smallBlind: null,
     allowCustomBets: true,
+    newStartingStack: null,
+    newProgression: BlindProgressionModel(
+      progressionType: BlindProgressionType.manual,
+      progressionInterval: null,
+      blinds: BlindLevelModel(smallBlind: 20),
+    ),
   );
 
   await lobbyStateHolder.future;
@@ -167,7 +195,9 @@ void runSaveSettingsAllowCustomBetsTest(
   expect(
     newLobbyState,
     lobbyState.copyWith(
-      allowCustomBets: true,
+      settings: lobbyState.settings.copyWith(
+        allowCustomBets: true,
+      ),
     ),
   );
 }

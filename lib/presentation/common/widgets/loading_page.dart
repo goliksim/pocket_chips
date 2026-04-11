@@ -7,7 +7,8 @@ class LoadingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PatternBackground(
-          child: Center(
-        child: CircularProgressIndicator(),
-      ));
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
 }

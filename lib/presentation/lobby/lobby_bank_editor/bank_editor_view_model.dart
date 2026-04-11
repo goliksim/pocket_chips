@@ -11,7 +11,7 @@ class BankEditorViewModel {
   final VoidCallback _pop;
 
   final int currentDefaultBank;
-  final int currentBigBlind;
+  final int minRecommendedStartingStack;
 
   BankEditorViewModel({
     required LobbyStateHolder lobbyStateHolder,
@@ -19,7 +19,7 @@ class BankEditorViewModel {
     required ToastManager toastManager,
     required AppLocalizations strings,
     required this.currentDefaultBank,
-    required this.currentBigBlind,
+    required this.minRecommendedStartingStack,
   })  : _lobbyStateHolder = lobbyStateHolder,
         _toastManager = toastManager,
         _strings = strings,
@@ -27,13 +27,13 @@ class BankEditorViewModel {
 
   Future<void> changeBank(int newBank) async {
     if (!kDebugMode && newBank <= 0) {
-      return;
+      return _toastManager.showToast(_strings.toast_bank3);
     }
 
     await _lobbyStateHolder.updateDefaultBank(newBank);
 
-    if (newBank < currentBigBlind) {
-      _toastManager.showToast(_strings.toast_bank1);
+    if (newBank < minRecommendedStartingStack) {
+      _toastManager.showToast(_strings.toast_bank_warning);
     }
 
     _pop();

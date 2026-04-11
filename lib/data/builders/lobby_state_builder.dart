@@ -1,6 +1,10 @@
+import '../../domain/models/game/blind_level_model.dart';
+import '../../domain/models/game/blind_progression_model.dart';
+import '../../domain/models/lobby/lobby_game_settings_model.dart';
 import '../../domain/models/lobby/lobby_state_model.dart';
 import '../../domain/models/player/player_model.dart';
 import '../storage/entities/lobby_state_entity.dart';
+import 'lobby_game_settings_builder.dart';
 import 'player_builder.dart';
 
 class LobbyStateEntityBuilder {
@@ -10,8 +14,7 @@ class LobbyStateEntityBuilder {
                 .toList() ??
             List<PlayerModel>.empty(),
         banks: entity.banks ?? <String, int>{},
-        smallBlindValue: entity.smallBlindValue,
-        allowCustomBets: entity.allowCustomBets,
+        settings: _buildSettings(entity),
         dealerId: entity.dealerId,
         defaultBank: entity.defaultBank,
         gameState: entity.gameState,
@@ -23,11 +26,28 @@ class LobbyStateEntityBuilder {
               (p) => PlayerEntityBuilder.toEntity(p),
             )
             .toList(),
-        smallBlindValue: model.smallBlindValue,
-        allowCustomBets: model.allowCustomBets,
+        settings: LobbyGameSettingsEntityBuilder.toEntity(model.settings),
         banks: model.banks,
         dealerId: model.dealerId,
         defaultBank: model.defaultBank,
         gameState: model.gameState,
       );
+
+  static LobbyGameSettingsModel _buildSettings(LobbyStateEntity entity) {
+    final nestedSettings = entity.settings;
+    if (nestedSettings != null) {
+      return LobbyGameSettingsEntityBuilder.fromEntity(nestedSettings);
+    }
+
+    // Fallback
+    return LobbyGameSettingsModel(
+      progression: BlindProgressionModel(
+        progressionType: BlindProgressionType.manual,
+        progressionInterval: null,
+        blinds: BlindLevelModel(
+          smallBlind: entity.smallBlindValue ?? defaultSmallBlindValue,
+        ),
+      ),
+    );
+  }
 }

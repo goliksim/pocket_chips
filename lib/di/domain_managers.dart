@@ -44,6 +44,10 @@ final analyticsServiceProvider = Provider<AnalyticsService>(
   (_) => AnalyticsService(),
 );
 
+final currentTimeProvider = Provider<DateTime Function()>(
+  (_) => () => DateTime.now().toUtc(),
+);
+
 final firebaseAnalyticsObserverProvider = Provider<FirebaseAnalyticsObserver>(
   (ref) => FirebaseAnalyticsObserver(
     analytics: ref.read(analyticsServiceProvider).analytics,

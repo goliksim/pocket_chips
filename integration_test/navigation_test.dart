@@ -5,7 +5,6 @@ import 'package:patrol/patrol.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/di/repositories.dart';
-import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
@@ -20,6 +19,7 @@ import 'pages/lobby_page.dart';
 import 'pages/onboarding_page.dart';
 import 'pages/player_editor_page.dart';
 import 'test_utils/test_action.dart';
+import 'test_utils/test_utils.dart';
 
 @GenerateMocks([AppRepository])
 void main() {
@@ -28,12 +28,7 @@ void main() {
   patrolTest(
     'Navigation Test 1',
     ($) async {
-      final mockConfig = ConfigModel(
-        isDark: false,
-        firstLaunch: false,
-        locale: 'en',
-        version: '2.0.0',
-      );
+      final mockConfig = defaultConfig();
 
       final players = List.generate(
         2,
@@ -48,6 +43,7 @@ void main() {
         players: players,
         banks: {for (var player in players) player.uid: 100},
       );
+      // TODO: add MockGameState to test's consistency
 
       final mockPurchasesRepository =
           MockPurchasesRepository(hasPurchasesForRestore: true)

@@ -187,6 +187,7 @@ class OnboardingLinksPage extends StatelessWidget {
             ),
             action: () => launchUrl(links.privacyPolicyUrl),
           ),
+          SizedBox(height: stdHorizontalOffset),
         ],
       );
 }

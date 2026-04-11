@@ -1,12 +1,17 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../di/domain_managers.dart';
 import '../../../di/model_holders.dart';
 import '../../../di/repositories.dart';
 import '../../../services/game_logic_service.dart';
 import '../../../utils/logs.dart';
+import '../../models/game/blind_level_model.dart';
+import '../../models/game/blind_progression_model.dart';
+import '../../models/game/game_progression_state.dart';
 import '../../models/game/game_session_state.dart';
 import '../../models/game/game_state_effect.dart';
 import '../../models/game/game_state_enum.dart';
@@ -40,10 +45,16 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
             await ref.read(appRepositoryProvider).getGameSessionState()
         : null;
 
+    final normalizedSessionState = _normalizeSessionState(
+      lobbyState: lobbyState,
+      sessionState: sessionState ?? GameSessionState.initial(),
+      nowUtc: _nowUtc(),
+    );
+
     final result = _autoFoldInactivePlayers(
       GameStateModel(
         lobbyState: lobbyState,
-        sessionState: sessionState ?? GameSessionState.initial(),
+        sessionState: normalizedSessionState,
       ),
     );
 
@@ -63,8 +74,13 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
         pair.previous == state.value ? pair.current : pair.previous;
 
     if (previous != null) {
+      // Clearing effects that don't have to be shown on undo
       await _updateGame(
-        previous,
+        previous.copyWith(
+          effects: previous.effects
+              .whereType<GameStateNeedWinnerSelectionEffect>()
+              .toList(),
+        ),
         clearPreviousState: true,
       );
     }
@@ -84,11 +100,17 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     logs.writeLog('GameSM: starting betting');
 
     // 1. Create the initial state for the new hand
+    final preparedSessionState = _prepareSessionForHandStart(
+      currentModel.sessionState,
+      progression: currentModel.lobbyState.settings.progression,
+      nowUtc: _nowUtc(),
+    );
+
     final initialHandState = currentModel.copyWith(
       lobbyState: currentModel.lobbyState.copyWith(
         gameState: GameStatusEnum.preFlop,
       ),
-      sessionState: currentModel.sessionState.copyWith(lapCounter: 0),
+      sessionState: preparedSessionState.copyWith(lapCounter: 0),
     );
 
     // 2. Calculate the state after posting blinds
@@ -178,11 +200,50 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     );
   }
 
+  Future<void> nextLevel() async {
+    final currentModel = state.requireValue;
+    final currentLevelIndex =
+        currentModel.sessionState.progressionState.currentLevelIndex;
+
+    return _setManualProgressionLevel(currentLevelIndex + 1);
+  }
+
+  /// Updates the active manual level during breakdown and persists it
+  /// together with the normalized progression session state.
+  Future<void> _setManualProgressionLevel(int levelIndex) async {
+    final currentModel = state.requireValue;
+    final progression = currentModel.lobbyState.settings.progression;
+
+    if (!currentModel.lobbyState.gameState.canEditPlayers ||
+        progression.progressionType != BlindProgressionType.manual) {
+      return;
+    }
+
+    final safeIndex = levelIndex.clamp(0, progression.levels.length - 1);
+    final updatedProgressionState = _normalizeProgressionState(
+      progressionState: currentModel.sessionState.progressionState.copyWith(
+        currentLevelIndex: safeIndex,
+      ),
+      progression: progression,
+      nowUtc: _nowUtc(),
+      initializeMissingSchedule: true,
+    );
+
+    await _updateGame(
+      currentModel.copyWith(
+        sessionState: currentModel.sessionState.copyWith(
+          progressionState: updatedProgressionState,
+        ),
+        effects: [],
+      ),
+    );
+  }
+
   GameStateModel _resetShowdownEffects(GameStateModel model) => model.copyWith(
         effects: [
           if (model.effects.isEmpty && model.activePlayers.length > 1)
-            GameStateEffect.needWinnerSelection(
-              possibleWinnersUid: model.possibleWinnersUids,
+            _buildWinnerSelectionEffect(
+              model: model,
               isSideSpot: false,
             ),
         ],
@@ -190,6 +251,28 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
   GameStateModel _removeEffects(GameStateModel model) =>
       model.copyWith(effects: []);
+
+  GameStateEffect _buildWinnerSelectionEffect({
+    required GameStateModel model,
+    required bool isSideSpot,
+  }) {
+    final layer = _buildDistributionLayer(
+      model: model,
+      sessionState: model.sessionState,
+    );
+
+    if (layer == null) {
+      return GameStateEffect.needWinnerSelection(isSideSpot: isSideSpot);
+    }
+
+    return GameStateEffect.needWinnerSelection(
+      isSideSpot: isSideSpot,
+      potValue: layer.potValue,
+      anteValue: layer.anteValue,
+      foldedValue: layer.foldedValue,
+      playerContributions: layer.possibleWinnerContributions,
+    );
+  }
 
   // Notifing the client of winner or requirement of winners selection
   GameStateModel _selectWinnersOnShowdown({
@@ -202,7 +285,8 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
     if (winFromFold) {
       final winner = model.activePlayers.first;
-      final totalBets = model.sessionState.bets.values.sum;
+      final totalBets = model.sessionState.bets.values.sum +
+          model.sessionState.anteBets.values.sum;
       final newBanks = Map.of(model.lobbyState.banks)
         ..update(winner.uid, (value) => value + totalBets);
 
@@ -228,8 +312,8 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
           gameState: GameStatusEnum.showdown,
         ),
         effects: [
-          GameStateEffect.needWinnerSelection(
-            possibleWinnersUid: model.possibleWinnersUids,
+          _buildWinnerSelectionEffect(
+            model: model,
             isSideSpot: false,
           ),
         ],
@@ -276,6 +360,31 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     );
   }
 
+  GameStateModel _processAnte({
+    required GameStateModel model,
+    required PlayerId playerId,
+    required int ante,
+  }) {
+    final newAnteBets = Map<String, int>.from(model.sessionState.anteBets)
+      ..update(
+        playerId,
+        (value) => value + ante,
+        ifAbsent: () => ante,
+      );
+
+    final newBanks = Map.of(model.lobbyState.banks)
+      ..update(
+        playerId,
+        (value) => value - ante,
+        ifAbsent: () => 0,
+      );
+
+    return model.copyWith(
+      lobbyState: model.lobbyState.copyWith(banks: newBanks),
+      sessionState: model.sessionState.copyWith(anteBets: newAnteBets),
+    );
+  }
+
   // Update current players bank/bet and find next player
   Future<void> _executeBet(int bid) async {
     logs.writeLog('GameSM: executeBet $bid');
@@ -306,122 +415,91 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     var lobbyState = model.lobbyState;
     var sessionState = model.sessionState;
 
-    // Sorted bets set
-    List<int> bets =
-        sessionState.bets.values.toSet().where((b) => b > 0).toList()..sort();
+    while (true) {
+      final layer = _buildDistributionLayer(
+        model: model,
+        sessionState: sessionState,
+      );
 
-    // Iterate over each bet value
-    logs.writeLog('GameSM: distrubution bets $bets');
-    for (var i = 0; i < bets.length; i++) {
-      final bid = bets[i];
-
-      logs.writeLog('GameSM: distrubution $bid');
-      if (bid <= 0) continue;
-
-      // Side-spot check
-      final possibleWinnersUids = model.possibleWinnersUids;
-      if (winners.isEmpty && possibleWinnersUids.length > 1) {
-        logs.writeLog('GameSM: need to call winnerChooseDialog');
-
-        return model.copyWith(
-          effects: [
-            GameStateEffect.needWinnerSelection(
-              possibleWinnersUid: possibleWinnersUids,
-              isSideSpot: true,
-            )
-          ],
-        );
-      }
-
-      // The amount that will be distributed among the winners for this bet
-      int sumToDivide = 0;
-
-      // We go through the bets and check if anyone has placed a given bet.
-      for (final entry in sessionState.bets.entries) {
-        // If a guy placed such a bet
-        if (entry.value >= bid) {
-          // If not a winner, then we contribute it to the general bank.
-          if (!winners.contains(entry.key)) {
-            logs.writeLog(
-              'GameSM: ${entry.key} not winner, increase dividingSum',
-            );
-            sumToDivide += bid;
-          } else {
-            logs.writeLog('GameSM: ${entry.value} is winner bet, returning');
-            // If this is a winner, then he got his money back.
-            final newBanks = Map.of(lobbyState.banks)
-              ..update(entry.key, (value) => value + bid);
-
-            lobbyState = lobbyState.copyWith(banks: newBanks);
-          }
-        }
-      }
-      logs.writeLog('GameSM: sumToDivide $sumToDivide');
-
-      // End the loop if there's a remainder and there are no more players
-      // Return the money to the player who bet the most
-      if (winners.isEmpty) {
-        final newBanks = Map.of(lobbyState.banks);
-
-        for (final player in model.activePlayers) {
-          newBanks.update(player.uid,
-              (value) => value + (sessionState.bets[player.uid] ?? 0));
-        }
-        lobbyState = lobbyState.copyWith(banks: newBanks);
-
-        return model.copyWith(
+      if (layer == null) {
+        return GameStateModel(
           lobbyState: lobbyState,
+          sessionState: sessionState,
           effects: [],
         );
       }
 
-      final winnersCount = winners.length;
+      if (winners.isEmpty) {
+        // If we erase winners on previous pot and still have contributions - it means we have side spot
 
-      // The divided spoils are divided among the winners, and only those who are still in the game
-      for (final winnerUid in winners) {
-        final bet = sessionState.bets[winnerUid] ?? 0;
+        // If we have more than 1 player in side spot - we need to select winner in UI
+        if (layer.possibleWinnerContributions.length > 1) {
+          logs.writeLog('GameSM: need to call winnerChooseDialog');
 
-        if (bet > 0) {
-          logs.writeLog(
-            'GameSM: adding ${sumToDivide ~/ winnersCount} to $winnerUid',
+          return model.copyWith(
+            sessionState: sessionState,
+            effects: [
+              GameStateEffect.needWinnerSelection(
+                isSideSpot: true,
+                potValue: layer.potValue,
+                anteValue: layer.anteValue,
+                foldedValue: layer.foldedValue,
+                playerContributions: layer.possibleWinnerContributions,
+              ),
+            ],
           );
+        }
+
+        // If we have only 1 player in side spot - he overpaid for some reason, just return money
+        final winnerUid = layer.possibleWinnerContributions.keys.singleOrNull;
+        if (winnerUid == null) {
+          return GameStateModel(
+            lobbyState: lobbyState,
+            sessionState: sessionState,
+            effects: [],
+          );
+        }
+
+        final newBanks = Map.of(lobbyState.banks)
+          ..update(
+            winnerUid,
+            (value) => value + layer.potValue,
+          );
+
+        lobbyState = lobbyState.copyWith(banks: newBanks);
+      } else {
+        // Happy pass - if all winners are in current layer, just distribute money and finish
+        final eligibleWinners = winners
+            .where(layer.possibleWinnerContributions.containsKey)
+            .toSet();
+
+        if (eligibleWinners.isEmpty) {
+          return GameStateModel(
+            lobbyState: lobbyState,
+            sessionState: sessionState,
+            effects: [],
+          );
+        }
+
+        final sumPerPerson = layer.potValue ~/ eligibleWinners.length;
+
+        for (final winnerUid in eligibleWinners) {
+          logs.writeLog('GameSM: adding $sumPerPerson to $winnerUid');
           final newBanks = Map.of(lobbyState.banks)
             ..update(
               winnerUid,
-              (value) => value + (sumToDivide ~/ winnersCount),
+              (value) => value + sumPerPerson,
             );
           lobbyState = lobbyState.copyWith(banks: newBanks);
         }
+
+        winners = <String>{};
       }
 
-      // Subtract the processed rate from the list of bets
-      for (int m = 0; m < bets.length; m++) {
-        bets[m] -= bid;
-      }
-      logs.writeLog('GameSM: distrubution new bets $bets');
-
-      // We exclude from the count the players whose bet was equal to the wagered one
-
-      final newBets = Map.of(sessionState.bets);
-
-      for (final player in model.lobbyState.players) {
-        if (sessionState.bets[player.uid] == bid) {
-          winners.remove(player.uid);
-        }
-
-        // We reduce the players' bets, since the amount equal to [bid] has already been played
-        newBets.update(
-          player.uid,
-          (value) {
-            final newBet = value - bid;
-            return newBet > 0 ? newBet : 0;
-          },
-          ifAbsent: () => 0,
-        );
-      }
-
-      sessionState = sessionState.copyWith(
-        bets: newBets,
+      sessionState = _consumeDistributionLayer(
+        model: model,
+        sessionState: sessionState,
+        layer: layer,
       );
 
       model = GameStateModel(
@@ -430,11 +508,148 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
         effects: [],
       );
     }
+  }
 
-    return GameStateModel(
-      lobbyState: lobbyState,
+  _DistributionLayer? _buildDistributionLayer({
+    required GameStateModel model,
+    required GameSessionState sessionState,
+  }) {
+    Map<String, int> buildDistributionBets({
+      required GameStateModel model,
+      required GameSessionState sessionState,
+    }) {
+      if (model.currentAnteType != AnteType.traditional) {
+        return sessionState.bets;
+      }
+
+      final mergedBets = <String, int>{};
+      final playerUids = {
+        ...sessionState.bets.keys,
+        ...sessionState.anteBets.keys,
+      };
+
+      for (final playerUid in playerUids) {
+        final total = (sessionState.bets[playerUid] ?? 0) +
+            (sessionState.anteBets[playerUid] ?? 0);
+        if (total > 0) {
+          mergedBets[playerUid] = total;
+        }
+      }
+
+      return mergedBets;
+    }
+
+    final effectiveBets = buildDistributionBets(
+      model: model,
       sessionState: sessionState,
-      effects: [],
+    );
+
+    final activeContributors = model.activePlayers
+        .where((player) => (effectiveBets[player.uid] ?? 0) > 0)
+        .toList();
+
+    if (activeContributors.isEmpty) {
+      return null;
+    }
+
+    final totalBid =
+        activeContributors.map((player) => effectiveBets[player.uid] ?? 0).min;
+    final participantContributions = <String, int>{};
+    var foldedValue = 0;
+
+    var maxConsumedBet = 0;
+    var totalConsumedAnte = 0;
+
+    for (final player in model.lobbyState.players) {
+      final contribution = min(effectiveBets[player.uid] ?? 0, totalBid);
+      if (contribution <= 0) {
+        continue;
+      }
+
+      participantContributions[player.uid] = contribution;
+
+      var consumedAnte = 0;
+      var consumedBet = 0;
+      if (model.currentAnteType == AnteType.traditional) {
+        consumedAnte =
+            min(sessionState.anteBets[player.uid] ?? 0, contribution);
+        consumedBet = contribution - consumedAnte;
+      } else {
+        consumedBet = contribution;
+      }
+
+      totalConsumedAnte += consumedAnte;
+      maxConsumedBet = max(maxConsumedBet, consumedBet);
+
+      // If player is folded - his bet goes to deadmoney
+      if (!model.isPlayerActive(player.uid)) {
+        foldedValue += contribution;
+      }
+    }
+
+    final anteValue = model.currentAnteType == AnteType.bigBlindAnte
+        ? sessionState.anteBets.values.sum
+        : totalConsumedAnte;
+
+    final basePotValue = participantContributions.values.sum;
+    final potValue = model.currentAnteType == AnteType.bigBlindAnte
+        ? basePotValue + anteValue
+        : basePotValue;
+
+    return _DistributionLayer(
+      potValue: potValue,
+      anteValue: anteValue,
+      foldedValue: foldedValue,
+      possibleWinnerContributions: {
+        for (final player in activeContributors) player.uid: totalBid,
+      },
+      participantContributions: participantContributions,
+    );
+  }
+
+  /// Reducing player bets on current layer and ante bets
+  GameSessionState _consumeDistributionLayer({
+    required GameStateModel model,
+    required GameSessionState sessionState,
+    required _DistributionLayer layer,
+  }) {
+    final newBets = Map<String, int>.from(sessionState.bets);
+    final newAnteBets = Map<String, int>.from(sessionState.anteBets);
+
+    for (final entry in layer.participantContributions.entries) {
+      final playerUid = entry.key;
+      var remainingContribution = entry.value;
+
+      if (model.currentAnteType == AnteType.traditional) {
+        final anteValue = newAnteBets[playerUid] ?? 0;
+        final consumedAnte = min(anteValue, remainingContribution);
+        final anteLeft = anteValue - consumedAnte;
+
+        if (anteLeft > 0) {
+          newAnteBets[playerUid] = anteLeft;
+        } else {
+          newAnteBets.remove(playerUid);
+        }
+
+        remainingContribution -= consumedAnte;
+      }
+
+      final betValue = newBets[playerUid] ?? 0;
+      final betLeft = betValue - remainingContribution;
+      if (betLeft > 0) {
+        newBets[playerUid] = betLeft;
+      } else {
+        newBets.remove(playerUid);
+      }
+    }
+
+    if (model.currentAnteType == AnteType.bigBlindAnte && layer.anteValue > 0) {
+      newAnteBets.clear();
+    }
+
+    return sessionState.copyWith(
+      bets: newBets,
+      anteBets: newAnteBets,
     );
   }
 
@@ -565,13 +780,22 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
   GameStateModel _toBreakdown({required GameStateModel model}) {
     logs.writeLog('GameSM: prepare state for breakdown');
 
+    final nowUtc = _nowUtc();
+    final progressionState = _advanceProgressionOnBreakdown(
+      sessionState: model.sessionState,
+      progression: model.lobbyState.settings.progression,
+      nowUtc: nowUtc,
+    );
+
     final model1 = model.copyWith(
       sessionState: model.sessionState.copyWith(
         bets: {},
+        anteBets: {},
         foldedPlayers: {},
         firstPlayerUid: null,
         currentPlayerUid: null,
         lapCounter: 0,
+        progressionState: progressionState,
       ),
     );
 
@@ -612,74 +836,151 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     LobbyStateModel currentLobby() => editableModel.lobbyState;
     GameSessionState currentSession() => editableModel.sessionState;
 
+    int findNextActivePosition({
+      required GameStateModel model,
+      required int fromPosition,
+      int initialOffset = 1,
+    }) {
+      final players = model.lobbyState.players;
+
+      for (int i = initialOffset; i <= players.length; i++) {
+        final localIndex = (fromPosition + i) % players.length;
+        final player = players[localIndex];
+
+        if (model.isPlayerActive(player.uid)) {
+          return localIndex;
+        }
+      }
+
+      return fromPosition;
+    }
+
     GameStateModel processBetOrAllIn({
       required GameStateModel modelToProcess,
       required PlayerModel player,
       required int value,
     }) {
-      final currentLobby = modelToProcess.lobbyState;
+      final bank = modelToProcess.lobbyState.banks[player.uid] ?? 0;
+      final actualBid = min(bank, value);
 
-      final bank = currentLobby.banks[player.uid] ?? 0;
+      if (actualBid <= 0) {
+        return modelToProcess;
+      }
 
       return _processBet(
         model: modelToProcess,
         playerId: player.uid,
-        // Bet only real amount of money
-        bid: bank < value ? bank : value,
+        bid: actualBid,
       );
+    }
+
+    GameStateModel processAnteOrAllIn({
+      required GameStateModel modelToProcess,
+      required PlayerModel player,
+      required int value,
+    }) {
+      final bank = modelToProcess.lobbyState.banks[player.uid] ?? 0;
+      final actualAnte = min(bank, value);
+
+      if (actualAnte <= 0) {
+        return modelToProcess;
+      }
+
+      return _processAnte(
+        model: modelToProcess,
+        playerId: player.uid,
+        ante: actualAnte,
+      );
+    }
+
+    GameStateModel processAntes({
+      required GameStateModel model,
+      required int dealerPosition,
+      required int bigBlindPosition,
+    }) {
+      final anteType = model.currentAnteType;
+      final anteValue = model.currentAnteValue;
+
+      var updatedModel = model;
+
+      if (anteType == AnteType.none || anteValue == null || anteValue <= 0) {
+        return updatedModel;
+      } else if (anteType == AnteType.bigBlindAnte) {
+        final bigBlindPlayer =
+            updatedModel.lobbyState.players[bigBlindPosition];
+
+        return processAnteOrAllIn(
+          modelToProcess: updatedModel,
+          player: bigBlindPlayer,
+          value: anteValue,
+        );
+      } else {
+        // AnteType.traditional
+        for (int i = 1; i <= updatedModel.lobbyState.players.length; i++) {
+          final localIndex =
+              (dealerPosition + i) % updatedModel.lobbyState.players.length;
+          final player = updatedModel.lobbyState.players[localIndex];
+
+          if (!updatedModel.isPlayerActive(player.uid)) {
+            continue;
+          }
+
+          updatedModel = processAnteOrAllIn(
+            modelToProcess: updatedModel,
+            player: player,
+            value: anteValue,
+          );
+        }
+      }
+
+      return updatedModel;
     }
 
     final dealerPosition = currentLobby()
         .players
         .indexWhere((p) => p.uid == currentLobby().dealerId);
 
-    int bigBlindPosition = dealerPosition;
-
-    (GameStateModel, int) makeBetByCondition({
-      required GameStateModel model,
-      required bool Function(PlayerId) condition,
-      required int value,
-      int initialOffset = 1,
-    }) {
-      final currentLobby = model.lobbyState;
-
-      for (int i = initialOffset; i < currentLobby.players.length; i++) {
-        int localIndex = (i + dealerPosition) % currentLobby.players.length;
-
-        final localPlayer = currentLobby.players[localIndex];
-
-        if (condition(localPlayer.uid)) {
-          model = processBetOrAllIn(
-            modelToProcess: editableModel,
-            player: localPlayer,
-            value: value,
-          );
-
-          return (model, localIndex);
-        }
-      }
-
-      return (model, bigBlindPosition);
-    }
-
-    //HEAD UP case
+    // HEAD UP case
     final isHandsUp = editableModel.activePlayersWithMoney.length == 2;
+    final smallBlindPosition = findNextActivePosition(
+      model: editableModel,
+      fromPosition: dealerPosition,
+      initialOffset: isHandsUp ? 0 : 1,
+    );
+    final bigBlindPosition = findNextActivePosition(
+      model: editableModel,
+      fromPosition: smallBlindPosition,
+    );
 
     // Small blind bet
-    (editableModel, _) = makeBetByCondition(
-      model: model,
-      condition: (uid) => editableModel.isPlayerActive(uid),
-      value: currentLobby().smallBlindValue,
-      initialOffset: isHandsUp ? 0 : 1,
+    if (editableModel.currentAnteType == AnteType.traditional) {
+      editableModel = processAntes(
+        model: editableModel,
+        dealerPosition: dealerPosition,
+        bigBlindPosition: bigBlindPosition,
+      );
+    }
+
+    editableModel = processBetOrAllIn(
+      modelToProcess: editableModel,
+      player: currentLobby().players[smallBlindPosition],
+      value: editableModel.currentSmallBlindValue,
     );
 
     // Big blind bet
-    (editableModel, bigBlindPosition) = makeBetByCondition(
-      model: model,
-      condition: (uid) => (editableModel.isPlayerActive(uid) &&
-          (currentSession().bets[uid] ?? 0) == 0),
-      value: currentLobby().bigBlindValue,
+    editableModel = processBetOrAllIn(
+      modelToProcess: editableModel,
+      player: currentLobby().players[bigBlindPosition],
+      value: editableModel.currentBigBlindValue,
     );
+
+    if (editableModel.currentAnteType == AnteType.bigBlindAnte) {
+      editableModel = processAntes(
+        model: editableModel,
+        dealerPosition: dealerPosition,
+        bigBlindPosition: bigBlindPosition,
+      );
+    }
 
     if (editableModel.checkBidsEqual() &&
         editableModel.activePlayersWithMoneyCount <= 1) {
@@ -698,7 +999,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
       final localPlayer = currentLobby().players[localIndex];
 
-      if (editableModel.isPlayerActive(localPlayer.uid)) {
+      if (editableModel.isPlayerActiveWithMoney(localPlayer.uid)) {
         editableModel = editableModel.copyWith(
           sessionState: editableModel.sessionState.copyWith(
             currentPlayerUid: localPlayer.uid,
@@ -725,7 +1026,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
             .toSet()
         : <String>{};
 
-    final foldedPlayers = model.sessionState.foldedPlayers
+    final foldedPlayers = Set<String>.from(model.sessionState.foldedPlayers)
       ..addAll(foldedByBank);
 
     return model.copyWith(
@@ -774,4 +1075,230 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       ),
     );
   }
+
+  /// Returns a single UTC timestamp source so progression calculations
+  /// are consistent across restore, hand start and breakdown transitions.
+  DateTime _nowUtc() => ref.read(currentTimeProvider)();
+
+  /// Restores progression-related session fields after app launch.
+  /// During breakdown it also applies any overdue timed transitions.
+  GameSessionState _normalizeSessionState({
+    required LobbyStateModel lobbyState,
+    required GameSessionState sessionState,
+    required DateTime nowUtc,
+  }) {
+    final progression = lobbyState.settings.progression;
+    final baseState = _normalizeProgressionState(
+      progressionState: sessionState.progressionState,
+      progression: progression,
+      nowUtc: nowUtc,
+      initializeMissingSchedule: lobbyState.gameState.isStarted,
+    );
+
+    if (lobbyState.gameState != GameStatusEnum.gameBreak) {
+      return sessionState.copyWith(progressionState: baseState);
+    }
+
+    final advancedState = _advanceTimedLevelsIfNeeded(
+      progressionState: baseState,
+      progression: progression,
+      nowUtc: nowUtc,
+    );
+
+    return sessionState.copyWith(progressionState: advancedState);
+  }
+
+  /// Prepares progression data right before a new hand starts.
+  /// This ensures missing counters or timers are initialized for the
+  /// currently selected progression mode.
+  GameSessionState _prepareSessionForHandStart(
+    GameSessionState sessionState, {
+    required BlindProgressionModel progression,
+    required DateTime nowUtc,
+  }) =>
+      sessionState.copyWith(
+        progressionState: _normalizeProgressionState(
+          progressionState: sessionState.progressionState,
+          progression: progression,
+          nowUtc: nowUtc,
+          initializeMissingSchedule: true,
+        ),
+      );
+
+  /// Advances progression only when a hand has fully ended and the game
+  /// entered breakdown. Hands-based progression is decremented here,
+  /// while timed progression is caught up against the current time.
+  GameProgressionState _advanceProgressionOnBreakdown({
+    required GameSessionState sessionState,
+    required BlindProgressionModel progression,
+    required DateTime nowUtc,
+  }) {
+    final normalizedState = _normalizeProgressionState(
+      progressionState: sessionState.progressionState,
+      progression: progression,
+      nowUtc: nowUtc,
+      initializeMissingSchedule: true,
+    );
+
+    final timedState = _advanceTimedLevelsIfNeeded(
+      progressionState: normalizedState,
+      progression: progression,
+      nowUtc: nowUtc,
+    );
+
+    if (progression.progressionType != BlindProgressionType.everyNHands) {
+      return timedState;
+    }
+
+    final interval = progression.progressionInterval;
+    if (interval == null || interval <= 0) {
+      return timedState.copyWith(handsUntilNextLevel: null);
+    }
+
+    final lastIndex = progression.levels.length - 1;
+    if (timedState.currentLevelIndex >= lastIndex) {
+      return timedState.copyWith(handsUntilNextLevel: null);
+    }
+
+    final handsLeft = (timedState.handsUntilNextLevel ?? interval) - 1;
+    if (handsLeft > 0) {
+      return timedState.copyWith(handsUntilNextLevel: handsLeft);
+    }
+
+    final newLevelIndex = min(timedState.currentLevelIndex + 1, lastIndex);
+    final handsUntilNextLevel = newLevelIndex >= lastIndex ? null : interval;
+
+    return timedState.copyWith(
+      currentLevelIndex: newLevelIndex,
+      handsUntilNextLevel: handsUntilNextLevel,
+    );
+  }
+
+  /// Normalizes progression fields for the active progression mode
+  GameProgressionState _normalizeProgressionState({
+    required GameProgressionState progressionState,
+    required BlindProgressionModel progression,
+    required DateTime nowUtc,
+    required bool initializeMissingSchedule,
+  }) {
+    final levels = progression.levels;
+    final safeIndex = progressionState.currentLevelIndex.clamp(
+      0,
+      max(0, levels.length - 1),
+    ) as int;
+
+    switch (progression.progressionType) {
+      // For manual progression we just need to ensure the level index is within bounds and clear timers.
+      case BlindProgressionType.manual:
+        return progressionState.copyWith(
+          currentLevelIndex: safeIndex,
+          handsUntilNextLevel: null,
+          nextLevelAtEpochMsUtc: null,
+        );
+      // For hands-based progression we also clamp the level index, clear timers and ensure the hand counter is initialized.
+      case BlindProgressionType.everyNHands:
+        final interval = progression.progressionInterval;
+        final isLastLevel = safeIndex >= levels.length - 1;
+        final handsUntilNextLevel = interval == null || interval <= 0
+            ? null
+            : isLastLevel
+                ? null
+                : progressionState.handsUntilNextLevel ?? interval;
+
+        return progressionState.copyWith(
+          currentLevelIndex: safeIndex,
+          handsUntilNextLevel: handsUntilNextLevel,
+          nextLevelAtEpochMsUtc: null,
+        );
+      // For timed progression we clamp the level index, clear hand counters and ensure the next-level timestamp is initialized if missing.
+      case BlindProgressionType.everyNMinutes:
+        final interval = progression.progressionInterval;
+        final nextLevelAtEpochMsUtc = interval == null ||
+                interval <= 0 ||
+                (!initializeMissingSchedule &&
+                    progressionState.nextLevelAtEpochMsUtc == null)
+            ? progressionState.nextLevelAtEpochMsUtc
+            : progressionState.nextLevelAtEpochMsUtc ??
+                nowUtc.add(Duration(minutes: interval)).millisecondsSinceEpoch;
+
+        return progressionState.copyWith(
+          currentLevelIndex: safeIndex,
+          handsUntilNextLevel: null,
+          nextLevelAtEpochMsUtc: nextLevelAtEpochMsUtc,
+        );
+    }
+  }
+
+  /// Applies all overdue timed level transitions based on the saved
+  /// next-deadline timestamp. This lets the app recover correct blind
+  /// state after pause or restart without losing elapsed time.
+  GameProgressionState _advanceTimedLevelsIfNeeded({
+    required GameProgressionState progressionState,
+    required BlindProgressionModel progression,
+    required DateTime nowUtc,
+  }) {
+    if (progression.progressionType != BlindProgressionType.everyNMinutes) {
+      return progressionState;
+    }
+
+    final interval = progression.progressionInterval;
+    final nextLevelAtEpochMsUtc = progressionState.nextLevelAtEpochMsUtc;
+    if (interval == null || interval <= 0 || nextLevelAtEpochMsUtc == null) {
+      return progressionState.copyWith(nextLevelAtEpochMsUtc: null);
+    }
+
+    final lastIndex = progression.levels.length - 1;
+    if (progressionState.currentLevelIndex >= lastIndex) {
+      return progressionState.copyWith(nextLevelAtEpochMsUtc: null);
+    }
+
+    final nextLevelAtUtc = DateTime.fromMillisecondsSinceEpoch(
+      nextLevelAtEpochMsUtc,
+      isUtc: true,
+    );
+    if (nowUtc.isBefore(nextLevelAtUtc)) {
+      return progressionState;
+    }
+
+    final intervalDuration = Duration(minutes: interval);
+    final elapsed = nowUtc.difference(nextLevelAtUtc);
+    final transitions =
+        1 + (elapsed.inMilliseconds ~/ intervalDuration.inMilliseconds);
+    final newLevelIndex = min(
+      progressionState.currentLevelIndex + transitions,
+      lastIndex,
+    );
+
+    if (newLevelIndex == lastIndex) {
+      return progressionState.copyWith(
+        currentLevelIndex: newLevelIndex,
+        nextLevelAtEpochMsUtc: null,
+      );
+    }
+
+    final newNextLevelAtUtc = nextLevelAtUtc.add(
+      Duration(minutes: interval * transitions),
+    );
+
+    return progressionState.copyWith(
+      currentLevelIndex: newLevelIndex,
+      nextLevelAtEpochMsUtc: newNextLevelAtUtc.millisecondsSinceEpoch,
+    );
+  }
+}
+
+class _DistributionLayer {
+  const _DistributionLayer({
+    required this.potValue,
+    required this.anteValue,
+    required this.foldedValue,
+    required this.possibleWinnerContributions,
+    required this.participantContributions,
+  });
+
+  final int potValue;
+  final int anteValue;
+  final int foldedValue;
+  final Map<String, int> possibleWinnerContributions;
+  final Map<String, int> participantContributions;
 }

@@ -286,7 +286,7 @@ void runCallRaiseValueCalculationAllInTest(
   final (callValue, isAllIn) =
       currentState.calculateCallValue(currentPlayerUid!);
 
-  expect(callValue, 20);
+  expect(callValue, 10);
   expect(isAllIn, true);
 }
 

@@ -151,9 +151,9 @@ class MyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        height: (height != null) ? height : stdButtonHeight,
+        height: height ?? stdButtonHeight,
         alignment: alignment,
-        width: (width != null) ? width : stdButtonWidth,
+        width: width ?? stdButtonWidth,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             side: side,

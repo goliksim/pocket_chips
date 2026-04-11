@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -11,6 +10,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get tooltip_dealer => 'Дилер';
+
+  @override
+  String get tooltip_increase_level => 'Следующий уровень прогрессии';
 
   @override
   String get tooltip_theme => 'Сменить тему';
@@ -322,16 +324,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sett_title => 'Настройки игры';
 
   @override
-  String get sett_win1 => 'Начальный стек';
+  String get sett_win1 => 'Сбросить стеки';
 
   @override
-  String get sett_win2 => 'Малый блайнд';
-
-  @override
-  String get sett_win3 => 'Большой блайнд';
-
-  @override
-  String get sett_custom_bets => 'Разрешить свои ставки/повышения';
+  String get sett_custom_bets => 'Ставки вне правил';
 
   @override
   String get sett_conf => 'Сохранить';
@@ -340,10 +336,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get game_welc => 'Добро пожаловать!';
 
   @override
-  String get game_turn1 => 'Ход';
-
-  @override
-  String get game_turn2 => '';
+  String get game_turn => 'Терн';
 
   @override
   String get game_shdw => 'Вскрытие';
@@ -356,9 +349,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get game_flop => 'Флоп';
-
-  @override
-  String get game_turn => 'Терн';
 
   @override
   String get game_river => 'Ривер';
@@ -377,6 +367,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get game_bet => 'Cтавка';
+
+  @override
+  String get game_total_bet => 'Общая ставка';
 
   @override
   String get game_bet_to => 'Полная ставка';
@@ -403,7 +396,23 @@ class AppLocalizationsRu extends AppLocalizations {
   String get game_win_conf => 'Подтвердить';
 
   @override
-  String get game_win4 => 'Выберите победителя сайд-пота';
+  String get game_pot_main => 'Основной банк';
+
+  @override
+  String get game_pot_side => 'Сайд-пот';
+
+  @override
+  String game_pot_including_ante(Object amount) {
+    return 'включая анте $amount';
+  }
+
+  @override
+  String game_pot_including_folded(Object amount) {
+    return 'включая сброшенные $amount';
+  }
+
+  @override
+  String get game_progression_setup => 'Установки';
 
   @override
   String get game_start => 'Начать торги';
@@ -433,25 +442,102 @@ class AppLocalizationsRu extends AppLocalizations {
   String get toast_moreplay2 => 'Вы не можете начать игру без игроков';
 
   @override
-  String get toast_bank1 =>
-      'Рекомендуем значение стека не менее большого блайнда';
+  String get toast_bank3 => 'Начальный стек не может быть нулевым';
 
   @override
-  String get toast_bank2 => 'В вашем случае';
-
-  @override
-  String get toast_bank3 => 'Стек не может быть равен нулю';
-
-  @override
-  String get toast_bank4 =>
-      'Рекомендуем использовать значение большого блайнда меньше стека';
-
-  @override
-  String get toast_bank5 => 'Нелья играть без блайндов';
+  String get toast_bank_warning =>
+      'Внимание! Начальный стек меньше обязательных ставок';
 
   @override
   String get toast_custom_bet_warning =>
       'Такая ставка возможна, но противоречит правилам минимального рейза';
+
+  @override
+  String get toast_ante_zero => 'Анте не может быть нулевым';
+
+  @override
+  String get toast_levels_zero => 'Количество уровней не может быть нулевым';
+
+  @override
+  String get toast_cannot_be_zero => 'Значение не может быть нулевым';
+
+  @override
+  String get toast_exceeds_maximum =>
+      'Значение превышает максимально допустимое';
+
+  @override
+  String get sett_ante_type => 'Тип анте';
+
+  @override
+  String get sett_ante => 'Размер анте';
+
+  @override
+  String get sett_progression => 'Прогрессия';
+
+  @override
+  String get sett_progression_tooltip =>
+      'Уровни будут переключаться вручную, каждые N раздач или N минут.\nПереключение происходит только на перерыве.';
+
+  @override
+  String get sett_progression_manual => 'Вручную';
+
+  @override
+  String get sett_progression_hands => 'N раздач';
+
+  @override
+  String get sett_progression_hands_left => 'Раздач осталось';
+
+  @override
+  String get sett_progression_minutes => 'N минут';
+
+  @override
+  String get sett_progression_minutes_left => 'Минут осталось';
+
+  @override
+  String get sett_progression_hands_interval => 'Число раздач';
+
+  @override
+  String get sett_progression_minutes_interval => 'Число минут';
+
+  @override
+  String get sett_levels_count => 'Число уровней';
+
+  @override
+  String get sett_level => 'Ур.';
+
+  @override
+  String get sett_level_full => 'Уровень';
+
+  @override
+  String get sett_small_blind => 'Малый блайнд';
+
+  @override
+  String get sett_big_blind => 'Большой блайнд';
+
+  @override
+  String get sett_mode_simple => 'Упрощенные';
+
+  @override
+  String get sett_mode_pro => 'Pro';
+
+  @override
+  String get sett_level_blind => 'Блайнды';
+
+  @override
+  String get sett_level_ante => 'Анте';
+
+  @override
+  String get ante_type_none => 'Нет';
+
+  @override
+  String get ante_type_tooltip =>
+      'Обычное анте: Платят все игроки (по ~10% SB) перед блайндами.\nBB анте: Платит только ББ (сумма = 1BB) после блайндов, достается победителю основного банка полностью.';
+
+  @override
+  String get ante_type_traditional => 'Стандартное';
+
+  @override
+  String get ante_type_big_blind => 'BBA';
 
   @override
   String get toast_unav => 'Недоступно';
@@ -541,19 +627,25 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get update_1 =>
-      'Исправлены многие проблемы приложения, улучшен пользовательский опыт';
+      'Исправлены многие ошибки, улучшен пользовательский опыт';
 
   @override
   String get update_2 =>
-      'Добавлена страница для поддержки автора, буду рад любой помощи!';
+      'Добавлена страница поддержки автора, буду рад любой помощи!';
 
   @override
-  String get update_3 =>
-      'ПРО пользователи теперь могут ставить игрокам свои фото из галереи';
+  String get update_3 => 'ПРО пользователи могут настраивать аватар из галереи';
 
   @override
   String get update_4 =>
-      'ПРО пользователи теперь могут отменять последнее действие игры';
+      'ПРО пользователи могут отменять последнее действие игры';
+
+  @override
+  String get update_5 =>
+      'ПРО пользователи могут настраивать структуру блайндов в настройках';
+
+  @override
+  String get update_6 => 'Добавлена возможность настройки анте';
 
   @override
   String get pro_version_offer_title => 'Максимум возможностей в PRO версии';
@@ -578,13 +670,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pro_version_offer_option_5 =>
-      'Сохранение прогресса игры и частых игроков';
+      'Сохранение игроков и прогресса игры';
 
   @override
   String get pro_version_offer_option_6 => 'Кастомные аватары игроков';
 
   @override
   String get pro_version_offer_option_7 => 'Отмена последнего действия';
+
+  @override
+  String get pro_version_offer_option_8 => 'Настройка структура блайндов';
 
   @override
   String get pro_version_offer_button_purchased => 'PRO активен';
@@ -594,4 +689,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pro_version_offer_button_not_available => 'Cейчас не доступно';
+
+  @override
+  String get error_was_found => 'Произошла ошибка';
+
+  @override
+  String get error_copy => 'Копировать текст ошибки';
+
+  @override
+  String get error_retry_button => 'Повторить';
 }

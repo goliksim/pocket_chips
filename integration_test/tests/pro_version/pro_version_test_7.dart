@@ -4,7 +4,6 @@ import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/di/repositories.dart';
-import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/models/game/game_state_enum.dart';
 import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
@@ -19,6 +18,7 @@ import '../../pages/lobby_page.dart';
 import '../../pages/player_editor_page.dart';
 import '../../pages/pro_version_offer_page.dart';
 import '../../test_utils/test_action.dart';
+import '../../test_utils/test_utils.dart';
 
 /// [ProVersionTest]
 /// No cached PRO mode, store is unavailable
@@ -27,12 +27,8 @@ Future<void> runProVersionTest7(
   PatrolTester tester,
   AppRepository repository,
 ) async {
-  final mockConfig = ConfigModel(
-    isDark: false,
-    firstLaunch: false,
-    locale: 'en',
-    version: '2.0.0',
-  );
+  final mockConfig = await defaultConfig();
+
   final players = List.generate(
     noProPlayerCount - 1,
     (index) => PlayerModel(
@@ -47,6 +43,7 @@ Future<void> runProVersionTest7(
     players: players,
     banks: {for (var player in players) player.uid: 100},
   );
+  // TODO: add MockGameState to test's consistency
 
   final mockPurchasesRepository =
       MockPurchasesRepository(hasPurchasesForRestore: false)

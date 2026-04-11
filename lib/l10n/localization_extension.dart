@@ -1,4 +1,7 @@
+import '../domain/models/game/blind_level_model.dart';
 import '../domain/models/game/game_state_enum.dart';
+import '../presentation/settings/view_state/game_settings_mode_state.dart';
+import '../utils/extensions.dart';
 import 'app_localizations.dart';
 
 extension LocalizationExtension on AppLocalizations {
@@ -35,4 +38,45 @@ extension LocalizationExtension on AppLocalizations {
         return 'Unkown item';
     }
   }
+
+  String anteTypeLabel(AnteType type) {
+    switch (type) {
+      case AnteType.none:
+        return ante_type_none;
+      case AnteType.traditional:
+        return ante_type_traditional;
+      case AnteType.bigBlindAnte:
+        return ante_type_big_blind;
+    }
+  }
+
+  String settingsModeLabel(GameSettingsModeState mode) =>
+      mode == GameSettingsModeState.simple ? sett_mode_simple : sett_mode_pro;
+
+  String progressionLabel(BlindProgressionType type) {
+    switch (type) {
+      case BlindProgressionType.manual:
+        return sett_progression_manual;
+      case BlindProgressionType.everyNHands:
+        return sett_progression_hands;
+      case BlindProgressionType.everyNMinutes:
+        return sett_progression_minutes;
+    }
+  }
+
+  String progressionLeftLabel(BlindProgressionType type) {
+    switch (type) {
+      case BlindProgressionType.manual:
+        return "";
+      case BlindProgressionType.everyNHands:
+        return sett_progression_hands_left;
+      case BlindProgressionType.everyNMinutes:
+        return sett_progression_minutes_left;
+    }
+  }
+
+  String blindsValueLabel(int smallBlind) =>
+      '${smallBlind.toCompactBank}\u2215${(smallBlind * 2).toCompact}';
+  String anteValueLabel(int? anteValue, AnteType anteType) =>
+      '${anteValue != null ? '${anteValue.toCompactBank} \u2215 ' : ''}${anteTypeLabel(anteType)}';
 }

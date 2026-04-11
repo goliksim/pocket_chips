@@ -11,9 +11,11 @@ import 'view_state/game_page_control_state.dart';
 
 class GameControl extends StatefulWidget {
   final GameControlViewModel viewModel;
+  final Widget? statsWidget;
 
   const GameControl({
     required this.viewModel,
+    this.statsWidget,
     super.key,
   });
 
@@ -92,7 +94,7 @@ class _GameControlState extends State<GameControl> {
                 ),
                 orElse: () => SizedBox(
                   height: stdButtonHeight * 1.6,
-                  child: null,
+                  child: widget.statsWidget,
                 ),
               ),
               SizedBox(height: stdHorizontalOffset),
@@ -111,8 +113,10 @@ class _GameControlState extends State<GameControl> {
                       ),
                 breakdown: (breakdownState) => BreakdownButtons(
                   canStartBetting: breakdownState.canStartBetting,
+                  canIncreaseLevel: breakdownState.canIncreaseLevel,
                   openSettings: () => widget.viewModel.openSettings(),
                   startBetting: () => widget.viewModel.startBetting(),
+                  increaseLevel: () => widget.viewModel.increaseGameLevel(),
                 ),
                 showdown: (_) => SizedBox(
                   height: stdButtonHeight,
