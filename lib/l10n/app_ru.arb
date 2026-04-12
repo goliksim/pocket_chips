@@ -230,5 +230,23 @@
     "pro_version_offer_button_not_available":"Cейчас не доступно",
     "error_was_found": "Произошла ошибка",
     "error_copy": "Копировать текст ошибки",
-    "error_retry_button" : "Повторить"
+    "error_retry_button" : "Повторить",
+    "toast_sit_out_enabled": "Игрок {name} будет пропускать раздачи",
+    "@toast_sit_out_enabled": {
+      "placeholders": {
+        "name": {}
+      }
+    },
+    "toast_sit_out_disabled": "Игрок {name} вернулся в игру",
+    "@toast_sit_out_disabled": {
+      "placeholders": {
+        "name": {}
+      }
+    },
+    "sett_sit_out_mode": "Режим Sit-Out (Пауза)",
+    "sit_out_mode_cash": "Кеш-игра",
+    "sit_out_mode_tournament": "Турнир",
+    "sit_out_mode_tooltip": "Кеш-игра: Игрок полностью отсутствует в раздаче.\nТурнир: С игрока списываются блайнды/анте, а он сам отправляется в фолд.",
+    "pro_version_offer_option_9": "Турнирная пауза игрока",
+    "update_7": "Добавлена функция паузы (Sit-Out) для игроков"
 }

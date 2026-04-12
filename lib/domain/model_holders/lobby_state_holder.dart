@@ -4,28 +4,32 @@ import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../di/domain_managers.dart';
+import '../../di/model_holders.dart';
 import '../../di/repositories.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/toast_manager.dart';
 import '../../utils/logs.dart';
+import '../models/game/game_session_state.dart';
 import '../models/game/game_settings_model.dart';
 import '../models/game/game_state_enum.dart';
 import '../models/lobby/lobby_game_settings_model.dart';
 import '../models/lobby/lobby_state_model.dart';
 import '../models/player/player_model.dart';
+import '../repositories/app_repository.dart';
 import 'game_settings_provider.dart';
 
 class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     implements GameSettingsProvider {
   AppLocalizations get _strings => ref.read(stringsProvider);
   ToastManager get _toastManager => ref.read(toastManagerProvider);
+  AppRepository get _appRepository => ref.read(appRepositoryProvider);
 
   LobbyStateModel get activeLobby => state.requireValue;
 
   @override
   FutureOr<LobbyStateModel> build() async {
     logs.writeLog('LobbySH: READ DATA AND BUILD STATE');
-    final lobby = await ref.read(appRepositoryProvider).getLobbyState();
+    final lobby = await _appRepository.getLobbyState();
 
     return lobby ?? LobbyStateModel.empty();
   }
@@ -35,7 +39,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     logs.writeLog('LobbySH: STATE UPDATED');
 
     try {
-      await ref.read(appRepositoryProvider).updateLobbyState(newState);
+      await _appRepository.updateLobbyState(newState);
     } catch (e) {
       logs.writeLog('LobbySH: save lobby state error - $e');
     }
@@ -46,6 +50,9 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     state = AsyncValue.data(
       LobbyStateModel.empty(),
     );
+
+    // Clear previous states when creating a new lobby
+    ref.read(gamePreviousStateNotifierProvider.notifier).clearPrevious();
   }
 
   Future<void> updateDefaultBank(int newBank) {
@@ -76,12 +83,14 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
 
     logs.writeLog('LobbySH: reset with:\n lobbyBank: ${lobby.defaultBank}}');
 
-    await updateLobby(
-      lobby.copyWith(
-        banks: newBanks,
-        gameState: GameStatusEnum.notStarted,
-      ),
+    final newLobbyState = lobby.copyWith(
+      banks: newBanks,
+      gameState: GameStatusEnum.notStarted,
     );
+    final newSessionState = GameSessionState.initial();
+
+    await updateLobby(newLobbyState);
+    await _appRepository.updateGameSessionState(newSessionState);
   }
 
   Future<void> addPlayer({
@@ -249,6 +258,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
       startingStack: lobby.defaultBank,
       allowCustomBets: lobby.settings.allowCustomBets,
       progression: lobby.settings.progression,
+      sitOutMode: lobby.settings.sitOutMode,
     );
   }
 
@@ -260,6 +270,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
             allowCustomBets: settings.allowCustomBets ??
                 activeLobby.settings.allowCustomBets,
             progression: settings.newProgression,
+            sitOutMode: settings.sitOutMode ?? activeLobby.settings.sitOutMode,
           ),
           banks: (settings.newStartingStack != null)
               ? (Map.of(activeLobby.banks)

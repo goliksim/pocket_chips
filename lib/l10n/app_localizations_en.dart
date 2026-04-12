@@ -694,4 +694,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get error_retry_button => 'Retry';
+
+  @override
+  String toast_sit_out_enabled(Object name) {
+    return 'Player $name will skip rounds';
+  }
+
+  @override
+  String toast_sit_out_disabled(Object name) {
+    return 'Player $name is back in the game';
+  }
+
+  @override
+  String get sett_sit_out_mode => 'Sit-Out Mode';
+
+  @override
+  String get sit_out_mode_cash => 'Cash Game';
+
+  @override
+  String get sit_out_mode_tournament => 'Tournament';
+
+  @override
+  String get sit_out_mode_tooltip =>
+      'Cash Game: Player skips rounds.\nTournament: Player posts blinds/antes if required and auto-folds.';
+
+  @override
+  String get pro_version_offer_option_9 => 'Tournament Sit-Out Mode';
+
+  @override
+  String get update_7 => 'Added pause (Sit-Out) feature for players';
 }

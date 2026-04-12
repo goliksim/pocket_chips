@@ -228,5 +228,23 @@
     "pro_version_offer_button_not_available":"Currently unavailable",
     "error_was_found": "An error occured",
     "error_copy": "Copy error info",
-    "error_retry_button" : "Retry"
+    "error_retry_button" : "Retry",
+    "toast_sit_out_enabled": "Player {name} will skip rounds",
+    "@toast_sit_out_enabled": {
+      "placeholders": {
+        "name": {}
+      }
+    },
+    "toast_sit_out_disabled": "Player {name} is back in the game",
+    "@toast_sit_out_disabled": {
+      "placeholders": {
+        "name": {}
+      }
+    },
+    "sett_sit_out_mode": "Sit-Out Mode",
+    "sit_out_mode_cash": "Cash Game",
+    "sit_out_mode_tournament": "Tournament",
+    "sit_out_mode_tooltip": "Cash Game: Player skips rounds.\nTournament: Player posts blinds/antes if required and auto-folds.",
+    "pro_version_offer_option_9": "Tournament Sit-Out Mode",
+    "update_7": "Added pause (Sit-Out) feature for players"
 }

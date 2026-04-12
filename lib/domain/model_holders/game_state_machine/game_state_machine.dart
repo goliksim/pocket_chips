@@ -16,6 +16,7 @@ import '../../models/game/game_session_state.dart';
 import '../../models/game/game_state_effect.dart';
 import '../../models/game/game_state_enum.dart';
 import '../../models/game/game_state_model.dart';
+import '../../models/game/sit_out_mode.dart';
 import '../../models/lobby/lobby_state_model.dart';
 import '../../models/player/player_id.dart';
 import '../../models/player/player_model.dart';
@@ -29,9 +30,8 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
   GamePreviousStateNotifier get _previousStateNotifier =>
       ref.read(gamePreviousStateNotifierProvider.notifier);
-  StatePair get _previousState => ref.read(gamePreviousStateNotifierProvider);
 
-  bool get canUndoAction => _previousState.previous != null;
+  bool get canUndoAction => _previousStateNotifier.hasPrevious;
 
   @override
   FutureOr<GameStateModel> build() async {
@@ -40,14 +40,13 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     // Reading because can't change lobbyStateHolder from this page
     final lobbyState = await ref.read(lobbyStateHolderProvider.future);
 
-    final sessionState = lobbyState.gameState.isStarted
-        ? state.value?.sessionState ??
-            await ref.read(appRepositoryProvider).getGameSessionState()
-        : null;
+    final storedState =
+        await ref.read(appRepositoryProvider).getGameSessionState();
+    final sessionState = storedState ?? GameSessionState.initial();
 
     final normalizedSessionState = _normalizeSessionState(
       lobbyState: lobbyState,
-      sessionState: sessionState ?? GameSessionState.initial(),
+      sessionState: sessionState,
       nowUtc: _nowUtc(),
     );
 
@@ -66,24 +65,40 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
   }
 
   Future<void> undoLastAction() async {
-    final pair = _previousState;
     logs.writeLog('GameSM: undo action');
 
-    // Can sometimes loose previous step because of game restoring
-    final previous =
-        pair.previous == state.value ? pair.current : pair.previous;
+    final previous = _previousStateNotifier.popNextValidState(state.value);
 
     if (previous != null) {
-      // Clearing effects that don't have to be shown on undo
       await _updateGame(
-        previous.copyWith(
-          effects: previous.effects
-              .whereType<GameStateNeedWinnerSelectionEffect>()
-              .toList(),
-        ),
-        clearPreviousState: true,
+        previous,
+        savePreviousState: false,
       );
     }
+  }
+
+  Future<void> toggleSitOut(String playerUid) async {
+    final currentModel = state.requireValue;
+    if (!currentModel.lobbyState.gameState.canEditPlayers) {
+      return;
+    }
+
+    final sitOutPlayers = Set.of(currentModel.sessionState.sitOutPlayers);
+    if (sitOutPlayers.contains(playerUid)) {
+      sitOutPlayers.remove(playerUid);
+    } else {
+      sitOutPlayers.add(playerUid);
+    }
+
+    await _updateGame(
+      currentModel.copyWith(
+        sessionState: currentModel.sessionState.copyWith(
+          sitOutPlayers: sitOutPlayers,
+        ),
+        effects: [],
+      ),
+      savePreviousState: false,
+    );
   }
 
   /// The first method in game, is contolling by client (current player)
@@ -952,7 +967,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       fromPosition: smallBlindPosition,
     );
 
-    // Small blind bet
+    // Apply regular ante before blinds
     if (editableModel.currentAnteType == AnteType.traditional) {
       editableModel = processAntes(
         model: editableModel,
@@ -961,6 +976,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       );
     }
 
+    // Small blind bet
     editableModel = processBetOrAllIn(
       modelToProcess: editableModel,
       player: currentLobby().players[smallBlindPosition],
@@ -974,12 +990,27 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       value: editableModel.currentBigBlindValue,
     );
 
+    // Apply BBA after blinds
     if (editableModel.currentAnteType == AnteType.bigBlindAnte) {
       editableModel = processAntes(
         model: editableModel,
         dealerPosition: dealerPosition,
         bigBlindPosition: bigBlindPosition,
       );
+    }
+
+    /// Cash game sit outs are already inActive
+    /// Tournament sit outs fold only after blinds and ante
+    if (editableModel.lobbyState.settings.sitOutMode == SitOutMode.tournament) {
+      final tournamentSitOuts = editableModel.sessionState.sitOutPlayers;
+      if (tournamentSitOuts.isNotEmpty) {
+        editableModel = editableModel.copyWith(
+          sessionState: editableModel.sessionState.copyWith(
+            foldedPlayers: Set.of(editableModel.sessionState.foldedPlayers)
+              ..addAll(tournamentSitOuts),
+          ),
+        );
+      }
     }
 
     if (editableModel.checkBidsEqual() &&
@@ -1039,18 +1070,14 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
   Future<void> _updateGame(
     GameStateModel newModel, {
     bool savePreviousState = true,
-    bool clearPreviousState = false,
   }) async {
     logs.writeLog('GameSM: UPDATE GAME');
 
     if (savePreviousState) {
-      _previousStateNotifier.setState((
-        previous: state.value,
-        current: newModel,
-      ));
-    }
-    if (clearPreviousState) {
-      _previousStateNotifier.clearPrevious();
+      final oldModel = state.value;
+      if (oldModel != null) {
+        _previousStateNotifier.pushState(oldModel);
+      }
     }
 
     state = AsyncData(newModel);

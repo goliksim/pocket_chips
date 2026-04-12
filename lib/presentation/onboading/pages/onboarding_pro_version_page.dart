@@ -114,6 +114,7 @@ class OnboardingProVersionPage extends ConsumerWidget {
                 context.strings.pro_version_offer_option_3,
                 context.strings.pro_version_offer_option_6,
                 context.strings.pro_version_offer_option_1,
+                context.strings.pro_version_offer_option_9,
               ].map(
                 (text) => Padding(
                   padding: EdgeInsets.only(bottom: stdHorizontalOffset / 4),

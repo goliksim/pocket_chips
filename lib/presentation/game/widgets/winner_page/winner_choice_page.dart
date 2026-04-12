@@ -245,8 +245,8 @@ class _WinnerChoiceCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'asdasdsdssdsdsdssdsds',
-                      maxLines: 2,
+                      winner.name,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: context.theme.onBackground,

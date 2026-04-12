@@ -1411,6 +1411,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get error_retry_button;
+
+  /// No description provided for @toast_sit_out_enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Player {name} will skip rounds'**
+  String toast_sit_out_enabled(Object name);
+
+  /// No description provided for @toast_sit_out_disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Player {name} is back in the game'**
+  String toast_sit_out_disabled(Object name);
+
+  /// No description provided for @sett_sit_out_mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Sit-Out Mode'**
+  String get sett_sit_out_mode;
+
+  /// No description provided for @sit_out_mode_cash.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash Game'**
+  String get sit_out_mode_cash;
+
+  /// No description provided for @sit_out_mode_tournament.
+  ///
+  /// In en, this message translates to:
+  /// **'Tournament'**
+  String get sit_out_mode_tournament;
+
+  /// No description provided for @sit_out_mode_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash Game: Player skips rounds.\nTournament: Player posts blinds/antes if required and auto-folds.'**
+  String get sit_out_mode_tooltip;
+
+  /// No description provided for @pro_version_offer_option_9.
+  ///
+  /// In en, this message translates to:
+  /// **'Tournament Sit-Out Mode'**
+  String get pro_version_offer_option_9;
+
+  /// No description provided for @update_7.
+  ///
+  /// In en, this message translates to:
+  /// **'Added pause (Sit-Out) feature for players'**
+  String get update_7;
 }
 
 class _AppLocalizationsDelegate

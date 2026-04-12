@@ -64,6 +64,31 @@ class GamePage extends ConsumerWidget {
               centerTitle: true,
               backgroundColor: const Color(0x00000000),
               actions: <Widget>[
+                if (viewState.canEditPlayer)
+                  AspectRatio(
+                    aspectRatio: 1,
+                    child: Transform.scale(
+                      scaleX: -1,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.sync_sharp,
+                          color: context.theme.onBackground.withAlpha(164),
+                          size: stdIconSize,
+                        ),
+                        tooltip: context.strings.tooltip_rot,
+                        onPressed: () => tableOffsetController.increaseOffset(),
+                      ),
+                    ),
+                  ),
+                if (viewState.canEditPlayer && viewModel.canUndoAction)
+                  SizedBox(
+                    height: stdIconSize,
+                    child: VerticalDivider(
+                      color: context.theme.onBackground.withAlpha(164),
+                      thickness: 1,
+                      width: 0,
+                    ),
+                  ),
                 if (viewModel.canUndoAction)
                   ProVersionWrapper(
                     child: AspectRatio(
@@ -77,22 +102,6 @@ class GamePage extends ConsumerWidget {
                         ),
                         tooltip: context.strings.tooltip_undo,
                         onPressed: () => viewModel.undoLastAction(),
-                      ),
-                    ),
-                  ),
-                if (viewState.canEditPlayer)
-                  AspectRatio(
-                    aspectRatio: 1,
-                    child: Transform.scale(
-                      scaleX: -1,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.sync_sharp,
-                          color: context.theme.onBackground,
-                          size: stdIconSize,
-                        ),
-                        tooltip: context.strings.tooltip_rot,
-                        onPressed: () => tableOffsetController.increaseOffset(),
                       ),
                     ),
                   ),

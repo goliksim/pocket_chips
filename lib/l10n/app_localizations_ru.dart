@@ -698,4 +698,33 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get error_retry_button => 'Повторить';
+
+  @override
+  String toast_sit_out_enabled(Object name) {
+    return 'Игрок $name будет пропускать раздачи';
+  }
+
+  @override
+  String toast_sit_out_disabled(Object name) {
+    return 'Игрок $name вернулся в игру';
+  }
+
+  @override
+  String get sett_sit_out_mode => 'Режим Sit-Out (Пауза)';
+
+  @override
+  String get sit_out_mode_cash => 'Кеш-игра';
+
+  @override
+  String get sit_out_mode_tournament => 'Турнир';
+
+  @override
+  String get sit_out_mode_tooltip =>
+      'Кеш-игра: Игрок полностью отсутствует в раздаче.\nТурнир: С игрока списываются блайнды/анте, а он сам отправляется в фолд.';
+
+  @override
+  String get pro_version_offer_option_9 => 'Турнирная пауза игрока';
+
+  @override
+  String get update_7 => 'Добавлена функция паузы (Sit-Out) для игроков';
 }

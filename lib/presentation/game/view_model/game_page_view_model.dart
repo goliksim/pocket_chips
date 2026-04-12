@@ -14,6 +14,7 @@ import '../../../domain/models/game/game_state_effect.dart';
 import '../../../domain/models/game/game_state_enum.dart';
 import '../../../domain/models/game/game_state_model.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../services/crash_reporting_service.dart';
 import '../../../services/event_push_service/handlers/event_handler.dart';
 import '../../../services/event_push_service/promotion_service.dart';
 import '../../../services/game_logic_service.dart';
@@ -37,6 +38,9 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
   AppLocalizations get _strings => ref.read(stringsProvider);
   ToastManager get _toastManager => ref.read(toastManagerProvider);
   PromotionManager get _promotionManager => ref.read(promotionManagerProvider);
+  CrashReportingService get _crashReporting =>
+      ref.read(crashReportingServiceProvider);
+
   DateTime get _nowUtc => ref.read(currentTimeProvider)();
 
   Timer? _minuteRefreshTimer;
@@ -88,6 +92,8 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
                   isCurrent: p.uid == gameModel.sessionState.currentPlayerUid,
                   isFolded:
                       gameModel.sessionState.foldedPlayers.contains(p.uid),
+                  isSitOut:
+                      gameModel.sessionState.sitOutPlayers.contains(p.uid),
                   bank: gameModel.lobbyState.banks[p.uid] ?? 0,
                   bet: gameModel.sessionState.bets[p.uid] ?? 0,
                   ante: gameModel.sessionState.anteBets[p.uid] ?? 0,
@@ -96,9 +102,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         // TODO: players noise offset
         smallBlindValue: gameModel.currentSmallBlindValue,
         showProgression:
-            gameModel.lobbyState.settings.progression.levels.length > 1 &&
-                gameModel.sessionState.progressionState.currentLevelIndex <
-                    gameModel.lobbyState.settings.progression.levels.length - 1,
+            gameModel.lobbyState.settings.progression.levels.length > 1,
         progressionType:
             gameModel.lobbyState.settings.progression.progressionType,
         anteType: gameModel.currentAnteType,
@@ -116,6 +120,32 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
   bool get canUndoAction => _gameStateMachine.canUndoAction;
 
   Future<void> undoLastAction() => _gameStateMachine.undoLastAction();
+
+  Future<void> toggleSitOut(String playerUid) async {
+    final player = state.requireValue.tableState.players
+        .firstWhere((p) => p.uid == playerUid);
+
+    try {
+      await _gameStateMachine.toggleSitOut(playerUid);
+    } catch (error, trace) {
+      await _crashReporting.recordError(
+        error: error,
+        trace: trace,
+        reason: 'GamePageViewModel.toggleSitOut',
+      );
+      logs.writeLog(
+        'GameVM: error toggling sit out for player ${player.name} - $error',
+      );
+    }
+
+    if (player.isSitOut) {
+      _toastManager.showToast(_strings.toast_sit_out_disabled(player.name));
+    } else {
+      _toastManager.showToast(_strings.toast_sit_out_enabled(player.name));
+    }
+
+    return;
+  }
 
   Future<void> openPlayerEditor(String? playerUid) async {
     if (state.requireValue.canEditPlayer) {
@@ -162,86 +192,82 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
   Future<void> increaseGameLevel() async => _gameStateMachine.nextLevel();
 
   GamePageControlState _getControlState(GameStateModel gameModel) {
-    try {
-      final gameState = gameModel.lobbyState.gameState;
-      final currentPlayerUid = gameModel.sessionState.currentPlayerUid;
+    final gameState = gameModel.lobbyState.gameState;
+    final currentPlayerUid = gameModel.sessionState.currentPlayerUid;
 
-      switch (gameState) {
-        case GameStatusEnum.notStarted:
-        case GameStatusEnum.gameBreak:
-          return GamePageControlState.breakdown(
-            canStartBetting: gameModel.canStartOrContinueGame,
-            canIncreaseLevel: gameModel.canIncreaseLevel,
-          );
-        case GameStatusEnum.showdown:
-          return GamePageControlState.showdown();
-
-        default:
-          break;
-      }
-
-      if (currentPlayerUid == null) {
+    switch (gameState) {
+      case GameStatusEnum.notStarted:
+      case GameStatusEnum.gameBreak:
+        return GamePageControlState.breakdown(
+          canStartBetting: gameModel.canStartOrContinueGame,
+          canIncreaseLevel: gameModel.canIncreaseLevel,
+        );
+      case GameStatusEnum.showdown:
         return GamePageControlState.showdown();
-      }
 
-      final maxBet = gameModel.sessionState.bets.values.maxOrNull ?? 0;
-      final currentBank =
-          gameModel.lobbyState.banks[gameModel.sessionState.currentPlayerUid] ??
-              0;
-      final currentBet = gameModel
-              .sessionState.bets[gameModel.sessionState.currentPlayerUid] ??
-          0;
-
-      final (minRaiseValue, raiseIsAllIn) =
-          gameModel.calculateRaiseValue(currentPlayerUid);
-
-      final (callValue, callIsAllIn) =
-          gameModel.calculateCallValue(currentPlayerUid);
-
-      final allowCustomBets = gameModel.lobbyState.settings.allowCustomBets;
-
-      final bool canCheck = (currentBet == maxBet);
-      final bool canRaise;
-      final bool canAllIn;
-
-      final int minPossibleBet;
-      final int maxPossibleBet = currentBank;
-      final int minRuleBet = [maxPossibleBet, minRaiseValue].min;
-
-      if (allowCustomBets) {
-        canRaise = !callIsAllIn;
-        canAllIn = false;
-        minPossibleBet = callValue;
-      } else {
-        canRaise = !callIsAllIn && (currentBank > minRaiseValue);
-        canAllIn = !callIsAllIn && raiseIsAllIn;
-        minPossibleBet = minRaiseValue;
-      }
-
-      final isFirstBet =
-          gameModel.checkBidsEqual() && gameState != GameStatusEnum.preFlop;
-
-      return GamePageControlState.active(
-        raiseState: RaiseControlState(
-          canRaise: canRaise,
-          raiseIsAllIn: canAllIn,
-          isFirstBet: isFirstBet,
-          maxPossibleBet: maxPossibleBet,
-          minPossibleBet: minPossibleBet,
-          minRuleBet: minRuleBet,
-          currentBet: currentBet,
-        ),
-        mainState: canCheck
-            ? MainControlState.check()
-            : MainControlState.call(
-                callIsAllIn: callIsAllIn,
-                // TODO: move this logic to UI or replace
-                callValue: callIsAllIn ? callValue + currentBet : callValue,
-              ),
-      );
-    } catch (e) {
-      throw Exception();
+      default:
+        break;
     }
+
+    if (currentPlayerUid == null) {
+      return GamePageControlState.showdown();
+    }
+
+    final maxBet = gameModel.sessionState.bets.values.maxOrNull ?? 0;
+    final currentBank =
+        gameModel.lobbyState.banks[gameModel.sessionState.currentPlayerUid] ??
+            0;
+    final currentBet =
+        gameModel.sessionState.bets[gameModel.sessionState.currentPlayerUid] ??
+            0;
+
+    final (minRaiseValue, raiseIsAllIn) =
+        gameModel.calculateRaiseValue(currentPlayerUid);
+
+    final (callValue, callIsAllIn) =
+        gameModel.calculateCallValue(currentPlayerUid);
+
+    final allowCustomBets = gameModel.lobbyState.settings.allowCustomBets;
+
+    final bool canCheck = (currentBet == maxBet);
+    final bool canRaise;
+    final bool canAllIn;
+
+    final int minPossibleBet;
+    final int maxPossibleBet = currentBank;
+    final int minRuleBet = [maxPossibleBet, minRaiseValue].min;
+
+    if (allowCustomBets) {
+      canRaise = !callIsAllIn;
+      canAllIn = false;
+      minPossibleBet = callValue;
+    } else {
+      canRaise = !callIsAllIn && (currentBank > minRaiseValue);
+      canAllIn = !callIsAllIn && raiseIsAllIn;
+      minPossibleBet = minRaiseValue;
+    }
+
+    final isFirstBet =
+        gameModel.checkBidsEqual() && gameState != GameStatusEnum.preFlop;
+
+    return GamePageControlState.active(
+      raiseState: RaiseControlState(
+        canRaise: canRaise,
+        raiseIsAllIn: canAllIn,
+        isFirstBet: isFirstBet,
+        maxPossibleBet: maxPossibleBet,
+        minPossibleBet: minPossibleBet,
+        minRuleBet: minRuleBet,
+        currentBet: currentBet,
+      ),
+      mainState: canCheck
+          ? MainControlState.check()
+          : MainControlState.call(
+              callIsAllIn: callIsAllIn,
+              // TODO: move this logic to UI or replace
+              callValue: callIsAllIn ? callValue + currentBet : callValue,
+            ),
+    );
   }
 
   int? _getIntervalLeft(GameProgressionState progressionState) =>

@@ -10,6 +10,7 @@ abstract class GameSessionState with _$GameSessionState {
     required Map<String, int> bets,
     @Default(<String, int>{}) Map<String, int> anteBets,
     required Set<String> foldedPlayers,
+    @Default(<String>{}) Set<String> sitOutPlayers,
     required int lapCounter,
     @Default(GameProgressionState()) GameProgressionState progressionState,
     String? currentPlayerUid,
@@ -20,6 +21,7 @@ abstract class GameSessionState with _$GameSessionState {
         bets: {},
         anteBets: {},
         foldedPlayers: {},
+        sitOutPlayers: {},
         lapCounter: 0,
       );
 }

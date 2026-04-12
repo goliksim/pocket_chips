@@ -39,11 +39,11 @@ Future<void> runProVersionTest7(
   );
   final testName = 'test_123';
 
+  final mockGameState = null;
   final mockLobbyState = LobbyStateModel(
     players: players,
     banks: {for (var player in players) player.uid: 100},
   );
-  // TODO: add MockGameState to test's consistency
 
   final mockPurchasesRepository =
       MockPurchasesRepository(hasPurchasesForRestore: false)
@@ -54,6 +54,9 @@ Future<void> runProVersionTest7(
   );
   when(repository.isProVersion()).thenAnswer(
     (_) async => false,
+  );
+  when(repository.getGameSessionState()).thenAnswer(
+    (_) async => mockGameState,
   );
 
   final homePage = HomePageTester(tester);

@@ -94,8 +94,8 @@ void main() {
 
       await _pumpGameControlHarness(tester, repo);
 
-      expect(find.byKey(GameKeys.progressionSetupLabel), findsOneWidget);
-      expect(find.byKey(GameKeys.progressionLevel(2)), findsNothing);
+      expect(find.byKey(GameKeys.progressionSetupLabel), findsNothing);
+      expect(find.byKey(GameKeys.progressionLevel(2)), findsOneWidget);
       expect(find.byKey(GameKeys.increaseLevelButton), findsNothing);
       expect(find.byKey(GameKeys.blinds(20)), findsOneWidget);
     });
@@ -124,9 +124,7 @@ void main() {
           lapCounter: 0,
           progressionState: GameProgressionState(
             currentLevelIndex: 0,
-            nextLevelAtEpochMsUtc: currentTime
-                .add(const Duration(minutes: 3))
-                .millisecondsSinceEpoch,
+            nextLevelAtEpochMsUtc: null,
           ),
         ),
       );
