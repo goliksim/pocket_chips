@@ -1,20 +1,20 @@
 import 'dart:async';
 
 import '../../../utils/logs.dart';
-import '../../monitization/video_ads/google_ads_manager.dart';
+import '../../monitization/video_ads/video_ads_manager.dart';
 import 'event_handler.dart';
 
 class AdvertisementHandler implements EventHandler {
   static const _cooldown = Duration(minutes: 5);
   DateTime? _lastShowTime;
 
-  final GoogleAdsManager _googleAdsManager;
+  final VideoAdsManager _googleAdsManager;
   final bool _isPro;
 
   AdvertisementHandler({
-    required GoogleAdsManager googleAdsManager,
+    required VideoAdsManager videoAdsManager,
     required bool isPro,
-  })  : _googleAdsManager = googleAdsManager,
+  })  : _googleAdsManager = videoAdsManager,
         _isPro = isPro {
     // The first showing after 1 minutes after first launch
     _lastShowTime = DateTime.now().subtract(Duration(minutes: 4));

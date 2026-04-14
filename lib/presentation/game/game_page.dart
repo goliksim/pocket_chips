@@ -9,7 +9,6 @@ import '../../utils/theme/ui_values.dart';
 import '../common/widgets/error_page.dart';
 import '../common/widgets/loading_page.dart';
 import '../common/widgets/ui_widgets.dart';
-import '../monitization/ads/app_bar_banner.dart';
 import '../monitization/pro_version/widgets/pro_version_wrapper.dart';
 import 'widgets/game_contol/game_control.dart';
 import 'widgets/game_progression_widget.dart';
@@ -40,7 +39,6 @@ class GamePage extends ConsumerWidget {
           child: Scaffold(
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
-              flexibleSpace: const AppBarBanner(),
               toolbarHeight: stdButtonHeight * 0.75,
               leading: IconButton(
                 key: CommonKeys.closePageButton,

@@ -6,8 +6,8 @@ import 'package:pocket_chips/di/domain_managers.dart';
 import 'package:pocket_chips/di/repositories.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
-import '../../mocks/google_ads_manager_mock.dart' hide MockScenario;
 import '../../mocks/purchases_repository_mock.dart';
+import '../../mocks/video_ads_manager_mock.dart' hide MockScenario;
 import '../../pages/donation_page.dart';
 import '../../pages/home_page.dart';
 import '../../test_utils/test_action.dart';
@@ -48,7 +48,7 @@ Future<void> runMonitizationTest3(
           proVersionRepositoryProvider.overrideWithValue(
             mockPurchasesRepository,
           ),
-          googleAdsManagerProvider.overrideWith(() => mockGoogleAdsManager),
+          videoAdsManagerProvider.overrideWith(() => mockGoogleAdsManager),
         ],
         child: const MyApp(),
       ),

@@ -12,8 +12,8 @@ import '../../../../services/analytics_event.dart';
 import '../../../../services/analytics_service.dart';
 import '../../../../services/crash_reporting_service.dart';
 import '../../../../services/monitization/purchases/purchases_manager.dart';
-import '../../../../services/monitization/video_ads/google_ads_manager.dart';
 import '../../../../services/monitization/video_ads/models/iterstitial_ad_state.dart';
+import '../../../../services/monitization/video_ads/video_ads_manager.dart';
 import '../../../../services/toast_manager.dart';
 import '../../../../utils/constants.dart';
 import '../../../../utils/logs.dart';
@@ -36,12 +36,12 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
   PurchasesManager get _purchasesManager =>
       ref.read(purchasesManagerProvider.notifier);
 
-  GoogleAdsManager get _googleAdsManager =>
-      ref.read(googleAdsManagerProvider.notifier);
+  VideoAdsManager get _googleAdsManager =>
+      ref.read(videoAdsManagerProvider.notifier);
 
   @override
   FutureOr<DonationViewState> build() async {
-    final videoAdState = ref.watch(googleAdsManagerProvider);
+    final videoAdState = ref.watch(videoAdsManagerProvider);
     logs.writeLog('DonationVM: build $videoAdState');
     final videoAdItem = _getAdItemState(videoAdState);
 
@@ -93,7 +93,7 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
   }
 
   void retry() async {
-    _googleAdsManager.reload();
+    _googleAdsManager.reloadIfUnavailable(reason: 'Manual');
     _purchasesManager.runBuild();
   }
 

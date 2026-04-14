@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../app/navigation/navigation_manager.dart';
 import '../app/navigation/route_information_parser.dart';
@@ -19,8 +22,11 @@ import '../services/event_push_service/promotion_service.dart';
 import '../services/initialization_manager.dart';
 import '../services/monitization/purchases/pro_version_manager.dart';
 import '../services/monitization/purchases/purchases_manager.dart';
-import '../services/monitization/video_ads/google_ads_manager.dart';
+import '../services/monitization/video_ads/banner_ads_manager.dart';
+import '../services/monitization/video_ads/banner_ads_manager_impl.dart';
 import '../services/monitization/video_ads/models/iterstitial_ad_state.dart';
+import '../services/monitization/video_ads/video_ads_manager.dart';
+import '../services/monitization/video_ads/video_ads_manager_impl.dart';
 import '../services/toast_manager.dart';
 import '../utils/firebase_flags.dart';
 import '../utils/theme/theme_manager.dart';
@@ -121,10 +127,33 @@ final proVersionProvider = Provider<bool>(
       ref.watch(proVersionOfferModelHolderProvider).value?.isPurchased ?? false,
 );
 
-final googleAdsManagerProvider =
-    NotifierProvider<GoogleAdsManager, IterstitialAdState>(
-  GoogleAdsManager.new,
+final videoAdsManagerProvider =
+    NotifierProvider<VideoAdsManager, IterstitialAdState>(
+  VideoAdsManagerImpl.new,
 );
+
+final bannerAdsManagerProvider = Provider<BannerAdsManager<BannerAd>>(
+  (ref) => BannerAdsManagerImpl(
+    isPro: ref.watch(proVersionProvider),
+  ),
+);
+
+final currentBannerProvider = StreamProvider.autoDispose<BannerAd?>((ref) {
+  final manager = ref.watch(bannerAdsManagerProvider);
+  final controller = StreamController<BannerAd?>();
+
+  void listener() => controller.add(manager.bannerAd);
+
+  manager.addListener(listener);
+  controller.add(manager.bannerAd);
+
+  ref.onDispose(() {
+    manager.removeListener(listener);
+    controller.close();
+  });
+
+  return controller.stream;
+});
 
 final promotionManagerProvider = Provider<PromotionManager>(
   (ref) => PromotionManager(
@@ -143,7 +172,7 @@ final donationHandlerProvider = Provider<DonationHandler>(
 
 final adsHandler = Provider<AdvertisementHandler>(
   (ref) => AdvertisementHandler(
-    googleAdsManager: ref.read(googleAdsManagerProvider.notifier),
+    videoAdsManager: ref.read(videoAdsManagerProvider.notifier),
     isPro: ref.watch(proVersionProvider),
   ),
 );
