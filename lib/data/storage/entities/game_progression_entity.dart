@@ -6,13 +6,13 @@ part 'game_progression_entity.g.dart';
 class GameProgressionEntity {
   @JsonKey(defaultValue: 0)
   final int currentLevelIndex;
-  final int? handsUntilNextLevel;
-  final int? nextLevelAtEpochMsUtc;
+  final int? handsFromLevelStart;
+  final int? levelTimerStartMsUtc;
 
   const GameProgressionEntity({
     this.currentLevelIndex = 0,
-    this.handsUntilNextLevel,
-    this.nextLevelAtEpochMsUtc,
+    this.handsFromLevelStart,
+    this.levelTimerStartMsUtc,
   });
 
   factory GameProgressionEntity.fromJson(Map<String, dynamic> json) =>

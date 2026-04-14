@@ -90,7 +90,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
   int get _progressionInterval =>
       _parseControllerValue(_progressionIntervalController,
           fallback: state.progression.progressionInterval) ??
-      10;
+      20;
 
   bool _validateLevels() {
     for (var level in _levels) {

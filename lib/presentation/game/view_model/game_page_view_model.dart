@@ -14,7 +14,6 @@ import '../../../domain/models/game/game_state_effect.dart';
 import '../../../domain/models/game/game_state_enum.dart';
 import '../../../domain/models/game/game_state_model.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../../services/crash_reporting_service.dart';
 import '../../../services/event_push_service/handlers/event_handler.dart';
 import '../../../services/event_push_service/promotion_service.dart';
 import '../../../services/game_logic_service.dart';
@@ -38,8 +37,6 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
   AppLocalizations get _strings => ref.read(stringsProvider);
   ToastManager get _toastManager => ref.read(toastManagerProvider);
   PromotionManager get _promotionManager => ref.read(promotionManagerProvider);
-  CrashReportingService get _crashReporting =>
-      ref.read(crashReportingServiceProvider);
 
   DateTime get _nowUtc => ref.read(currentTimeProvider)();
 
@@ -109,7 +106,10 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         anteValue: gameModel.currentAnteValue,
         progressionLevel:
             gameModel.sessionState.progressionState.currentLevelIndex + 1,
-        leftInterval: _getIntervalLeft(gameModel.sessionState.progressionState),
+        leftInterval: _getIntervalLeft(
+          gameModel.sessionState.progressionState,
+          gameModel.lobbyState.settings.progression.progressionInterval,
+        ),
       ),
       gameStatus: gameState,
       currentPlayerName: gameModel.currentPlayer?.name,
@@ -127,12 +127,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
 
     try {
       await _gameStateMachine.toggleSitOut(playerUid);
-    } catch (error, trace) {
-      await _crashReporting.recordError(
-        error: error,
-        trace: trace,
-        reason: 'GamePageViewModel.toggleSitOut',
-      );
+    } catch (error) {
       logs.writeLog(
         'GameVM: error toggling sit out for player ${player.name} - $error',
       );
@@ -178,12 +173,7 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
       );
 
   @override
-  Future<void> openSettings() async {
-    await _navigationManager.showLobbySettings();
-
-    //Rebuild after lobbyEditing
-    _gameStateMachine.runBuild();
-  }
+  Future<void> openSettings() => _navigationManager.showGameSettings();
 
   @override
   Future<void> startBetting() async => _gameStateMachine.startBetting();
@@ -270,9 +260,21 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
     );
   }
 
-  int? _getIntervalLeft(GameProgressionState progressionState) =>
-      progressionState.handsUntilNextLevel ??
-      progressionState.minutesUntilNextLevelAt(_nowUtc);
+  int? _getIntervalLeft(
+    GameProgressionState progressionState,
+    int? intervalMin,
+  ) {
+    if (intervalMin == null) return null;
+
+    if (progressionState.handsFromLevelStart != null) {
+      return progressionState.handsUntilNextLevel(intervalMin: intervalMin);
+    }
+    if (progressionState.levelTimerStartMsUtc != null) {}
+    return progressionState.minutesUntilNextLevelAt(
+      _nowUtc,
+      intervalMin: intervalMin,
+    );
+  }
 
   Future<void> _executeEffect({
     required GameStateEffect effect,
@@ -333,9 +335,10 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
   void _syncMinuteRefreshTimer(GameStateModel gameModel) {
     final progressionState = gameModel.sessionState.progressionState;
     final shouldRefreshEveryMinute =
-        gameModel.lobbyState.settings.progression.progressionType ==
+        gameModel.lobbyState.gameState.canEditPlayers &&
+            gameModel.lobbyState.settings.progression.progressionType ==
                 BlindProgressionType.everyNMinutes &&
-            progressionState.nextLevelAtEpochMsUtc != null;
+            progressionState.levelTimerStartMsUtc != null;
 
     if (!shouldRefreshEveryMinute) {
       _disposeMinuteRefreshTimer();
@@ -348,13 +351,8 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
       const Duration(minutes: 1),
       (_) {
         if (ref.mounted) {
-          state = AsyncData(
-            state.requireValue.copyWith(
-              tableState: state.requireValue.tableState.copyWith(
-                leftInterval: _getIntervalLeft(progressionState),
-              ),
-            ),
-          );
+          // Just trigger state rebuild to update progression and level increasement
+          _gameStateMachine.refreshByTimer();
         }
       },
     );

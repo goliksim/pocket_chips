@@ -1172,6 +1172,24 @@ abstract class AppLocalizations {
   /// **'Your purchase is pending:'**
   String get toast_purchase_pending_state_named;
 
+  /// No description provided for @toast_level_clamp.
+  ///
+  /// In en, this message translates to:
+  /// **'Current level adjusted due to settings changes'**
+  String get toast_level_clamp;
+
+  /// No description provided for @toast_level_reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Level reverted, timer restarted'**
+  String get toast_level_reset;
+
+  /// No description provided for @toast_settings_undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings changes undone'**
+  String get toast_settings_undo;
+
   /// No description provided for @purchases_restore_button.
   ///
   /// In en, this message translates to:

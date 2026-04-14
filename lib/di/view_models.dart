@@ -112,6 +112,14 @@ final lobbySettingsViewModelProvider =
   ),
 );
 
+final gameSettingsViewModelProvider =
+    Provider.autoDispose<GameSettingsViewModel>(
+  (ref) => GameSettingsViewModel(
+    gameSettingsProvider: ref.read(gameStateMachineProvider.notifier),
+    pop: () => ref.read(navigationManagerProvider).pop(),
+  ),
+);
+
 final winnerChooseViewModelProvider =
     Provider.autoDispose.family<WinnerChoiceViewModel, WinnerChoiceArgs>(
   (ref, args) => WinnerChoiceViewModel(

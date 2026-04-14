@@ -124,7 +124,7 @@ void main() {
           lapCounter: 0,
           progressionState: GameProgressionState(
             currentLevelIndex: 0,
-            nextLevelAtEpochMsUtc: null,
+            levelTimerStartMsUtc: null,
           ),
         ),
       );
@@ -171,8 +171,8 @@ void main() {
           lapCounter: 0,
           progressionState: GameProgressionState(
             currentLevelIndex: 0,
-            nextLevelAtEpochMsUtc: currentTime
-                .add(const Duration(seconds: 130))
+            levelTimerStartMsUtc: currentTime
+                .add(const Duration(seconds: 10)) // Interval(120s) + 10s = 130s
                 .millisecondsSinceEpoch,
           ),
         ),

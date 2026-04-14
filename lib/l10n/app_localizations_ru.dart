@@ -575,6 +575,17 @@ class AppLocalizationsRu extends AppLocalizations {
       'Ваша покупка обрабатывается:';
 
   @override
+  String get toast_level_clamp =>
+      'Текущий уровень изменен из-за конфигурации настроек';
+
+  @override
+  String get toast_level_reset =>
+      'Уровень прогресии восстановлен, таймер сброшен';
+
+  @override
+  String get toast_settings_undo => 'Изменение настроек отменено';
+
+  @override
   String get purchases_restore_button => 'Восстановить покупки';
 
   @override

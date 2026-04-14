@@ -127,6 +127,13 @@ mixin PurchasesMixin<T> on AsyncNotifier<T> {
     } on Exception catch (e) {
       logs.writeLog(e.toString());
       toastManager.showToast(e.toString());
+      unawaited(
+        crashReporting.recordError(
+          error: e,
+          trace: StackTrace.current,
+          reason: 'PurchasesManager.loadPurchases',
+        ),
+      );
 
       return [];
     }

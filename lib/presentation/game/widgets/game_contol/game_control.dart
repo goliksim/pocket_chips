@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../utils/theme/ui_values.dart';
@@ -88,7 +89,16 @@ class _GameControlState extends State<GameControl> {
                               minRuleBet: activeState.raiseState.minRuleBet,
                               currentBet: activeState.raiseState.currentBet,
                             )
-                          : null,
+                          : (kDebugMode
+                              ? Banner(
+                                  message: 'Debug',
+                                  location: BannerLocation.bottomStart,
+                                  child: SizedBox(
+                                    height: stdButtonHeight * 1.6,
+                                    child: widget.statsWidget,
+                                  ),
+                                )
+                              : null),
                     ),
                   ),
                 ),

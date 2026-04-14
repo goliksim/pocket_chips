@@ -7,6 +7,7 @@ import '../../di/domain_managers.dart';
 import '../../di/model_holders.dart';
 import '../../di/repositories.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/crash_reporting_service.dart';
 import '../../services/toast_manager.dart';
 import '../../utils/logs.dart';
 import '../models/game/game_session_state.dart';
@@ -23,6 +24,8 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
   AppLocalizations get _strings => ref.read(stringsProvider);
   ToastManager get _toastManager => ref.read(toastManagerProvider);
   AppRepository get _appRepository => ref.read(appRepositoryProvider);
+  CrashReportingService get _crashReporting =>
+      ref.read(crashReportingServiceProvider);
 
   LobbyStateModel get activeLobby => state.requireValue;
 
@@ -40,18 +43,24 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
 
     try {
       await _appRepository.updateLobbyState(newState);
-    } catch (e) {
-      logs.writeLog('LobbySH: save lobby state error - $e');
+    } catch (error, trace) {
+      logs.writeLog('LobbySH: save lobby state error - $error');
+
+      unawaited(
+        _crashReporting.recordError(
+          error: error,
+          trace: trace,
+          reason: 'LobbyStateHolder.updateLobby',
+        ),
+      );
     }
   }
 
   Future<void> createNewLobby() async {
     logs.writeLog('LobbySH: create new lobby');
-    state = AsyncValue.data(
-      LobbyStateModel.empty(),
-    );
 
-    // Clear previous states when creating a new lobby
+    await updateLobby(LobbyStateModel.empty());
+    await _appRepository.updateGameSessionState(GameSessionState.initial());
     ref.read(gamePreviousStateNotifierProvider.notifier).clearPrevious();
   }
 
@@ -87,10 +96,21 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
       banks: newBanks,
       gameState: GameStatusEnum.notStarted,
     );
-    final newSessionState = GameSessionState.initial();
 
-    await updateLobby(newLobbyState);
-    await _appRepository.updateGameSessionState(newSessionState);
+    try {
+      await updateLobby(newLobbyState);
+      await _appRepository.updateGameSessionState(GameSessionState.initial());
+    } catch (error, trace) {
+      logs.writeLog('LobbySH: reset lobby error - $error');
+
+      unawaited(
+        _crashReporting.recordError(
+          error: error,
+          trace: trace,
+          reason: 'LobbyStateHolder.resetLobby',
+        ),
+      );
+    }
   }
 
   Future<void> addPlayer({

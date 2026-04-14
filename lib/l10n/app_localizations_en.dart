@@ -572,6 +572,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toast_purchase_pending_state_named => 'Your purchase is pending:';
 
   @override
+  String get toast_level_clamp =>
+      'Current level adjusted due to settings changes';
+
+  @override
+  String get toast_level_reset => 'Level reverted, timer restarted';
+
+  @override
+  String get toast_settings_undo => 'Settings changes undone';
+
+  @override
   String get purchases_restore_button => 'Restore Purchases';
 
   @override

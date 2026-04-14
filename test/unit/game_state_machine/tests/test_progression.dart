@@ -40,7 +40,7 @@ void runInitializationWithSavedHandsProgressionTest(
     lapCounter: 0,
     progressionState: const GameProgressionState(
       currentLevelIndex: 1,
-      handsUntilNextLevel: 3,
+      handsFromLevelStart: 2,
     ),
   );
 
@@ -130,9 +130,9 @@ void runTimedProgressionAdvanceOnRestoreTest(
     lapCounter: 0,
     progressionState: GameProgressionState(
       currentLevelIndex: 0,
-      nextLevelAtEpochMsUtc: DateTime.now()
+      levelTimerStartMsUtc: DateTime.now()
           .toUtc()
-          .subtract(const Duration(minutes: 1))
+          .subtract(const Duration(minutes: 6)) // Interval is 5, so 6 is past
           .millisecondsSinceEpoch,
     ),
   );
@@ -147,7 +147,7 @@ void runTimedProgressionAdvanceOnRestoreTest(
     gameState.sessionState.progressionState.currentLevelIndex,
     1,
   );
-  expect(gameState.sessionState.progressionState.nextLevelAtEpochMsUtc, isNull);
+  expect(gameState.sessionState.progressionState.levelTimerStartMsUtc, isNull);
   expect(gameState.currentSmallBlindValue, 20);
 }
 
