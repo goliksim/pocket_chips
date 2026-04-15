@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/keys/keys.dart';
+import '../../services/toast_manager.dart';
 import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
 import '../common/widgets/dialog_widget.dart';
@@ -28,9 +29,15 @@ class _WinnerCheck extends StatefulWidget {
   State<_WinnerCheck> createState() => __WinnerCheckState();
 }
 
-class __WinnerCheckState extends State<_WinnerCheck> {
+class __WinnerCheckState extends State<_WinnerCheck> with ToastsMixin {
   void callback() {
-    setState(() {});
+    setState(() {
+      if (context.winner != 0) {
+        showToast(
+          ' 👑 ${context.strings.check_player} ${context.winner} ${context.strings.game_win2} 👑',
+        );
+      }
+    });
   }
 
   @override

@@ -36,7 +36,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooltip_add_main => 'Add Player';
 
   @override
-  String get tooltip_undo => 'Undo action';
+  String get tooltip_undo => 'Undo last action';
 
   @override
   String get conf_canc => 'Cancel';
@@ -215,7 +215,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about_set_8 => 'change the game settings';
 
   @override
-  String get about_set_9 => 'mark as away (sit out)';
+  String get about_set_9 => 'mark player as away (sit out)';
 
   @override
   String get about_tab_1 => 'Game table';
@@ -649,7 +649,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'PRO users can their photos from the gallery to players';
 
   @override
-  String get update_4 => 'PRO users can undo their last game action';
+  String get update_4 => 'PRO users can undo their last game actions';
 
   @override
   String get update_5 =>
@@ -686,7 +686,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pro_version_offer_option_6 => 'Custom player avatars';
 
   @override
-  String get pro_version_offer_option_7 => 'Undo last action';
+  String get pro_version_offer_option_7 => 'Undo last actions';
 
   @override
   String get pro_version_offer_option_8 => 'Blind structure in settings';
@@ -708,6 +708,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get error_retry_button => 'Retry';
+
+  @override
+  String get toast_sit_out_unavailable => 'Сannot be changed during betting';
 
   @override
   String toast_sit_out_enabled(Object name) {

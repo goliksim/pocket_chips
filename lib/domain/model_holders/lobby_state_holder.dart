@@ -247,27 +247,18 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
   }
 
   Future<void> reorderPlayer(int oldIndex, int newIndex) async {
-    if (newIndex > oldIndex) {
-      newIndex -= 1;
-    }
-
     final currentLobby = activeLobby;
-
     if (!currentLobby.gameState.canEditPlayers) {
       throw Exception('Cannot edit player list on this state');
     }
 
-    final player = currentLobby.players[oldIndex];
-    final newPlayers = List<PlayerModel>.from(currentLobby.players)
-      ..removeAt(oldIndex)
-      ..insert(newIndex, player);
-
-    final newLobby = currentLobby.copyWith(
-      players: newPlayers,
-    );
+    final newPlayers = List<PlayerModel>.from(currentLobby.players);
+    newPlayers.reorder(oldIndex, newIndex);
 
     logs.writeLog('LobbySH: players reordered');
-    await updateLobby(newLobby);
+    await updateLobby(currentLobby.copyWith(
+      players: newPlayers,
+    ));
   }
 
   @override
@@ -298,4 +289,14 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
               : activeLobby.banks,
         ),
       );
+}
+
+extension ReorderList<T> on List<T> {
+  void reorder(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final item = removeAt(oldIndex);
+    insert(newIndex, item);
+  }
 }

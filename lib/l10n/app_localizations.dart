@@ -155,7 +155,7 @@ abstract class AppLocalizations {
   /// No description provided for @tooltip_undo.
   ///
   /// In en, this message translates to:
-  /// **'Undo action'**
+  /// **'Undo last action'**
   String get tooltip_undo;
 
   /// No description provided for @conf_canc.
@@ -491,7 +491,7 @@ abstract class AppLocalizations {
   /// No description provided for @about_set_9.
   ///
   /// In en, this message translates to:
-  /// **'mark as away (sit out)'**
+  /// **'mark player as away (sit out)'**
   String get about_set_9;
 
   /// No description provided for @about_tab_1.
@@ -1319,7 +1319,7 @@ abstract class AppLocalizations {
   /// No description provided for @update_4.
   ///
   /// In en, this message translates to:
-  /// **'PRO users can undo their last game action'**
+  /// **'PRO users can undo their last game actions'**
   String get update_4;
 
   /// No description provided for @update_5.
@@ -1391,7 +1391,7 @@ abstract class AppLocalizations {
   /// No description provided for @pro_version_offer_option_7.
   ///
   /// In en, this message translates to:
-  /// **'Undo last action'**
+  /// **'Undo last actions'**
   String get pro_version_offer_option_7;
 
   /// No description provided for @pro_version_offer_option_8.
@@ -1435,6 +1435,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get error_retry_button;
+
+  /// No description provided for @toast_sit_out_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Сannot be changed during betting'**
+  String get toast_sit_out_unavailable;
 
   /// No description provided for @toast_sit_out_enabled.
   ///

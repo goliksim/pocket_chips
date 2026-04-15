@@ -126,17 +126,23 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         .firstWhere((p) => p.uid == playerUid);
 
     try {
-      await _gameStateMachine.toggleSitOut(playerUid);
+      if (!state.requireValue.canEditPlayer) {
+        return _toastManager.showToast(_strings.toast_sit_out_unavailable);
+      }
+
+      final performed = await _gameStateMachine.toggleSitOut(playerUid);
+
+      if (performed) {
+        _toastManager.showToast(
+          player.isSitOut
+              ? _strings.toast_sit_out_disabled(player.name)
+              : _strings.toast_sit_out_enabled(player.name),
+        );
+      }
     } catch (error) {
       logs.writeLog(
         'GameVM: error toggling sit out for player ${player.name} - $error',
       );
-    }
-
-    if (player.isSitOut) {
-      _toastManager.showToast(_strings.toast_sit_out_disabled(player.name));
-    } else {
-      _toastManager.showToast(_strings.toast_sit_out_enabled(player.name));
     }
 
     return;

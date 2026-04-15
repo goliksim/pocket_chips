@@ -36,7 +36,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tooltip_add_main => 'Добавить игрока';
 
   @override
-  String get tooltip_undo => 'Отмена действия';
+  String get tooltip_undo => 'Отмена последнего действия';
 
   @override
   String get conf_canc => 'Отменить';
@@ -652,7 +652,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get update_4 =>
-      'ПРО пользователи могут отменять последнее действие игры';
+      'ПРО пользователи могут отменять последние действия игры';
 
   @override
   String get update_5 =>
@@ -690,7 +690,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pro_version_offer_option_6 => 'Кастомные аватары игроков';
 
   @override
-  String get pro_version_offer_option_7 => 'Отмена последнего действия';
+  String get pro_version_offer_option_7 => 'Отмена последних действий';
 
   @override
   String get pro_version_offer_option_8 => 'Настройка структура блайндов';
@@ -712,6 +712,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get error_retry_button => 'Повторить';
+
+  @override
+  String get toast_sit_out_unavailable => 'Нельзя менять во время ставок';
 
   @override
   String toast_sit_out_enabled(Object name) {
