@@ -140,7 +140,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about_welc_4 => 'stores players\' chips';
 
   @override
-  String get about_welc_5 => 'allows you to place bets';
+  String get about_welc_5 => 'allows you to place bets/antes';
 
   @override
   String get about_welc_6 => 'divide the final pot between players';
@@ -188,18 +188,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about_plme_7 => 'Reorder players by drag-drop.';
 
   @override
+  String get about_plme_8 =>
+      '[PRO-feature] Use your gallery photo as player avatar';
+
+  @override
   String get about_set_1 => 'Settings';
 
   @override
   String get about_set_2 =>
-      'In the settings tab, you can also configure the initial stack, as well as small blind.';
+      'In the settings tab, you can configure the Initial stack, enable custom bets, select Sit Out mode and configure Simple or PRO blinds structure.';
 
   @override
   String get about_set_3 =>
       'Before the start of betting, you can make any changes:';
 
   @override
-  String get about_set_4 => 'add, remove players';
+  String get about_set_4 => 'add/remove/edit players';
 
   @override
   String get about_set_5 => 'change player stacks';
@@ -208,10 +212,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about_set_6 => 'you can change the dealer, etc';
 
   @override
-  String get about_set_8 => 'change the initial smallblind';
+  String get about_set_8 => 'change the game settings';
 
   @override
-  String get about_set_9 => 'change the description and player\'s avatar';
+  String get about_set_9 => 'mark as away (sit out)';
 
   @override
   String get about_tab_1 => 'Game table';
@@ -226,11 +230,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get about_tab_4 =>
-      'After showdown (end of betting) you need to choose a winner or winners.';
+      'On showdown (end of betting) you need to choose a winners of main/side pots';
 
   @override
   String get about_tab_5 =>
-      'If side pots were created in the game (someone went ALL-in), then first choose the winner of the main pot.';
+      'You can mark/unmark player as away (sit out) by long press';
 
   @override
   String get about_link_1 => 'Links';

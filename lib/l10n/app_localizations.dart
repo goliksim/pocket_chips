@@ -359,7 +359,7 @@ abstract class AppLocalizations {
   /// No description provided for @about_welc_5.
   ///
   /// In en, this message translates to:
-  /// **'allows you to place bets'**
+  /// **'allows you to place bets/antes'**
   String get about_welc_5;
 
   /// No description provided for @about_welc_6.
@@ -440,6 +440,12 @@ abstract class AppLocalizations {
   /// **'Reorder players by drag-drop.'**
   String get about_plme_7;
 
+  /// No description provided for @about_plme_8.
+  ///
+  /// In en, this message translates to:
+  /// **'[PRO-feature] Use your gallery photo as player avatar'**
+  String get about_plme_8;
+
   /// No description provided for @about_set_1.
   ///
   /// In en, this message translates to:
@@ -449,7 +455,7 @@ abstract class AppLocalizations {
   /// No description provided for @about_set_2.
   ///
   /// In en, this message translates to:
-  /// **'In the settings tab, you can also configure the initial stack, as well as small blind.'**
+  /// **'In the settings tab, you can configure the Initial stack, enable custom bets, select Sit Out mode and configure Simple or PRO blinds structure.'**
   String get about_set_2;
 
   /// No description provided for @about_set_3.
@@ -461,7 +467,7 @@ abstract class AppLocalizations {
   /// No description provided for @about_set_4.
   ///
   /// In en, this message translates to:
-  /// **'add, remove players'**
+  /// **'add/remove/edit players'**
   String get about_set_4;
 
   /// No description provided for @about_set_5.
@@ -479,13 +485,13 @@ abstract class AppLocalizations {
   /// No description provided for @about_set_8.
   ///
   /// In en, this message translates to:
-  /// **'change the initial smallblind'**
+  /// **'change the game settings'**
   String get about_set_8;
 
   /// No description provided for @about_set_9.
   ///
   /// In en, this message translates to:
-  /// **'change the description and player\'s avatar'**
+  /// **'mark as away (sit out)'**
   String get about_set_9;
 
   /// No description provided for @about_tab_1.
@@ -509,13 +515,13 @@ abstract class AppLocalizations {
   /// No description provided for @about_tab_4.
   ///
   /// In en, this message translates to:
-  /// **'After showdown (end of betting) you need to choose a winner or winners.'**
+  /// **'On showdown (end of betting) you need to choose a winners of main/side pots'**
   String get about_tab_4;
 
   /// No description provided for @about_tab_5.
   ///
   /// In en, this message translates to:
-  /// **'If side pots were created in the game (someone went ALL-in), then first choose the winner of the main pot.'**
+  /// **'You can mark/unmark player as away (sit out) by long press'**
   String get about_tab_5;
 
   /// No description provided for @about_link_1.

@@ -140,7 +140,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get about_welc_4 => 'хранит фишки игроков';
 
   @override
-  String get about_welc_5 => 'позволяет вам делать ставки';
+  String get about_welc_5 => 'позволяет ставить ставки/анте';
 
   @override
   String get about_welc_6 => 'делить итоговый банк между игроками';
@@ -172,12 +172,11 @@ class AppLocalizationsRu extends AppLocalizations {
       'Кнопка НАЧАЛЬНОГО СТЕКА позволяет вам изменить начальный стек для всех игроков.';
 
   @override
-  String get about_plme_3 =>
-      'Проведите пальцем по игроку влево, чтобы удалить его.';
+  String get about_plme_3 => 'Проведите влево по игроку для удаления.';
 
   @override
   String get about_plme_4 =>
-      '[ПРО-функция] Проведите пальцем по игроку вправо, чтобы добавить его в хранилище.';
+      '[ПРО-функция] Проведите вправо по игроку для сохранения в хранилище.';
 
   @override
   String get about_plme_5 => 'Они будут храниться там вечно.';
@@ -189,18 +188,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get about_plme_7 => 'Меняй порядок игроков перетаскиванием.';
 
   @override
+  String get about_plme_8 =>
+      '[ПРО-функция] Используй фото галереи в качестве аватара';
+
+  @override
   String get about_set_1 => 'Настройки';
 
   @override
   String get about_set_2 =>
-      'Во вкладке настройки вы также можете настроить начальный стек, а также малый блайнд.';
+      'В настройках игры вы можете изменить начальный стек, включить ставки вне правил, выбрать режим паузы игроков и настроить простую или PRO структуру блайндов.';
 
   @override
   String get about_set_3 =>
       'Перед началом ставок вы можете внести любые изменения:';
 
   @override
-  String get about_set_4 => 'добавлять, удалять игроков';
+  String get about_set_4 => 'добавлять/удалять/изменять игроков';
 
   @override
   String get about_set_5 => 'менять стеки игроков';
@@ -209,10 +212,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get about_set_6 => 'вы можете сменить дилера и т.д';
 
   @override
-  String get about_set_8 => 'изменить начальный малый блайнд';
+  String get about_set_8 => 'изменить настройки игры';
 
   @override
-  String get about_set_9 => 'изменить имя и аватар игрока';
+  String get about_set_9 => 'поставить игрока на паузу (отсутствие)';
 
   @override
   String get about_tab_1 => 'Игровой стол';
@@ -227,11 +230,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get about_tab_4 =>
-      'После вскрытия (окончания ставок) вам необходимо выбрать победителя или победителей.';
+      'На вскрытии (окончание ставок) вам необходимо выбрать победителя или победителей.';
 
   @override
   String get about_tab_5 =>
-      'Если в игре были созданы побочные банки (кто-то пошел олл-ин), то сначала выберите победителя основного банка.';
+      'Вы можете включить/отключить паузу игрока долгим нажатие';
 
   @override
   String get about_link_1 => 'Полезные ссылки';
