@@ -7,6 +7,7 @@ import '../../presentation/game/game_page.dart';
 import '../../presentation/home/home_page.dart';
 import '../../presentation/init/init_page.dart';
 import '../../presentation/lobby/lobby_page.dart';
+import '../../presentation/monitization/ads/banner_ads_wrapper.dart';
 import '../theme_provider.dart';
 import 'models/app_route.dart';
 import 'navigation_manager.dart';
@@ -52,19 +53,21 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
         .toList(growable: false);
 
     return AppThemeBuilder(
-      builder: (context, theme) => Navigator(
-        key: navigatorKey,
-        pages: pages,
-        observers: observers,
-        // TODO: refactor to use onDidRemovePage
-        //ignore: deprecated_member_use
-        onPopPage: (route, result) {
-          final didPop = route.didPop(result);
-          if (!didPop) return false;
+      builder: (context, theme) => BannerAdWrapper(
+        child: Navigator(
+          key: navigatorKey,
+          pages: pages,
+          observers: observers,
+          // TODO: refactor to use onDidRemovePage
+          //ignore: deprecated_member_use
+          onPopPage: (route, result) {
+            final didPop = route.didPop(result);
+            if (!didPop) return false;
 
-          final wasHandled = navigationManager.handleBackNavigation();
-          return wasHandled;
-        },
+            final wasHandled = navigationManager.handleBackNavigation();
+            return wasHandled;
+          },
+        ),
       ),
     );
   }

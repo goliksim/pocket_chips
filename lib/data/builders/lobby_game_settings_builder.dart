@@ -41,6 +41,7 @@ class LobbyGameSettingsEntityBuilder {
 
     return LobbyGameSettingsModel(
       allowCustomBets: entity.allowCustomBets,
+      sitOutMode: entity.sitOutMode,
       progression: progression,
     );
   }
@@ -50,6 +51,7 @@ class LobbyGameSettingsEntityBuilder {
   ) =>
       LobbyGameSettingsEntity(
         allowCustomBets: model.allowCustomBets,
+        sitOutMode: model.sitOutMode,
         progression: BlindProgressionEntity(
           mode: model.progression.mode,
           progressionType: model.progression.progressionType,

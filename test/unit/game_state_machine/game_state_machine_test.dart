@@ -15,7 +15,9 @@ import 'tests/test_initialization.dart';
 import 'tests/test_progression.dart';
 import 'tests/test_raise_value_calculation.dart';
 import 'tests/test_showndown_step.dart';
+import 'tests/test_sit_out.dart';
 import 'tests/test_starting_bet.dart';
+import 'tests/test_undo_stack.dart';
 
 @GenerateMocks([AppRepository])
 void main() {
@@ -38,29 +40,31 @@ void main() {
       tearDown(() {
         container.dispose();
       });
-
+      // -- Initialization Tests
       test(
-        'Initialization Test',
+        '[Initialization] base initialization test',
         () => runInitialization(container, mockAppRepository),
       );
 
       test(
-        'Initialization with auto-fold for players with zero bank',
+        '[Initialization] initialization with auto-fold for players with zero bank',
         () => runInitializationAndAutoFold(container, mockAppRepository),
       );
+      //
       test(
-        'Initialization restores saved blind progression state',
+        '[Initialization] initialization restores saved blind progression state',
         () => runInitializationWithSavedHandsProgressionTest(
           container,
           mockAppRepository,
         ),
       );
+      // -- Progression Tests
       test(
-        'Manual progression resets after rebuild in notStarted state',
-        () => runManualProgressionResetOnRebuildTest(mockAppRepository),
+        '[Progression] manual progression state is kept after rebuild in notStarted state',
+        () => runManualProgressionKeptOnRebuildTest(mockAppRepository),
       );
       test(
-        'Manual progression clamps current level on restore',
+        '[Progression] manual progression clamps current level on restore',
         () => runManualProgressionClampOnRestoreTest(
           container,
           mockAppRepository,
@@ -68,40 +72,44 @@ void main() {
       );
 
       test(
-        'Hands progression advances level after completed hand',
+        '[Progression] hands progression advances level after completed hand',
         () => runEveryNHandsProgressionTest(container, mockAppRepository),
       );
 
       test(
-        'Timed progression advances on restore during breakdown',
+        '[Progression] timed progression advances on restore during breakdown',
         () => runTimedProgressionAdvanceOnRestoreTest(
           container,
           mockAppRepository,
         ),
       );
       test(
-        'Hands progression does not advance after reaching last level',
+        '[Progression] hands progression does not advance after reaching last level',
         () => runEveryNHandsLastLevelNoAdvanceTest(
           container,
           mockAppRepository,
         ),
       );
       test(
-        'Manual progression does not change during active hand',
+        '[Progression] manual progression does not change during active hand',
         () => runManualProgressionIgnoredDuringHandTest(
           container,
           mockAppRepository,
         ),
       );
       test(
-        'Manual progression stays on last level',
+        '[Progression] manual progression stays on last level',
         () => runManualProgressionStaysOnLastLevelTest(
           container,
           mockAppRepository,
         ),
       );
+      test(
+        '[Progression] Manual progression saves to Undo stack',
+        () => runManualProgressionUndoStackTest(container, mockAppRepository),
+      );
 
-      // ---
+      // -- Hands-up Tests
 
       test(
         '[Hands-up] startingBetting test',
@@ -141,7 +149,7 @@ void main() {
         ),
       );
 
-      // ---
+      // --- Starting-Betting Tests
 
       test(
         '[Starting-Betting] common test',
@@ -189,7 +197,7 @@ void main() {
             runStartingBetFirstSecondNoChips2Test(container, mockAppRepository),
       );
 
-      // ---
+      // --- Raise Value Calculation Tests
 
       test(
         '[Raise Value] calculate pre-flop raise value for small blind',
@@ -226,7 +234,7 @@ void main() {
         () => runReRaiseValueCalculationAllInTest(container, mockAppRepository),
       );
 
-      // ---
+      // --- Call Value Calculation Tests
 
       test(
         '[Call Value] calculate pre-flop call value for small blind',
@@ -267,6 +275,8 @@ void main() {
             runCallRaiseValueCalculationAllInTest(container, mockAppRepository),
       );
 
+      // --- Execute Fold Tests
+
       test(
         '[Execute FOLD] common fold',
         () => runExecuteFoldTest(container, mockAppRepository),
@@ -289,14 +299,14 @@ void main() {
             runExecuteFoldPlayerWithInactiveTest(container, mockAppRepository),
       );
 
-      //---
+      //--- Execute Check Tests
 
       test(
         '[Execute CHECK] сheck on big blind player on pre-flop hand-up',
         () => runExecuteCheckHandUpBigBlindTest(container, mockAppRepository),
       );
 
-      // ---
+      // --- Showdown Tests
 
       test(
         '[Showdown Test] check auto show single winner and money distibution',
@@ -375,7 +385,7 @@ void main() {
         ),
       );
 
-      //---
+      //--- Execute Call Tests
 
       test(
         '[Call Test] final call after raise test',
@@ -386,10 +396,47 @@ void main() {
         () => runExecuteCallFinalAfterReRaiseTest(container, mockAppRepository),
       );
 
-      //---
+      //--- Execute Raise Tests
       test(
         '[Raise Test] re-raise on last player before equal',
         () => runExecuteReRaiseLastTest(container, mockAppRepository),
+      );
+
+      //--- Sit Out Tests
+      test(
+        '[Sit Out] toggle sit out',
+        () => runSitOutToggleTest(container, mockAppRepository),
+      );
+      test(
+        '[Sit Out] cash mode ignores player',
+        () => runSitOutCashModeTest(container, mockAppRepository),
+      );
+      test(
+        '[Sit Out] tournament mode pays and auto folds',
+        () => runSitOutTournamentModeTest(container, mockAppRepository),
+      );
+
+      test(
+        '[Sit Out] Player pause does not save to Undo stack',
+        () => runPlayerSitOutUndoStackTest(container, mockAppRepository),
+      );
+      test(
+        '[Sit Out] Pause data persists after reload and settings change',
+        () => runSitOutReloadPersistenceTest(container, mockAppRepository),
+      );
+      test(
+        '[Sit Out] Modifying pause and progression in breakdown emits no effects',
+        () => runGameBreakEffectsTest(container, mockAppRepository),
+      );
+
+      //--- Undo Stack Tests
+      test(
+        '[Undo] Multiple actions are undone correctly step by step',
+        () => runMultipleUndoTest(container, mockAppRepository),
+      );
+      test(
+        '[Undo] Undo exhausts properly down to notStarted state and disabling feature',
+        () => runUndoUntilEmptyTest(container, mockAppRepository),
       );
     },
   );

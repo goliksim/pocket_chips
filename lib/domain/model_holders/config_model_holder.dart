@@ -3,11 +3,16 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../../di/domain_managers.dart';
 import '../../di/repositories.dart';
+import '../../services/crash_reporting_service.dart';
 import '../../utils/logs.dart';
 import '../models/config_model.dart';
 
 class ConfigModelHolder extends AsyncNotifier<ConfigModel> {
+  CrashReportingService get _crashReporting =>
+      ref.read(crashReportingServiceProvider);
+
   @override
   FutureOr<ConfigModel> build() => ref.read(appRepositoryProvider).getConfig();
 
@@ -25,8 +30,16 @@ class ConfigModelHolder extends AsyncNotifier<ConfigModel> {
 
     try {
       await ref.read(appRepositoryProvider).updateConfig(newConfig);
-    } catch (e) {
-      logs.writeLog('Saving config error: $e');
+    } catch (error, trace) {
+      logs.writeLog('Saving config error: $error');
+
+      unawaited(
+        _crashReporting.recordError(
+          error: error,
+          trace: trace,
+          reason: 'ConfigModelHolder.updateConfig',
+        ),
+      );
     }
   }
 

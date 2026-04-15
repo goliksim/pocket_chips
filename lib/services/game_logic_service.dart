@@ -5,6 +5,7 @@ import '../domain/models/game/blind_progression_model.dart';
 import '../domain/models/game/game_state_model.dart';
 import '../domain/models/player/player_id.dart';
 import '../domain/models/player/player_model.dart';
+import '../domain/models/game/sit_out_mode.dart';
 
 extension GameStateModelX on GameStateModel {
   BlindProgressionModel get blindProgression => lobbyState.settings.progression;
@@ -39,8 +40,16 @@ extension GameStateModelX on GameStateModel {
     return (progressionState.currentLevelIndex < blindLevels.length - 1);
   }
 
-  bool isPlayerActive(PlayerId playerUid) =>
-      !sessionState.foldedPlayers.contains(playerUid);
+  bool isPlayerActive(PlayerId playerUid) {
+    if (sessionState.foldedPlayers.contains(playerUid)) return false;
+
+    if (lobbyState.settings.sitOutMode == SitOutMode.cashGame &&
+        sessionState.sitOutPlayers.contains(playerUid)) {
+      return false;
+    }
+
+    return true;
+  }
 
   Iterable<PlayerModel> get activePlayers =>
       lobbyState.players.where((e) => isPlayerActive(e.uid));

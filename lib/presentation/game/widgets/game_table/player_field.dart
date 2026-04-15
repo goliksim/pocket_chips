@@ -14,22 +14,24 @@ class PlayerField extends StatelessWidget {
   final GamePlayerItem player;
 
   final bool shouldReverse;
+  final VoidCallback? onLongPress;
 
   const PlayerField({
     required this.player,
     required this.shouldReverse,
+    this.onLongPress,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) => Opacity(
         key: GameTableKeys.playerCard(player.name),
-        opacity: player.isFolded ? 0.4 : 1.0,
+        opacity: (player.isFolded || player.isSitOut) ? 0.4 : 1.0,
         child: MyButton(
           buttonColor: player.isCurrent
               ? context.theme.primaryColor
               : context.theme.bankColor,
-          //longAction: () async {},
+          longAction: () => onLongPress?.call(),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: shouldReverse
@@ -60,6 +62,20 @@ List<Widget> _reversablePlayerWidgetList(
                   ? EmptyAssetFilter.filter(player.uid)
                   : null,
             ),
+            if (player.isSitOut)
+              Container(
+                decoration: const BoxDecoration(
+                  color: Colors.black45,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(
+                    MdiIcons.pause,
+                    size: stdIconSize * 1.15,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             if (player.isDealer)
               Image(
                 filterQuality: FilterQuality.medium,

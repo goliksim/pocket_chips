@@ -19,7 +19,7 @@ class PromotionManager {
         : _handlers.where((h) => types.contains(h.type)).toList();
 
     for (final handler in handlersToCheck) {
-      if (handler.isReady()) {
+      if (await handler.isReady()) {
         if (delay != null) {
           await Future.delayed(delay);
         }

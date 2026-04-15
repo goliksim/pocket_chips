@@ -42,7 +42,7 @@
     "about_welc_2":"All you need to play: cards and phone!",
     "about_welc_3":"The app:",
     "about_welc_4":"stores players' chips",
-    "about_welc_5":"allows you to place bets",
+    "about_welc_5":"allows you to place bets/antes",
     "about_welc_6":"divide the final pot between players",
     "about_welc_7":"This application based on the rules of unlimited Texas Hold'em.",
     "about_hom_1":"Home screen",
@@ -56,19 +56,20 @@
     "about_plme_5":"They will be stored there forever.",
     "about_plme_6":"Edit player's info by tapping it.",
     "about_plme_7":"Reorder players by drag-drop.",
+    "about_plme_8":"[PRO-feature] Use your gallery photo as player avatar",
     "about_set_1":"Settings",
-    "about_set_2":"In the settings tab, you can also configure the initial stack, as well as small blind.",
+    "about_set_2":"In the settings tab, you can configure the Initial stack, enable custom bets, select Sit Out mode and configure Simple or PRO blinds structure.",
     "about_set_3":"Before the start of betting, you can make any changes:",
-    "about_set_4":"add, remove players",
+    "about_set_4":"add/remove/edit players",
     "about_set_5":"change player stacks",
     "about_set_6":"you can change the dealer, etc",
-    "about_set_8":"change the initial smallblind",
-    "about_set_9":"change the description and player's avatar",
+    "about_set_8":"change the game settings",
+    "about_set_9":"mark as away (sit out)",
     "about_tab_1":"Game table",
     "about_tab_2":"At the top of the screen you can change the player's position at the game table.",
     "about_tab_3":"The amount of your bet or raise can be selected using the slider or by clicking on chips.",
-    "about_tab_4":"After showdown (end of betting) you need to choose a winner or winners.",
-    "about_tab_5":"If side pots were created in the game (someone went ALL-in), then first choose the winner of the main pot.",
+    "about_tab_4":"On showdown (end of betting) you need to choose a winners of main/side pots",
+    "about_tab_5":"You can mark/unmark player as away (sit out) by long press",
     "about_link_1":"Links",
     "about_link_2":"Like my app? Rate it and leave a comment! Don't forget share with friends!",
     "about_link_3":"Rate app",
@@ -189,6 +190,9 @@
     "toast_video_ad_success":"Thank you for watching video ad!",
     "toast_purchase_error_named":"Found error with purchase:",
     "toast_purchase_pending_state_named":"Your purchase is pending:",
+    "toast_level_clamp":"Current level adjusted due to settings changes",
+    "toast_level_reset":"Level reverted, timer restarted",
+    "toast_settings_undo":"Settings changes undone",
     "purchases_restore_button":"Restore Purchases",
     "purchase_done_text":"Purchased",
     "check_table":"Table",
@@ -228,5 +232,23 @@
     "pro_version_offer_button_not_available":"Currently unavailable",
     "error_was_found": "An error occured",
     "error_copy": "Copy error info",
-    "error_retry_button" : "Retry"
+    "error_retry_button" : "Retry",
+    "toast_sit_out_enabled": "Player {name} will skip rounds",
+    "@toast_sit_out_enabled": {
+      "placeholders": {
+        "name": {}
+      }
+    },
+    "toast_sit_out_disabled": "Player {name} is back in the game",
+    "@toast_sit_out_disabled": {
+      "placeholders": {
+        "name": {}
+      }
+    },
+    "sett_sit_out_mode": "Sit-Out Mode",
+    "sit_out_mode_cash": "Cash Game",
+    "sit_out_mode_tournament": "Tournament",
+    "sit_out_mode_tooltip": "Cash Game: Player skips rounds.\nTournament: Player posts blinds/antes if required and auto-folds.",
+    "pro_version_offer_option_9": "Tournament Sit-Out Mode",
+    "update_7": "Added pause (Sit-Out) feature for players"
 }

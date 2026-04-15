@@ -7,31 +7,44 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../di/domain_managers.dart';
 import '../../../di/model_holders.dart';
 import '../../../di/repositories.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../../services/crash_reporting_service.dart';
 import '../../../services/game_logic_service.dart';
+import '../../../services/toast_manager.dart';
 import '../../../utils/logs.dart';
 import '../../models/game/blind_level_model.dart';
 import '../../models/game/blind_progression_model.dart';
 import '../../models/game/game_progression_state.dart';
 import '../../models/game/game_session_state.dart';
+import '../../models/game/game_settings_model.dart';
 import '../../models/game/game_state_effect.dart';
 import '../../models/game/game_state_enum.dart';
 import '../../models/game/game_state_model.dart';
+import '../../models/game/sit_out_mode.dart';
+import '../../models/lobby/lobby_game_settings_model.dart';
 import '../../models/lobby/lobby_state_model.dart';
 import '../../models/player/player_id.dart';
 import '../../models/player/player_model.dart';
+import '../game_settings_provider.dart';
 import '../lobby_state_holder.dart';
 import 'previous_state_notifier.dart';
 
 /// Main class with game logic
-class GameStateMachine extends AsyncNotifier<GameStateModel> {
+class GameStateMachine extends AsyncNotifier<GameStateModel>
+    implements GameSettingsProvider {
   LobbyStateHolder get _lobbyStateHolder =>
       ref.read(lobbyStateHolderProvider.notifier);
+  CrashReportingService get _crashReporting =>
+      ref.read(crashReportingServiceProvider);
+
+  // TODO: remove UI from game logic
+  AppLocalizations get _strings => ref.read(stringsProvider);
+  ToastManager get _toastManager => ref.read(toastManagerProvider);
 
   GamePreviousStateNotifier get _previousStateNotifier =>
       ref.read(gamePreviousStateNotifierProvider.notifier);
-  StatePair get _previousState => ref.read(gamePreviousStateNotifierProvider);
 
-  bool get canUndoAction => _previousState.previous != null;
+  bool get canUndoAction => _previousStateNotifier.hasPrevious;
 
   @override
   FutureOr<GameStateModel> build() async {
@@ -40,14 +53,13 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     // Reading because can't change lobbyStateHolder from this page
     final lobbyState = await ref.read(lobbyStateHolderProvider.future);
 
-    final sessionState = lobbyState.gameState.isStarted
-        ? state.value?.sessionState ??
-            await ref.read(appRepositoryProvider).getGameSessionState()
-        : null;
+    final storedState =
+        await ref.read(appRepositoryProvider).getGameSessionState();
+    final sessionState = storedState ?? GameSessionState.initial();
 
     final normalizedSessionState = _normalizeSessionState(
       lobbyState: lobbyState,
-      sessionState: sessionState ?? GameSessionState.initial(),
+      sessionState: sessionState,
       nowUtc: _nowUtc(),
     );
 
@@ -65,25 +77,73 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
     return result;
   }
 
+  Future<void> refreshByTimer() async {
+    final newState = await build();
+
+    // Write to storage to save multiple level increasements
+    // Dont need to update stack - any game action will update it
+    // Need to save previous state to stack to have revert possibility
+    await _updateGame(
+      newState,
+      saveNewToStack: false,
+    );
+  }
+
   Future<void> undoLastAction() async {
-    final pair = _previousState;
     logs.writeLog('GameSM: undo action');
 
-    // Can sometimes loose previous step because of game restoring
-    final previous =
-        pair.previous == state.value ? pair.current : pair.previous;
+    final previous = _previousStateNotifier.popNextValidState(state.value);
 
     if (previous != null) {
-      // Clearing effects that don't have to be shown on undo
-      await _updateGame(
-        previous.copyWith(
-          effects: previous.effects
-              .whereType<GameStateNeedWinnerSelectionEffect>()
-              .toList(),
-        ),
-        clearPreviousState: true,
+      // Correct old Nminutes progression
+      final normalizedProgression = _checkLevelForOverValue(
+        progressionState: previous.sessionState.progressionState,
+        progression: previous.lobbyState.settings.progression,
+        nowUtc: _nowUtc(),
+        resetLevelOnTimeIncreasement: true,
       );
+
+      await _updateGame(
+        GameStateModel(
+          lobbyState: previous.lobbyState,
+          sessionState: previous.sessionState.copyWith(
+            progressionState: normalizedProgression,
+          ),
+        ),
+        // Not need to save - any action will save it
+        savePreviousToStack: false,
+        saveNewToStack: false,
+      );
+    } else {
+      ref.notifyListeners();
     }
+  }
+
+  Future<void> toggleSitOut(String playerUid) async {
+    final currentModel = state.requireValue;
+    if (!currentModel.lobbyState.gameState.canEditPlayers) {
+      return;
+    }
+
+    final sitOutPlayers = Set.of(currentModel.sessionState.sitOutPlayers);
+    if (sitOutPlayers.contains(playerUid)) {
+      sitOutPlayers.remove(playerUid);
+    } else {
+      sitOutPlayers.add(playerUid);
+    }
+
+    await _updateGame(
+      currentModel.copyWith(
+        sessionState: currentModel.sessionState.copyWith(
+          sitOutPlayers: sitOutPlayers,
+        ),
+        effects: [],
+      ),
+      // Dont need to save - any action will save it
+      // Make possible to undo action to good state, skipping multiple sit out
+      saveNewToStack: false,
+      savePreviousToStack: false,
+    );
   }
 
   /// The first method in game, is contolling by client (current player)
@@ -196,7 +256,8 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
     await _updateGame(
       model3,
-      savePreviousState: false,
+      // Not saving becaise previos state was distribution
+      savePreviousToStack: false,
     );
   }
 
@@ -782,8 +843,8 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
     final nowUtc = _nowUtc();
     final progressionState = _advanceProgressionOnBreakdown(
-      sessionState: model.sessionState,
-      progression: model.lobbyState.settings.progression,
+      progressionState: model.sessionState.progressionState,
+      progressionSettings: model.lobbyState.settings.progression,
       nowUtc: nowUtc,
     );
 
@@ -952,7 +1013,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       fromPosition: smallBlindPosition,
     );
 
-    // Small blind bet
+    // Apply regular ante before blinds
     if (editableModel.currentAnteType == AnteType.traditional) {
       editableModel = processAntes(
         model: editableModel,
@@ -961,6 +1022,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       );
     }
 
+    // Small blind bet
     editableModel = processBetOrAllIn(
       modelToProcess: editableModel,
       player: currentLobby().players[smallBlindPosition],
@@ -974,12 +1036,27 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       value: editableModel.currentBigBlindValue,
     );
 
+    // Apply BBA after blinds
     if (editableModel.currentAnteType == AnteType.bigBlindAnte) {
       editableModel = processAntes(
         model: editableModel,
         dealerPosition: dealerPosition,
         bigBlindPosition: bigBlindPosition,
       );
+    }
+
+    /// Cash game sit outs are already inActive
+    /// Tournament sit outs fold only after blinds and ante
+    if (editableModel.lobbyState.settings.sitOutMode == SitOutMode.tournament) {
+      final tournamentSitOuts = editableModel.sessionState.sitOutPlayers;
+      if (tournamentSitOuts.isNotEmpty) {
+        editableModel = editableModel.copyWith(
+          sessionState: editableModel.sessionState.copyWith(
+            foldedPlayers: Set.of(editableModel.sessionState.foldedPlayers)
+              ..addAll(tournamentSitOuts),
+          ),
+        );
+      }
     }
 
     if (editableModel.checkBidsEqual() &&
@@ -1038,19 +1115,29 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
 
   Future<void> _updateGame(
     GameStateModel newModel, {
-    bool savePreviousState = true,
-    bool clearPreviousState = false,
+    bool savePreviousToStack = true,
+    bool saveNewToStack = true,
   }) async {
     logs.writeLog('GameSM: UPDATE GAME');
 
-    if (savePreviousState) {
-      _previousStateNotifier.setState((
-        previous: state.value,
-        current: newModel,
-      ));
+    final oldModel = state.value;
+    final previousDistribution = oldModel?.effects
+            .whereType<GameStateNeedWinnerSelectionEffect>()
+            .isNotEmpty ??
+        false;
+    final newDistibution = newModel.effects
+        .whereType<GameStateNeedWinnerSelectionEffect>()
+        .isNotEmpty;
+
+    // To save first not Started state
+    if (!previousDistribution && savePreviousToStack) {
+      if (oldModel != null) {
+        _previousStateNotifier.pushState(oldModel);
+      }
     }
-    if (clearPreviousState) {
-      _previousStateNotifier.clearPrevious();
+    // To save last state before restore
+    if (!newDistibution && saveNewToStack) {
+      _previousStateNotifier.pushState(newModel);
     }
 
     state = AsyncData(newModel);
@@ -1061,8 +1148,16 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       await ref
           .read(appRepositoryProvider)
           .updateGameSessionState(newModel.sessionState);
-    } catch (e) {
-      logs.writeLog('Save game session state error: $e');
+    } catch (error, trace) {
+      logs.writeLog('Save game session state error: $error');
+
+      unawaited(
+        _crashReporting.recordError(
+          error: error,
+          trace: trace,
+          reason: 'GameStateMachine._updateGame',
+        ),
+      );
     }
   }
 
@@ -1099,7 +1194,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       return sessionState.copyWith(progressionState: baseState);
     }
 
-    final advancedState = _advanceTimedLevelsIfNeeded(
+    final advancedState = _checkLevelForOverValue(
       progressionState: baseState,
       progression: progression,
       nowUtc: nowUtc,
@@ -1129,49 +1224,34 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
   /// entered breakdown. Hands-based progression is decremented here,
   /// while timed progression is caught up against the current time.
   GameProgressionState _advanceProgressionOnBreakdown({
-    required GameSessionState sessionState,
-    required BlindProgressionModel progression,
+    required GameProgressionState progressionState,
+    required BlindProgressionModel progressionSettings,
     required DateTime nowUtc,
   }) {
+    final GameProgressionState newProgression;
+    if (progressionSettings.progressionType ==
+        BlindProgressionType.everyNHands) {
+      newProgression = progressionState.copyWith(
+        handsFromLevelStart: (progressionState.handsFromLevelStart ?? 0) + 1,
+      );
+    } else {
+      newProgression = progressionState;
+    }
+
     final normalizedState = _normalizeProgressionState(
-      progressionState: sessionState.progressionState,
-      progression: progression,
+      progressionState: newProgression,
+      progression: progressionSettings,
       nowUtc: nowUtc,
       initializeMissingSchedule: true,
     );
 
-    final timedState = _advanceTimedLevelsIfNeeded(
+    final timedState = _checkLevelForOverValue(
       progressionState: normalizedState,
-      progression: progression,
+      progression: progressionSettings,
       nowUtc: nowUtc,
     );
 
-    if (progression.progressionType != BlindProgressionType.everyNHands) {
-      return timedState;
-    }
-
-    final interval = progression.progressionInterval;
-    if (interval == null || interval <= 0) {
-      return timedState.copyWith(handsUntilNextLevel: null);
-    }
-
-    final lastIndex = progression.levels.length - 1;
-    if (timedState.currentLevelIndex >= lastIndex) {
-      return timedState.copyWith(handsUntilNextLevel: null);
-    }
-
-    final handsLeft = (timedState.handsUntilNextLevel ?? interval) - 1;
-    if (handsLeft > 0) {
-      return timedState.copyWith(handsUntilNextLevel: handsLeft);
-    }
-
-    final newLevelIndex = min(timedState.currentLevelIndex + 1, lastIndex);
-    final handsUntilNextLevel = newLevelIndex >= lastIndex ? null : interval;
-
-    return timedState.copyWith(
-      currentLevelIndex: newLevelIndex,
-      handsUntilNextLevel: handsUntilNextLevel,
-    );
+    return timedState;
   }
 
   /// Normalizes progression fields for the active progression mode
@@ -1187,102 +1267,177 @@ class GameStateMachine extends AsyncNotifier<GameStateModel> {
       max(0, levels.length - 1),
     ) as int;
 
+    if (progressionState.currentLevelIndex != safeIndex) {
+      _toastManager.showToast(_strings.toast_level_clamp);
+    }
+
     switch (progression.progressionType) {
       // For manual progression we just need to ensure the level index is within bounds and clear timers.
       case BlindProgressionType.manual:
         return progressionState.copyWith(
           currentLevelIndex: safeIndex,
-          handsUntilNextLevel: null,
-          nextLevelAtEpochMsUtc: null,
+          handsFromLevelStart: null,
+          levelTimerStartMsUtc: null,
         );
       // For hands-based progression we also clamp the level index, clear timers and ensure the hand counter is initialized.
       case BlindProgressionType.everyNHands:
         final interval = progression.progressionInterval;
         final isLastLevel = safeIndex >= levels.length - 1;
-        final handsUntilNextLevel = interval == null || interval <= 0
+        final handsFromLevelStart = interval == null || interval <= 0
             ? null
             : isLastLevel
                 ? null
-                : progressionState.handsUntilNextLevel ?? interval;
+                : progressionState.handsFromLevelStart ?? 0;
 
         return progressionState.copyWith(
           currentLevelIndex: safeIndex,
-          handsUntilNextLevel: handsUntilNextLevel,
-          nextLevelAtEpochMsUtc: null,
+          handsFromLevelStart: handsFromLevelStart,
+          levelTimerStartMsUtc: null,
         );
-      // For timed progression we clamp the level index, clear hand counters and ensure the next-level timestamp is initialized if missing.
+      // For timed progression we clamp the level index, clear hand counters
+      // and ensure the timer start is initialized if missing.
       case BlindProgressionType.everyNMinutes:
         final interval = progression.progressionInterval;
-        final nextLevelAtEpochMsUtc = interval == null ||
-                interval <= 0 ||
-                (!initializeMissingSchedule &&
-                    progressionState.nextLevelAtEpochMsUtc == null)
-            ? progressionState.nextLevelAtEpochMsUtc
-            : progressionState.nextLevelAtEpochMsUtc ??
-                nowUtc.add(Duration(minutes: interval)).millisecondsSinceEpoch;
+        final noInterval = interval == null || interval <= 0;
+
+        final int? levelTimerStartMsUtc;
+
+        if (noInterval) {
+          levelTimerStartMsUtc = null;
+        } else if (initializeMissingSchedule) {
+          levelTimerStartMsUtc = progressionState.levelTimerStartMsUtc ??
+              nowUtc.millisecondsSinceEpoch;
+        } else {
+          levelTimerStartMsUtc = progressionState.levelTimerStartMsUtc;
+        }
 
         return progressionState.copyWith(
           currentLevelIndex: safeIndex,
-          handsUntilNextLevel: null,
-          nextLevelAtEpochMsUtc: nextLevelAtEpochMsUtc,
+          handsFromLevelStart: null,
+          levelTimerStartMsUtc: levelTimerStartMsUtc,
         );
     }
   }
 
-  /// Applies all overdue timed level transitions based on the saved
-  /// next-deadline timestamp. This lets the app recover correct blind
-  /// state after pause or restart without losing elapsed time.
-  GameProgressionState _advanceTimedLevelsIfNeeded({
+  /// If we need to increase level - increase
+  GameProgressionState _checkLevelForOverValue({
     required GameProgressionState progressionState,
     required BlindProgressionModel progression,
     required DateTime nowUtc,
+    bool resetLevelOnTimeIncreasement = false,
   }) {
-    if (progression.progressionType != BlindProgressionType.everyNMinutes) {
-      return progressionState;
-    }
-
     final interval = progression.progressionInterval;
-    final nextLevelAtEpochMsUtc = progressionState.nextLevelAtEpochMsUtc;
-    if (interval == null || interval <= 0 || nextLevelAtEpochMsUtc == null) {
-      return progressionState.copyWith(nextLevelAtEpochMsUtc: null);
-    }
+    if (progression.progressionType == BlindProgressionType.everyNMinutes) {
+      final interval = progression.progressionInterval;
+      final levelTimerStartMsUtc = progressionState.levelTimerStartMsUtc;
+      if (interval == null || interval <= 0 || levelTimerStartMsUtc == null) {
+        return progressionState.copyWith(levelTimerStartMsUtc: null);
+      }
 
-    final lastIndex = progression.levels.length - 1;
-    if (progressionState.currentLevelIndex >= lastIndex) {
-      return progressionState.copyWith(nextLevelAtEpochMsUtc: null);
-    }
+      // If already at last level - just clear the timer and return
+      final lastIndex = progression.levels.length - 1;
+      if (progressionState.currentLevelIndex >= lastIndex) {
+        return progressionState.copyWith(levelTimerStartMsUtc: null);
+      }
 
-    final nextLevelAtUtc = DateTime.fromMillisecondsSinceEpoch(
-      nextLevelAtEpochMsUtc,
-      isUtc: true,
-    );
-    if (nowUtc.isBefore(nextLevelAtUtc)) {
-      return progressionState;
-    }
+      final deadlineMs =
+          levelTimerStartMsUtc + Duration(minutes: interval).inMilliseconds;
+      // If deadline is still in the future - no changes needed
+      if (nowUtc.millisecondsSinceEpoch < deadlineMs) {
+        return progressionState;
+      }
+      final int newLevelIndex;
+      if (resetLevelOnTimeIncreasement) {
+        newLevelIndex = progressionState.currentLevelIndex;
+        _toastManager.showToast(_strings.toast_level_reset);
+      } else {
+        newLevelIndex = min(
+          progressionState.currentLevelIndex + 1,
+          lastIndex,
+        );
+      }
 
-    final intervalDuration = Duration(minutes: interval);
-    final elapsed = nowUtc.difference(nextLevelAtUtc);
-    final transitions =
-        1 + (elapsed.inMilliseconds ~/ intervalDuration.inMilliseconds);
-    final newLevelIndex = min(
-      progressionState.currentLevelIndex + transitions,
-      lastIndex,
-    );
-
-    if (newLevelIndex == lastIndex) {
       return progressionState.copyWith(
         currentLevelIndex: newLevelIndex,
-        nextLevelAtEpochMsUtc: null,
+        levelTimerStartMsUtc:
+            newLevelIndex == lastIndex ? null : nowUtc.millisecondsSinceEpoch,
       );
-    }
+    } else if (progression.progressionType ==
+        BlindProgressionType.everyNHands) {
+      final handsFromLevelStart = progressionState.handsFromLevelStart;
+      if (interval == null || interval <= 0 || handsFromLevelStart == null) {
+        return progressionState.copyWith(handsFromLevelStart: null);
+      }
 
-    final newNextLevelAtUtc = nextLevelAtUtc.add(
-      Duration(minutes: interval * transitions),
+      // If already at last level - just clear the counter and return
+      final lastIndex = progression.levels.length - 1;
+      if (progressionState.currentLevelIndex >= lastIndex) {
+        return progressionState.copyWith(handsFromLevelStart: null);
+      }
+
+      if (handsFromLevelStart < interval) {
+        return progressionState;
+      }
+
+      // Advance one level and reset timer start to now
+      final newLevelIndex = min(
+        progressionState.currentLevelIndex + 1,
+        lastIndex,
+      );
+
+      return progressionState.copyWith(
+        currentLevelIndex: newLevelIndex,
+        handsFromLevelStart: newLevelIndex == lastIndex ? null : 0,
+      );
+    } else {
+      return progressionState;
+    }
+  }
+
+  @override
+  GameSettingsModelArgs get getSettings {
+    final lobby = state.requireValue.lobbyState;
+
+    return GameSettingsModelArgs(
+      startingStack: lobby.defaultBank,
+      allowCustomBets: lobby.settings.allowCustomBets,
+      progression: lobby.settings.progression,
+      sitOutMode: lobby.settings.sitOutMode,
+    );
+  }
+
+  @override
+  Future<void> saveSettings(GameSettingsModelResult settings) {
+    final currentModel = state.requireValue;
+
+    final newLobbyState = currentModel.lobbyState.copyWith(
+      defaultBank:
+          settings.newStartingStack ?? currentModel.lobbyState.defaultBank,
+      settings: LobbyGameSettingsModel(
+        allowCustomBets: settings.allowCustomBets ??
+            currentModel.lobbyState.settings.allowCustomBets,
+        progression: settings.newProgression,
+        sitOutMode:
+            settings.sitOutMode ?? currentModel.lobbyState.settings.sitOutMode,
+      ),
+      banks: (settings.newStartingStack != null)
+          ? (Map.of(currentModel.lobbyState.banks)
+            ..updateAll((_, __) => settings.newStartingStack!))
+          : currentModel.lobbyState.banks,
     );
 
-    return progressionState.copyWith(
-      currentLevelIndex: newLevelIndex,
-      nextLevelAtEpochMsUtc: newNextLevelAtUtc.millisecondsSinceEpoch,
+    final newSessionState = _normalizeSessionState(
+      lobbyState: newLobbyState,
+      sessionState: currentModel.sessionState,
+      nowUtc: _nowUtc(),
+    );
+
+    return _updateGame(
+      currentModel.copyWith(
+        lobbyState: newLobbyState,
+        sessionState: newSessionState,
+        effects: [],
+      ),
     );
   }
 }

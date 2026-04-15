@@ -10,6 +10,8 @@ class GameSessionEntity {
   @JsonKey(defaultValue: <String, int>{})
   final Map<String, int> anteBets;
   final Set<String> foldedPlayersInactive;
+  @JsonKey(defaultValue: <String>{})
+  final Set<String> sitOutPlayers;
   final int lapCounter;
   final GameProgressionEntity? progressionState;
   final String? currentPlayerUid;
@@ -19,6 +21,7 @@ class GameSessionEntity {
     required this.bets,
     required this.anteBets,
     required this.foldedPlayersInactive,
+    required this.sitOutPlayers,
     required this.lapCounter,
     this.progressionState,
     this.currentPlayerUid,

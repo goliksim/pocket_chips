@@ -52,6 +52,10 @@ class UpdateDialog extends StatelessWidget {
                   text: context.strings.update_6,
                   icon: Icons.settings,
                 ),
+                _PatchNoteItem(
+                  text: context.strings.update_7,
+                  icon: Icons.pause_circle_outline,
+                ),
               ],
             ),
           ),

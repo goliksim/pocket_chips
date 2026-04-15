@@ -56,14 +56,14 @@ Future<void> runGameTest13(
     [
       openGamePage(tester),
       gamePage.verifySmallBlindValues(50),
-      gamePage.verifyProgressionSetupLabel(),
+      gamePage.verifyProgressionLevel(5),
       gamePage.openSettins(),
       settingsDialog.verifyVisibility(),
       settingsDialog.enterLevelsCount('2'),
       settingsDialog.saveChangesAndExit(),
       gamePage.verifyVisibility(),
       gamePage.verifySmallBlindValues(20),
-      gamePage.verifyProgressionSetupLabel(),
+      gamePage.verifyProgressionLevel(2),
       gamePage.startGame(),
       gamePage.verifyGameStatus(GameStatusEnum.preFlop),
       gamePage.verifyPlayerBetValue(

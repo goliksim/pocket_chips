@@ -4,28 +4,35 @@ import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../di/domain_managers.dart';
+import '../../di/model_holders.dart';
 import '../../di/repositories.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/crash_reporting_service.dart';
 import '../../services/toast_manager.dart';
 import '../../utils/logs.dart';
+import '../models/game/game_session_state.dart';
 import '../models/game/game_settings_model.dart';
 import '../models/game/game_state_enum.dart';
 import '../models/lobby/lobby_game_settings_model.dart';
 import '../models/lobby/lobby_state_model.dart';
 import '../models/player/player_model.dart';
+import '../repositories/app_repository.dart';
 import 'game_settings_provider.dart';
 
 class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     implements GameSettingsProvider {
   AppLocalizations get _strings => ref.read(stringsProvider);
   ToastManager get _toastManager => ref.read(toastManagerProvider);
+  AppRepository get _appRepository => ref.read(appRepositoryProvider);
+  CrashReportingService get _crashReporting =>
+      ref.read(crashReportingServiceProvider);
 
   LobbyStateModel get activeLobby => state.requireValue;
 
   @override
   FutureOr<LobbyStateModel> build() async {
     logs.writeLog('LobbySH: READ DATA AND BUILD STATE');
-    final lobby = await ref.read(appRepositoryProvider).getLobbyState();
+    final lobby = await _appRepository.getLobbyState();
 
     return lobby ?? LobbyStateModel.empty();
   }
@@ -35,17 +42,26 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
     logs.writeLog('LobbySH: STATE UPDATED');
 
     try {
-      await ref.read(appRepositoryProvider).updateLobbyState(newState);
-    } catch (e) {
-      logs.writeLog('LobbySH: save lobby state error - $e');
+      await _appRepository.updateLobbyState(newState);
+    } catch (error, trace) {
+      logs.writeLog('LobbySH: save lobby state error - $error');
+
+      unawaited(
+        _crashReporting.recordError(
+          error: error,
+          trace: trace,
+          reason: 'LobbyStateHolder.updateLobby',
+        ),
+      );
     }
   }
 
   Future<void> createNewLobby() async {
     logs.writeLog('LobbySH: create new lobby');
-    state = AsyncValue.data(
-      LobbyStateModel.empty(),
-    );
+
+    await updateLobby(LobbyStateModel.empty());
+    await _appRepository.updateGameSessionState(GameSessionState.initial());
+    ref.read(gamePreviousStateNotifierProvider.notifier).clearPrevious();
   }
 
   Future<void> updateDefaultBank(int newBank) {
@@ -76,12 +92,25 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
 
     logs.writeLog('LobbySH: reset with:\n lobbyBank: ${lobby.defaultBank}}');
 
-    await updateLobby(
-      lobby.copyWith(
-        banks: newBanks,
-        gameState: GameStatusEnum.notStarted,
-      ),
+    final newLobbyState = lobby.copyWith(
+      banks: newBanks,
+      gameState: GameStatusEnum.notStarted,
     );
+
+    try {
+      await updateLobby(newLobbyState);
+      await _appRepository.updateGameSessionState(GameSessionState.initial());
+    } catch (error, trace) {
+      logs.writeLog('LobbySH: reset lobby error - $error');
+
+      unawaited(
+        _crashReporting.recordError(
+          error: error,
+          trace: trace,
+          reason: 'LobbyStateHolder.resetLobby',
+        ),
+      );
+    }
   }
 
   Future<void> addPlayer({
@@ -249,6 +278,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
       startingStack: lobby.defaultBank,
       allowCustomBets: lobby.settings.allowCustomBets,
       progression: lobby.settings.progression,
+      sitOutMode: lobby.settings.sitOutMode,
     );
   }
 
@@ -260,6 +290,7 @@ class LobbyStateHolder extends AsyncNotifier<LobbyStateModel>
             allowCustomBets: settings.allowCustomBets ??
                 activeLobby.settings.allowCustomBets,
             progression: settings.newProgression,
+            sitOutMode: settings.sitOutMode ?? activeLobby.settings.sitOutMode,
           ),
           banks: (settings.newStartingStack != null)
               ? (Map.of(activeLobby.banks)

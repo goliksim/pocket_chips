@@ -99,7 +99,7 @@ class OnboardingLobbyPage extends StatelessWidget {
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            '- ${context.strings.about_plme_6}\n- ${context.strings.about_plme_7}\n',
+            '- ${context.strings.about_plme_6}\n- ${context.strings.about_plme_7}\n- ${context.strings.about_plme_8}\n',
             style: TextStyle(
               height: 1.5,
               color: context.theme.onBackground,

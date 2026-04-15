@@ -10,6 +10,7 @@ class GameSessionEntityBuilder {
         anteBets: entity.anteBets,
         lapCounter: entity.lapCounter,
         foldedPlayers: entity.foldedPlayersInactive,
+        sitOutPlayers: entity.sitOutPlayers,
         progressionState: entity.progressionState == null
             ? const GameProgressionState()
             : GameProgressionEntityBuilder.fromEntity(entity.progressionState!),
@@ -23,6 +24,7 @@ class GameSessionEntityBuilder {
         anteBets: model.anteBets,
         lapCounter: model.lapCounter,
         foldedPlayersInactive: model.foldedPlayers,
+        sitOutPlayers: model.sitOutPlayers,
         progressionState:
             GameProgressionEntityBuilder.toEntity(model.progressionState),
         currentPlayerUid: model.currentPlayerUid,

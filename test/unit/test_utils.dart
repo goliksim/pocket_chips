@@ -4,6 +4,7 @@ import 'package:pocket_chips/domain/models/game/game_state_enum.dart';
 import 'package:pocket_chips/domain/models/lobby/lobby_game_settings_model.dart';
 import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
+import 'package:pocket_chips/domain/models/game/sit_out_mode.dart';
 import 'package:pocket_chips/services/assets_provider.dart';
 
 List<PlayerModel> createPlayers(int count) => List.generate(
@@ -26,6 +27,7 @@ LobbyStateModel createLobbyState(
   Map<String, int>? banks,
   int? defaultBank,
   GameStatusEnum? gameState,
+  SitOutMode sitOutMode = SitOutMode.cashGame,
 }) =>
     LobbyStateModel(
       players: players,
@@ -41,6 +43,7 @@ LobbyStateModel createLobbyState(
             anteValue: anteValue,
           ),
         ),
+        sitOutMode: sitOutMode,
       ),
       banks: banks ??
           Map.fromEntries(

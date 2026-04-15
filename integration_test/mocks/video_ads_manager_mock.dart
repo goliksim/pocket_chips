@@ -1,5 +1,7 @@
-import 'package:pocket_chips/services/monitization/video_ads/google_ads_manager.dart';
+import 'dart:ui';
+
 import 'package:pocket_chips/services/monitization/video_ads/models/iterstitial_ad_state.dart';
+import 'package:pocket_chips/services/monitization/video_ads/video_ads_manager.dart';
 
 enum MockScenario {
   success,
@@ -7,7 +9,7 @@ enum MockScenario {
   error,
 }
 
-class MockGoogleAdsManager extends GoogleAdsManager {
+class MockGoogleAdsManager extends VideoAdsManager {
   MockScenario _scenario = MockScenario.success;
   final Duration _loadingTime;
 
@@ -37,7 +39,7 @@ class MockGoogleAdsManager extends GoogleAdsManager {
   }
 
   @override
-  void reload() {
+  void reloadIfUnavailable({required String reason}) {
     switch (_scenario) {
       case MockScenario.success:
         state = IterstitialAdState.ready;
@@ -54,4 +56,12 @@ class MockGoogleAdsManager extends GoogleAdsManager {
   void setScenario(MockScenario scenario) {
     _scenario = scenario;
   }
+
+  @override
+  // Not showing in test
+  bool get isReady => false;
+
+  @override
+  // Not showing in test
+  Future<void> showInterstitialAd({VoidCallback? onAdDismissed}) async {}
 }

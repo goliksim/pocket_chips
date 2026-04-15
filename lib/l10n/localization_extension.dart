@@ -1,5 +1,6 @@
 import '../domain/models/game/blind_level_model.dart';
 import '../domain/models/game/game_state_enum.dart';
+import '../domain/models/game/sit_out_mode.dart';
 import '../presentation/settings/view_state/game_settings_mode_state.dart';
 import '../utils/extensions.dart';
 import 'app_localizations.dart';
@@ -47,6 +48,15 @@ extension LocalizationExtension on AppLocalizations {
         return ante_type_traditional;
       case AnteType.bigBlindAnte:
         return ante_type_big_blind;
+    }
+  }
+
+  String sitOutModeLabel(SitOutMode mode) {
+    switch (mode) {
+      case SitOutMode.cashGame:
+        return sit_out_mode_cash;
+      case SitOutMode.tournament:
+        return sit_out_mode_tournament;
     }
   }
 

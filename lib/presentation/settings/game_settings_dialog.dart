@@ -7,6 +7,7 @@ import '../../app/keys/keys.dart';
 import '../../domain/models/game/blind_level_model.dart';
 import '../../domain/models/game/blind_progression_model.dart';
 import '../../domain/models/game/game_settings_model.dart';
+import '../../domain/models/game/sit_out_mode.dart';
 import '../../domain/models/lobby/lobby_state_model.dart';
 import '../../l10n/localization_extension.dart';
 import '../../services/toast_manager.dart';
@@ -46,6 +47,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
   late BlindProgressionType _progressionType;
   late List<BlindLevelModel> _levels;
   late bool _allowCustomBets;
+  late SitOutMode _sitOutMode;
   int? _expandedLevelIndex;
 
   GameSettingsModelArgs get state => widget.viewModel.state;
@@ -56,6 +58,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
     logs.writeLog('Settings is opened $state');
 
     _allowCustomBets = state.allowCustomBets;
+    _sitOutMode = state.sitOutMode;
     final progression = state.progression;
 
     _settingsMode = state.progression.map(
@@ -87,7 +90,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
   int get _progressionInterval =>
       _parseControllerValue(_progressionIntervalController,
           fallback: state.progression.progressionInterval) ??
-      10;
+      20;
 
   bool _validateLevels() {
     for (var level in _levels) {
@@ -213,6 +216,7 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
 
     final newSettings = GameSettingsModelResult(
       allowCustomBets: _allowCustomBets,
+      sitOutMode: _sitOutMode,
       newStartingStack: _startingStack,
       newProgression: _settingsMode == GameSettingsModeState.simple
           ? BlindProgressionModel(
@@ -406,12 +410,34 @@ class _GameSettingsDialogState extends State<GameSettingsDialog>
                               ],
                             ),
                           ),
+                          // Sit-Out Mode Selector
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: stdHorizontalOffset,
+                            ),
+                            child: ProVersionWrapper(
+                              child: _SettingsDropdownField<SitOutMode>(
+                                label: context.strings.sett_sit_out_mode,
+                                tooltip: context.strings.sit_out_mode_tooltip,
+                                values: SitOutMode.values,
+                                value: _sitOutMode,
+                                labelBuilder: context.strings.sitOutModeLabel,
+                                onChanged: (mode) {
+                                  if (mode != null) {
+                                    setState(() {
+                                      _sitOutMode = mode;
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: stdHorizontalOffset / 2),
+                SizedBox(height: stdHorizontalOffset),
                 MyButton(
                   key: GameSettingsKeys.confirmButton,
                   height: stdButtonHeight * 0.65,

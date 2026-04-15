@@ -274,6 +274,8 @@ class GameTable extends StatelessWidget {
                               child: PlayerField(
                                 player: player,
                                 shouldReverse: reversePlayer,
+                                onLongPress: () =>
+                                    viewModel.toggleSitOut(player.uid),
                               ),
                             ),
                     ),

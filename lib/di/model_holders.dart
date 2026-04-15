@@ -34,7 +34,7 @@ final gameStateMachineProvider =
 );
 
 final gamePreviousStateNotifierProvider =
-    NotifierProvider<GamePreviousStateNotifier, StatePair>(
+    NotifierProvider<GamePreviousStateNotifier, List<GameStateModel>>(
   GamePreviousStateNotifier.new,
 );
 

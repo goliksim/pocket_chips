@@ -5,14 +5,14 @@ class GameProgressionEntityBuilder {
   static GameProgressionState fromEntity(GameProgressionEntity entity) =>
       GameProgressionState(
         currentLevelIndex: entity.currentLevelIndex,
-        handsUntilNextLevel: entity.handsUntilNextLevel,
-        nextLevelAtEpochMsUtc: entity.nextLevelAtEpochMsUtc,
+        handsFromLevelStart: entity.handsFromLevelStart,
+        levelTimerStartMsUtc: entity.levelTimerStartMsUtc,
       );
 
   static GameProgressionEntity toEntity(GameProgressionState model) =>
       GameProgressionEntity(
         currentLevelIndex: model.currentLevelIndex,
-        handsUntilNextLevel: model.handsUntilNextLevel,
-        nextLevelAtEpochMsUtc: model.nextLevelAtEpochMsUtc,
+        handsFromLevelStart: model.handsFromLevelStart,
+        levelTimerStartMsUtc: model.levelTimerStartMsUtc,
       );
 }

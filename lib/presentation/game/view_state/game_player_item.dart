@@ -13,6 +13,7 @@ abstract class GamePlayerItem with _$GamePlayerItem {
     required bool isDealer,
     required bool isCurrent,
     required bool isFolded,
+    @Default(false) bool isSitOut,
     required int bank,
     required int bet,
     required int ante,
