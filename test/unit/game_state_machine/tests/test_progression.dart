@@ -416,13 +416,31 @@ void runManualProgressionUndoStackTest(
       .thenAnswer((_) async => gameSessionState);
 
   final notifier = container.read(gameStateMachineProvider.notifier);
-  await container.read(gameStateMachineProvider.future);
-
-  final undoStackInitial = container.read(gamePreviousStateNotifierProvider);
-  final initialCount = undoStackInitial.length;
+  final currentState = await container.read(gameStateMachineProvider.future);
 
   await notifier.nextLevel();
 
   final undoStackAfter = container.read(gamePreviousStateNotifierProvider);
-  expect(undoStackAfter.length, initialCount + 1); // SHOULD save to stack
+
+  final lastStackValue = undoStackAfter.last;
+  final lastStackLvlIndex =
+      lastStackValue.sessionState.progressionState.currentLevelIndex;
+  final preLastStackValue = undoStackAfter[undoStackAfter.length - 2];
+  final preLastStackLvlIndex =
+      preLastStackValue.sessionState.progressionState.currentLevelIndex;
+
+  expect(preLastStackValue, currentState);
+  expect(
+    lastStackValue,
+    currentState.copyWith(
+      sessionState: currentState.sessionState.copyWith(
+        progressionState: currentState.sessionState.progressionState.copyWith(
+          currentLevelIndex: 1,
+        ),
+      ),
+    ),
+  );
+
+  expect(preLastStackLvlIndex, 0);
+  expect(lastStackLvlIndex, 1);
 }

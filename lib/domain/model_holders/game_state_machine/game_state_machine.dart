@@ -37,6 +37,7 @@ class GameStateMachine extends AsyncNotifier<GameStateModel>
   CrashReportingService get _crashReporting =>
       ref.read(crashReportingServiceProvider);
 
+  // TODO: remove UI from game logic
   AppLocalizations get _strings => ref.read(stringsProvider);
   ToastManager get _toastManager => ref.read(toastManagerProvider);
 
