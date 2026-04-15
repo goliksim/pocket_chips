@@ -58,6 +58,18 @@ class DonationViewModel extends AsyncNotifier<DonationViewState> {
           ),
         );
       }
+
+      final needToRefresh = purchasesState.when(
+        data: (data) => data.isEmpty,
+        loading: () => false,
+        error: (_, __) => true,
+      );
+
+      if (needToRefresh) {
+        Future.microtask(
+          () => _purchasesManager.runBuild(),
+        );
+      }
     }
 
     return DonationViewState(

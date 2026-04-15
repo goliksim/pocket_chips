@@ -112,8 +112,8 @@ final themeManagerProvider = NotifierProvider<ThemeManager, ThemeMode>(
   ThemeManager.new,
 );
 
-final purchasesManagerProvider = AsyncNotifierProvider.autoDispose<
-    PurchasesManager, List<PurchasableProduct>>(
+final purchasesManagerProvider =
+    AsyncNotifierProvider<PurchasesManager, List<PurchasableProduct>>(
   PurchasesManager.new,
 );
 
@@ -167,6 +167,14 @@ final promotionManagerProvider = Provider<PromotionManager>(
 final donationHandlerProvider = Provider<DonationHandler>(
   (ref) => DonationHandler(
     navigationManager: ref.read(navigationManagerProvider),
+    isPurchasesReady: () async {
+      try {
+        final products = await ref.read(purchasesManagerProvider.future);
+        return products.isNotEmpty;
+      } catch (e) {
+        return false;
+      }
+    },
   ),
 );
 

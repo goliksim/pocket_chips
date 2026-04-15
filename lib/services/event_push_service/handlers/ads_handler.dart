@@ -24,7 +24,7 @@ class AdvertisementHandler implements EventHandler {
   EventType get type => EventType.advertisement;
 
   @override
-  bool isReady() {
+  Future<bool> isReady() async {
     if (_isPro) {
       // Not showing add for PRO users
       logs.writeLog('AdvertisementHandler is disabled via PRO mode');

@@ -6,6 +6,6 @@ enum EventType {
 abstract interface class EventHandler {
   EventType get type;
 
-  bool isReady();
+  Future<bool> isReady();
   Future<void> show();
 }
