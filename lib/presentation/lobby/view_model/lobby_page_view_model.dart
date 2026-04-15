@@ -109,8 +109,21 @@ class LobbyPageViewModel extends AsyncNotifier<LobbyPageState> {
     return (result ?? false) ? _removePlayer(playerUid) : Future.value(false);
   }
 
-  Future<void> onReorderPlayer(int oldIndex, int newIndex) =>
-      _lobbyStateHolder.reorderPlayer(oldIndex, newIndex);
+  Future<void> onReorderPlayer(int oldIndex, int newIndex) async {
+    final currentState = state.value;
+    if (currentState == null) return;
+
+    //Local changes for UI
+    final updatedPlayers = List<LobbyPlayerItem>.from(currentState.players);
+    updatedPlayers.reorder(oldIndex, newIndex);
+    state = AsyncData(currentState.copyWith(players: updatedPlayers));
+
+    try {
+      await _lobbyStateHolder.reorderPlayer(oldIndex, newIndex);
+    } catch (e) {
+      ref.invalidateSelf();
+    }
+  }
 
   Future<void> openStartingStackEditor() =>
       _navigationManager.showStartingStackEditor();

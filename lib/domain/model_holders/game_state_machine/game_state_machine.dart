@@ -119,10 +119,10 @@ class GameStateMachine extends AsyncNotifier<GameStateModel>
     }
   }
 
-  Future<void> toggleSitOut(String playerUid) async {
+  Future<bool> toggleSitOut(String playerUid) async {
     final currentModel = state.requireValue;
     if (!currentModel.lobbyState.gameState.canEditPlayers) {
-      return;
+      return false;
     }
 
     final sitOutPlayers = Set.of(currentModel.sessionState.sitOutPlayers);
@@ -144,6 +144,8 @@ class GameStateMachine extends AsyncNotifier<GameStateModel>
       saveNewToStack: false,
       savePreviousToStack: false,
     );
+
+    return true;
   }
 
   /// The first method in game, is contolling by client (current player)

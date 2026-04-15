@@ -223,46 +223,43 @@ class PlayerEditorPageState extends State<PlayerEditorPage> with ToastsMixin {
                           ),
                         ),
                         // Button field
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              flex: 7,
-                              child: Text(
-                                context.strings.playp_edit_win3,
-                                style: TextStyle(
-                                  color: player.forceDeadler
-                                      ? context.theme.hintColor
-                                      : context.theme.onBackground,
-                                  fontSize: stdFontSize * 0.85,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: SizedBox(
-                                height: stdButtonHeight * 0.6,
-                                child: Transform.scale(
-                                  scale: 1.25,
-                                  child: Checkbox(
-                                    key: PlayerEditorKeys.dealerCheckbox,
-                                    checkColor: Colors.white,
-                                    fillColor: WidgetStateProperty.all<Color>(
-                                      player.makeDealer
-                                          ? context.theme.primaryColor
-                                          : context.theme.bgrColor,
-                                    ),
-                                    value: player.makeDealer ||
-                                        player.forceDeadler,
-                                    onChanged: widget.viewModel.makeDealer,
+                        if (!player.forceDeadler)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                flex: 7,
+                                child: Text(
+                                  context.strings.playp_edit_win3,
+                                  style: TextStyle(
+                                    color: context.theme.onBackground,
+                                    fontSize: stdFontSize * 0.85,
+                                    fontWeight: FontWeight.normal,
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
+                              Expanded(
+                                flex: 2,
+                                child: SizedBox(
+                                  height: stdButtonHeight * 0.6,
+                                  child: Transform.scale(
+                                    scale: 1.25,
+                                    child: Checkbox(
+                                      key: PlayerEditorKeys.dealerCheckbox,
+                                      checkColor: Colors.white,
+                                      fillColor: WidgetStateProperty.all<Color>(
+                                        player.makeDealer
+                                            ? context.theme.primaryColor
+                                            : context.theme.bgrColor,
+                                      ),
+                                      value: player.makeDealer,
+                                      onChanged: widget.viewModel.makeDealer,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         MyButton(
                           key: PlayerEditorKeys.confirmButton,
                           height: stdButtonHeight * 0.75,

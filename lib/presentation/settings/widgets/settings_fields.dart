@@ -241,6 +241,8 @@ class _SettingsDropdownField<T> extends StatelessWidget {
         children: [
           Expanded(
             child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
               child: Text.rich(
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
