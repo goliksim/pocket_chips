@@ -339,7 +339,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get game_welc => 'Welcome to New Game!';
 
   @override
-  String get game_turn => 'Turn';
+  String get game_player_turn => 'Turn of';
 
   @override
   String get game_shdw => 'Showdown';
@@ -352,6 +352,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get game_flop => 'Flop';
+
+  @override
+  String get game_turn => 'Turn';
 
   @override
   String get game_river => 'River';

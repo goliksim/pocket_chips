@@ -339,7 +339,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get game_welc => 'Добро пожаловать!';
 
   @override
-  String get game_turn => 'Терн';
+  String get game_player_turn => 'Ход';
 
   @override
   String get game_shdw => 'Вскрытие';
@@ -352,6 +352,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get game_flop => 'Флоп';
+
+  @override
+  String get game_turn => 'Терн';
 
   @override
   String get game_river => 'Ривер';

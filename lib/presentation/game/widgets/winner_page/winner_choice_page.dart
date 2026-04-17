@@ -215,7 +215,7 @@ class _WinnerChoiceCard extends StatelessWidget {
     return MyButton(
       height: stdButtonHeight,
       key: WinnerKeys.winnerChoiceItem(winner.uid),
-      buttonColor: context.theme.bankColor,
+      buttonColor: context.theme.playerColor,
       action: () => onTap(winner.uid),
       child: Padding(
         padding: EdgeInsets.symmetric(
