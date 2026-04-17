@@ -722,11 +722,11 @@ abstract class AppLocalizations {
   /// **'Welcome to New Game!'**
   String get game_welc;
 
-  /// No description provided for @game_turn.
+  /// No description provided for @game_player_turn.
   ///
   /// In en, this message translates to:
-  /// **'Turn'**
-  String get game_turn;
+  /// **'Turn of'**
+  String get game_player_turn;
 
   /// No description provided for @game_shdw.
   ///
@@ -751,6 +751,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Flop'**
   String get game_flop;
+
+  /// No description provided for @game_turn.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn'**
+  String get game_turn;
 
   /// No description provided for @game_river.
   ///

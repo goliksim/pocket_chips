@@ -105,7 +105,7 @@
     "sett_win1":"Сбросить стеки",
     "sett_conf":"Сохранить",
     "game_welc":"Добро пожаловать!",
-    "game_turn":"Ход",
+    "game_player_turn":"Ход",
     "game_shdw":"Вскрытие",
     "game_break":"Перерыв",
     "game_pflop":"Префлоп",

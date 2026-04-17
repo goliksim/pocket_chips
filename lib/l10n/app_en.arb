@@ -103,7 +103,7 @@
     "sett_custom_bets":"Allow custom bets/raises",
     "sett_conf":"Save Changes",
     "game_welc":"Welcome to New Game!",
-    "game_turn":"Turn of",
+    "game_player_turn":"Turn of",
     "game_shdw":"Showdown",
     "game_break":"Breaktime",
     "game_pflop":"Pre-Flop",
