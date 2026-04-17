@@ -10,6 +10,9 @@ class CardBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => CardWidget(
+        borderColor: (context.theme.name == 'dark')
+            ? context.theme.playerColor
+            : context.theme.bankColor,
         child: ColorFiltered(
           colorFilter: (context.theme.name == 'dark')
               ? ColorFilter.mode(

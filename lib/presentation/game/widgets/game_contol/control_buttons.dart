@@ -24,7 +24,11 @@ class ControlButtons extends StatelessWidget {
   /// Bet or Raise button title
   String _raiseButtonTitle(AppLocalizations strings) {
     if (state.raiseState.raiseIsAllIn) {
-      return strings.game_all;
+      final prefix = strings.game_all;
+      final value =
+          (state.raiseState.maxPossibleBet + state.raiseState.currentBet)
+              .toCompactBank;
+      return '$prefix\n$value';
     }
 
     return state.raiseState.isFirstBet ? strings.game_bet : strings.game_raise;
@@ -66,7 +70,8 @@ class ControlButtons extends StatelessWidget {
     );
   }
 
-  bool get _raiseButtonActive => state.raiseState.canRaise;
+  bool get _raiseButtonActive =>
+      state.raiseState.canRaise || state.raiseState.raiseIsAllIn;
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +92,7 @@ class ControlButtons extends StatelessWidget {
               action: () => _raiseAction(),
             ),
           ),
-        SizedBox(width: stdHorizontalOffset),
+        SizedBox(width: stdHorizontalOffset / 2),
         // Call/Check/AlIn
         Flexible(
           flex: _raiseButtonActive ? 20 : 31,
@@ -102,7 +107,7 @@ class ControlButtons extends StatelessWidget {
           ),
         ),
         // Fold
-        SizedBox(width: stdHorizontalOffset),
+        SizedBox(width: stdHorizontalOffset / 2),
         Flexible(
           flex: 10,
           fit: FlexFit.tight,

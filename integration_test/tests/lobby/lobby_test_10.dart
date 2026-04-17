@@ -9,6 +9,7 @@ import '../../pages/game_page.dart';
 import '../../pages/home_page.dart';
 import '../../pages/lobby_page.dart';
 import '../../test_utils/test_action.dart';
+import '../../test_utils/test_utils.dart';
 import 'lobby_test_utils.dart';
 
 /// [LobbyTest]

@@ -118,6 +118,16 @@ class NavigationManager extends ChangeNotifier {
         ),
       );
 
+  Future<void> showGameSettings() => transitionDialog(
+        type: DialogTransitionType.slideDown,
+        context: context,
+        child: Consumer(
+          builder: (_, ref, __) => GameSettingsDialog(
+            viewModel: ref.watch(gameSettingsViewModelProvider),
+          ),
+        ),
+      );
+
   Future<void> showPlayerEditor(PlayerId? playerUid) => transitionDialog(
         context: context,
         child: Consumer(
@@ -156,7 +166,6 @@ class NavigationManager extends ChangeNotifier {
         context: context,
         child: Consumer(
           builder: (_, ref, __) => WinnerChoiceWindow(
-            title: args.title,
             viewModel: ref.watch(
               winnerChooseViewModelProvider(args),
             ),
@@ -170,9 +179,9 @@ class NavigationManager extends ChangeNotifier {
     required VoidCallback action,
     required String message,
   }) =>
-      showDialog<bool>(
+      transitionDialog<bool>(
         context: context,
-        builder: (BuildContext thisContext) => ConfirmationWindow(
+        child: ConfirmationWindow(
           title: title,
           actionTitle: actionTitle,
           message: message,

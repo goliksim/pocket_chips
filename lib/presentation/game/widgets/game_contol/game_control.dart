@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../utils/theme/ui_values.dart';
@@ -11,9 +12,11 @@ import 'view_state/game_page_control_state.dart';
 
 class GameControl extends StatefulWidget {
   final GameControlViewModel viewModel;
+  final Widget? statsWidget;
 
   const GameControl({
     required this.viewModel,
+    this.statsWidget,
     super.key,
   });
 
@@ -83,15 +86,25 @@ class _GameControlState extends State<GameControl> {
                                   activeState.raiseState.maxPossibleBet,
                               minPossibleBet:
                                   activeState.raiseState.minPossibleBet,
+                              minRuleBet: activeState.raiseState.minRuleBet,
                               currentBet: activeState.raiseState.currentBet,
                             )
-                          : null,
+                          : (kDebugMode
+                              ? Banner(
+                                  message: 'Debug',
+                                  location: BannerLocation.bottomStart,
+                                  child: SizedBox(
+                                    height: stdButtonHeight * 1.6,
+                                    child: widget.statsWidget,
+                                  ),
+                                )
+                              : null),
                     ),
                   ),
                 ),
                 orElse: () => SizedBox(
                   height: stdButtonHeight * 1.6,
-                  child: null,
+                  child: widget.statsWidget,
                 ),
               ),
               SizedBox(height: stdHorizontalOffset),
@@ -110,8 +123,10 @@ class _GameControlState extends State<GameControl> {
                       ),
                 breakdown: (breakdownState) => BreakdownButtons(
                   canStartBetting: breakdownState.canStartBetting,
+                  canIncreaseLevel: breakdownState.canIncreaseLevel,
                   openSettings: () => widget.viewModel.openSettings(),
                   startBetting: () => widget.viewModel.startBetting(),
+                  increaseLevel: () => widget.viewModel.increaseGameLevel(),
                 ),
                 showdown: (_) => SizedBox(
                   height: stdButtonHeight,
@@ -135,7 +150,7 @@ class _InheritedWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) => state.map(
         active: (activeState) => RaiseProviderScope(
-          additionalBet: activeState.raiseState.minPossibleBet,
+          additionalBet: activeState.raiseState.minRuleBet,
           child: child,
         ),
         breakdown: (_) => child,

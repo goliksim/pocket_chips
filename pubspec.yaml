@@ -3,7 +3,9 @@ description: Pocket poker chips for your phone. Play poker with only cards.
 
 publish_to: 'none' 
 
-version: 2.0.0+0
+#A.B.C represent version name
+#+D represent version code (should be greater than previous)
+version: 2.1.0+17
 
 environment:
   sdk: '>=3.0.3 <4.0.0'
@@ -85,6 +87,7 @@ dev_dependencies:
   
 dependency_overrides:
   in_app_purchase_storekit: 0.4.0
+  webview_flutter_android: 4.10.10
 
 patrol:
   app_name: "Pocket Chips"

@@ -4,20 +4,13 @@ import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/model_holders.dart';
 import 'package:pocket_chips/di/repositories.dart';
-import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/models/lobby/lobby_state_model.dart';
 
 import '../../mocks/lobby_state_holder_mock.dart';
 import '../../mocks/purchases_repository_mock.dart';
 import '../../solver_test.mocks.dart';
 import '../../test_utils/test_action.dart';
-
-ConfigModel defaultConfig() => ConfigModel(
-      isDark: false,
-      firstLaunch: false,
-      locale: 'en',
-      version: '2.0.0',
-    );
+import '../../test_utils/test_utils.dart';
 
 TAction pumpHomeApp({
   required PatrolTester tester,

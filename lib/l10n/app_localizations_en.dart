@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooltip_dealer => 'Dealer';
 
   @override
+  String get tooltip_increase_level => 'Next progression level';
+
+  @override
   String get tooltip_theme => 'Change Theme';
 
   @override
@@ -33,7 +36,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooltip_add_main => 'Add Player';
 
   @override
-  String get tooltip_undo => 'Undo action';
+  String get tooltip_undo => 'Undo last action';
 
   @override
   String get conf_canc => 'Cancel';
@@ -137,7 +140,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about_welc_4 => 'stores players\' chips';
 
   @override
-  String get about_welc_5 => 'allows you to place bets';
+  String get about_welc_5 => 'allows you to place bets/antes';
 
   @override
   String get about_welc_6 => 'divide the final pot between players';
@@ -185,18 +188,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about_plme_7 => 'Reorder players by drag-drop.';
 
   @override
+  String get about_plme_8 =>
+      '[PRO-feature] Use your gallery photo as player avatar';
+
+  @override
   String get about_set_1 => 'Settings';
 
   @override
   String get about_set_2 =>
-      'In the settings tab, you can also configure the initial stack, as well as small blind.';
+      'In the settings tab, you can configure the Initial stack, enable custom bets, select Sit Out mode and configure Simple or PRO blinds structure.';
 
   @override
   String get about_set_3 =>
       'Before the start of betting, you can make any changes:';
 
   @override
-  String get about_set_4 => 'add, remove players';
+  String get about_set_4 => 'add/remove/edit players';
 
   @override
   String get about_set_5 => 'change player stacks';
@@ -205,10 +212,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about_set_6 => 'you can change the dealer, etc';
 
   @override
-  String get about_set_8 => 'change the initial smallblind';
+  String get about_set_8 => 'change the game settings';
 
   @override
-  String get about_set_9 => 'change the description and player\'s avatar';
+  String get about_set_9 => 'mark player as away (sit out)';
 
   @override
   String get about_tab_1 => 'Game table';
@@ -223,11 +230,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get about_tab_4 =>
-      'After showdown (end of betting) you need to choose a winner or winners.';
+      'On showdown (end of betting) you need to choose a winners of main/side pots';
 
   @override
   String get about_tab_5 =>
-      'If side pots were created in the game (someone went ALL-in), then first choose the winner of the main pot.';
+      'You can mark/unmark player as away (sit out) by long press';
 
   @override
   String get about_link_1 => 'Links';
@@ -320,13 +327,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sett_title => 'Game Settings';
 
   @override
-  String get sett_win1 => 'Starting Stack';
+  String get sett_win1 => 'Update stacks';
 
   @override
-  String get sett_win2 => 'Small Blind';
-
-  @override
-  String get sett_win3 => 'Big Blind';
+  String get sett_custom_bets => 'Allow custom bets/raises';
 
   @override
   String get sett_conf => 'Save Changes';
@@ -335,10 +339,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get game_welc => 'Welcome to New Game!';
 
   @override
-  String get game_turn1 => 'Turn';
-
-  @override
-  String get game_turn2 => 'of';
+  String get game_player_turn => 'Turn of';
 
   @override
   String get game_shdw => 'Showdown';
@@ -374,6 +375,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get game_bet => 'Bet';
 
   @override
+  String get game_total_bet => 'Total bet';
+
+  @override
   String get game_bet_to => 'Bet to';
 
   @override
@@ -392,13 +396,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get game_win2 => 'is winner!';
 
   @override
-  String get game_win3 => 'Select the winners';
+  String get game_win3 => 'Select winners';
 
   @override
   String get game_win_conf => 'Enter';
 
   @override
-  String get game_win4 => 'Select side-pot winner';
+  String get game_pot_main => 'Main Pot';
+
+  @override
+  String get game_pot_side => 'Side Pot';
+
+  @override
+  String game_pot_including_ante(Object amount) {
+    return 'including ante $amount';
+  }
+
+  @override
+  String game_pot_including_folded(Object amount) {
+    return 'including folded $amount';
+  }
+
+  @override
+  String get game_progression_setup => 'Setup';
 
   @override
   String get game_start => 'Start Betting';
@@ -428,20 +448,101 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toast_moreplay2 => 'You cant play without players';
 
   @override
-  String get toast_bank1 =>
-      'We recommend a value for the stack at least big blind';
-
-  @override
-  String get toast_bank2 => 'In your case';
-
-  @override
   String get toast_bank3 => 'The stack cannot be zero';
 
   @override
-  String get toast_bank4 => 'We recommend a Big Blind value less than Stack';
+  String get toast_bank_warning =>
+      'Attention! Starting stack is lower than the required forced bets';
 
   @override
-  String get toast_bank5 => 'The Small Blind cannot be zero';
+  String get toast_custom_bet_warning =>
+      'This bet is possible, but it violates the min raise rules';
+
+  @override
+  String get toast_ante_zero => 'Ante cannot be zero';
+
+  @override
+  String get toast_levels_zero => 'Levels count cannot be zero';
+
+  @override
+  String get toast_cannot_be_zero => 'Value cannot be zero';
+
+  @override
+  String get toast_exceeds_maximum => 'Value exceeds maximum allowed';
+
+  @override
+  String get sett_ante_type => 'Ante Type';
+
+  @override
+  String get sett_ante => 'Ante value';
+
+  @override
+  String get sett_progression => 'Progression';
+
+  @override
+  String get sett_progression_tooltip =>
+      'Levels will be switched manually, every N hands or N minutes.\nSwitching occurs only during breakdown.';
+
+  @override
+  String get sett_progression_manual => 'Manual';
+
+  @override
+  String get sett_progression_hands => 'N hands';
+
+  @override
+  String get sett_progression_hands_left => 'Hands left';
+
+  @override
+  String get sett_progression_minutes => 'N minutes';
+
+  @override
+  String get sett_progression_minutes_left => 'Minutes left';
+
+  @override
+  String get sett_progression_hands_interval => 'Hands interval';
+
+  @override
+  String get sett_progression_minutes_interval => 'Minutes interval';
+
+  @override
+  String get sett_levels_count => 'Levels count';
+
+  @override
+  String get sett_level => 'Lvl';
+
+  @override
+  String get sett_level_full => 'Level';
+
+  @override
+  String get sett_small_blind => 'Small blind';
+
+  @override
+  String get sett_big_blind => 'Big blind';
+
+  @override
+  String get sett_mode_simple => 'Simple';
+
+  @override
+  String get sett_mode_pro => 'Pro';
+
+  @override
+  String get sett_level_blind => 'Blinds';
+
+  @override
+  String get sett_level_ante => 'Ante';
+
+  @override
+  String get ante_type_none => 'None';
+
+  @override
+  String get ante_type_tooltip =>
+      'Traditional: All players pays (~10% of SB) before the blinds. BBA: Only BB pays (amount = 1BB) after the blinds, goes to main pot winner in full.';
+
+  @override
+  String get ante_type_traditional => 'Traditional';
+
+  @override
+  String get ante_type_big_blind => 'BBA';
 
   @override
   String get toast_unav => 'Unavailible now';
@@ -476,6 +577,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get toast_purchase_pending_state_named => 'Your purchase is pending:';
+
+  @override
+  String get toast_level_clamp =>
+      'Current level adjusted due to settings changes';
+
+  @override
+  String get toast_level_reset => 'Level reverted, timer restarted';
+
+  @override
+  String get toast_settings_undo => 'Settings changes undone';
 
   @override
   String get purchases_restore_button => 'Restore Purchases';
@@ -538,10 +649,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get update_3 =>
-      'PRO users can now put their photos from the gallery to players';
+      'PRO users can their photos from the gallery to players';
 
   @override
-  String get update_4 => 'PRO users can now undo their last game action';
+  String get update_4 => 'PRO users can undo their last game actions';
+
+  @override
+  String get update_5 =>
+      'PRO users can customize the blind structure in the settings';
+
+  @override
+  String get update_6 => 'Added the ability to customize the ante';
 
   @override
   String get pro_version_offer_title => 'Maximum features in the PRO version';
@@ -565,14 +683,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pro_version_offer_option_4 => 'Up to 10 players in the lobby';
 
   @override
-  String get pro_version_offer_option_5 =>
-      'Saving game progress and frequent players';
+  String get pro_version_offer_option_5 => 'Saving players & game progress';
 
   @override
   String get pro_version_offer_option_6 => 'Custom player avatars';
 
   @override
-  String get pro_version_offer_option_7 => 'Undo last action';
+  String get pro_version_offer_option_7 => 'Undo last actions';
+
+  @override
+  String get pro_version_offer_option_8 => 'Blind structure in settings';
 
   @override
   String get pro_version_offer_button_purchased => 'PRO active';
@@ -582,4 +702,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pro_version_offer_button_not_available => 'Currently unavailable';
+
+  @override
+  String get error_was_found => 'An error occured';
+
+  @override
+  String get error_copy => 'Copy error info';
+
+  @override
+  String get error_retry_button => 'Retry';
+
+  @override
+  String get toast_sit_out_unavailable => 'Сannot be changed during betting';
+
+  @override
+  String toast_sit_out_enabled(Object name) {
+    return 'Player $name will skip rounds';
+  }
+
+  @override
+  String toast_sit_out_disabled(Object name) {
+    return 'Player $name is back in the game';
+  }
+
+  @override
+  String get sett_sit_out_mode => 'Sit-Out Mode';
+
+  @override
+  String get sit_out_mode_cash => 'Cash Game';
+
+  @override
+  String get sit_out_mode_tournament => 'Tournament';
+
+  @override
+  String get sit_out_mode_tooltip =>
+      'Cash Game: Player skips rounds.\nTournament: Player posts blinds/antes if required and auto-folds.';
+
+  @override
+  String get pro_version_offer_option_9 => 'Tournament Sit-Out Mode';
+
+  @override
+  String get update_7 => 'Added pause (Sit-Out) feature for players';
 }

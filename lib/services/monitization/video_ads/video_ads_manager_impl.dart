@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../../di/domain_managers.dart';
@@ -13,8 +12,9 @@ import '../../crash_reporting_service.dart';
 import 'app_resume_listener_mixin.dart';
 import 'models/iterstitial_ad_state.dart';
 import 'retry_policy_mixin.dart';
+import 'video_ads_manager.dart';
 
-class GoogleAdsManager extends Notifier<IterstitialAdState>
+class VideoAdsManagerImpl extends VideoAdsManager
     with RetryPolicyMixin, AppResumeListenerMixin {
   static const int _maxFailedLoadAttempts = 3;
 
@@ -25,6 +25,7 @@ class GoogleAdsManager extends Notifier<IterstitialAdState>
   CrashReportingService get _crashReporting =>
       ref.read(crashReportingServiceProvider);
 
+  @override
   bool get isReady => state == IterstitialAdState.ready;
 
   @override
@@ -65,11 +66,7 @@ class GoogleAdsManager extends Notifier<IterstitialAdState>
     }
   }
 
-  void reload() => _reloadInternal(
-        reason: 'manual',
-        ignoreCooldown: true,
-      );
-
+  @override
   void reloadIfUnavailable({
     String reason = 'automatic',
   }) {
@@ -83,6 +80,7 @@ class GoogleAdsManager extends Notifier<IterstitialAdState>
     );
   }
 
+  @override
   Future<void> showInterstitialAd({VoidCallback? onAdDismissed}) async {
     final interstitialAd = _interstitialAd;
 
@@ -134,13 +132,13 @@ class GoogleAdsManager extends Notifier<IterstitialAdState>
     if (kIsWeb) return;
     // Skip reload while ad is loading
     if (state == IterstitialAdState.loading) {
-      logs.writeLog('GoogleAdsManager skip reload while ad is loading');
+      logs.writeLog('VideoAdsManager skip reload while ad is loading');
       return;
     }
 
     // Skip retry if it is on cooldown
     final onCooldown = isRetryOnCooldown(
-      logName: 'GoogleAdsManager',
+      logName: 'VideoAdsManager',
       reason: reason,
     );
 
@@ -148,7 +146,7 @@ class GoogleAdsManager extends Notifier<IterstitialAdState>
       return;
     }
 
-    logs.writeLog('GoogleAdsManager reload, reason: $reason');
+    logs.writeLog('VideoAdsManager reload, reason: $reason');
 
     markRetryStarted();
     cancelScheduledRetry();
@@ -205,14 +203,14 @@ class GoogleAdsManager extends Notifier<IterstitialAdState>
         _crashReporting.recordError(
           error: error,
           trace: trace,
-          reason: 'GoogleAdsManager._createInterstitialAd',
+          reason: 'VideoAdsManager._createInterstitialAd',
         ),
       );
     }
   }
 
   void _startBackoffRetry() => scheduleRetry(
-        logName: 'GoogleAdsManager',
+        logName: 'VideoAdsManager',
         action: () => reloadIfUnavailable(reason: 'backoff'),
       );
 

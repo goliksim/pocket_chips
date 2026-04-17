@@ -17,12 +17,20 @@ class WinnerChoiceViewModel with ChangeNotifier {
     required AppLocalizations strings,
     required WinnerChoiceArgs args,
   })  : _navigationManager = navigationManager,
+        isSidePot = args.isSidePot,
+        potValue = args.potValue,
+        anteValue = args.anteValue ?? 0,
+        foldedValue = args.foldedValue ?? 0,
         possibleWinners = args.possibleWinners,
         _toastManager = toastManager,
         _strings = strings {
     _init();
   }
 
+  final bool isSidePot;
+  final int potValue;
+  final int anteValue;
+  final int foldedValue;
   final List<PossibleWinnerItem> possibleWinners;
   Map<String, bool> markedState = {};
 

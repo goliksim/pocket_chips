@@ -6,11 +6,12 @@ import '../../di/view_models.dart';
 import '../../l10n/localization_extension.dart';
 import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
+import '../common/widgets/error_page.dart';
 import '../common/widgets/loading_page.dart';
 import '../common/widgets/ui_widgets.dart';
-import '../monitization/ads/app_bar_banner.dart';
 import '../monitization/pro_version/widgets/pro_version_wrapper.dart';
 import 'widgets/game_contol/game_control.dart';
+import 'widgets/game_progression_widget.dart';
 import 'widgets/game_table/game_table.dart';
 import 'widgets/game_title_widget.dart';
 
@@ -25,7 +26,7 @@ class GamePage extends ConsumerWidget {
 
     final stateProvider = ref.watch(gamePageViewModelProvider);
 
-    return stateProvider.maybeWhen(
+    return stateProvider.when(
       skipLoadingOnReload: true,
       data: (viewState) {
         final tableOffsetController =
@@ -38,7 +39,6 @@ class GamePage extends ConsumerWidget {
           child: Scaffold(
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
-              flexibleSpace: const AppBarBanner(),
               toolbarHeight: stdButtonHeight * 0.75,
               leading: IconButton(
                 key: CommonKeys.closePageButton,
@@ -62,6 +62,31 @@ class GamePage extends ConsumerWidget {
               centerTitle: true,
               backgroundColor: const Color(0x00000000),
               actions: <Widget>[
+                if (viewState.canEditPlayer)
+                  AspectRatio(
+                    aspectRatio: 1,
+                    child: Transform.scale(
+                      scaleX: -1,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.sync_sharp,
+                          color: context.theme.onBackground.withAlpha(164),
+                          size: stdIconSize,
+                        ),
+                        tooltip: context.strings.tooltip_rot,
+                        onPressed: () => tableOffsetController.increaseOffset(),
+                      ),
+                    ),
+                  ),
+                if (viewState.canEditPlayer && viewModel.canUndoAction)
+                  SizedBox(
+                    height: stdIconSize,
+                    child: VerticalDivider(
+                      color: context.theme.onBackground.withAlpha(164),
+                      thickness: 1,
+                      width: 0,
+                    ),
+                  ),
                 if (viewModel.canUndoAction)
                   ProVersionWrapper(
                     child: AspectRatio(
@@ -78,22 +103,6 @@ class GamePage extends ConsumerWidget {
                       ),
                     ),
                   ),
-                if (viewState.canEditPlayer)
-                  AspectRatio(
-                    aspectRatio: 1,
-                    child: Transform.scale(
-                      scaleX: -1,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.sync_sharp,
-                          color: context.theme.onBackground,
-                          size: stdIconSize,
-                        ),
-                        tooltip: context.strings.tooltip_rot,
-                        onPressed: () => tableOffsetController.increaseOffset(),
-                      ),
-                    ),
-                  ),
               ],
             ),
             backgroundColor: Colors.transparent,
@@ -105,8 +114,12 @@ class GamePage extends ConsumerWidget {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: stdHorizontalOffset),
+                      padding: EdgeInsets.fromLTRB(
+                        stdHorizontalOffset,
+                        0,
+                        stdHorizontalOffset,
+                        stdHorizontalOffset,
+                      ),
                       child: GameTable(
                         viewModel: viewModel,
                         tableRotationOffset: tableRotationOffset,
@@ -123,6 +136,8 @@ class GamePage extends ConsumerWidget {
                   ),
                   child: GameControl(
                     viewModel: viewModel,
+                    statsWidget:
+                        GameProgressionWidget(tableState: viewState.tableState),
                   ),
                 ),
               ],
@@ -130,7 +145,12 @@ class GamePage extends ConsumerWidget {
           ),
         );
       },
-      orElse: () => const LoadingPage(),
+      loading: () => const LoadingPage(),
+      error: (error, trace) => ErrorPage(
+        message: 'GamePage error occured:\n $error\n$trace',
+        retryCallback: () => viewModel.runBuild(),
+        canPop: true,
+      ),
     );
   }
 }

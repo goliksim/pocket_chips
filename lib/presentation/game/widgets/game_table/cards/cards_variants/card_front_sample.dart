@@ -12,6 +12,9 @@ class CardFrontSample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => CardWidget(
+        borderColor: (context.theme.name == 'dark')
+            ? context.theme.playerColor
+            : context.theme.bankColor,
         child: ColoredBox(
           color: (context.theme.name == 'dark')
               ? context.theme.bankColor

@@ -9,6 +9,26 @@ import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
 import '../../test_utils.dart';
 
+void expectWinnerSelectionEffect(
+  List<GameStateEffect> effects, {
+  required Set<String> possibleWinnersUid,
+  required bool isSideSpot,
+}) {
+  expect(effects.length, 1);
+
+  final effect = effects.single;
+  expect(effect, isA<GameStateNeedWinnerSelectionEffect>());
+
+  effect.map(
+    error: (_) => fail('Expected needWinnerSelection effect'),
+    hasWinner: (_) => fail('Expected needWinnerSelection effect'),
+    needWinnerSelection: (effect) {
+      expect(effect.playerContributions.keys.toSet(), possibleWinnersUid);
+      expect(effect.isSideSpot, isSideSpot);
+    },
+  );
+}
+
 /// [FoldTest] regular test
 void runExecuteFoldTest(
   ProviderContainer container,
@@ -305,13 +325,9 @@ void runExecuteFoldPlayerWithInactiveTest(
     ),
   );
   // Effects check
-  expect(
+  expectWinnerSelectionEffect(
     gameState.effects,
-    [
-      GameStateEffect.needWinnerSelection(
-        possibleWinnersUid: {players[1].uid, players[2].uid, players[3].uid},
-        isSideSpot: false,
-      )
-    ],
+    possibleWinnersUid: {players[1].uid, players[2].uid, players[3].uid},
+    isSideSpot: false,
   );
 }

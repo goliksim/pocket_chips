@@ -12,7 +12,6 @@ import '../../utils/theme/ui_values.dart';
 import '../common/widgets/attention_button.dart';
 import '../common/widgets/chips_image.dart';
 import '../common/widgets/ui_widgets.dart';
-import '../monitization/ads/app_bar_banner.dart';
 import '../monitization/pro_version/widgets/pro_version_wrapper.dart';
 
 class AnimatedHomePage extends ConsumerStatefulWidget {
@@ -89,7 +88,7 @@ class _AnimatedHomePageState extends ConsumerState<AnimatedHomePage>
           // old theme (underneath)
           ThemeProvider(
             theme: old,
-            child: _HomePage(showBanner: false),
+            child: _HomePage(),
           ),
 
           // new theme revealed with radial mask
@@ -116,7 +115,7 @@ class _AnimatedHomePageState extends ConsumerState<AnimatedHomePage>
                 ).createShader(rect),
                 child: child,
               ),
-              child: _HomePage(showBanner: false),
+              child: _HomePage(),
             ),
           ),
         ],
@@ -133,18 +132,15 @@ class _AnimatedHomePageState extends ConsumerState<AnimatedHomePage>
 
 class _HomePage extends ConsumerWidget {
   final title = 'POCKET CHIPS';
-  final bool showBanner;
 
-  const _HomePage({
-    this.showBanner = true,
-  });
+  const _HomePage();
 
   @override
   Widget build(
     BuildContext context,
     WidgetRef ref,
   ) {
-    final viewModel = ref.watch(homePageViewModelProvider.notifier);
+    final viewModel = ref.read(homePageViewModelProvider.notifier);
     final asyncState = ref.watch(homePageViewModelProvider);
 
     final isLoading = asyncState.isLoading;
@@ -159,7 +155,6 @@ class _HomePage extends ConsumerWidget {
       child: PatternBackground(
         child: Scaffold(
           appBar: AppBar(
-            flexibleSpace: showBanner ? const AppBarBanner() : null,
             leading: AspectRatio(
               aspectRatio: 1,
               child: IconButton(

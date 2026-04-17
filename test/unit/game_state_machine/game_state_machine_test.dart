@@ -12,9 +12,12 @@ import 'tests/test_execute_fold.dart';
 import 'tests/test_execute_raise.dart';
 import 'tests/test_hands_up_starting_bet.dart';
 import 'tests/test_initialization.dart';
+import 'tests/test_progression.dart';
 import 'tests/test_raise_value_calculation.dart';
 import 'tests/test_showndown_step.dart';
+import 'tests/test_sit_out.dart';
 import 'tests/test_starting_bet.dart';
+import 'tests/test_undo_stack.dart';
 
 @GenerateMocks([AppRepository])
 void main() {
@@ -37,18 +40,76 @@ void main() {
       tearDown(() {
         container.dispose();
       });
-
+      // -- Initialization Tests
       test(
-        'Initialization Test',
+        '[Initialization] base initialization test',
         () => runInitialization(container, mockAppRepository),
       );
 
       test(
-        'Initialization with auto-fold for players with zero bank',
+        '[Initialization] initialization with auto-fold for players with zero bank',
         () => runInitializationAndAutoFold(container, mockAppRepository),
       );
+      //
+      test(
+        '[Initialization] initialization restores saved blind progression state',
+        () => runInitializationWithSavedHandsProgressionTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      // -- Progression Tests
+      test(
+        '[Progression] manual progression state is kept after rebuild in notStarted state',
+        () => runManualProgressionKeptOnRebuildTest(mockAppRepository),
+      );
+      test(
+        '[Progression] manual progression clamps current level on restore',
+        () => runManualProgressionClampOnRestoreTest(
+          container,
+          mockAppRepository,
+        ),
+      );
 
-      // ---
+      test(
+        '[Progression] hands progression advances level after completed hand',
+        () => runEveryNHandsProgressionTest(container, mockAppRepository),
+      );
+
+      test(
+        '[Progression] timed progression advances on restore during breakdown',
+        () => runTimedProgressionAdvanceOnRestoreTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        '[Progression] hands progression does not advance after reaching last level',
+        () => runEveryNHandsLastLevelNoAdvanceTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        '[Progression] manual progression does not change during active hand',
+        () => runManualProgressionIgnoredDuringHandTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        '[Progression] manual progression stays on last level',
+        () => runManualProgressionStaysOnLastLevelTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        '[Progression] Manual progression saves to Undo stack',
+        () => runManualProgressionUndoStackTest(container, mockAppRepository),
+      );
+
+      // -- Hands-up Tests
 
       test(
         '[Hands-up] startingBetting test',
@@ -88,7 +149,7 @@ void main() {
         ),
       );
 
-      // ---
+      // --- Starting-Betting Tests
 
       test(
         '[Starting-Betting] common test',
@@ -109,6 +170,20 @@ void main() {
         '[Starting-Betting] second player has no chips',
         () => runStartingBetSecondNoChipsTest(container, mockAppRepository),
       );
+      test(
+        '[Starting-Betting] traditional ante is posted before blinds',
+        () => runStartingBetTraditionalAntePriorityTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        '[Starting-Betting] BBA is posted after big blind',
+        () => runStartingBetBigBlindAntePriorityTest(
+          container,
+          mockAppRepository,
+        ),
+      );
 
       test(
         '[Starting-Betting] first&second players has no chips',
@@ -122,7 +197,7 @@ void main() {
             runStartingBetFirstSecondNoChips2Test(container, mockAppRepository),
       );
 
-      // ---
+      // --- Raise Value Calculation Tests
 
       test(
         '[Raise Value] calculate pre-flop raise value for small blind',
@@ -159,7 +234,7 @@ void main() {
         () => runReRaiseValueCalculationAllInTest(container, mockAppRepository),
       );
 
-      // ---
+      // --- Call Value Calculation Tests
 
       test(
         '[Call Value] calculate pre-flop call value for small blind',
@@ -200,6 +275,8 @@ void main() {
             runCallRaiseValueCalculationAllInTest(container, mockAppRepository),
       );
 
+      // --- Execute Fold Tests
+
       test(
         '[Execute FOLD] common fold',
         () => runExecuteFoldTest(container, mockAppRepository),
@@ -222,14 +299,14 @@ void main() {
             runExecuteFoldPlayerWithInactiveTest(container, mockAppRepository),
       );
 
-      //---
+      //--- Execute Check Tests
 
       test(
         '[Execute CHECK] сheck on big blind player on pre-flop hand-up',
         () => runExecuteCheckHandUpBigBlindTest(container, mockAppRepository),
       );
 
-      // ---
+      // --- Showdown Tests
 
       test(
         '[Showdown Test] check auto show single winner and money distibution',
@@ -279,8 +356,36 @@ void main() {
         '[Showdown Test] distribution test 4',
         () => runShowdownDistribution4Test(container, mockAppRepository),
       );
+      test(
+        '[Showdown Test] folded dead money is carried into next pot',
+        () => runShowdownFoldedDeadMoneyEffectTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        '[Showdown Test] traditional ante stays proportional in side pots',
+        () => runShowdownTraditionalAnteDistributionTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        '[Showdown Test] traditional ante with short stack logic creates zero bid pot',
+        () => runShowdownTraditionalAnteShortStackEffectTest(
+          container,
+          mockAppRepository,
+        ),
+      );
+      test(
+        '[Showdown Test] traditional ante matched by everyone skips zero bid pot and splits early',
+        () => runShowdownTraditionalAnteNormalEffectTest(
+          container,
+          mockAppRepository,
+        ),
+      );
 
-      //---
+      //--- Execute Call Tests
 
       test(
         '[Call Test] final call after raise test',
@@ -291,10 +396,47 @@ void main() {
         () => runExecuteCallFinalAfterReRaiseTest(container, mockAppRepository),
       );
 
-      //---
+      //--- Execute Raise Tests
       test(
         '[Raise Test] re-raise on last player before equal',
         () => runExecuteReRaiseLastTest(container, mockAppRepository),
+      );
+
+      //--- Sit Out Tests
+      test(
+        '[Sit Out] toggle sit out',
+        () => runSitOutToggleTest(container, mockAppRepository),
+      );
+      test(
+        '[Sit Out] cash mode ignores player',
+        () => runSitOutCashModeTest(container, mockAppRepository),
+      );
+      test(
+        '[Sit Out] tournament mode pays and auto folds',
+        () => runSitOutTournamentModeTest(container, mockAppRepository),
+      );
+
+      test(
+        '[Sit Out] Player pause does not save to Undo stack',
+        () => runPlayerSitOutUndoStackTest(container, mockAppRepository),
+      );
+      test(
+        '[Sit Out] Pause data persists after reload and settings change',
+        () => runSitOutReloadPersistenceTest(container, mockAppRepository),
+      );
+      test(
+        '[Sit Out] Modifying pause and progression in breakdown emits no effects',
+        () => runGameBreakEffectsTest(container, mockAppRepository),
+      );
+
+      //--- Undo Stack Tests
+      test(
+        '[Undo] Multiple actions are undone correctly step by step',
+        () => runMultipleUndoTest(container, mockAppRepository),
+      );
+      test(
+        '[Undo] Undo exhausts properly down to notStarted state and disabling feature',
+        () => runUndoUntilEmptyTest(container, mockAppRepository),
       );
     },
   );

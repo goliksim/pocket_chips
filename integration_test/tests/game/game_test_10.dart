@@ -1,5 +1,6 @@
 import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/keys/keys.dart';
+import 'package:pocket_chips/domain/models/game/game_state_enum.dart';
 import 'package:pocket_chips/domain/models/player/player_model.dart';
 
 import '../../game_test.mocks.dart';
@@ -7,6 +8,7 @@ import '../../pages/common_tester.dart';
 import '../../pages/game_page.dart';
 import '../../pages/lobby_page.dart';
 import '../../test_utils/test_action.dart';
+import '../../test_utils/test_utils.dart';
 import 'game_test_utils.dart';
 
 /// [GameTest]
@@ -42,7 +44,8 @@ Future<void> runGameTest10(
       // Verify current player is second player
       // And current player can be changed to first player after undo, even after lobby reset
       gamePage.call(),
-      gamePage.verifyCurrentPlayer(players.last.name),
+      gamePage.verifyCurrentPlayer(players.last.name), // BB player
+      gamePage.verifyGameStatus(GameStatusEnum.preFlop),
       CommonTester.closePage(tester),
       lobbyPage.verifyVisibility(),
       () => tester(LobbyKeys.resetLobbyButton).tap(),
@@ -51,9 +54,11 @@ Future<void> runGameTest10(
       () => tester.pumpAndSettle(),
       lobbyPage.toGame(),
       gamePage.verifyVisibility(),
+      gamePage.verifyGameStatus(GameStatusEnum.notStarted),
       gamePage.verifyUndoButtonVisibility(),
       gamePage.undoLastAction(),
-      gamePage.verifyCurrentPlayer(players.first.name),
+      gamePage.verifyCurrentPlayer(players.last.name), // BB player
+      gamePage.verifyGameStatus(GameStatusEnum.preFlop),
     ],
   )();
 }

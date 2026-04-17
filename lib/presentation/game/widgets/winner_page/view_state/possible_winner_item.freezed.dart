@@ -18,6 +18,8 @@ mixin _$PossibleWinnerItem {
   String get assetUrl;
   String get name;
   int get bid;
+  int? get totalBet;
+  int? get totalAnte;
 
   /// Create a copy of PossibleWinnerItem
   /// with the given fields replaced by the non-null parameter values.
@@ -36,15 +38,20 @@ mixin _$PossibleWinnerItem {
             (identical(other.assetUrl, assetUrl) ||
                 other.assetUrl == assetUrl) &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.bid, bid) || other.bid == bid));
+            (identical(other.bid, bid) || other.bid == bid) &&
+            (identical(other.totalBet, totalBet) ||
+                other.totalBet == totalBet) &&
+            (identical(other.totalAnte, totalAnte) ||
+                other.totalAnte == totalAnte));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, uid, assetUrl, name, bid);
+  int get hashCode =>
+      Object.hash(runtimeType, uid, assetUrl, name, bid, totalBet, totalAnte);
 
   @override
   String toString() {
-    return 'PossibleWinnerItem(uid: $uid, assetUrl: $assetUrl, name: $name, bid: $bid)';
+    return 'PossibleWinnerItem(uid: $uid, assetUrl: $assetUrl, name: $name, bid: $bid, totalBet: $totalBet, totalAnte: $totalAnte)';
   }
 }
 
@@ -54,7 +61,13 @@ abstract mixin class $PossibleWinnerItemCopyWith<$Res> {
           PossibleWinnerItem value, $Res Function(PossibleWinnerItem) _then) =
       _$PossibleWinnerItemCopyWithImpl;
   @useResult
-  $Res call({String uid, String assetUrl, String name, int bid});
+  $Res call(
+      {String uid,
+      String assetUrl,
+      String name,
+      int bid,
+      int? totalBet,
+      int? totalAnte});
 }
 
 /// @nodoc
@@ -74,6 +87,8 @@ class _$PossibleWinnerItemCopyWithImpl<$Res>
     Object? assetUrl = null,
     Object? name = null,
     Object? bid = null,
+    Object? totalBet = freezed,
+    Object? totalAnte = freezed,
   }) {
     return _then(_self.copyWith(
       uid: null == uid
@@ -92,6 +107,14 @@ class _$PossibleWinnerItemCopyWithImpl<$Res>
           ? _self.bid
           : bid // ignore: cast_nullable_to_non_nullable
               as int,
+      totalBet: freezed == totalBet
+          ? _self.totalBet
+          : totalBet // ignore: cast_nullable_to_non_nullable
+              as int?,
+      totalAnte: freezed == totalAnte
+          ? _self.totalAnte
+          : totalAnte // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -189,14 +212,16 @@ extension PossibleWinnerItemPatterns on PossibleWinnerItem {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String uid, String assetUrl, String name, int bid)?
+    TResult Function(String uid, String assetUrl, String name, int bid,
+            int? totalBet, int? totalAnte)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _PossibleWinnerItem() when $default != null:
-        return $default(_that.uid, _that.assetUrl, _that.name, _that.bid);
+        return $default(_that.uid, _that.assetUrl, _that.name, _that.bid,
+            _that.totalBet, _that.totalAnte);
       case _:
         return orElse();
     }
@@ -217,13 +242,15 @@ extension PossibleWinnerItemPatterns on PossibleWinnerItem {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String uid, String assetUrl, String name, int bid)
+    TResult Function(String uid, String assetUrl, String name, int bid,
+            int? totalBet, int? totalAnte)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _PossibleWinnerItem():
-        return $default(_that.uid, _that.assetUrl, _that.name, _that.bid);
+        return $default(_that.uid, _that.assetUrl, _that.name, _that.bid,
+            _that.totalBet, _that.totalAnte);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -243,13 +270,15 @@ extension PossibleWinnerItemPatterns on PossibleWinnerItem {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String uid, String assetUrl, String name, int bid)?
+    TResult? Function(String uid, String assetUrl, String name, int bid,
+            int? totalBet, int? totalAnte)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _PossibleWinnerItem() when $default != null:
-        return $default(_that.uid, _that.assetUrl, _that.name, _that.bid);
+        return $default(_that.uid, _that.assetUrl, _that.name, _that.bid,
+            _that.totalBet, _that.totalAnte);
       case _:
         return null;
     }
@@ -263,7 +292,9 @@ class _PossibleWinnerItem implements PossibleWinnerItem {
       {required this.uid,
       required this.assetUrl,
       required this.name,
-      required this.bid});
+      required this.bid,
+      this.totalBet,
+      this.totalAnte});
 
   @override
   final String uid;
@@ -273,6 +304,10 @@ class _PossibleWinnerItem implements PossibleWinnerItem {
   final String name;
   @override
   final int bid;
+  @override
+  final int? totalBet;
+  @override
+  final int? totalAnte;
 
   /// Create a copy of PossibleWinnerItem
   /// with the given fields replaced by the non-null parameter values.
@@ -291,15 +326,20 @@ class _PossibleWinnerItem implements PossibleWinnerItem {
             (identical(other.assetUrl, assetUrl) ||
                 other.assetUrl == assetUrl) &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.bid, bid) || other.bid == bid));
+            (identical(other.bid, bid) || other.bid == bid) &&
+            (identical(other.totalBet, totalBet) ||
+                other.totalBet == totalBet) &&
+            (identical(other.totalAnte, totalAnte) ||
+                other.totalAnte == totalAnte));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, uid, assetUrl, name, bid);
+  int get hashCode =>
+      Object.hash(runtimeType, uid, assetUrl, name, bid, totalBet, totalAnte);
 
   @override
   String toString() {
-    return 'PossibleWinnerItem(uid: $uid, assetUrl: $assetUrl, name: $name, bid: $bid)';
+    return 'PossibleWinnerItem(uid: $uid, assetUrl: $assetUrl, name: $name, bid: $bid, totalBet: $totalBet, totalAnte: $totalAnte)';
   }
 }
 
@@ -311,7 +351,13 @@ abstract mixin class _$PossibleWinnerItemCopyWith<$Res>
       __$PossibleWinnerItemCopyWithImpl;
   @override
   @useResult
-  $Res call({String uid, String assetUrl, String name, int bid});
+  $Res call(
+      {String uid,
+      String assetUrl,
+      String name,
+      int bid,
+      int? totalBet,
+      int? totalAnte});
 }
 
 /// @nodoc
@@ -331,6 +377,8 @@ class __$PossibleWinnerItemCopyWithImpl<$Res>
     Object? assetUrl = null,
     Object? name = null,
     Object? bid = null,
+    Object? totalBet = freezed,
+    Object? totalAnte = freezed,
   }) {
     return _then(_PossibleWinnerItem(
       uid: null == uid
@@ -349,6 +397,14 @@ class __$PossibleWinnerItemCopyWithImpl<$Res>
           ? _self.bid
           : bid // ignore: cast_nullable_to_non_nullable
               as int,
+      totalBet: freezed == totalBet
+          ? _self.totalBet
+          : totalBet // ignore: cast_nullable_to_non_nullable
+              as int?,
+      totalAnte: freezed == totalAnte
+          ? _self.totalAnte
+          : totalAnte // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }

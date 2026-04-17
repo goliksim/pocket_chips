@@ -9,6 +9,7 @@ import '../../../../app/keys/keys.dart';
 import '../../../../domain/models/lobby/lobby_state_model.dart';
 import '../../../../services/assets_provider.dart';
 import '../../../../utils/extensions.dart';
+import '../../../../utils/theme/ui_values.dart';
 import '../../../monitization/pro_version/widgets/pro_version_wrapper.dart';
 import '../../view_model/game_page_view_model.dart';
 import '../add_player_button.dart';
@@ -98,8 +99,8 @@ class GameTable extends StatelessWidget {
     final addButtonOffset = showAddButton ? 1 : 0;
     final totalElementCount = players.length + addButtonOffset;
 
-    final bets = players.map((e) => e.bet).whereType<int>();
-    final totalBets = bets.sum;
+    final bets = players.map<int>((e) => e.bet).sum;
+    final antes = players.map<int>((e) => e.ante).sum;
 
     return LayoutBuilder(
       builder: (context, contrains) {
@@ -126,7 +127,7 @@ class GameTable extends StatelessWidget {
                   child: ColorFiltered(
                     colorFilter: ColorFilter.mode(
                       context.theme.primaryColor.withAlpha(
-                        context.theme.name == 'light' ? 20 : 0,
+                        context.theme.name == 'light' ? 20 : 20,
                       ),
                       BlendMode.srcATop,
                     ),
@@ -168,22 +169,6 @@ class GameTable extends StatelessWidget {
                 ),
               ),
             ),
-            // Small/Big Blinds
-            Positioned(
-              top: height * 0.75,
-              child: SizedBox(
-                height: height / 25,
-                child: FittedBox(
-                  child: Text(
-                    key: GameKeys.blinds(tableState.smallBlindValue),
-                    '${tableState.smallBlindValue.toSeparated} / ${(tableState.smallBlindValue * 2).toSeparated}',
-                    style: TextStyle(
-                      color: context.theme.onBackground.withAlpha(200),
-                    ),
-                  ),
-                ),
-              ),
-            ),
             // Total bets
             Positioned(
               top: height * 0.7,
@@ -198,7 +183,7 @@ class GameTable extends StatelessWidget {
                     ),
                     child: Center(
                       child: Text(
-                        totalBets.toSeparatedBank,
+                        bets.toSeparatedBank,
                         style: TextStyle(
                           color: Colors.white,
                         ),
@@ -208,6 +193,32 @@ class GameTable extends StatelessWidget {
                 ),
               ),
             ),
+            // Ante bets
+            if (antes != 0)
+              Positioned(
+                top: height * 0.7 + height / 20 + stdHorizontalOffset / 2,
+                child: SizedBox(
+                  height: height / 25,
+                  child: FittedBox(
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: borderRadius / 4),
+                      decoration: BoxDecoration(
+                        color: context.theme.playerColor,
+                        borderRadius: BorderRadius.circular(borderRadius),
+                      ),
+                      child: Center(
+                        child: Text(
+                          antes.toSeparatedBank,
+                          style: TextStyle(
+                            color: context.theme.onBackground.withAlpha(200),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             // Iteration throw players
             ...List.generate(totalElementCount, (index) => index).expand(
               (int index) {
@@ -263,6 +274,8 @@ class GameTable extends StatelessWidget {
                               child: PlayerField(
                                 player: player,
                                 shouldReverse: reversePlayer,
+                                onLongPress: () =>
+                                    viewModel.toggleSitOut(player.uid),
                               ),
                             ),
                     ),

@@ -6,9 +6,9 @@ import '../../di/view_models.dart';
 import '../../domain/models/lobby/lobby_state_model.dart';
 import '../../utils/extensions.dart';
 import '../../utils/theme/ui_values.dart';
+import '../common/widgets/error_page.dart';
 import '../common/widgets/loading_page.dart';
 import '../common/widgets/ui_widgets.dart';
-import '../monitization/ads/app_bar_banner.dart';
 import '../monitization/pro_version/widgets/pro_version_wrapper.dart';
 import 'player_list/player_list_view.dart';
 import 'widgets/attention_add_player_button.dart';
@@ -28,13 +28,12 @@ class LobbyPage extends ConsumerWidget {
 
     final stateProvider = ref.watch(lobbyPageViewModelProvider);
 
-    return stateProvider.maybeWhen(
+    return stateProvider.when(
       skipLoadingOnReload: true,
       data: (state) => PatternBackground(
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
-            flexibleSpace: const AppBarBanner(),
             scrolledUnderElevation: 0,
             toolbarHeight: stdButtonHeight * 0.75,
             leading: IconButton(
@@ -156,7 +155,12 @@ class LobbyPage extends ConsumerWidget {
           ),
         ),
       ),
-      orElse: () => const LoadingPage(),
+      loading: () => const LoadingPage(),
+      error: (error, trace) => ErrorPage(
+        message: 'LobbyPage error occured:\n$error\n$trace',
+        retryCallback: () => viewModel.runBuild(),
+        canPop: true,
+      ),
     );
   }
 }

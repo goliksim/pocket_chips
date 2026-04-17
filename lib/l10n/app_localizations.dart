@@ -104,6 +104,12 @@ abstract class AppLocalizations {
   /// **'Dealer'**
   String get tooltip_dealer;
 
+  /// No description provided for @tooltip_increase_level.
+  ///
+  /// In en, this message translates to:
+  /// **'Next progression level'**
+  String get tooltip_increase_level;
+
   /// No description provided for @tooltip_theme.
   ///
   /// In en, this message translates to:
@@ -149,7 +155,7 @@ abstract class AppLocalizations {
   /// No description provided for @tooltip_undo.
   ///
   /// In en, this message translates to:
-  /// **'Undo action'**
+  /// **'Undo last action'**
   String get tooltip_undo;
 
   /// No description provided for @conf_canc.
@@ -353,7 +359,7 @@ abstract class AppLocalizations {
   /// No description provided for @about_welc_5.
   ///
   /// In en, this message translates to:
-  /// **'allows you to place bets'**
+  /// **'allows you to place bets/antes'**
   String get about_welc_5;
 
   /// No description provided for @about_welc_6.
@@ -434,6 +440,12 @@ abstract class AppLocalizations {
   /// **'Reorder players by drag-drop.'**
   String get about_plme_7;
 
+  /// No description provided for @about_plme_8.
+  ///
+  /// In en, this message translates to:
+  /// **'[PRO-feature] Use your gallery photo as player avatar'**
+  String get about_plme_8;
+
   /// No description provided for @about_set_1.
   ///
   /// In en, this message translates to:
@@ -443,7 +455,7 @@ abstract class AppLocalizations {
   /// No description provided for @about_set_2.
   ///
   /// In en, this message translates to:
-  /// **'In the settings tab, you can also configure the initial stack, as well as small blind.'**
+  /// **'In the settings tab, you can configure the Initial stack, enable custom bets, select Sit Out mode and configure Simple or PRO blinds structure.'**
   String get about_set_2;
 
   /// No description provided for @about_set_3.
@@ -455,7 +467,7 @@ abstract class AppLocalizations {
   /// No description provided for @about_set_4.
   ///
   /// In en, this message translates to:
-  /// **'add, remove players'**
+  /// **'add/remove/edit players'**
   String get about_set_4;
 
   /// No description provided for @about_set_5.
@@ -473,13 +485,13 @@ abstract class AppLocalizations {
   /// No description provided for @about_set_8.
   ///
   /// In en, this message translates to:
-  /// **'change the initial smallblind'**
+  /// **'change the game settings'**
   String get about_set_8;
 
   /// No description provided for @about_set_9.
   ///
   /// In en, this message translates to:
-  /// **'change the description and player\'s avatar'**
+  /// **'mark player as away (sit out)'**
   String get about_set_9;
 
   /// No description provided for @about_tab_1.
@@ -503,13 +515,13 @@ abstract class AppLocalizations {
   /// No description provided for @about_tab_4.
   ///
   /// In en, this message translates to:
-  /// **'After showdown (end of betting) you need to choose a winner or winners.'**
+  /// **'On showdown (end of betting) you need to choose a winners of main/side pots'**
   String get about_tab_4;
 
   /// No description provided for @about_tab_5.
   ///
   /// In en, this message translates to:
-  /// **'If side pots were created in the game (someone went ALL-in), then first choose the winner of the main pot.'**
+  /// **'You can mark/unmark player as away (sit out) by long press'**
   String get about_tab_5;
 
   /// No description provided for @about_link_1.
@@ -689,20 +701,14 @@ abstract class AppLocalizations {
   /// No description provided for @sett_win1.
   ///
   /// In en, this message translates to:
-  /// **'Starting Stack'**
+  /// **'Update stacks'**
   String get sett_win1;
 
-  /// No description provided for @sett_win2.
+  /// No description provided for @sett_custom_bets.
   ///
   /// In en, this message translates to:
-  /// **'Small Blind'**
-  String get sett_win2;
-
-  /// No description provided for @sett_win3.
-  ///
-  /// In en, this message translates to:
-  /// **'Big Blind'**
-  String get sett_win3;
+  /// **'Allow custom bets/raises'**
+  String get sett_custom_bets;
 
   /// No description provided for @sett_conf.
   ///
@@ -716,17 +722,11 @@ abstract class AppLocalizations {
   /// **'Welcome to New Game!'**
   String get game_welc;
 
-  /// No description provided for @game_turn1.
+  /// No description provided for @game_player_turn.
   ///
   /// In en, this message translates to:
-  /// **'Turn'**
-  String get game_turn1;
-
-  /// No description provided for @game_turn2.
-  ///
-  /// In en, this message translates to:
-  /// **'of'**
-  String get game_turn2;
+  /// **'Turn of'**
+  String get game_player_turn;
 
   /// No description provided for @game_shdw.
   ///
@@ -794,6 +794,12 @@ abstract class AppLocalizations {
   /// **'Bet'**
   String get game_bet;
 
+  /// No description provided for @game_total_bet.
+  ///
+  /// In en, this message translates to:
+  /// **'Total bet'**
+  String get game_total_bet;
+
   /// No description provided for @game_bet_to.
   ///
   /// In en, this message translates to:
@@ -833,7 +839,7 @@ abstract class AppLocalizations {
   /// No description provided for @game_win3.
   ///
   /// In en, this message translates to:
-  /// **'Select the winners'**
+  /// **'Select winners'**
   String get game_win3;
 
   /// No description provided for @game_win_conf.
@@ -842,11 +848,35 @@ abstract class AppLocalizations {
   /// **'Enter'**
   String get game_win_conf;
 
-  /// No description provided for @game_win4.
+  /// No description provided for @game_pot_main.
   ///
   /// In en, this message translates to:
-  /// **'Select side-pot winner'**
-  String get game_win4;
+  /// **'Main Pot'**
+  String get game_pot_main;
+
+  /// No description provided for @game_pot_side.
+  ///
+  /// In en, this message translates to:
+  /// **'Side Pot'**
+  String get game_pot_side;
+
+  /// No description provided for @game_pot_including_ante.
+  ///
+  /// In en, this message translates to:
+  /// **'including ante {amount}'**
+  String game_pot_including_ante(Object amount);
+
+  /// No description provided for @game_pot_including_folded.
+  ///
+  /// In en, this message translates to:
+  /// **'including folded {amount}'**
+  String game_pot_including_folded(Object amount);
+
+  /// No description provided for @game_progression_setup.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup'**
+  String get game_progression_setup;
 
   /// No description provided for @game_start.
   ///
@@ -902,35 +932,191 @@ abstract class AppLocalizations {
   /// **'You cant play without players'**
   String get toast_moreplay2;
 
-  /// No description provided for @toast_bank1.
-  ///
-  /// In en, this message translates to:
-  /// **'We recommend a value for the stack at least big blind'**
-  String get toast_bank1;
-
-  /// No description provided for @toast_bank2.
-  ///
-  /// In en, this message translates to:
-  /// **'In your case'**
-  String get toast_bank2;
-
   /// No description provided for @toast_bank3.
   ///
   /// In en, this message translates to:
   /// **'The stack cannot be zero'**
   String get toast_bank3;
 
-  /// No description provided for @toast_bank4.
+  /// No description provided for @toast_bank_warning.
   ///
   /// In en, this message translates to:
-  /// **'We recommend a Big Blind value less than Stack'**
-  String get toast_bank4;
+  /// **'Attention! Starting stack is lower than the required forced bets'**
+  String get toast_bank_warning;
 
-  /// No description provided for @toast_bank5.
+  /// No description provided for @toast_custom_bet_warning.
   ///
   /// In en, this message translates to:
-  /// **'The Small Blind cannot be zero'**
-  String get toast_bank5;
+  /// **'This bet is possible, but it violates the min raise rules'**
+  String get toast_custom_bet_warning;
+
+  /// No description provided for @toast_ante_zero.
+  ///
+  /// In en, this message translates to:
+  /// **'Ante cannot be zero'**
+  String get toast_ante_zero;
+
+  /// No description provided for @toast_levels_zero.
+  ///
+  /// In en, this message translates to:
+  /// **'Levels count cannot be zero'**
+  String get toast_levels_zero;
+
+  /// No description provided for @toast_cannot_be_zero.
+  ///
+  /// In en, this message translates to:
+  /// **'Value cannot be zero'**
+  String get toast_cannot_be_zero;
+
+  /// No description provided for @toast_exceeds_maximum.
+  ///
+  /// In en, this message translates to:
+  /// **'Value exceeds maximum allowed'**
+  String get toast_exceeds_maximum;
+
+  /// No description provided for @sett_ante_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Ante Type'**
+  String get sett_ante_type;
+
+  /// No description provided for @sett_ante.
+  ///
+  /// In en, this message translates to:
+  /// **'Ante value'**
+  String get sett_ante;
+
+  /// No description provided for @sett_progression.
+  ///
+  /// In en, this message translates to:
+  /// **'Progression'**
+  String get sett_progression;
+
+  /// No description provided for @sett_progression_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Levels will be switched manually, every N hands or N minutes.\nSwitching occurs only during breakdown.'**
+  String get sett_progression_tooltip;
+
+  /// No description provided for @sett_progression_manual.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual'**
+  String get sett_progression_manual;
+
+  /// No description provided for @sett_progression_hands.
+  ///
+  /// In en, this message translates to:
+  /// **'N hands'**
+  String get sett_progression_hands;
+
+  /// No description provided for @sett_progression_hands_left.
+  ///
+  /// In en, this message translates to:
+  /// **'Hands left'**
+  String get sett_progression_hands_left;
+
+  /// No description provided for @sett_progression_minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'N minutes'**
+  String get sett_progression_minutes;
+
+  /// No description provided for @sett_progression_minutes_left.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes left'**
+  String get sett_progression_minutes_left;
+
+  /// No description provided for @sett_progression_hands_interval.
+  ///
+  /// In en, this message translates to:
+  /// **'Hands interval'**
+  String get sett_progression_hands_interval;
+
+  /// No description provided for @sett_progression_minutes_interval.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes interval'**
+  String get sett_progression_minutes_interval;
+
+  /// No description provided for @sett_levels_count.
+  ///
+  /// In en, this message translates to:
+  /// **'Levels count'**
+  String get sett_levels_count;
+
+  /// No description provided for @sett_level.
+  ///
+  /// In en, this message translates to:
+  /// **'Lvl'**
+  String get sett_level;
+
+  /// No description provided for @sett_level_full.
+  ///
+  /// In en, this message translates to:
+  /// **'Level'**
+  String get sett_level_full;
+
+  /// No description provided for @sett_small_blind.
+  ///
+  /// In en, this message translates to:
+  /// **'Small blind'**
+  String get sett_small_blind;
+
+  /// No description provided for @sett_big_blind.
+  ///
+  /// In en, this message translates to:
+  /// **'Big blind'**
+  String get sett_big_blind;
+
+  /// No description provided for @sett_mode_simple.
+  ///
+  /// In en, this message translates to:
+  /// **'Simple'**
+  String get sett_mode_simple;
+
+  /// No description provided for @sett_mode_pro.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro'**
+  String get sett_mode_pro;
+
+  /// No description provided for @sett_level_blind.
+  ///
+  /// In en, this message translates to:
+  /// **'Blinds'**
+  String get sett_level_blind;
+
+  /// No description provided for @sett_level_ante.
+  ///
+  /// In en, this message translates to:
+  /// **'Ante'**
+  String get sett_level_ante;
+
+  /// No description provided for @ante_type_none.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get ante_type_none;
+
+  /// No description provided for @ante_type_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Traditional: All players pays (~10% of SB) before the blinds. BBA: Only BB pays (amount = 1BB) after the blinds, goes to main pot winner in full.'**
+  String get ante_type_tooltip;
+
+  /// No description provided for @ante_type_traditional.
+  ///
+  /// In en, this message translates to:
+  /// **'Traditional'**
+  String get ante_type_traditional;
+
+  /// No description provided for @ante_type_big_blind.
+  ///
+  /// In en, this message translates to:
+  /// **'BBA'**
+  String get ante_type_big_blind;
 
   /// No description provided for @toast_unav.
   ///
@@ -997,6 +1183,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your purchase is pending:'**
   String get toast_purchase_pending_state_named;
+
+  /// No description provided for @toast_level_clamp.
+  ///
+  /// In en, this message translates to:
+  /// **'Current level adjusted due to settings changes'**
+  String get toast_level_clamp;
+
+  /// No description provided for @toast_level_reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Level reverted, timer restarted'**
+  String get toast_level_reset;
+
+  /// No description provided for @toast_settings_undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings changes undone'**
+  String get toast_settings_undo;
 
   /// No description provided for @purchases_restore_button.
   ///
@@ -1115,14 +1319,26 @@ abstract class AppLocalizations {
   /// No description provided for @update_3.
   ///
   /// In en, this message translates to:
-  /// **'PRO users can now put their photos from the gallery to players'**
+  /// **'PRO users can their photos from the gallery to players'**
   String get update_3;
 
   /// No description provided for @update_4.
   ///
   /// In en, this message translates to:
-  /// **'PRO users can now undo their last game action'**
+  /// **'PRO users can undo their last game actions'**
   String get update_4;
+
+  /// No description provided for @update_5.
+  ///
+  /// In en, this message translates to:
+  /// **'PRO users can customize the blind structure in the settings'**
+  String get update_5;
+
+  /// No description provided for @update_6.
+  ///
+  /// In en, this message translates to:
+  /// **'Added the ability to customize the ante'**
+  String get update_6;
 
   /// No description provided for @pro_version_offer_title.
   ///
@@ -1169,7 +1385,7 @@ abstract class AppLocalizations {
   /// No description provided for @pro_version_offer_option_5.
   ///
   /// In en, this message translates to:
-  /// **'Saving game progress and frequent players'**
+  /// **'Saving players & game progress'**
   String get pro_version_offer_option_5;
 
   /// No description provided for @pro_version_offer_option_6.
@@ -1181,8 +1397,14 @@ abstract class AppLocalizations {
   /// No description provided for @pro_version_offer_option_7.
   ///
   /// In en, this message translates to:
-  /// **'Undo last action'**
+  /// **'Undo last actions'**
   String get pro_version_offer_option_7;
+
+  /// No description provided for @pro_version_offer_option_8.
+  ///
+  /// In en, this message translates to:
+  /// **'Blind structure in settings'**
+  String get pro_version_offer_option_8;
 
   /// No description provided for @pro_version_offer_button_purchased.
   ///
@@ -1201,6 +1423,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Currently unavailable'**
   String get pro_version_offer_button_not_available;
+
+  /// No description provided for @error_was_found.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occured'**
+  String get error_was_found;
+
+  /// No description provided for @error_copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy error info'**
+  String get error_copy;
+
+  /// No description provided for @error_retry_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get error_retry_button;
+
+  /// No description provided for @toast_sit_out_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Сannot be changed during betting'**
+  String get toast_sit_out_unavailable;
+
+  /// No description provided for @toast_sit_out_enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Player {name} will skip rounds'**
+  String toast_sit_out_enabled(Object name);
+
+  /// No description provided for @toast_sit_out_disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Player {name} is back in the game'**
+  String toast_sit_out_disabled(Object name);
+
+  /// No description provided for @sett_sit_out_mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Sit-Out Mode'**
+  String get sett_sit_out_mode;
+
+  /// No description provided for @sit_out_mode_cash.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash Game'**
+  String get sit_out_mode_cash;
+
+  /// No description provided for @sit_out_mode_tournament.
+  ///
+  /// In en, this message translates to:
+  /// **'Tournament'**
+  String get sit_out_mode_tournament;
+
+  /// No description provided for @sit_out_mode_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash Game: Player skips rounds.\nTournament: Player posts blinds/antes if required and auto-folds.'**
+  String get sit_out_mode_tooltip;
+
+  /// No description provided for @pro_version_offer_option_9.
+  ///
+  /// In en, this message translates to:
+  /// **'Tournament Sit-Out Mode'**
+  String get pro_version_offer_option_9;
+
+  /// No description provided for @update_7.
+  ///
+  /// In en, this message translates to:
+  /// **'Added pause (Sit-Out) feature for players'**
+  String get update_7;
 }
 
 class _AppLocalizationsDelegate

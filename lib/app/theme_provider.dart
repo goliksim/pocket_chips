@@ -47,7 +47,9 @@ class AppThemeBuilder extends ConsumerWidget {
     return ThemeProvider(
       key: CommonKeys.themeKey(theme),
       theme: theme,
-      child: builder(context, theme),
+      child: Builder(
+        builder: (context) => builder(context, theme),
+      ),
     );
   }
 }

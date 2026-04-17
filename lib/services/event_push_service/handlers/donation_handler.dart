@@ -7,10 +7,13 @@ class DonationHandler implements EventHandler {
   DateTime? _lastShowTime;
 
   final NavigationManager _navigationManager;
+  final Future<bool> Function() _isPurchasesReady;
 
   DonationHandler({
     required NavigationManager navigationManager,
-  }) : _navigationManager = navigationManager {
+    required Future<bool> Function() isPurchasesReady,
+  })  : _navigationManager = navigationManager,
+        _isPurchasesReady = isPurchasesReady {
     // The first showing after 15 minutes after first launch
     _lastShowTime = DateTime.now().subtract(Duration(minutes: 10));
   }
@@ -19,19 +22,20 @@ class DonationHandler implements EventHandler {
   EventType get type => EventType.donation;
 
   @override
-  bool isReady() {
-    final isReady = _lastShowTime == null ||
+  Future<bool> isReady() async {
+    final isTimeReady = _lastShowTime == null ||
         DateTime.now().difference(_lastShowTime!) > _cooldown;
 
-    if (isReady) {
-      return true;
+    if (!isTimeReady) {
+      final nextShowTime = _lastShowTime!.add(_cooldown);
+      final left = nextShowTime.difference(DateTime.now()).inSeconds;
+
+      logs.writeLog('DonationHandler is not ready, $left seconds left');
+      return false;
     }
-    final nextShowTime = _lastShowTime!.add(_cooldown);
-    final left = nextShowTime.difference(DateTime.now()).inSeconds;
 
-    logs.writeLog('DonationHandler is not ready, $left seconds left');
-
-    return false;
+    logs.writeLog('DonationHandler is ready, checking purchases');
+    return _isPurchasesReady();
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../app/keys/keys.dart';
 import '../../../../../services/assets_provider.dart';
+import '../../../../../services/toast_manager.dart';
 import '../../../../../utils/extensions.dart';
 import '../../../../../utils/theme/ui_values.dart';
 import 'raise_provider.dart';
@@ -9,11 +10,13 @@ import 'raise_provider.dart';
 class RaiseFieldWidget extends StatefulWidget {
   final int maxPossibleBet;
   final int minPossibleBet;
+  final int minRuleBet;
   final int currentBet;
 
   const RaiseFieldWidget({
     required this.maxPossibleBet,
     required this.minPossibleBet,
+    required this.minRuleBet,
     required this.currentBet,
     super.key,
   });
@@ -50,6 +53,18 @@ class RaiseFieldWidgetState extends State<RaiseFieldWidget> {
   List<int> _getChipsFromBetRange(int betRange) =>
       _chipsValues.where((value) => value <= betRange).toList();
 
+  void _changeBet(RaiseProviderScopeState provider, int newValue) {
+    final oldValue = provider.additionalBet;
+
+    provider.changeBet(newValue);
+
+    if (newValue < widget.minRuleBet && oldValue >= widget.minRuleBet) {
+      ToastManager().showToast(
+        context.strings.toast_custom_bet_warning,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = RaiseProviderScope.of(context);
@@ -76,7 +91,7 @@ class RaiseFieldWidgetState extends State<RaiseFieldWidget> {
 
                     if (bet + coin <= widget.maxPossibleBet) {
                       setState(() {
-                        provider.changeBet(bet + coin);
+                        _changeBet(provider, bet + coin);
                       });
                     }
                   },
@@ -86,11 +101,12 @@ class RaiseFieldWidgetState extends State<RaiseFieldWidget> {
             ),
             _RaiseSlider(
               minBet: widget.minPossibleBet,
+              minRuleBet: widget.minRuleBet,
               maxBet: widget.maxPossibleBet,
               currentBet: widget.currentBet,
               value: provider.additionalBet,
               onChanged: (newValue) {
-                provider.changeBet(newValue);
+                _changeBet(provider, newValue);
               },
             ),
           ],
@@ -167,6 +183,7 @@ class _CoinsRow extends StatelessWidget {
 /// Raise selection slider
 class _RaiseSlider extends StatefulWidget {
   final int minBet;
+  final int minRuleBet;
   final int value;
   final int maxBet;
   final int currentBet;
@@ -174,6 +191,7 @@ class _RaiseSlider extends StatefulWidget {
 
   const _RaiseSlider({
     required this.minBet,
+    required this.minRuleBet,
     required this.maxBet,
     required this.value,
     required this.onChanged,
@@ -203,6 +221,7 @@ class _RaiseSliderState extends State<_RaiseSlider> {
     super.initState();
   }
 
+  //TODO bad logic
   int get totalBetMin => widget.minBet + widget.currentBet;
   int get totalBetMax => widget.maxBet + widget.currentBet;
 
@@ -227,19 +246,43 @@ class _RaiseSliderState extends State<_RaiseSlider> {
                 ),
               ),
               Flexible(
-                child: Slider(
-                  key: GameControlKeys.raiseSlider,
-                  label: '$tmpBid',
-                  value: tmpBid.toDouble(),
-                  onChanged: (newValue) {
-                    widget.onChanged(newValue.toInt());
+                child: SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: Colors.transparent,
+                    inactiveTrackColor: Colors.transparent,
+                    secondaryActiveTrackColor: Colors.transparent,
+                    trackShape: _RaiseSliderTrackShape(
+                      minimum: widget.minBet,
+                      warningLimit: widget.minRuleBet,
+                      maximum: widget.maxBet,
+                      warningColor: context.theme.alertColor,
+                      regularColor: context.theme.secondaryColor,
+                      inactiveColor: context.theme.hintColor.withValues(
+                        alpha: 0.35,
+                      ),
+                    ),
+                    thumbColor: tmpBid < widget.minRuleBet
+                        ? context.theme.alertColor
+                        : context.theme.secondaryColor,
+                    overlayColor: (tmpBid < widget.minRuleBet
+                            ? context.theme.alertColor
+                            : context.theme.secondaryColor)
+                        .withValues(alpha: 0.15),
+                  ),
+                  child: Slider(
+                    key: GameControlKeys.raiseSlider,
+                    label: '$tmpBid',
+                    value: tmpBid.toDouble(),
+                    onChanged: (newValue) {
+                      widget.onChanged(newValue.toInt());
 
-                    setState(() {
-                      tmpBid = newValue.toInt();
-                    });
-                  },
-                  min: widget.minBet.toDouble(),
-                  max: widget.maxBet.toDouble(),
+                      setState(() {
+                        tmpBid = newValue.toInt();
+                      });
+                    },
+                    min: widget.minBet.toDouble(),
+                    max: widget.maxBet.toDouble(),
+                  ),
                 ),
               ),
               Text(
@@ -257,4 +300,120 @@ class _RaiseSliderState extends State<_RaiseSlider> {
           ),
         ),
       );
+}
+
+class _RaiseSliderTrackShape extends SliderTrackShape {
+  final int minimum;
+  final int warningLimit;
+  final int maximum;
+  final Color warningColor;
+  final Color regularColor;
+  final Color inactiveColor;
+
+  const _RaiseSliderTrackShape({
+    required this.minimum,
+    required this.warningLimit,
+    required this.maximum,
+    required this.warningColor,
+    required this.regularColor,
+    required this.inactiveColor,
+  });
+
+  @override
+  Rect getPreferredRect({
+    required RenderBox parentBox,
+    Offset offset = Offset.zero,
+    required SliderThemeData sliderTheme,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+  }) {
+    final trackHeight = sliderTheme.trackHeight ?? 4;
+    final trackLeft = offset.dx +
+        (sliderTheme.overlayShape
+                    ?.getPreferredSize(isEnabled, isDiscrete)
+                    .width ??
+                0) /
+            2;
+    final trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2;
+    final trackWidth = parentBox.size.width -
+        (sliderTheme.overlayShape
+                ?.getPreferredSize(isEnabled, isDiscrete)
+                .width ??
+            0);
+
+    return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
+  }
+
+  @override
+  void paint(
+    PaintingContext context,
+    Offset offset, {
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required Animation<double> enableAnimation,
+    required Offset thumbCenter,
+    Offset? secondaryOffset,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+    required TextDirection textDirection,
+  }) {
+    final canvas = context.canvas;
+    final trackRect = getPreferredRect(
+      parentBox: parentBox,
+      offset: offset,
+      sliderTheme: sliderTheme,
+      isEnabled: isEnabled,
+      isDiscrete: isDiscrete,
+    );
+
+    final radius = Radius.circular(trackRect.height / 2);
+    final trackRRect = RRect.fromRectAndRadius(trackRect, radius);
+    canvas.drawRRect(trackRRect, Paint()..color = inactiveColor);
+
+    if (maximum <= minimum) {
+      return;
+    }
+
+    final warningClamped = warningLimit.clamp(minimum, maximum).toDouble();
+    final warningRatio = (warningClamped - minimum) / (maximum - minimum);
+    final warningWidth = trackRect.width * warningRatio;
+
+    if (warningWidth > 0) {
+      final warningRect = Rect.fromLTWH(
+        trackRect.left,
+        trackRect.top,
+        warningWidth,
+        trackRect.height,
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndCorners(
+          warningRect,
+          topLeft: radius,
+          bottomLeft: radius,
+          topRight: warningWidth >= trackRect.width ? radius : Radius.zero,
+          bottomRight: warningWidth >= trackRect.width ? radius : Radius.zero,
+        ),
+        Paint()..color = warningColor,
+      );
+    }
+
+    if (warningWidth < trackRect.width) {
+      final regularRect = Rect.fromLTWH(
+        trackRect.left + warningWidth,
+        trackRect.top,
+        trackRect.width - warningWidth,
+        trackRect.height,
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndCorners(
+          regularRect,
+          topLeft: warningWidth <= 0 ? radius : Radius.zero,
+          bottomLeft: warningWidth <= 0 ? radius : Radius.zero,
+          topRight: radius,
+          bottomRight: radius,
+        ),
+        Paint()..color = regularColor,
+      );
+    }
+  }
 }

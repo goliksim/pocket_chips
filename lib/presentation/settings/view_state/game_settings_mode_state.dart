@@ -1,0 +1,4 @@
+enum GameSettingsModeState {
+  simple,
+  pro;
+}

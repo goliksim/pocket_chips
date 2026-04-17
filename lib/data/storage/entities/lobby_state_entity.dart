@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../../domain/models/game/game_state_enum.dart';
+import 'lobby_game_settings_entity.dart';
 import 'player_entity.dart';
 
 part 'lobby_state_entity.g.dart';
@@ -8,17 +9,19 @@ part 'lobby_state_entity.g.dart';
 @JsonSerializable()
 class LobbyStateEntity {
   final GameStatusEnum gameState;
-  final int smallBlindValue;
+  final int? smallBlindValue;
   final int defaultBank;
+  final LobbyGameSettingsEntity? settings;
 
   final List<PlayerEntity>? players;
   final Map<String, int>? banks;
   final String? dealerId;
 
   const LobbyStateEntity({
-    required this.smallBlindValue,
+    this.smallBlindValue,
     required this.defaultBank,
     required this.gameState,
+    this.settings,
     this.players,
     this.banks,
     this.dealerId,
@@ -31,5 +34,5 @@ class LobbyStateEntity {
 
   @override
   String toString() =>
-      '[LobbyStateEntity] - players: $players, banks: $banks, smallBlindValue: $smallBlindValue, dealerId: $dealerId, defaultBank: $defaultBank, gameState: $gameState';
+      '[LobbyStateEntity] - players: $players, banks: $banks, smallBlindValue: $smallBlindValue, dealerId: $dealerId, defaultBank: $defaultBank, gameState: $gameState, settings: $settings';
 }

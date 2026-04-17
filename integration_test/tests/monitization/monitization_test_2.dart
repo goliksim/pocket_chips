@@ -4,14 +4,14 @@ import 'package:patrol_finders/patrol_finders.dart';
 import 'package:pocket_chips/app/application.dart';
 import 'package:pocket_chips/di/domain_managers.dart';
 import 'package:pocket_chips/di/repositories.dart';
-import 'package:pocket_chips/domain/models/config_model.dart';
 import 'package:pocket_chips/domain/repositories/app_repository.dart';
 
-import '../../mocks/google_ads_manager_mock.dart' hide MockScenario;
 import '../../mocks/purchases_repository_mock.dart';
+import '../../mocks/video_ads_manager_mock.dart' hide MockScenario;
 import '../../pages/donation_page.dart';
 import '../../pages/home_page.dart';
 import '../../test_utils/test_action.dart';
+import '../../test_utils/test_utils.dart';
 
 /// [MonitizationTest]
 /// Cached PRO mode
@@ -20,12 +20,7 @@ Future<void> runMonitizationTest2(
   PatrolTester tester,
   AppRepository repository,
 ) async {
-  final mockConfig = ConfigModel(
-    isDark: false,
-    firstLaunch: false,
-    locale: 'en',
-    version: '2.0.0',
-  );
+  final mockConfig = await defaultConfig();
 
   final mockPurchasesRepository =
       MockPurchasesRepository(hasPurchasesForRestore: true)
@@ -54,7 +49,7 @@ Future<void> runMonitizationTest2(
           proVersionRepositoryProvider.overrideWithValue(
             mockPurchasesRepository,
           ),
-          googleAdsManagerProvider.overrideWith(() => mockGoogleAdsManager),
+          videoAdsManagerProvider.overrideWith(() => mockGoogleAdsManager),
         ],
         child: const MyApp(),
       ),

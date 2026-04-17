@@ -7,6 +7,9 @@ import '../../../app/navigation/navigation_manager.dart';
 import '../../../di/domain_managers.dart';
 import '../../../di/model_holders.dart';
 import '../../../domain/model_holders/game_state_machine/game_state_machine.dart';
+import '../../../domain/models/game/blind_level_model.dart';
+import '../../../domain/models/game/blind_progression_model.dart';
+import '../../../domain/models/game/game_progression_state.dart';
 import '../../../domain/models/game/game_state_effect.dart';
 import '../../../domain/models/game/game_state_enum.dart';
 import '../../../domain/models/game/game_state_model.dart';
@@ -35,15 +38,22 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
   ToastManager get _toastManager => ref.read(toastManagerProvider);
   PromotionManager get _promotionManager => ref.read(promotionManagerProvider);
 
+  DateTime get _nowUtc => ref.read(currentTimeProvider)();
+
+  Timer? _minuteRefreshTimer;
+
   GamePageViewState get viewState => state.requireValue;
 
   @override
   FutureOr<GamePageViewState> build() async {
     logs.writeLog('GameVM: BUILDING STATE');
+    ref.onDispose(_disposeMinuteRefreshTimer);
 
     final gameModel = await ref.watch(gameStateMachineProvider.future);
     final gameState = gameModel.lobbyState.gameState;
     final players = gameModel.lobbyState.players;
+
+    _syncMinuteRefreshTimer(gameModel);
 
     final effects = gameModel.effects;
     if (effects.isNotEmpty) {
@@ -79,12 +89,27 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
                   isCurrent: p.uid == gameModel.sessionState.currentPlayerUid,
                   isFolded:
                       gameModel.sessionState.foldedPlayers.contains(p.uid),
+                  isSitOut:
+                      gameModel.sessionState.sitOutPlayers.contains(p.uid),
                   bank: gameModel.lobbyState.banks[p.uid] ?? 0,
                   bet: gameModel.sessionState.bets[p.uid] ?? 0,
+                  ante: gameModel.sessionState.anteBets[p.uid] ?? 0,
                 ))
             .toList(),
         // TODO: players noise offset
-        smallBlindValue: gameModel.lobbyState.smallBlindValue,
+        smallBlindValue: gameModel.currentSmallBlindValue,
+        showProgression:
+            gameModel.lobbyState.settings.progression.levels.length > 1,
+        progressionType:
+            gameModel.lobbyState.settings.progression.progressionType,
+        anteType: gameModel.currentAnteType,
+        anteValue: gameModel.currentAnteValue,
+        progressionLevel:
+            gameModel.sessionState.progressionState.currentLevelIndex + 1,
+        leftInterval: _getIntervalLeft(
+          gameModel.sessionState.progressionState,
+          gameModel.lobbyState.settings.progression.progressionInterval,
+        ),
       ),
       gameStatus: gameState,
       currentPlayerName: gameModel.currentPlayer?.name,
@@ -95,6 +120,33 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
   bool get canUndoAction => _gameStateMachine.canUndoAction;
 
   Future<void> undoLastAction() => _gameStateMachine.undoLastAction();
+
+  Future<void> toggleSitOut(String playerUid) async {
+    final player = state.requireValue.tableState.players
+        .firstWhere((p) => p.uid == playerUid);
+
+    try {
+      if (!state.requireValue.canEditPlayer) {
+        return _toastManager.showToast(_strings.toast_sit_out_unavailable);
+      }
+
+      final performed = await _gameStateMachine.toggleSitOut(playerUid);
+
+      if (performed) {
+        _toastManager.showToast(
+          player.isSitOut
+              ? _strings.toast_sit_out_disabled(player.name)
+              : _strings.toast_sit_out_enabled(player.name),
+        );
+      }
+    } catch (error) {
+      logs.writeLog(
+        'GameVM: error toggling sit out for player ${player.name} - $error',
+      );
+    }
+
+    return;
+  }
 
   Future<void> openPlayerEditor(String? playerUid) async {
     if (state.requireValue.canEditPlayer) {
@@ -127,81 +179,107 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
       );
 
   @override
-  Future<void> openSettings() async {
-    await _navigationManager.showLobbySettings();
-
-    //Rebuild after lobbyEditing
-    _gameStateMachine.runBuild();
-  }
+  Future<void> openSettings() => _navigationManager.showGameSettings();
 
   @override
   Future<void> startBetting() async => _gameStateMachine.startBetting();
 
+  @override
+  Future<void> increaseGameLevel() async => _gameStateMachine.nextLevel();
+
   GamePageControlState _getControlState(GameStateModel gameModel) {
-    try {
-      final gameState = gameModel.lobbyState.gameState;
-      final currentPlayerUid = gameModel.sessionState.currentPlayerUid;
+    final gameState = gameModel.lobbyState.gameState;
+    final currentPlayerUid = gameModel.sessionState.currentPlayerUid;
 
-      switch (gameState) {
-        case GameStatusEnum.notStarted:
-        case GameStatusEnum.gameBreak:
-          return GamePageControlState.breakdown(
-            canStartBetting: gameModel.canStartOrContinueGame,
-          );
-        case GameStatusEnum.showdown:
-          return GamePageControlState.showdown();
-
-        default:
-          break;
-      }
-
-      if (currentPlayerUid == null) {
+    switch (gameState) {
+      case GameStatusEnum.notStarted:
+      case GameStatusEnum.gameBreak:
+        return GamePageControlState.breakdown(
+          canStartBetting: gameModel.canStartOrContinueGame,
+          canIncreaseLevel: gameModel.canIncreaseLevel,
+        );
+      case GameStatusEnum.showdown:
         return GamePageControlState.showdown();
-      }
 
-      final maxBet = gameModel.sessionState.bets.values.maxOrNull ?? 0;
-      final currentBank =
-          gameModel.lobbyState.banks[gameModel.sessionState.currentPlayerUid] ??
-              0;
-      final currentBet = gameModel
-              .sessionState.bets[gameModel.sessionState.currentPlayerUid] ??
-          0;
-
-      final (raiseBank, raiseIsAllIn) =
-          gameModel.calculateRaiseValue(currentPlayerUid);
-
-      final (callValue, callIsAllIn) =
-          gameModel.calculateCallValue(currentPlayerUid);
-      final betBool = gameModel.checkBidsEqual();
-
-      final currentPlayerCanSkip = (currentBet == maxBet);
-      final canRaise =
-          !callIsAllIn && (currentBank > raiseBank || raiseIsAllIn);
-
-      final isFirstBet = betBool && gameState != GameStatusEnum.preFlop;
-
-      final maxPossibleBet = currentBank;
-      final minPossibleBet = raiseBank;
-
-      return GamePageControlState.active(
-        raiseState: RaiseControlState(
-          canRaise: canRaise,
-          raiseIsAllIn: raiseIsAllIn,
-          isFirstBet: isFirstBet,
-          maxPossibleBet: maxPossibleBet,
-          minPossibleBet: minPossibleBet,
-          currentBet: currentBet,
-        ),
-        mainState: currentPlayerCanSkip
-            ? MainControlState.check()
-            : MainControlState.call(
-                callIsAllIn: callIsAllIn,
-                callValue: callValue,
-              ),
-      );
-    } catch (e) {
-      throw Exception();
+      default:
+        break;
     }
+
+    if (currentPlayerUid == null) {
+      return GamePageControlState.showdown();
+    }
+
+    final maxBet = gameModel.sessionState.bets.values.maxOrNull ?? 0;
+    final currentBank =
+        gameModel.lobbyState.banks[gameModel.sessionState.currentPlayerUid] ??
+            0;
+    final currentBet =
+        gameModel.sessionState.bets[gameModel.sessionState.currentPlayerUid] ??
+            0;
+
+    final (minRaiseValue, raiseIsAllIn) =
+        gameModel.calculateRaiseValue(currentPlayerUid);
+
+    final (callValue, callIsAllIn) =
+        gameModel.calculateCallValue(currentPlayerUid);
+
+    final allowCustomBets = gameModel.lobbyState.settings.allowCustomBets;
+
+    final bool canCheck = (currentBet == maxBet);
+    final bool canRaise;
+    final bool canAllIn;
+
+    final int minPossibleBet;
+    final int maxPossibleBet = currentBank;
+    final int minRuleBet = [maxPossibleBet, minRaiseValue].min;
+
+    if (allowCustomBets) {
+      canRaise = !callIsAllIn;
+      canAllIn = false;
+      minPossibleBet = callValue;
+    } else {
+      canRaise = !callIsAllIn && (currentBank > minRaiseValue);
+      canAllIn = !callIsAllIn && raiseIsAllIn;
+      minPossibleBet = minRaiseValue;
+    }
+
+    final isFirstBet =
+        gameModel.checkBidsEqual() && gameState != GameStatusEnum.preFlop;
+
+    return GamePageControlState.active(
+      raiseState: RaiseControlState(
+        canRaise: canRaise,
+        raiseIsAllIn: canAllIn,
+        isFirstBet: isFirstBet,
+        maxPossibleBet: maxPossibleBet,
+        minPossibleBet: minPossibleBet,
+        minRuleBet: minRuleBet,
+        currentBet: currentBet,
+      ),
+      mainState: canCheck
+          ? MainControlState.check()
+          : MainControlState.call(
+              callIsAllIn: callIsAllIn,
+              // TODO: move this logic to UI or replace
+              callValue: callIsAllIn ? callValue + currentBet : callValue,
+            ),
+    );
+  }
+
+  int? _getIntervalLeft(
+    GameProgressionState progressionState,
+    int? intervalMin,
+  ) {
+    if (intervalMin == null) return null;
+
+    if (progressionState.handsFromLevelStart != null) {
+      return progressionState.handsUntilNextLevel(intervalMin: intervalMin);
+    }
+    if (progressionState.levelTimerStartMsUtc != null) {}
+    return progressionState.minutesUntilNextLevelAt(
+      _nowUtc,
+      intervalMin: intervalMin,
+    );
   }
 
   Future<void> _executeEffect({
@@ -228,18 +306,23 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         logs.writeLog('GameVM: calling winner selector');
 
         final players = stateModel.lobbyState.players
-            .where((p) => effect.possibleWinnersUid.contains(p.uid));
+            .where((p) => effect.playerContributions.keys.contains(p.uid));
 
         final winners = await _navigationManager.showWinnerChooseDialog(
           WinnerChoiceArgs(
-            title: effect.isSideSpot ? _strings.game_win4 : _strings.game_win3,
+            isSidePot: effect.isSideSpot,
+            potValue: effect.potValue,
+            anteValue: effect.anteValue,
+            foldedValue: effect.foldedValue,
             possibleWinners: players
                 .map(
                   (p) => PossibleWinnerItem(
                     name: p.name,
                     assetUrl: p.assetUrl,
                     uid: p.uid,
-                    bid: stateModel.sessionState.bets[p.uid] ?? 0,
+                    bid: effect.playerContributions[p.uid] ?? 0,
+                    totalBet: stateModel.sessionState.bets[p.uid] ?? 0,
+                    totalAnte: stateModel.sessionState.anteBets[p.uid] ?? 0,
                   ),
                 )
                 .toList(),
@@ -253,5 +336,36 @@ class GamePageViewModel extends AsyncNotifier<GamePageViewState>
         }
       },
     );
+  }
+
+  void _syncMinuteRefreshTimer(GameStateModel gameModel) {
+    final progressionState = gameModel.sessionState.progressionState;
+    final shouldRefreshEveryMinute =
+        gameModel.lobbyState.gameState.canEditPlayers &&
+            gameModel.lobbyState.settings.progression.progressionType ==
+                BlindProgressionType.everyNMinutes &&
+            progressionState.levelTimerStartMsUtc != null;
+
+    if (!shouldRefreshEveryMinute) {
+      _disposeMinuteRefreshTimer();
+      return;
+    }
+
+    _minuteRefreshTimer?.cancel();
+
+    _minuteRefreshTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) {
+        if (ref.mounted) {
+          // Just trigger state rebuild to update progression and level increasement
+          _gameStateMachine.refreshByTimer();
+        }
+      },
+    );
+  }
+
+  void _disposeMinuteRefreshTimer() {
+    _minuteRefreshTimer?.cancel();
+    _minuteRefreshTimer = null;
   }
 }

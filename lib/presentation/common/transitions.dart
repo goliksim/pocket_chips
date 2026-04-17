@@ -4,6 +4,8 @@
 
 library;
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../../utils/theme/ui_values.dart';
@@ -20,7 +22,7 @@ Future<T?> transitionDialog<T>({
   required Widget child,
   DialogTransitionType type = DialogTransitionType.scale,
   Duration duration = const Duration(milliseconds: 400),
-  Color barrierColor = const Color(0x80000000),
+  Color barrierColor = const Color.fromARGB(182, 9, 7, 11),
 }) {
   final ThemeData theme = Theme.of(context);
   return showGeneralDialog<T>(
@@ -43,7 +45,7 @@ Future<T?> transitionDialog<T>({
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     barrierColor: barrierColor,
     transitionDuration: duration,
-    transitionBuilder: getTransitionBuilder(type),
+    transitionBuilder: getTransitionBuilderWithBlur(type),
   );
 }
 
@@ -57,6 +59,25 @@ Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
     case DialogTransitionType.slideDown:
       return _dialogSlideDown;
   }
+}
+
+Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+    getTransitionBuilderWithBlur(DialogTransitionType type) {
+  final baseBuilder = getTransitionBuilder(type);
+
+  return (context, animation, secondaryAnimation, child) {
+    final baseWidget =
+        baseBuilder?.call(context, animation, secondaryAnimation, child) ??
+            child;
+
+    return BackdropFilter(
+      filter: ImageFilter.blur(
+        sigmaX: 10 * animation.value,
+        sigmaY: 10 * animation.value,
+      ),
+      child: baseWidget,
+    );
+  };
 }
 
 Widget _dialogScale(
